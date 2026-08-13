@@ -1,83 +1,24 @@
-import {
-  Apple,
-  ArrowRight,
-  Cake,
-  Carrot,
-  IceCream,
-  Milk,
-  ShoppingBasket,
-  type LucideIcon,
-} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
 
 /**
- * PART 5 — the "Shop by Category" grid: a tinted card per category with real
- * product photos, a small icon badge, a title + subtitle, and a circular
- * arrow button — matching the client's own Planeat reference exactly (its
- * Vegetables and Fruits cards).
- *
- * The data (`collages` on `HomePayload`) was built in Phase 0/1 for exactly
- * this and simply had no consumer yet — `getHomePayload` already returns up
- * to 4 image URLs and the remaining count per category in one query, so this
- * component is pure presentation.
+ * PART 5 — the "Shop by Category" grid: a real 2×2 photo collage per
+ * category with a "+N more" count overlaid on the images themselves, and a
+ * plain title underneath. Matches the client's second reference (the
+ * grouped-by-category rail): white card, no per-category theming, the photos
+ * do the selling.
  */
 
-const STYLE: Record<
-  string,
-  { icon: LucideIcon; badgeBg: string; badgeFg: string; cardBg: string; arrowBg: string }
-> = {
-  vegetables: {
-    icon: Carrot,
-    badgeBg: 'bg-primary/15',
-    badgeFg: 'text-primary-dark',
-    cardBg: 'bg-tint-green',
-    arrowBg: 'bg-primary-dark',
-  },
-  fruits: {
-    icon: Apple,
-    badgeBg: 'bg-[#F5A62333]',
-    badgeFg: 'text-[#C97A17]',
-    cardBg: 'bg-tint-yellow',
-    arrowBg: 'bg-[#C97A17]',
-  },
-  dairy: {
-    icon: Milk,
-    badgeBg: 'bg-[#2C5C8F26]',
-    badgeFg: 'text-[#2C5C8F]',
-    cardBg: 'bg-[#E8EFF7]',
-    arrowBg: 'bg-[#2C5C8F]',
-  },
-  'bakery-biscuits': {
-    icon: Cake,
-    badgeBg: 'bg-[#8A5A2B26]',
-    badgeFg: 'text-[#8A5A2B]',
-    cardBg: 'bg-[#F6EBDD]',
-    arrowBg: 'bg-[#8A5A2B]',
-  },
-  'ice-cream': {
-    icon: IceCream,
-    badgeBg: 'bg-[#A8365C26]',
-    badgeFg: 'text-[#A8365C]',
-    cardBg: 'bg-[#FBE7EE]',
-    arrowBg: 'bg-[#A8365C]',
-  },
-  grocery: {
-    icon: ShoppingBasket,
-    badgeBg: 'bg-[#5C6B6226]',
-    badgeFg: 'text-[#5C6B62]',
-    cardBg: 'bg-[#EEF0E4]',
-    arrowBg: 'bg-[#5C6B62]',
-  },
-};
-
-const DEFAULT_STYLE = {
-  icon: ShoppingBasket,
-  badgeBg: 'bg-secondary',
-  badgeFg: 'text-muted-foreground',
-  cardBg: 'bg-secondary',
-  arrowBg: 'bg-foreground',
-};
+// Fewer than 4 photos reads as a gap unless the grid itself adapts: 1 photo
+// fills the whole cell, 2 sit side by side, 3 gives the first one double
+// height so nothing looks like a missing tile.
+function spanClass(index: number, total: number): string {
+  if (total <= 1) return 'col-span-2 row-span-2';
+  if (total === 2) return 'col-span-1 row-span-2';
+  if (total === 3 && index === 0) return 'col-span-1 row-span-2';
+  return 'col-span-1 row-span-1';
+}
 
 export function CategoryCollageTile({
   slug,
@@ -91,8 +32,6 @@ export function CategoryCollageTile({
   moreCount: number;
 }) {
   const t = useTranslations('home');
-  const style = STYLE[slug] ?? DEFAULT_STYLE;
-  const Icon = style.icon;
 
   // Only the two categories the reference actually specifies get a written
   // subtitle; inventing marketing copy for the other four would be a claim
@@ -102,47 +41,32 @@ export function CategoryCollageTile({
   return (
     <Link
       href={`/category/${slug}`}
-      className={`relative flex h-[168px] flex-col overflow-hidden rounded-[var(--radius)] p-3 transition-transform active:scale-[0.98] ${style.cardBg}`}
+      className="flex flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-card shadow-sm transition-transform active:scale-[0.98]"
     >
-      <span
-        className={`grid size-8 shrink-0 place-items-center rounded-full ${style.badgeBg} ${style.badgeFg}`}
-      >
-        <Icon className="size-4" aria-hidden />
-      </span>
+      <div className="relative aspect-[4/3] w-full bg-secondary">
+        {images.length > 0 && (
+          <div className="grid size-full grid-cols-2 grid-rows-2 gap-0.5">
+            {images.map((src, index) => (
+              <div key={src} className={cn('overflow-hidden', spanClass(index, images.length))}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt="" aria-hidden loading="lazy" className="size-full object-cover" />
+              </div>
+            ))}
+          </div>
+        )}
 
-      {/* One real photo rather than a grid of disconnected thumbnails — the
-          reference's own cards read as a single staged arrangement, and a
-          2×2 of separate squares reads as a UI pattern instead. */}
-      {images.length > 0 && (
-        <div className="mt-2 flex-1 overflow-hidden rounded-xl shadow-sm">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={images[0]}
-            alt=""
-            aria-hidden
-            loading="lazy"
-            className="size-full object-cover"
-          />
-        </div>
-      )}
+        {moreCount > 0 && (
+          <span className="absolute right-1.5 bottom-1.5 rounded-full bg-black/65 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-sm">
+            {t('moreCount', { count: moreCount })}
+          </span>
+        )}
+      </div>
 
-      <div className="mt-2 flex items-end justify-between gap-2">
-        <div className="min-w-0">
-          <p className="truncate text-[15px] leading-tight font-black">{name}</p>
-          {subtitle && (
-            <p className="truncate text-[11px] font-medium text-muted-foreground">{subtitle}</p>
-          )}
-          {!subtitle && moreCount > 0 && (
-            <p className="truncate text-[11px] font-medium text-muted-foreground">
-              {t('moreCount', { count: moreCount })}
-            </p>
-          )}
-        </div>
-        <span
-          className={`grid size-8 shrink-0 place-items-center rounded-full text-white ${style.arrowBg}`}
-        >
-          <ArrowRight className="size-4" aria-hidden />
-        </span>
+      <div className="p-3">
+        <p className="truncate text-[15px] leading-tight font-black">{name}</p>
+        {subtitle && (
+          <p className="truncate text-[11px] font-medium text-muted-foreground">{subtitle}</p>
+        )}
       </div>
     </Link>
   );
