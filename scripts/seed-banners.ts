@@ -30,22 +30,6 @@ const BANNERS = [
     titleEn: 'Fresh vegetables, fresh health!',
     sortOrder: 0,
   },
-  {
-    imageUrl: url('welcome-offer', '/banners/welcome-offer.jpg'),
-    titleMr: 'पहिल्या ऑर्डरवर ₹50 सूट!',
-    titleHi: 'पहले ऑर्डर पर ₹50 की छूट!',
-    titleEn: '₹50 off your first order!',
-    linkUrl: null,
-    sortOrder: 1,
-  },
-  {
-    imageUrl: url('fresh-daily', '/banners/fresh-daily.jpg'),
-    titleMr: 'ताजा भाजीपाला, रोज घरपोच',
-    titleHi: 'ताज़ी सब्ज़ियां, रोज़ घर पर',
-    titleEn: 'Fresh veggies, delivered daily',
-    linkUrl: '/category/vegetables',
-    sortOrder: 2,
-  },
 ];
 
 async function main(): Promise<void> {

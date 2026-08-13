@@ -1,7 +1,8 @@
 import { defineRouting } from 'next-intl/routing';
 
 /**
- * B15 — Marathi is the default language, not a localisation checkbox.
+ * B15 — the client set the default language explicitly rather than relying
+ * on browser detection.
  *
  * `localePrefix: 'always'` keeps every URL explicit (`/mr/...`, `/hi/...`,
  * `/en/...`). Ambiguous root URLs are the usual source of "why is my page
@@ -12,7 +13,7 @@ import { defineRouting } from 'next-intl/routing';
 export const LOCALES = ['mr', 'hi', 'en'] as const;
 export type AppLocale = (typeof LOCALES)[number];
 
-export const DEFAULT_LOCALE: AppLocale = 'mr';
+export const DEFAULT_LOCALE: AppLocale = 'en';
 
 export const LOCALE_LABELS: Record<AppLocale, string> = {
   mr: 'मराठी',
