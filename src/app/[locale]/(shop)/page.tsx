@@ -2,6 +2,7 @@ import { Bike, ChevronRight, Heart, LayoutGrid, Leaf, Sprout, Truck } from 'luci
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { AppHeader } from '@/components/shop/app-header';
+import { BannerCarousel } from '@/components/shop/banner-carousel';
 import { CategoryCollageTile } from '@/components/shop/category-collage-tile';
 import { ProductCard } from '@/components/shop/product-card';
 import { getHomePayload } from '@/lib/catalog/queries';
@@ -56,13 +57,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       <main className="px-4 py-4">
         {banners.length > 0 ? (
-          <ul className="mb-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1">
-            {banners.map((banner) => (
-              <li key={banner.id} className="w-full shrink-0 snap-start">
-                <ImageBanner imageUrl={banner.imageUrl} title={banner.title} />
-              </li>
-            ))}
-          </ul>
+          <BannerCarousel banners={banners} />
         ) : (
           <div className="mb-6">
             <HeroBanner
@@ -129,9 +124,13 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               </Link>
             </div>
 
-            <ul className="grid grid-cols-2 gap-3">
+            {/* A horizontal rail, not a 2-column grid: the reference shows
+                four narrow cards side by side that scroll sideways, which
+                keeps "Top Picks" one glanceable row instead of a block that
+                pushes everything below it off the screen. */}
+            <ul className="-mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {bestsellers.map((product) => (
-                <li key={product.id}>
+                <li key={product.id} className="w-[42vw] max-w-[168px] shrink-0 snap-start">
                   <ProductCard
                     product={{
                       id: product.id,
@@ -221,21 +220,6 @@ function HeroBanner({
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-/**
- * A real promotional graphic the owner uploaded from the admin panel
- * (`Banner.imageUrl`) — previously ignored entirely; only `title` was ever
- * rendered, on a generic decorative card, so an uploaded creative never
- * actually showed up. This is the fix: the image IS the banner.
- */
-function ImageBanner({ imageUrl, title }: { imageUrl: string; title: string }) {
-  return (
-    <div className="relative h-40 overflow-hidden rounded-[var(--radius)] bg-secondary">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={imageUrl} alt={title} className="size-full object-cover" />
     </div>
   );
 }

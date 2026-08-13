@@ -1,6 +1,6 @@
 'use client';
 
-import { ImageIcon } from 'lucide-react';
+import { ImageIcon, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useCart } from '@/hooks/use-cart';
@@ -70,7 +70,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       >
         <div
           className={cn(
-            'relative mb-2 grid aspect-square place-items-center overflow-hidden rounded-[calc(var(--radius)-4px)] bg-secondary',
+            'relative mb-2 grid aspect-square place-items-center overflow-hidden rounded-[calc(var(--radius)-4px)] bg-white',
             !product.inStock && 'opacity-45 grayscale',
           )}
         >
@@ -106,48 +106,54 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           </p>
         )}
 
-        <div className="mt-1.5 flex items-baseline gap-1.5">
-          <span className="text-sm font-bold">{formatPaise(price, { hidePaise: true })}</span>
-          {hasDiscount && (
-            <span className="text-[11px] text-muted-foreground line-through">
-              {formatPaise(mrp, { hidePaise: true })}
-            </span>
-          )}
-        </div>
       </Link>
 
-      <div className="mt-2">
+      {/* Price and the add control share one row, as in the reference — the
+          price sits bottom-left and a compact round + sits bottom-right,
+          rather than a full-width ADD bar under the card. */}
+      <div className="mt-1.5 flex items-end justify-between gap-2">
+        <div className="min-w-0">
+          <div className="flex items-baseline gap-1">
+            <span className="text-[15px] font-bold">
+              {formatPaise(price, { hidePaise: true })}
+            </span>
+            {hasDiscount && (
+              <span className="text-[11px] text-muted-foreground line-through">
+                {formatPaise(mrp, { hidePaise: true })}
+              </span>
+            )}
+          </div>
+          {variant && product.inStock && variant.stockQty <= variant.lowStockThreshold && (
+            <p className="mt-0.5 text-[10px] font-medium text-warning">
+              {t('lowStock', { count: variant.stockQty })}
+            </p>
+          )}
+        </div>
+
         {!product.inStock || !variant ? (
-          <button
-            type="button"
-            className="h-11 w-full rounded-[var(--radius)] border border-border text-xs font-semibold text-muted-foreground"
-            disabled
-          >
+          <span className="shrink-0 text-[10px] font-semibold text-muted-foreground">
             {t('outOfStock')}
-          </button>
+          </span>
         ) : quantity === 0 ? (
           <button
             type="button"
             onClick={handleAdd}
-            className="h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground shadow-sm"
+            aria-label={`${t('add')} ${product.name}`}
+            className="grid size-9 shrink-0 place-items-center rounded-xl bg-tint-green text-primary-dark"
           >
-            {t('add')}
+            <Plus className="size-4.5" strokeWidth={2.6} aria-hidden />
           </button>
         ) : (
-          <QtyStepper
-            quantity={quantity}
-            onIncrement={() => cart.increment(variant.id)}
-            onDecrement={() => cart.decrement(variant.id)}
-            disabled={cart.isMutating}
-            max={variant.stockQty}
-            label={product.name}
-          />
-        )}
-
-        {variant && product.inStock && variant.stockQty <= variant.lowStockThreshold && (
-          <p className="mt-1 text-center text-[10px] font-medium text-warning">
-            {t('lowStock', { count: variant.stockQty })}
-          </p>
+          <div className="shrink-0">
+            <QtyStepper
+              quantity={quantity}
+              onIncrement={() => cart.increment(variant.id)}
+              onDecrement={() => cart.decrement(variant.id)}
+              disabled={cart.isMutating}
+              max={variant.stockQty}
+              label={product.name}
+            />
+          </div>
         )}
       </div>
     </article>
