@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="mr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1B7A43" />
+    <title>Planeat — ऑफलाइन</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        background: #fdfcf8;
+        color: #1a1a1a;
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+      }
+      .mark {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+      }
+      h1 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        margin: 0;
+      }
+      p {
+        font-size: 0.875rem;
+        color: #6b6b6b;
+        margin: 0;
+        max-width: 320px;
+        line-height: 1.5;
+      }
+      button {
+        margin-top: 0.5rem;
+        height: 44px;
+        padding: 0 1.5rem;
+        border-radius: 999px;
+        border: none;
+        background: #1b7a43;
+        color: #fdfcf8;
+        font-size: 0.875rem;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <img class="mark" src="/icons/icon-192.png" alt="" />
+    <h1>इंटरनेट कनेक्शन नाही</h1>
+    <p>
+      कृपया तुमचे इंटरनेट कनेक्शन तपासा आणि पुन्हा प्रयत्न करा.<br />
+      No internet connection. Please check your connection and try again.<br />
+      इंटरनेट कनेक्शन नहीं है। कृपया अपना कनेक्शन जांचें।
+    </p>
+    <button onclick="location.reload()">पुन्हा प्रयत्न करा · Retry</button>
+  </body>
+</html>

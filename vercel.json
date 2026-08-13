@@ -1,0 +1,31 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["sin1"],
+  "framework": "nextjs",
+  "crons": [
+    {
+      "path": "/api/cron/generate-daily-orders",
+      "schedule": "0 19 * * *"
+    },
+    {
+      "path": "/api/cron/retry-failed-payments",
+      "schedule": "30 2 * * *"
+    },
+    {
+      "path": "/api/cron/send-tomorrow-preview",
+      "schedule": "30 14 * * *"
+    },
+    {
+      "path": "/api/cron/expire-subscriptions",
+      "schedule": "0 20 * * *"
+    },
+    {
+      "path": "/api/cron/reconcile-payments",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/send-notifications",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}

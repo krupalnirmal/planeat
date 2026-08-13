@@ -1,0 +1,1064 @@
+// Planeat — Prisma schema
+// TiDB Cloud (MySQL-compatible). relationMode = "prisma" means the DATABASE does not
+// create foreign-key indexes for us, so EVERY foreign key column below carries an
+// explicit @@index. Removing one turns a lookup into a full table scan. See PART 8.
+//
+// Money is ALWAYS integer paise stored as BigInt (R4). Never Float, never Decimal.
+// Timestamps are UTC. Ids are prefixed CUIDs generated in application code.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider     = "mysql"
+  relationMode = "prisma"
+}
+
+// ─────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────
+
+enum UserRole {
+  GUEST
+  CUSTOMER
+  DELIVERY_PARTNER
+  STORE_ADMIN
+  SUPER_ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  UNDISCLOSED
+}
+
+enum Locale {
+  mr
+  hi
+  en
+}
+
+enum UnitType {
+  G
+  KG
+  ML
+  L
+  PIECE
+  BUNCH
+  PACK
+}
+
+enum OrderType {
+  INSTANT
+  MEAL_PLAN_DAILY
+}
+
+enum OrderStatus {
+  PLACED
+  CONFIRMED
+  PACKED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  FAILED_DELIVERY
+  REFUNDED
+  PAYMENT_PENDING
+}
+
+enum PaymentMethod {
+  WALLET
+  RAZORPAY
+  COD
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum DeliverySlot {
+  EXPRESS
+  MORNING_7_9
+  EVENING_5_7
+  SUBSCRIPTION_0630_0900
+}
+
+enum ActivityLevel {
+  SEDENTARY
+  LIGHT
+  MODERATE
+  ACTIVE
+  VERY_ACTIVE
+}
+
+enum DietaryPreference {
+  VEG
+  VEGAN
+  JAIN
+  EGGETARIAN
+}
+
+enum HealthGoal {
+  WEIGHT_LOSS
+  WEIGHT_GAIN
+  MAINTENANCE
+  GENERAL_HEALTH
+  MANAGE_CONDITION
+}
+
+enum MealPlanStatus {
+  DRAFT
+  PENDING_CUSTOMER
+  ACTIVE
+  SUPERSEDED
+  EXPIRED
+}
+
+enum MealPlanGeneratedBy {
+  AI
+  ADMIN
+}
+
+enum MealSlot {
+  MORNING
+  EVENING
+}
+
+enum SwapReasonCode {
+  DONT_LIKE
+  ALLERGIC
+  NOT_AVAILABLE
+  TOO_EXPENSIVE
+  OTHER
+}
+
+enum SwapStatus {
+  PENDING
+  SUGGESTED
+  APPLIED
+  CANCELLED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+  COMPLETED
+}
+
+enum PricingMode {
+  PER_DELIVERY
+  FLAT
+}
+
+enum SubscriptionExceptionType {
+  SKIP
+  PAUSE
+  SKIPPED_UNPAID
+}
+
+enum WalletDirection {
+  CREDIT
+  DEBIT
+}
+
+enum WalletSource {
+  TOPUP
+  ORDER
+  PLAN_FEE
+  REFUND
+  ADJUSTMENT
+  COMPLAINT_CREDIT
+  CANCELLATION
+}
+
+enum SmartListSource {
+  VOICE
+  PHOTO
+  TEXT
+}
+
+enum SmartListStatus {
+  PROCESSING
+  READY
+  FAILED
+  CONVERTED
+}
+
+enum SmartListItemStatus {
+  MATCHED
+  AMBIGUOUS
+  UNMATCHED
+  USER_CONFIRMED
+}
+
+enum DeliveryAssignmentStatus {
+  ASSIGNED
+  PICKED_UP
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+}
+
+enum VehicleType {
+  BICYCLE
+  BIKE
+  SCOOTER
+  EV
+  WALK
+}
+
+enum NotificationChannel {
+  SMS
+  WHATSAPP
+  PUSH
+  IN_APP
+  EMAIL
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  FAILED
+  READ
+}
+
+enum AiFeature {
+  MEAL_PLAN_GENERATION
+  SWAP_SUGGESTION
+  VOICE_TRANSCRIPTION
+  TRANSCRIPT_PARSE
+  PHOTO_PARSE
+  PRODUCT_RATIONALE
+}
+
+enum AiCallStatus {
+  SUCCESS
+  VALIDATION_FAILED
+  RETRIED
+  FALLBACK
+  ERROR
+}
+
+enum OtpPurpose {
+  LOGIN
+  DELIVERY_VERIFICATION
+}
+
+// ─────────────────────────────────────────────────────────────
+// Users, addresses, service area
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id                String   @id
+  phone             String   @unique @db.VarChar(20)
+  name              String?  @db.VarChar(120)
+  email             String?  @db.VarChar(190)
+  dob               DateTime?
+  gender            Gender?
+  role              UserRole @default(CUSTOMER)
+  preferredLanguage Locale   @default(mr)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  addresses          Address[]
+  healthProfile      HealthProfile?
+  mealPlans          MealPlan[]
+  subscriptions      Subscription[]
+  cart               Cart?
+  orders             Order[]
+  walletTransactions WalletTransaction[]
+  payments           Payment[]
+  smartLists         SmartList[]
+  swapRequests       MealPlanSwapRequest[]
+  notifications      Notification[]
+  pushTokens         PushToken[]
+  deliveryPartner    DeliveryPartner?
+  aiLogs             AiGenerationLog[]
+  auditLogs          AuditLog[]            @relation("AuditActor")
+  otpRequests        OtpRequest[]
+  healthAccessLogs   HealthProfileAccessLog[]
+
+  @@index([role])
+  @@index([createdAt])
+  @@map("users")
+}
+
+model OtpRequest {
+  id          String     @id
+  phone       String     @db.VarChar(20)
+  userId      String?
+  codeHash    String     @db.VarChar(120)
+  purpose     OtpPurpose @default(LOGIN)
+  attempts    Int        @default(0)
+  maxAttempts Int        @default(5)
+  consumedAt  DateTime?
+  expiresAt   DateTime
+  createdAt   DateTime   @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([userId])
+  @@index([phone, createdAt])
+  @@index([expiresAt])
+  @@map("otp_requests")
+}
+
+model RefreshToken {
+  id        String    @id
+  userId    String
+  tokenHash String    @unique @db.VarChar(120)
+  userAgent String?   @db.VarChar(255)
+  revokedAt DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model Address {
+  id        String   @id
+  userId    String
+  label     String   @db.VarChar(40)
+  line1     String   @db.VarChar(255)
+  line2     String?  @db.VarChar(255)
+  landmark  String?  @db.VarChar(255)
+  city      String   @db.VarChar(80)
+  state     String   @db.VarChar(80)
+  pincode   String   @db.VarChar(10)
+  latitude  Float?
+  longitude Float?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subscriptions Subscription[]
+
+  @@index([userId])
+  @@index([pincode])
+  @@map("addresses")
+}
+
+model ServiceArea {
+  id                         String   @id
+  name                       String   @db.VarChar(120)
+  pincode                    String   @unique @db.VarChar(10)
+  centerLat                  Float
+  centerLng                  Float
+  radiusMeters               Int      @default(8000)
+  isActive                   Boolean  @default(true)
+  deliveryFeePaise           BigInt   @default(2500)
+  freeDeliveryThresholdPaise BigInt   @default(29900)
+  slotsJson                  Json?
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+
+  deliveryPartners DeliveryPartner[]
+
+  @@index([isActive])
+  @@map("service_areas")
+}
+
+model Waitlist {
+  id        String   @id
+  phone     String   @db.VarChar(20)
+  pincode   String   @db.VarChar(10)
+  latitude  Float?
+  longitude Float?
+  createdAt DateTime @default(now())
+
+  @@index([pincode])
+  @@index([createdAt])
+  @@map("waitlist")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Catalogue
+// ─────────────────────────────────────────────────────────────
+
+model Category {
+  id        String   @id
+  parentId  String?
+  slug      String   @unique @db.VarChar(120)
+  nameEn    String   @db.VarChar(120)
+  nameMr    String   @db.VarChar(120)
+  nameHi    String   @db.VarChar(120)
+  iconUrl   String?  @db.VarChar(500)
+  bannerUrl String?  @db.VarChar(500)
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children Category[] @relation("CategoryTree")
+  products Product[]
+
+  @@index([parentId])
+  @@index([isActive, sortOrder])
+  @@map("categories")
+}
+
+model Product {
+  id                 String   @id
+  categoryId         String
+  sku                String   @unique @db.VarChar(80)
+  nameEn             String   @db.VarChar(160)
+  nameMr             String   @db.VarChar(160)
+  nameHi             String   @db.VarChar(160)
+  description        String?  @db.Text
+  imageUrls          Json
+  unitType           UnitType @default(G)
+  tags               Json
+  nutrition          Json?
+  isMealPlanEligible Boolean  @default(false)
+  isActive           Boolean  @default(true)
+  searchKeywords     String?  @db.Text
+  sortOrder          Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  category      Category         @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variants      ProductVariant[]
+  aliases       ProductAlias[]
+  mealPlanItems MealPlanItem[]
+
+  @@index([categoryId])
+  @@index([isActive, isMealPlanEligible])
+  @@index([sku])
+  @@map("products")
+}
+
+model ProductVariant {
+  id                String   @id
+  productId         String
+  label             String   @db.VarChar(60)
+  quantity          Int
+  unit              UnitType
+  mrpPaise          BigInt
+  pricePaise        BigInt
+  stockQty          Int      @default(0)
+  lowStockThreshold Int      @default(5)
+  isDefault         Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  product       Product        @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+  mealPlanItems MealPlanItem[]
+
+  @@index([productId])
+  @@index([isActive])
+  @@map("product_variants")
+}
+
+model ProductAlias {
+  id        String   @id
+  productId String
+  alias     String   @db.VarChar(120)
+  locale    Locale   @default(mr)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([productId, alias, locale])
+  @@index([productId])
+  @@index([alias])
+  @@map("product_aliases")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Cart
+// ─────────────────────────────────────────────────────────────
+
+model Cart {
+  id        String   @id
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  items CartItem[]
+
+  @@index([userId])
+  @@map("carts")
+}
+
+model CartItem {
+  id        String   @id
+  cartId    String
+  productId String
+  variantId String
+  quantity  Int      @default(1)
+  addedAt   DateTime @default(now())
+
+  cart    Cart           @relation(fields: [cartId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([cartId, variantId])
+  @@index([cartId])
+  @@index([productId])
+  @@index([variantId])
+  @@map("cart_items")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Orders
+// ─────────────────────────────────────────────────────────────
+
+model Order {
+  id               String        @id
+  orderNumber      String        @unique @db.VarChar(30)
+  userId           String
+  addressSnapshot  Json
+  type             OrderType     @default(INSTANT)
+  status           OrderStatus   @default(PLACED)
+  subtotalPaise    BigInt        @default(0)
+  deliveryFeePaise BigInt        @default(0)
+  handlingFeePaise BigInt        @default(0)
+  discountPaise    BigInt        @default(0)
+  totalPaise       BigInt        @default(0)
+  paymentMethod    PaymentMethod @default(WALLET)
+  paymentStatus    PaymentStatus @default(PENDING)
+  subscriptionId   String?
+  scheduledDate    DateTime?     @db.Date
+  deliverySlot     DeliverySlot?
+  idempotencyKey   String        @unique @db.VarChar(120)
+  notes            String?       @db.Text
+  placedAt         DateTime      @default(now())
+  deliveredAt      DateTime?
+  cancelledAt      DateTime?
+  updatedAt        DateTime      @updatedAt
+
+  user          User                @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subscription  Subscription?       @relation(fields: [subscriptionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  items         OrderItem[]
+  statusHistory OrderStatusHistory[]
+  assignment    DeliveryAssignment?
+  issues        OrderIssue[]
+
+  // R5: the daily cron must be idempotent for a given subscription + date.
+  @@unique([subscriptionId, scheduledDate])
+  @@index([userId])
+  @@index([subscriptionId])
+  @@index([status])
+  @@index([type, scheduledDate])
+  @@index([placedAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id                String  @id
+  orderId           String
+  productId         String
+  variantId         String
+  nameSnapshot      String  @db.VarChar(160)
+  imageSnapshot     String? @db.VarChar(500)
+  mealSlot          MealSlot?
+  quantity          Int     @default(1)
+  unitPricePaise    BigInt
+  totalPaise        BigInt
+  isSubstituted     Boolean @default(false)
+  originalProductId String?
+
+  order   Order          @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
+  @@index([originalProductId])
+  @@map("order_items")
+}
+
+model OrderStatusHistory {
+  id         String       @id
+  orderId    String
+  fromStatus OrderStatus?
+  toStatus   OrderStatus
+  changedBy  String?
+  reason     String?      @db.VarChar(255)
+  createdAt  DateTime     @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([orderId])
+  @@index([changedBy])
+  @@map("order_status_history")
+}
+
+model OrderIssue {
+  id             String   @id
+  orderId        String
+  userId         String
+  orderItemId    String?
+  reasonCode     String   @db.VarChar(60)
+  description    String?  @db.Text
+  photoUrls      Json?
+  claimedPaise   BigInt   @default(0)
+  creditedPaise  BigInt   @default(0)
+  autoApproved   Boolean  @default(false)
+  status         String   @default("OPEN") @db.VarChar(30)
+  resolvedBy     String?
+  resolvedAt     DateTime?
+  createdAt      DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([orderItemId])
+  @@index([resolvedBy])
+  @@index([status])
+  @@map("order_issues")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Health profile & meal plan
+// ─────────────────────────────────────────────────────────────
+
+model HealthProfile {
+  id                 String             @id
+  userId             String             @unique
+  age                Int?
+  heightCm           Int?
+  weightKg           Int?
+  gender             Gender?
+  activityLevel      ActivityLevel?
+  householdAdults    Int                @default(1)
+  householdChildren  Int                @default(0)
+  medicalConditions  Json
+  allergies          Json
+  medications        String?            @db.Text
+  dietaryPreference  DietaryPreference  @default(VEG)
+  likedProductIds    Json
+  dislikedProductIds Json
+  goal               HealthGoal         @default(GENERAL_HEALTH)
+  notes              String?            @db.Text
+  consentGivenAt     DateTime?
+  consentVersion     String?            @db.VarChar(20)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  user       User                     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  accessLogs HealthProfileAccessLog[]
+
+  @@index([userId])
+  @@map("health_profiles")
+}
+
+/// S6 — every admin read of a health profile is logged.
+model HealthProfileAccessLog {
+  id              String   @id
+  healthProfileId String
+  actorId         String
+  reason          String?  @db.VarChar(255)
+  ip              String?  @db.VarChar(64)
+  createdAt       DateTime @default(now())
+
+  healthProfile HealthProfile @relation(fields: [healthProfileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  actor         User          @relation(fields: [actorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([healthProfileId])
+  @@index([actorId])
+  @@map("health_profile_access_logs")
+}
+
+model MealPlan {
+  id               String              @id
+  userId           String
+  version          Int                 @default(1)
+  profileSnapshot  Json
+  status           MealPlanStatus      @default(DRAFT)
+  generatedBy      MealPlanGeneratedBy @default(AI)
+  aiProvider       String?             @db.VarChar(40)
+  aiModel          String?             @db.VarChar(80)
+  promptVersion    String?             @db.VarChar(20)
+  overallNote      String?             @db.Text
+  flaggedForReview Boolean             @default(false)
+  flagReason       String?             @db.Text
+  reviewedBy       String?
+  reviewedAt       DateTime?
+  approvedAt       DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  days          MealPlanDay[]
+  subscriptions Subscription[]
+
+  @@unique([userId, version])
+  @@index([userId])
+  @@index([status])
+  @@index([flaggedForReview, reviewedAt])
+  @@index([reviewedBy])
+  @@map("meal_plans")
+}
+
+model MealPlanDay {
+  id         String @id
+  mealPlanId String
+  dayOfWeek  Int // 1 = Monday … 7 = Sunday
+
+  mealPlan MealPlan       @relation(fields: [mealPlanId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  items    MealPlanItem[]
+
+  @@unique([mealPlanId, dayOfWeek])
+  @@index([mealPlanId])
+  @@map("meal_plan_days")
+}
+
+model MealPlanItem {
+  id            String   @id
+  mealPlanDayId String
+  slot          MealSlot
+  productId     String
+  variantId     String?
+  quantity      Int // computed by B4 — never by the AI
+  unit          UnitType @default(G)
+  rationale     String?  @db.Text
+  sortOrder     Int      @default(0)
+
+  day          MealPlanDay           @relation(fields: [mealPlanDayId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  product      Product               @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variant      ProductVariant?       @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  swapRequests MealPlanSwapRequest[]
+
+  @@unique([mealPlanDayId, slot])
+  @@index([mealPlanDayId])
+  @@index([productId])
+  @@index([variantId])
+  @@map("meal_plan_items")
+}
+
+model MealPlanSwapRequest {
+  id              String         @id
+  mealPlanItemId  String
+  userId          String
+  reasonCode      SwapReasonCode
+  reasonText      String?        @db.VarChar(255)
+  status          SwapStatus     @default(PENDING)
+  aiSuggestions   Json?
+  chosenProductId String?
+  createdAt       DateTime       @default(now())
+  resolvedAt      DateTime?
+
+  mealPlanItem MealPlanItem @relation(fields: [mealPlanItemId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user         User         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([mealPlanItemId])
+  @@index([userId])
+  @@index([chosenProductId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("meal_plan_swap_requests")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Subscriptions
+// ─────────────────────────────────────────────────────────────
+
+model Subscription {
+  id            String             @id
+  userId        String
+  mealPlanId    String
+  addressId     String
+  deliverySlot  DeliverySlot       @default(SUBSCRIPTION_0630_0900)
+  startDate     DateTime           @db.Date
+  endDate       DateTime           @db.Date
+  status        SubscriptionStatus @default(ACTIVE)
+  pricingMode   PricingMode        @default(PER_DELIVERY)
+  planFeePaise  BigInt             @default(0)
+  prepaidPaise  BigInt             @default(0)
+  autoRenew     Boolean            @default(false)
+  cancelledAt   DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  user       User                      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mealPlan   MealPlan                  @relation(fields: [mealPlanId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  address    Address                   @relation(fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orders     Order[]
+  exceptions SubscriptionException[]
+
+  @@index([userId])
+  @@index([mealPlanId])
+  @@index([addressId])
+  @@index([status, startDate, endDate])
+  @@map("subscriptions")
+}
+
+model SubscriptionException {
+  id             String                    @id
+  subscriptionId String
+  date           DateTime                  @db.Date
+  type           SubscriptionExceptionType
+  reason         String?                   @db.VarChar(255)
+  createdAt      DateTime                  @default(now())
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([subscriptionId, date])
+  @@index([subscriptionId])
+  @@index([date])
+  @@map("subscription_exceptions")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Wallet & payments
+// ─────────────────────────────────────────────────────────────
+
+/// R4 — append-only ledger. Balance is derived by summing this table,
+/// never stored as a mutable column on the user.
+model WalletTransaction {
+  id                String          @id
+  userId            String
+  direction         WalletDirection
+  amountPaise       BigInt
+  source            WalletSource
+  refType           String          @db.VarChar(40)
+  refId             String          @db.VarChar(60)
+  balanceAfterPaise BigInt
+  note              String?         @db.VarChar(255)
+  createdBy         String?
+  createdAt         DateTime        @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  // R4 — idempotency key for every ledger write.
+  @@unique([source, refType, refId])
+  @@index([userId, createdAt])
+  @@index([createdBy])
+  @@map("wallet_transactions")
+}
+
+model Payment {
+  id                String        @id
+  userId            String
+  gateway           String        @db.VarChar(40)
+  gatewayOrderId    String?       @db.VarChar(120)
+  gatewayPaymentId  String?       @unique @db.VarChar(120)
+  amountPaise       BigInt
+  status            PaymentStatus @default(PENDING)
+  signatureVerified Boolean       @default(false)
+  rawPayload        Json?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([userId])
+  @@index([status, createdAt])
+  @@index([gatewayOrderId])
+  @@map("payments")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Smart list
+// ─────────────────────────────────────────────────────────────
+
+model SmartList {
+  id               String          @id
+  userId           String
+  source           SmartListSource
+  mediaUrl         String?         @db.VarChar(500)
+  transcript       String?         @db.Text
+  detectedLanguage String?         @db.VarChar(10)
+  aiRawOutput      Json?
+  status           SmartListStatus @default(PROCESSING)
+  name             String?         @db.VarChar(120)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  user  User            @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  items SmartListItem[]
+
+  @@index([userId, createdAt])
+  @@map("smart_lists")
+}
+
+model SmartListItem {
+  id               String              @id
+  smartListId      String
+  rawText          String              @db.VarChar(255)
+  parsedName       String?             @db.VarChar(160)
+  quantity         Int?
+  unit             UnitType?
+  matchedProductId String?
+  matchedVariantId String?
+  confidence       Float               @default(0)
+  status           SmartListItemStatus @default(UNMATCHED)
+  sortOrder        Int                 @default(0)
+
+  smartList SmartList @relation(fields: [smartListId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([smartListId])
+  @@index([matchedProductId])
+  @@index([matchedVariantId])
+  @@map("smart_list_items")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Delivery
+// ─────────────────────────────────────────────────────────────
+
+model DeliveryPartner {
+  id            String      @id
+  userId        String      @unique
+  vehicleType   VehicleType @default(BIKE)
+  isAvailable   Boolean     @default(false)
+  serviceAreaId String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  user        User                 @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  serviceArea ServiceArea?         @relation(fields: [serviceAreaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  assignments DeliveryAssignment[]
+
+  @@index([userId])
+  @@index([serviceAreaId])
+  @@index([isAvailable])
+  @@map("delivery_partners")
+}
+
+model DeliveryAssignment {
+  id            String                   @id
+  orderId       String                   @unique
+  partnerId     String
+  status        DeliveryAssignmentStatus @default(ASSIGNED)
+  deliveryOtp   String?                  @db.VarChar(10)
+  proofImageUrl String?                  @db.VarChar(500)
+  assignedAt    DateTime                 @default(now())
+  pickedAt      DateTime?
+  deliveredAt   DateTime?
+  failureReason String?                  @db.VarChar(255)
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  partner DeliveryPartner @relation(fields: [partnerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([orderId])
+  @@index([partnerId, status])
+  @@map("delivery_assignments")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Notifications, AI logs, audit, settings
+// ─────────────────────────────────────────────────────────────
+
+model Notification {
+  id          String              @id
+  userId      String
+  channel     NotificationChannel
+  templateKey String              @db.VarChar(80)
+  payload     Json
+  status      NotificationStatus  @default(QUEUED)
+  error       String?             @db.Text
+  sentAt      DateTime?
+  readAt      DateTime?
+  createdAt   DateTime            @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("notifications")
+}
+
+model PushToken {
+  id        String   @id
+  userId    String
+  token     String   @db.VarChar(255)
+  platform  String   @db.VarChar(20)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([userId, token])
+  @@index([userId])
+  @@map("push_tokens")
+}
+
+model AiGenerationLog {
+  id            String       @id
+  userId        String?
+  feature       AiFeature
+  provider      String       @db.VarChar(40)
+  model         String       @db.VarChar(80)
+  promptVersion String       @db.VarChar(20)
+  inputTokens   Int          @default(0)
+  outputTokens  Int          @default(0)
+  latencyMs     Int          @default(0)
+  status        AiCallStatus @default(SUCCESS)
+  error         String?      @db.Text
+  createdAt     DateTime     @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([userId])
+  @@index([feature, createdAt])
+  @@index([status])
+  @@map("ai_generation_logs")
+}
+
+model AuditLog {
+  id         String   @id
+  actorId    String?
+  action     String   @db.VarChar(80)
+  entityType String   @db.VarChar(60)
+  entityId   String   @db.VarChar(60)
+  before     Json?
+  after      Json?
+  ip         String?  @db.VarChar(64)
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([actorId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+/// R8 — every business number lives here and is editable from the admin panel
+/// at runtime. Env values are bootstrap defaults only.
+model AppSetting {
+  key         String   @id @db.VarChar(80)
+  value       Json
+  group       String   @default("general") @db.VarChar(40)
+  description String?  @db.VarChar(255)
+  updatedBy   String?
+  updatedAt   DateTime @updatedAt
+
+  @@index([group])
+  @@index([updatedBy])
+  @@map("app_settings")
+}
+
+model Banner {
+  id        String   @id
+  titleEn   String   @db.VarChar(160)
+  titleMr   String   @db.VarChar(160)
+  titleHi   String   @db.VarChar(160)
+  imageUrl  String   @db.VarChar(500)
+  linkUrl   String?  @db.VarChar(500)
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@map("banners")
+}

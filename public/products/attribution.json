@@ -1,0 +1,354 @@
+[
+  {
+    "sku": "BKY-BREAD-400",
+    "term": "sliced white bread loaf",
+    "title": "White bread 800.jpg",
+    "artist": "User Sannse on en.wikipedia",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:White_bread_800.jpg"
+  },
+  {
+    "sku": "BKY-MARIE-250",
+    "term": "tea biscuits plate",
+    "title": "Rich tea.jpg",
+    "artist": "Sean Whitton (User:Xyrael)",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Rich_tea.jpg"
+  },
+  {
+    "sku": "BKY-PAV-6",
+    "term": "pav bread buns indian",
+    "title": "Vada pav 01.jpg",
+    "artist": "Marajozkee",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Vada_pav_01.jpg"
+  },
+  {
+    "sku": "DRY-CURD-400",
+    "term": "yogurt bowl",
+    "title": "Yoghurt in bowl.jpg",
+    "artist": "Kris Miller from Issaquah",
+    "licence": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Yoghurt_in_bowl.jpg"
+  },
+  {
+    "sku": "DRY-GHEE-500",
+    "term": "clarified butter ghee",
+    "title": "Butterschmalz-3.jpg",
+    "artist": "Rainer Z ...",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Butterschmalz-3.jpg"
+  },
+  {
+    "sku": "DRY-MILK-500",
+    "term": "person pouring milk glass",
+    "title": "A person is pouring white milk into a glass cup.jpg",
+    "artist": "Shixart1985",
+    "licence": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:A_person_is_pouring_white_milk_into_a_glass_cup.jpg"
+  },
+  {
+    "sku": "DRY-PANEER-200",
+    "term": "paneer",
+    "title": "Panir Paneer Indian cheese fresh.jpg",
+    "artist": "Sonja Pauen - Stanhopea",
+    "licence": "CC BY 2.0 de",
+    "source": "https://commons.wikimedia.org/wiki/File:Panir_Paneer_Indian_cheese_fresh.jpg"
+  },
+  {
+    "sku": "FRT-APPLE",
+    "term": "apple fruit red whole",
+    "title": "Liat Portal for Foodie Disorder - Red Apple (Whole Fruit).jpg",
+    "artist": "HaJunkiyada",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Red_Apple_(Whole_Fruit).jpg"
+  },
+  {
+    "sku": "FRT-BANANA",
+    "term": "bunch of bananas yellow ripe fruit",
+    "title": "DFC 1274 Two vendors chat behind a stall piled high with ripe bananas at a local market.jpg",
+    "artist": "PattayaPatrol",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:DFC_1274_Two_vendors_chat_behind_a_stall_piled_high_with_ripe_bananas_at_a_local_market.jpg"
+  },
+  {
+    "sku": "FRT-LEMON",
+    "term": "lemon citrus fruit yellow",
+    "title": "Lemon.jpg",
+    "artist": "André Karwath aka Aka",
+    "licence": "CC BY-SA 2.5",
+    "source": "https://commons.wikimedia.org/wiki/File:Lemon.jpg"
+  },
+  {
+    "sku": "FRT-MOSAMBI",
+    "term": "sweet lime mosambi citrus fruit",
+    "title": "Sweet limes of Salem.jpg",
+    "artist": "Thamizhpparithi Maari",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Sweet_limes_of_Salem.jpg"
+  },
+  {
+    "sku": "FRT-PAPAYA",
+    "term": "papaya fruit ripe",
+    "title": "Malabar papaya.jpg",
+    "artist": "Netha Hussain",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Malabar_papaya.jpg"
+  },
+  {
+    "sku": "FRT-POMEGRANATE",
+    "term": "pomegranate fruit arils",
+    "title": "Punica granatum fruit Grenade.jpg",
+    "artist": "Jebulon",
+    "licence": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File:Punica_granatum_fruit_Grenade.jpg"
+  },
+  {
+    "sku": "GRC-ATTA-5KG",
+    "term": "wheat flour atta",
+    "title": "Atta Chakki.jpg",
+    "artist": "Bames24",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Atta_Chakki.jpg"
+  },
+  {
+    "sku": "GRC-OIL-1L",
+    "term": "sunflower cooking oil bottle",
+    "title": "Bottle 1 liter Sunflower refined oil.jpg",
+    "artist": "Exgsp Gmbh LLC BOTTLE 1 liter Sunflower refined oil",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Bottle_1_liter_Sunflower_refined_oil.jpg"
+  },
+  {
+    "sku": "GRC-RICE-5KG",
+    "term": "basmati rice grains raw",
+    "title": "Basmati Rice India, raw.jpg",
+    "artist": "cookbookman17",
+    "licence": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Basmati_Rice_India,_raw.jpg"
+  },
+  {
+    "sku": "GRC-SUGAR-1KG",
+    "term": "white sugar crystals",
+    "title": "Sugar-Crystals-magnified.jpg",
+    "artist": "Edal Anton Lefterov",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Sugar-Crystals-magnified.jpg"
+  },
+  {
+    "sku": "GRC-TEA-250",
+    "term": "black tea leaves dried",
+    "title": "Lipton-mug-tea.jpg",
+    "artist": "Evan-Amos",
+    "licence": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Lipton-mug-tea.jpg"
+  },
+  {
+    "sku": "GRC-TOORDAL-1KG",
+    "term": "yellow split peas dal",
+    "title": "Split pea.jpg",
+    "artist": "Sanjay Acharya",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Split_pea.jpg"
+  },
+  {
+    "sku": "ICE-KULFI-4",
+    "term": "kulfi",
+    "title": "Matkakulfi.jpg",
+    "artist": "danchitnis",
+    "licence": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Matkakulfi.jpg"
+  },
+  {
+    "sku": "ICE-VANILLA-700",
+    "term": "vanilla ice cream scoop",
+    "title": "Ice Cream Dessert.JPG",
+    "artist": "Unknown",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ice_Cream_Dessert.JPG"
+  },
+  {
+    "sku": "VEG-BEETROOT",
+    "term": "beetroot",
+    "title": "Beets produce-1.jpg",
+    "artist": "Quadell",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Beets_produce-1.jpg"
+  },
+  {
+    "sku": "VEG-BOTTLEGOURD",
+    "term": "bottle gourd",
+    "title": "Lagenaria siceraria Clavata Group1SHSU.jpg",
+    "artist": "Shu Suehiro",
+    "licence": "CC BY 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Lagenaria_siceraria_Clavata_Group1SHSU.jpg"
+  },
+  {
+    "sku": "VEG-BRINJAL",
+    "term": "aubergine vegetable",
+    "title": "Aubergine Rhodos.jpg",
+    "artist": "Karelj",
+    "licence": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Aubergine_Rhodos.jpg"
+  },
+  {
+    "sku": "VEG-CABBAGE",
+    "term": "cabbage head green vegetable",
+    "title": "Savoy Cabbage wrinkles.jpg",
+    "artist": "Sheila Sund",
+    "licence": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Savoy_Cabbage_wrinkles.jpg"
+  },
+  {
+    "sku": "VEG-CAPSICUM",
+    "term": "bell pepper capsicum green",
+    "title": "Green Peppers KGs.jpg",
+    "artist": "JMK (JohnManuel)",
+    "licence": "CC BY 2.5",
+    "source": "https://commons.wikimedia.org/wiki/File:Green_Peppers_KGs.jpg"
+  },
+  {
+    "sku": "VEG-CARROT",
+    "term": "carrot orange root vegetable",
+    "title": "Carrots of many colors.jpg",
+    "artist": "Stephen Ausmus",
+    "licence": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Carrots_of_many_colors.jpg"
+  },
+  {
+    "sku": "VEG-CAULIFLOWER",
+    "term": "cauliflower head white vegetable",
+    "title": "Chou-fleur 02.jpg",
+    "artist": "Coyau",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Chou-fleur_02.jpg"
+  },
+  {
+    "sku": "VEG-CLUSTERBEANS",
+    "term": "cluster beans guar cyamopsis pods",
+    "title": "Cluster bean cluster.jpg",
+    "artist": "Ton Rulkens",
+    "licence": "CC BY-SA 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Cluster_bean_cluster.jpg"
+  },
+  {
+    "sku": "VEG-CORIANDER",
+    "term": "Coriandrum sativum coriander leaves bunch fresh",
+    "title": "Bunches of coriander leaves.jpg",
+    "artist": "Kpsudeep",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Bunches_of_coriander_leaves.jpg"
+  },
+  {
+    "sku": "VEG-CUCUMBER",
+    "term": "cucumber green vegetable",
+    "title": "HK SYP Best of Best Vegetable green Cucumbers Aug-2012.JPG",
+    "artist": "Genmewcaugsa",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:HK_SYP_Best_of_Best_Vegetable_green_Cucumbers_Aug-2012.JPG"
+  },
+  {
+    "sku": "VEG-CURRYLEAVES",
+    "term": "curry leaves murraya koenigii",
+    "title": "Murraya koenigii leaves - curry leaves.jpg",
+    "artist": "Sonja Pauen - Stanhopea",
+    "licence": "CC BY 2.0 de",
+    "source": "https://commons.wikimedia.org/wiki/File:Murraya_koenigii_leaves_-_curry_leaves.jpg"
+  },
+  {
+    "sku": "VEG-FENUGREEK",
+    "term": "fenugreek leaves methi greens",
+    "title": "Methi leaves.jpg",
+    "artist": "Katyare",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Methi_leaves.jpg"
+  },
+  {
+    "sku": "VEG-FRESHPEANUT",
+    "term": "raw peanuts",
+    "title": "Raw peanuts.JPG",
+    "artist": "Sakurai Midori",
+    "licence": "CC BY 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Raw_peanuts.JPG"
+  },
+  {
+    "sku": "VEG-GARLIC",
+    "term": "garlic bulbs cloves",
+    "title": "Peeled garlic.JPG",
+    "artist": "BrokenSphere",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Peeled_garlic.JPG"
+  },
+  {
+    "sku": "VEG-GINGER",
+    "term": "fresh ginger root farmers market",
+    "title": "Liat Portal for Foodie Disorder - Fresh Ginger Root.jpg",
+    "artist": "HaJunkiyada",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Fresh_Ginger_Root.jpg"
+  },
+  {
+    "sku": "VEG-GREENCHILLI",
+    "term": "green chillies Kerala",
+    "title": "കാന്താരി മുളക്൧.jpg",
+    "artist": "Fotokannan",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:%E0%B4%95%E0%B4%BE%E0%B4%A8%E0%B5%8D%E0%B4%A4%E0%B4%BE%E0%B4%B0%E0%B4%BF_%E0%B4%AE%E0%B5%81%E0%B4%B3%E0%B4%95%E0%B5%8D%E0%B5%A7.jpg"
+  },
+  {
+    "sku": "VEG-OKRA",
+    "term": "okra Abelmoschus esculentus pods raw",
+    "title": "Bucket of raw okra pods.jpg",
+    "artist": "Bill Tarpenning",
+    "licence": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Bucket_of_raw_okra_pods.jpg"
+  },
+  {
+    "sku": "VEG-ONION",
+    "term": "red onion bulb vegetable",
+    "title": "Textura de cebolla.JPG",
+    "artist": "Yolandagagliardi",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Textura_de_cebolla.JPG"
+  },
+  {
+    "sku": "VEG-POTATO",
+    "term": "potato tuber vegetable",
+    "title": "Potato and cross section.jpg",
+    "artist": "Unknown",
+    "licence": "GFDL 1.2",
+    "source": "https://commons.wikimedia.org/wiki/File:Potato_and_cross_section.jpg"
+  },
+  {
+    "sku": "VEG-PUMPKIN",
+    "term": "pumpkin orange squash vegetable",
+    "title": "Cucurbita 2011 G1.jpg",
+    "artist": "George Chernilevsky",
+    "licence": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Cucurbita_2011_G1.jpg"
+  },
+  {
+    "sku": "VEG-RIDGEGOURD",
+    "term": "turai vegetable",
+    "title": "Luffa acutangula1.jpg",
+    "artist": "No machine-readable author provided. Hans B.~commonswiki assumed (based on copyright claims).",
+    "licence": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Luffa_acutangula1.jpg"
+  },
+  {
+    "sku": "VEG-SPINACH",
+    "term": "spinach leaves bunch green vegetable",
+    "title": "Fresh Spinach leaves.jpg",
+    "artist": "Charipearl",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Fresh_Spinach_leaves.jpg"
+  },
+  {
+    "sku": "VEG-TOMATO",
+    "term": "organic tomatoes ripe",
+    "title": "Healthy Red Tomatoes with Water Drops.jpg",
+    "artist": "epSos.de",
+    "licence": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Healthy_Red_Tomatoes_with_Water_Drops.jpg"
+  }
+]

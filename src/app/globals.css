@@ -1,0 +1,156 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * PART 5 — Planeat design tokens.
+ *
+ * The brand palette is defined once, in hex, exactly as specified. The shadcn
+ * variable names below are aliases pointing at it, so shadcn primitives inherit
+ * the brand automatically and there is still a single source of truth.
+ */
+
+@theme inline {
+  --color-background: var(--surface);
+  --color-foreground: var(--text);
+
+  --color-card: var(--surface-raised);
+  --color-card-foreground: var(--text);
+  --color-popover: var(--surface-raised);
+  --color-popover-foreground: var(--text);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-fg);
+  --color-secondary: var(--surface-sunken);
+  --color-secondary-foreground: var(--text);
+
+  --color-muted: var(--surface-sunken);
+  --color-muted-foreground: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-fg);
+  --color-destructive: var(--danger);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--primary);
+
+  /* A deeper green than --primary, for the header's icon circles and the
+     "Shop Now" style buttons the reference uses — one step darker than the
+     button green, the way the reference's own icon chips read. */
+  --color-primary-dark: var(--brand-green-dark);
+
+  /* The two light tints from the reference: green behind the Vegetables
+     card and the welcome banner, warm cream behind the Fruits card. */
+  --color-tint-green: var(--brand-tint-green);
+  --color-tint-yellow: var(--brand-tint-yellow);
+
+  --font-sans: var(--font-app);
+  --font-heading: var(--font-app);
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+
+  /* R10 — the design target is a 390px viewport. */
+  --spacing-touch: 2.75rem; /* 44px minimum touch target */
+}
+
+:root {
+  /* The Planeat brand mark: a fresh, natural GREEN system on a soft cream
+     page — not a coloured header band. The logo itself carries the colour
+     (a two-tone green wordmark with a leaf mark); the header sits on the
+     same cream as the rest of the page, the way the client's reference
+     does. Yellow survives only as a small accent (badges, the Fruits card's
+     tint), never as a large field. */
+  --primary: #1b7a3a; /* buttons, ADD, active tab, Shop Now */
+  --primary-fg: #ffffff;
+  --accent: #ffd400; /* small badges/flags only — never a background field */
+  --accent-fg: #111111;
+  --surface: #f8f7f2; /* soft warm cream, not grey */
+  --surface-raised: #ffffff;
+  --surface-sunken: #f0efe8;
+  --text: #14140f;
+  --text-muted: #6b7280;
+  --success: #1b7a3a;
+  --warning: #c97a17;
+  --danger: #c0392b;
+  --border: #ebe9e1;
+  --radius: 16px;
+
+  /* One step darker than --primary — the header's icon circles and small
+     dark-green chips, the way the reference's cart/profile icons read
+     against the cream page. */
+  --brand-green-dark: #14532d;
+
+  /* The two light tints from the reference: green behind the welcome
+     banner and the Vegetables card, warm cream-yellow behind Fruits. */
+  --brand-tint-green: #e8f5ea;
+  --brand-tint-yellow: #fdf1de;
+
+  /* Safe-area aware height of the 5-tab bottom navigation. */
+  --bottom-nav-height: 4.25rem;
+}
+
+.dark {
+  --primary: #2ea043;
+  --primary-fg: #04140a;
+  --accent: #ffd400;
+  --accent-fg: #111111;
+  --surface: #121212;
+  --surface-raised: #1c1c1c;
+  --surface-sunken: #242424;
+  --text: #f5f5f5;
+  --text-muted: #a3a3a3;
+  --success: #2ea043;
+  --warning: #e0a44a;
+  --danger: #e26454;
+  --border: #2e2e2e;
+
+  --brand-green-dark: #0b3d1f;
+  --brand-tint-green: #10331f;
+  --brand-tint-yellow: #332a12;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    /* Mobile-first: the storefront is a single centred column on any screen. */
+    text-rendering: optimizeLegibility;
+  }
+
+  /* R10 — every interactive element clears 44×44px. */
+  button,
+  a[role="button"],
+  [data-touch-target] {
+    min-height: var(--spacing-touch);
+  }
+}
+
+@layer components {
+  /* The app is designed at 390px and simply centres on anything wider. */
+  .app-shell {
+    @apply mx-auto w-full max-w-[480px] min-h-dvh bg-background;
+  }
+
+  .app-scroll {
+    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+}
