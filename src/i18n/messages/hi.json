@@ -104,7 +104,8 @@
     "iceCream": "आइसक्रीम",
     "grocery": "किराना",
     "empty": "इस श्रेणी में अभी कुछ नहीं है",
-    "productCount": "{count} चीज़ें"
+    "productCount": "{count} चीज़ें",
+    "other": "अन्य"
   },
   "product": {
     "add": "जोड़ें",

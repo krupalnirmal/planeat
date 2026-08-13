@@ -104,7 +104,8 @@
     "iceCream": "Ice Cream",
     "grocery": "Grocery",
     "empty": "Nothing in this category yet",
-    "productCount": "{count} items"
+    "productCount": "{count} items",
+    "other": "Other"
   },
   "product": {
     "add": "ADD",

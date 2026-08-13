@@ -22,6 +22,7 @@ export interface ProductCardView {
   imageUrl: string | null;
   unitType: UnitType;
   isMealPlanEligible: boolean;
+  vegetableType: string | null;
   variant: {
     id: string;
     label: string;
@@ -64,6 +65,7 @@ type ProductWithVariants = {
   imageUrls: unknown;
   unitType: UnitType;
   isMealPlanEligible: boolean;
+  vegetableType: string | null;
   category: { slug: string };
   variants: Array<{
     id: string;
@@ -92,6 +94,7 @@ const productCardSelect = {
   imageUrls: true,
   unitType: true,
   isMealPlanEligible: true,
+  vegetableType: true,
   category: { select: { slug: true } },
   variants: {
     where: { isActive: true },
@@ -120,6 +123,7 @@ export function toProductCard(product: ProductWithVariants, locale: Locale): Pro
     imageUrl: firstImageUrl(product.imageUrls),
     unitType: product.unitType,
     isMealPlanEligible: product.isMealPlanEligible,
+    vegetableType: product.vegetableType,
     variant: variant
       ? {
           id: variant.id,
@@ -173,6 +177,7 @@ export async function getHomePayload(locale: Locale): Promise<HomePayload> {
         iconUrl: true,
         products: {
           where: { isActive: true },
+          orderBy: { sortOrder: 'asc' },
           select: { isMealPlanEligible: true, imageUrls: true },
           take: 5,
         },

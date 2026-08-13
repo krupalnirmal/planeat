@@ -104,7 +104,8 @@
     "iceCream": "आइस्क्रीम",
     "grocery": "किराणा",
     "empty": "या श्रेणीत सध्या काहीही नाही",
-    "productCount": "{count} वस्तू"
+    "productCount": "{count} वस्तू",
+    "other": "इतर"
   },
   "product": {
     "add": "घाला",

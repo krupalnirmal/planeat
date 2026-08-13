@@ -3,13 +3,41 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { ProductCard } from '@/components/shop/product-card';
-import { getCategoryProducts } from '@/lib/catalog/queries';
+import { getCategoryProducts, type ProductCardView } from '@/lib/catalog/queries';
+import { VEGETABLE_TYPES, vegetableTypeLabel } from '@/lib/catalog/vegetable-types';
 import type { AppLocale } from '@/i18n/routing';
 
 /** Category listing (M2). Server-rendered, cached for a minute. */
 export const revalidate = 60;
 
 const PER_PAGE = 24;
+
+function ProductGrid({ products }: { products: ProductCardView[] }) {
+  return (
+    <ul className="grid grid-cols-2 gap-3">
+      {products.map((product) => (
+        <li key={product.id}>
+          <ProductCard
+            product={{
+              id: product.id,
+              name: product.name,
+              imageUrl: product.imageUrl,
+              unitType: product.unitType,
+              inStock: product.inStock,
+              variant: product.variant
+                ? {
+                    ...product.variant,
+                    pricePaise: product.variant.pricePaise.toString(),
+                    mrpPaise: product.variant.mrpPaise.toString(),
+                  }
+                : null,
+            }}
+          />
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default async function CategoryPage({
   params,
@@ -36,6 +64,18 @@ export default async function CategoryPage({
 
   const hasMore = page * PER_PAGE < result.total;
 
+  // Client-requested grouping, Vegetables only (PER_PAGE comfortably covers
+  // the whole category today, so every group is complete on page 1 — no
+  // cross-page split to reconcile).
+  const groups =
+    slug === 'vegetables'
+      ? VEGETABLE_TYPES.map((type) => ({
+          type,
+          products: result.products.filter((p) => p.vegetableType === type.id),
+        })).filter((group) => group.products.length > 0)
+      : null;
+  const ungrouped = groups ? result.products.filter((p) => !p.vegetableType) : [];
+
   return (
     <>
       <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-card px-3 py-3">
@@ -57,29 +97,26 @@ export default async function CategoryPage({
           <p className="rounded-[var(--radius)] border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
             {t('empty')}
           </p>
-        ) : (
-          <ul className="grid grid-cols-2 gap-3">
-            {result.products.map((product) => (
-              <li key={product.id}>
-                <ProductCard
-                  product={{
-                    id: product.id,
-                    name: product.name,
-                    imageUrl: product.imageUrl,
-                    unitType: product.unitType,
-                    inStock: product.inStock,
-                    variant: product.variant
-                      ? {
-                          ...product.variant,
-                          pricePaise: product.variant.pricePaise.toString(),
-                          mrpPaise: product.variant.mrpPaise.toString(),
-                        }
-                      : null,
-                  }}
-                />
-              </li>
+        ) : groups ? (
+          <div className="space-y-6">
+            {groups.map(({ type, products }) => (
+              <section key={type.id}>
+                <h2 className="mb-3 flex items-center gap-1.5 text-[15px] font-bold">
+                  <span aria-hidden>{type.emoji}</span>
+                  {vegetableTypeLabel(type, locale as AppLocale)}
+                </h2>
+                <ProductGrid products={products} />
+              </section>
             ))}
-          </ul>
+            {ungrouped.length > 0 && (
+              <section>
+                <h2 className="mb-3 text-[15px] font-bold">{t('other')}</h2>
+                <ProductGrid products={ungrouped} />
+              </section>
+            )}
+          </div>
+        ) : (
+          <ProductGrid products={result.products} />
         )}
 
         {(page > 1 || hasMore) && (

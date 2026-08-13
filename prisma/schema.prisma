@@ -419,6 +419,8 @@ model Product {
   imageUrls          Json
   unitType           UnitType @default(G)
   tags               Json
+  /** Culinary grouping, currently only populated for the Vegetables category — see VEGETABLE_TYPES. */
+  vegetableType      String?  @db.VarChar(40)
   nutrition          Json?
   isMealPlanEligible Boolean  @default(false)
   isActive           Boolean  @default(true)
