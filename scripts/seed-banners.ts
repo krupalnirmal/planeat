@@ -7,16 +7,44 @@
 // row can be referenced by analytics or an audit trail later, and
 // `isActive: false` is how the admin panel retires one anyway.
 import 'dotenv/config';
+import { readFileSync } from 'node:fs';
 import { db } from '../src/lib/db';
 import { ID_PREFIX, newId } from '../src/lib/ids';
 
+// slug -> Cloudinary URL, written by `scripts/upload-banners.mjs`.
+const cloudinaryMap: Record<string, string> = (() => {
+  try {
+    return JSON.parse(readFileSync('public/banners/cloudinary-map.json', 'utf-8'));
+  } catch {
+    return {};
+  }
+})();
+
+const url = (slug: string, localFile: string) => cloudinaryMap[slug] ?? localFile;
+
 const BANNERS = [
   {
-    imageUrl: '/banners/banner_3.jpg',
+    imageUrl: url('banner_3', '/banners/banner_3.jpg'),
     titleMr: 'ताज्या भाज्या, ताजं आरोग्य!',
     titleHi: 'ताज़ी सब्ज़ियां, ताज़ी सेहत!',
     titleEn: 'Fresh vegetables, fresh health!',
     sortOrder: 0,
+  },
+  {
+    imageUrl: url('welcome-offer', '/banners/welcome-offer.jpg'),
+    titleMr: 'पहिल्या ऑर्डरवर ₹50 सूट!',
+    titleHi: 'पहले ऑर्डर पर ₹50 की छूट!',
+    titleEn: '₹50 off your first order!',
+    linkUrl: null,
+    sortOrder: 1,
+  },
+  {
+    imageUrl: url('fresh-daily', '/banners/fresh-daily.jpg'),
+    titleMr: 'ताजा भाजीपाला, रोज घरपोच',
+    titleHi: 'ताज़ी सब्ज़ियां, रोज़ घर पर',
+    titleEn: 'Fresh veggies, delivered daily',
+    linkUrl: '/category/vegetables',
+    sortOrder: 2,
   },
 ];
 

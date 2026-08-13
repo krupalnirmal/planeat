@@ -40,6 +40,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# playwright MCP test artifacts (screenshots, console logs)
+.playwright-mcp/
+
 # editor-assistant scaffolding `prisma init` writes unasked (D-26 in
 # DECISIONS.md) — not project code, safe to regenerate any time.
 .claude/

@@ -12,11 +12,21 @@
  */
 
 import 'dotenv/config';
+import { readFileSync } from 'node:fs';
 import { UnitType, UserRole, Locale, VehicleType } from '../src/generated/prisma/client';
 import { db } from '../src/lib/db';
 import { ID_PREFIX, newId } from '../src/lib/ids';
 import { SETTING_GROUPS, bootstrapSettings } from '../src/lib/settings';
 import { ALIAS_COUNT, PRODUCT_ALIASES } from './aliases';
+
+// SKU -> Cloudinary URL, written by `scripts/upload-catalogue-images.mjs`.
+const cloudinaryMap: Record<string, string> = (() => {
+  try {
+    return JSON.parse(readFileSync('public/products/cloudinary-map.json', 'utf-8'));
+  } catch {
+    return {};
+  }
+})();
 
 // ─────────────────────────────────────────────────────────────
 // Catalogue data
@@ -710,8 +720,10 @@ async function seedCatalogue(): Promise<void> {
       // Freely-licensed photos fetched from Wikimedia Commons by
       // `scripts/fetch-product-images.mjs` — see `public/products/ATTRIBUTION.md`.
       // Demo catalogue assets: the owner replaces them with real stock photos
-      // from the admin panel once the store has its own.
-      const imageUrls = [`/products/${product.sku}.jpg`];
+      // from the admin panel once the store has its own. Mirrored onto
+      // Cloudinary by `scripts/upload-catalogue-images.mjs`; falls back to the
+      // local file if a SKU is missing from the map.
+      const imageUrls = [cloudinaryMap[product.sku] ?? `/products/${product.sku}.jpg`];
 
       const prd = await db.product.upsert({
         where: { sku: product.sku },
