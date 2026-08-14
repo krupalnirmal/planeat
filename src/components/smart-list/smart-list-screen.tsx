@@ -1,12 +1,13 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Camera, Clock, Keyboard, Loader2 } from 'lucide-react';
+import { Camera, Clock, Keyboard, Loader2, Mic } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { Recorder } from '@/components/smart-list/recorder';
-import { CenteredState, PageHeader } from '@/components/shop/page-header';
+import { LoginPrompt } from '@/components/shop/login-prompt';
+import { PageHeader } from '@/components/shop/page-header';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api, qs } from '@/lib/api/client';
 
@@ -42,7 +43,6 @@ type Mode = 'choose' | 'transcript' | 'type';
 export function SmartListScreen() {
   const t = useTranslations('smartList');
   const tc = useTranslations('common');
-  const te = useTranslations('errors');
   const locale = useLocale();
   const router = useRouter();
   const { isLoggedIn, isLoading: sessionLoading } = useSession();
@@ -132,23 +132,13 @@ export function SmartListScreen() {
   // B17 — the Smart List builds a cart, so it needs a login.
   if (!isLoggedIn) {
     return (
-      <>
-        <PageHeader title={t('title')} />
-        <main className="pb-2">
-          <div className="bg-card">
-            <CenteredState>
-              <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
-              <button
-                type="button"
-                onClick={() => router.push('/login?next=/smart-list')}
-                className="mt-6 h-12 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-              >
-                {te('unauthorized')}
-              </button>
-            </CenteredState>
-          </div>
-        </main>
-      </>
+      <LoginPrompt
+        icon={Mic}
+        title={t('title')}
+        bandSubtitle={t('subtitle')}
+        description={t('loginDescription')}
+        loginHref="/login?next=/smart-list"
+      />
     );
   }
 

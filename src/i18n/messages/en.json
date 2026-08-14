@@ -348,7 +348,8 @@
       "5": "Friday",
       "6": "Saturday",
       "7": "Sunday"
-    }
+    },
+    "loginDescription": "Log in to build a personalised weekly meal plan and get it delivered on your schedule."
   },
   "subscription": {
     "myWeek": "My Week",
@@ -570,7 +571,8 @@
     "noSavedLists": "No saved lists yet",
     "itemCount": "{count} items",
     "usedFallback": "AI wasn't available, so our own rules read the list.",
-    "failed": "We couldn't read that list. Please try again."
+    "failed": "We couldn't read that list. Please try again.",
+    "loginDescription": "Log in to speak or photograph your list — we'll match it to real products and add them to your cart."
   },
   "profile": {
     "title": "Profile",

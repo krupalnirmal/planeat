@@ -4,10 +4,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, RefreshCw, Salad, SlidersHorizontal } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { Link, useRouter } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import { DoctorBanner, MedicalDisclaimer } from '@/components/meal-plan/medical-disclaimer';
 import { PlanWeekView, type PlanDayView } from '@/components/meal-plan/plan-week-view';
-import { CenteredState, PageHeader } from '@/components/shop/page-header';
+import { LoginPrompt } from '@/components/shop/login-prompt';
+import { PageHeader } from '@/components/shop/page-header';
 import { MyWeek, type WeekDay } from '@/components/subscription/my-week';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api, qs } from '@/lib/api/client';
@@ -51,10 +52,8 @@ interface SubscriptionResponse {
 export function MealPlanScreen() {
   const t = useTranslations('mealPlan');
   const tc = useTranslations('common');
-  const te = useTranslations('errors');
   const tSub = useTranslations('subscription');
   const locale = useLocale();
-  const router = useRouter();
   const queryClient = useQueryClient();
   const { isLoggedIn, isLoading: sessionLoading } = useSession();
 
@@ -104,24 +103,13 @@ export function MealPlanScreen() {
   // B17 — the meal plan is a commitment point, so it needs a login.
   if (!isLoggedIn) {
     return (
-      <>
-        <PageHeader title={t('title')} />
-        <main className="pb-2">
-          <div className="bg-card">
-            <CenteredState>
-              <Salad className="size-12 text-muted-foreground/30" aria-hidden />
-              <p className="mt-4 text-sm text-muted-foreground">{t('subtitle')}</p>
-              <button
-                type="button"
-                onClick={() => router.push('/login?next=/meal-plan')}
-                className="mt-6 h-12 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-              >
-                {te('unauthorized')}
-              </button>
-            </CenteredState>
-          </div>
-        </main>
-      </>
+      <LoginPrompt
+        icon={Salad}
+        title={t('title')}
+        bandSubtitle={t('subtitle')}
+        description={t('loginDescription')}
+        loginHref="/login?next=/meal-plan"
+      />
     );
   }
 

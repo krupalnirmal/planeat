@@ -203,7 +203,7 @@ export function LoginFlow() {
   if (step === 'phone') {
     return (
       <main className="flex min-h-dvh flex-col px-6 pt-6 pb-6">
-        <div className="flex items-center justify-between">
+        <div className="relative flex items-center justify-center">
           <div className="flex items-center gap-1.5">
             <Leaf className="size-7 -rotate-12 text-primary" aria-hidden />
             <p className="text-2xl font-black tracking-tight">
@@ -213,10 +213,12 @@ export function LoginFlow() {
           </div>
 
           {/* B17 — the catalogue is public, so a customer who lands here by
-              accident must have a way back out that is not the OS back button. */}
+              accident must have a way back out that is not the OS back button.
+              Absolutely positioned so it doesn't pull the centred logo off
+              centre. */}
           <Link
             href="/"
-            className="rounded-full bg-card px-4 py-2 text-[13px] font-bold shadow-sm"
+            className="absolute top-0 right-0 rounded-full bg-card px-4 py-2 text-[13px] font-bold shadow-sm"
           >
             {t('skipLogin')}
           </Link>
@@ -278,9 +280,11 @@ export function LoginFlow() {
           </button>
         </form>
 
-        {/* Plain text, not links: the Terms and Privacy pages are M11 work
-            that has not shipped, and a link to a 404 is worse than none. */}
-        <p className="mt-auto border-t border-border pt-4 text-center text-[11px] leading-relaxed text-muted-foreground">
+        {/* A fixed gap, not `mt-auto` — stretching this to the very bottom of
+            the viewport left a large dead gap under the button on anything
+            taller than the shortest phones, with the top and bottom margins
+            reading as mismatched. */}
+        <p className="mt-10 border-t border-border pt-4 text-center text-[11px] leading-relaxed text-muted-foreground">
           {t('termsNote')}
         </p>
       </main>
