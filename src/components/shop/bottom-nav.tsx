@@ -32,7 +32,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label={t('home')}
-      className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] border-t border-border bg-card"
+      className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] border-t border-border bg-accent-faint"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <ul className="grid grid-cols-5 gap-1 px-1.5 py-2">
@@ -47,18 +47,18 @@ export function BottomNav() {
                 aria-current={active ? 'page' : undefined}
                 className={cn(
                   'flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-2xl py-1.5 transition-colors',
-                  active && 'bg-tint-green',
+                  active && 'bg-primary-dark',
                 )}
               >
                 <Icon
-                  className={cn(active ? 'text-primary-dark' : 'text-muted-foreground', 'size-5')}
+                  className={cn(active ? 'text-white' : 'text-muted-foreground', 'size-5')}
                   strokeWidth={active ? 2.4 : 1.8}
                   aria-hidden
                 />
                 <span
                   className={cn(
                     'text-[10.5px] leading-none',
-                    active ? 'font-bold text-primary-dark' : 'text-muted-foreground',
+                    active ? 'font-bold text-white' : 'text-muted-foreground',
                   )}
                 >
                   {t(tab.key)}

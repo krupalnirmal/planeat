@@ -49,6 +49,7 @@
      card and the welcome banner, warm cream behind the Fruits card. */
   --color-tint-green: var(--brand-tint-green);
   --color-tint-yellow: var(--brand-tint-yellow);
+  --color-accent-faint: var(--accent-faint);
 
   --font-sans: var(--font-app);
   --font-heading: var(--font-app);
@@ -101,6 +102,10 @@
   --brand-tint-green: #e8f5ea;
   --brand-tint-yellow: #fdf1de;
 
+  /* A faint wash of the brand's status-bar yellow (--accent, #FFD400) —
+     for a header/footer band that echoes it without shouting. */
+  --accent-faint: #fff3c4;
+
   /* Safe-area aware height of the 5-tab bottom navigation. */
   --bottom-nav-height: 4.25rem;
 }
@@ -123,6 +128,7 @@
   --brand-green-dark: #0b3d1f;
   --brand-tint-green: #10331f;
   --brand-tint-yellow: #332a12;
+  --accent-faint: #3d3212;
 }
 
 @layer base {

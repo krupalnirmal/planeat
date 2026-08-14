@@ -20,8 +20,24 @@ import { formatPaise, paise } from '@/lib/money';
  * that R8 keeps in `app_settings`.
  */
 
-/** Screens where a floating cart bar would be noise or a duplicate. */
-const HIDDEN_ON = ['/cart', '/checkout', '/login', '/profile/complete'];
+/**
+ * Screens where a floating cart bar would be noise or a duplicate — or,
+ * on any screen whose own action button sits in normal page flow rather
+ * than its own fixed bar (addresses, subscription, the meal-plan wizard,
+ * smart-list review), would float on top of that button and block it.
+ */
+const HIDDEN_ON = [
+  '/cart',
+  '/checkout',
+  '/login',
+  '/profile/complete',
+  '/addresses',
+  '/subscription',
+  // The whole meal-plan section (tab, onboarding wizard, plan view, approval)
+  // shares the same in-flow bottom button, not a fixed bar of its own.
+  '/meal-plan',
+  '/smart-list',
+];
 
 export function CartBar() {
   const t = useTranslations('cart');

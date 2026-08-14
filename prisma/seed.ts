@@ -657,12 +657,30 @@ const CATEGORIES: CategorySeed[] = [
   },
 ];
 
-/** B11 — pincode allow-list AND an 8 km radius; both must pass. */
+/**
+ * B11 — pincode allow-list AND a radius from the area's centre; both must
+ * pass. Nashik is the actual target market; the four Ahilyanagar villages
+ * below were the original bootstrap placeholders and stay only because
+ * delivery-partner demo accounts are already linked to them.
+ *
+ * Nashik's pincodes are all centred on roughly the same city-centre
+ * coordinate with a wide 15 km radius — accurate per-locality lat/lng isn't
+ * worth chasing for a demo when one generous radius covers the whole city.
+ */
+const NASHIK_CENTER = { lat: 19.9975, lng: 73.7898 };
 const SERVICE_AREAS = [
-  { name: 'Pathardi', pincode: '414102', lat: 19.1739, lng: 75.1817 },
-  { name: 'Mirajgaon', pincode: '414103', lat: 19.0242, lng: 75.1005 },
-  { name: 'Shevgaon', pincode: '414502', lat: 19.3494, lng: 75.2296 },
-  { name: 'Tisgaon', pincode: '414105', lat: 19.2201, lng: 75.0894 },
+  { name: 'Pathardi', pincode: '414102', lat: 19.1739, lng: 75.1817, radius: 8000 },
+  { name: 'Mirajgaon', pincode: '414103', lat: 19.0242, lng: 75.1005, radius: 8000 },
+  { name: 'Shevgaon', pincode: '414502', lat: 19.3494, lng: 75.2296, radius: 8000 },
+  { name: 'Tisgaon', pincode: '414105', lat: 19.2201, lng: 75.0894, radius: 8000 },
+  { name: 'Nashik (GPO)', pincode: '422001', ...NASHIK_CENTER, radius: 15000 },
+  { name: 'Panchavati', pincode: '422003', ...NASHIK_CENTER, radius: 15000 },
+  { name: 'College Road', pincode: '422005', ...NASHIK_CENTER, radius: 15000 },
+  { name: 'Satpur', pincode: '422007', ...NASHIK_CENTER, radius: 15000 },
+  { name: 'CIDCO', pincode: '422008', ...NASHIK_CENTER, radius: 15000 },
+  { name: 'Indira Nagar', pincode: '422009', ...NASHIK_CENTER, radius: 15000 },
+  { name: 'Gangapur Road', pincode: '422013', ...NASHIK_CENTER, radius: 15000 },
+  { name: 'Nashik Road', pincode: '422101', ...NASHIK_CENTER, radius: 15000 },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -695,7 +713,7 @@ async function seedServiceAreas(): Promise<void> {
         pincode: area.pincode,
         centerLat: area.lat,
         centerLng: area.lng,
-        radiusMeters: 8000,
+        radiusMeters: area.radius,
         deliveryFeePaise: 2500n,
         freeDeliveryThresholdPaise: 29900n,
         slotsJson: {
@@ -703,7 +721,12 @@ async function seedServiceAreas(): Promise<void> {
           subscription: ['SUBSCRIPTION_0630_0900'],
         },
       },
-      update: { name: area.name, centerLat: area.lat, centerLng: area.lng },
+      update: {
+        name: area.name,
+        centerLat: area.lat,
+        centerLng: area.lng,
+        radiusMeters: area.radius,
+      },
     });
   }
   console.info(`  service_areas: ${SERVICE_AREAS.length}`);
