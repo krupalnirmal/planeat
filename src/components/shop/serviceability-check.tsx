@@ -115,10 +115,11 @@ export function ServiceabilityCheck() {
       <button
         type="button"
         onClick={useCurrentLocation}
-        className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-[var(--radius)] border border-border text-sm font-medium"
+        disabled={check.isPending}
+        className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-[var(--radius)] border border-primary text-sm font-semibold text-primary disabled:opacity-60"
       >
-        <LocateFixed className="size-4 text-primary" aria-hidden />
-        {t('checking')}
+        <LocateFixed className={cn('size-4', check.isPending && 'animate-pulse')} aria-hidden />
+        {check.isPending ? t('checking') : t('useCurrentLocation')}
       </button>
 
       {error && <p className="mt-4 text-sm text-danger">{error}</p>}

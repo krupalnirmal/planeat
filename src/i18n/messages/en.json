@@ -877,6 +877,7 @@
   },
   "serviceability": {
     "title": "Do we deliver here?",
+    "useCurrentLocation": "Use my current location",
     "checking": "Checking whether we deliver to your area…",
     "available": "Good news — we deliver to your area.",
     "availableIn": "We deliver in {area}",
