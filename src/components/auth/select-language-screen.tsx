@@ -40,7 +40,7 @@ export function SelectLanguageScreen() {
               onClick={() => setSelected(code)}
               aria-pressed={active}
               className={cn(
-                'input-3d flex h-14 items-center justify-between rounded-[var(--radius)] border px-4 text-base font-bold',
+                'input-3d flex h-12 items-center justify-between rounded-[var(--radius)] border px-4 text-base font-bold',
                 active ? 'border-primary bg-tint-green text-primary-dark' : 'border-border/60 bg-card',
               )}
             >
@@ -58,7 +58,7 @@ export function SelectLanguageScreen() {
       <button
         type="button"
         onClick={confirm}
-        className="h-14 w-full rounded-[var(--radius)] bg-primary text-base font-bold text-primary-foreground"
+        className="h-12 w-full rounded-[var(--radius)] bg-primary text-base font-bold text-primary-foreground"
       >
         {t('continue')}
       </button>

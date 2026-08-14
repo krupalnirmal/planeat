@@ -250,7 +250,7 @@ export function LoginFlow() {
             if (phoneValid && !busy) void sendCode('sms');
           }}
         >
-          <div className="input-3d flex h-14 items-center gap-3 rounded-[var(--radius)] border border-border/60 bg-card px-4 focus-within:border-foreground">
+          <div className="input-3d flex h-12 items-center gap-3 rounded-[var(--radius)] border border-border/60 bg-card px-4 focus-within:border-foreground">
             <span className="text-base font-bold">+91</span>
             <span aria-hidden className="h-6 w-px bg-border" />
             <input
@@ -272,7 +272,7 @@ export function LoginFlow() {
           <button
             type="submit"
             disabled={!phoneValid || busy}
-            className="mt-4 h-14 w-full rounded-[var(--radius)] bg-primary text-base font-bold text-primary-foreground transition-colors disabled:bg-muted-foreground/45 disabled:text-white"
+            className="mt-4 h-12 w-full rounded-[var(--radius)] bg-primary text-base font-bold text-primary-foreground transition-colors disabled:bg-muted-foreground/45 disabled:text-white"
           >
             {busy ? t('sending') : t('sendOtp')}
           </button>
@@ -346,7 +346,7 @@ export function LoginFlow() {
                 onChange={(event) => setDigit(index, event.target.value)}
                 onKeyDown={(event) => handleOtpKeyDown(index, event)}
                 className={cn(
-                  'input-3d h-14 w-full max-w-14 rounded-[var(--radius)] border border-border/60 bg-card text-center text-2xl font-bold outline-none focus:border-primary',
+                  'input-3d h-12 w-full max-w-12 rounded-[var(--radius)] border border-border/60 bg-card text-center text-xl font-bold outline-none focus:border-primary',
                   error && 'border-danger',
                 )}
               />
@@ -400,7 +400,7 @@ export function LoginFlow() {
           <button
             type="submit"
             disabled={code.length !== OTP_LENGTH || busy}
-            className="mt-6 h-14 w-full rounded-[var(--radius)] bg-primary text-base font-bold text-primary-foreground disabled:opacity-50"
+            className="mt-6 h-12 w-full rounded-[var(--radius)] bg-primary text-base font-bold text-primary-foreground disabled:opacity-50"
           >
             {busy ? t('verifying') : t('verify')}
           </button>

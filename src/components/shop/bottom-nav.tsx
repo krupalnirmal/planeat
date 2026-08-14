@@ -47,18 +47,18 @@ export function BottomNav() {
                 aria-current={active ? 'page' : undefined}
                 className={cn(
                   'flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-2xl py-1.5 transition-colors',
-                  active && 'bg-primary-dark',
+                  active && 'bg-tint-green',
                 )}
               >
                 <Icon
-                  className={cn(active ? 'text-white' : 'text-muted-foreground', 'size-5')}
+                  className={cn(active ? 'text-primary' : 'text-muted-foreground', 'size-5')}
                   strokeWidth={active ? 2.4 : 1.8}
                   aria-hidden
                 />
                 <span
                   className={cn(
                     'text-[10.5px] leading-none',
-                    active ? 'font-bold text-white' : 'text-muted-foreground',
+                    active ? 'font-bold text-primary-dark' : 'text-muted-foreground',
                   )}
                 >
                   {t(tab.key)}

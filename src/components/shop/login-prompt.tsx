@@ -61,7 +61,7 @@ export function LoginPrompt({
 
           <Link
             href={loginHref}
-            className="mt-6 flex h-13 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground"
+            className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground"
           >
             <ArrowRight className="size-4" aria-hidden />
             {t('cta')}
