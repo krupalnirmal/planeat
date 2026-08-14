@@ -72,20 +72,26 @@ export function WalletScreen() {
   });
 
   if (sessionLoading) {
-    return <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>;
+    return (
+      <main className="pb-2">
+        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+      </main>
+    );
   }
 
   if (!isLoggedIn) {
     return (
-      <main className="px-6 py-16 text-center">
-        <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
-        <button
-          type="button"
-          onClick={() => router.push('/login?next=/wallet')}
-          className="mt-4 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-        >
-          {tc('next')}
-        </button>
+      <main className="pb-2">
+        <div className="bg-card px-6 py-16 text-center">
+          <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
+          <button
+            type="button"
+            onClick={() => router.push('/login?next=/wallet')}
+            className="mt-4 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+          >
+            {tc('next')}
+          </button>
+        </div>
       </main>
     );
   }
@@ -95,7 +101,8 @@ export function WalletScreen() {
   const rows = transactions.data?.transactions ?? [];
 
   return (
-    <main className="px-4 py-4">
+    <main className="space-y-2 pb-2">
+      <div className="bg-card px-4 py-4">
       <h1 className="mb-4 text-xl font-bold">{t('title')}</h1>
 
       <section className="rounded-[var(--radius)] bg-primary px-5 py-6 text-primary-foreground">
@@ -129,8 +136,10 @@ export function WalletScreen() {
           {t('lowBalance')}
         </p>
       )}
+      </div>
 
-      <div className="mt-6 mb-3 flex items-center justify-between">
+      <div className="bg-card px-4 py-4">
+      <div className="mb-3 flex items-center justify-between">
         <h2 className="text-base font-semibold">{t('transactions')}</h2>
         <div className="flex gap-1">
           {(
@@ -149,7 +158,7 @@ export function WalletScreen() {
                 'min-h-9 rounded-full px-3 text-xs',
                 filter === value
                   ? 'bg-primary text-primary-foreground font-semibold'
-                  : 'bg-card text-muted-foreground',
+                  : 'bg-background text-muted-foreground',
               )}
             >
               {t(labelKey)}
@@ -166,11 +175,11 @@ export function WalletScreen() {
         </p>
       )}
 
-      <ul className="divide-y divide-border overflow-hidden rounded-[var(--radius)] bg-card">
+      <ul className="divide-y divide-border overflow-hidden rounded-[var(--radius)] border border-border/60">
         {rows.map((row) => {
           const isCredit = row.direction === 'CREDIT';
           return (
-            <li key={row.id} className="flex items-center gap-3 px-4 py-3">
+            <li key={row.id} className="flex items-center gap-3 bg-background px-4 py-3">
               <span
                 className={cn(
                   'grid size-9 shrink-0 place-items-center rounded-full',
@@ -225,6 +234,7 @@ export function WalletScreen() {
           onClose={() => setTopupOpen(false)}
         />
       )}
+      </div>
     </main>
   );
 }

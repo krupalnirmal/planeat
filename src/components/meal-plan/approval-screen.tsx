@@ -112,30 +112,40 @@ export function ApprovalScreen({ mealPlanId }: { mealPlanId: string }) {
   });
 
   if (sessionLoading || quote.isLoading) {
-    return <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>;
+    return (
+      <main className="pb-2">
+        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+      </main>
+    );
   }
 
   if (done) {
     return (
-      <main className="px-6 py-20 text-center">
-        <CheckCircle2 className="mx-auto size-14 text-success" aria-hidden />
-        <h1 className="mt-4 text-lg font-bold">{t('successTitle')}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t('successBody', { date: done.startDate })}
-        </p>
-        <Link
-          href="/meal-plan"
-          className="mt-8 flex h-12 items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-        >
-          {t('viewPlan')}
-        </Link>
+      <main className="pb-2">
+        <div className="bg-card px-6 py-20 text-center">
+          <CheckCircle2 className="mx-auto size-14 text-success" aria-hidden />
+          <h1 className="mt-4 text-lg font-bold">{t('successTitle')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t('successBody', { date: done.startDate })}
+          </p>
+          <Link
+            href="/meal-plan"
+            className="mt-8 flex h-12 items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+          >
+            {t('viewPlan')}
+          </Link>
+        </div>
       </main>
     );
   }
 
   const data = quote.data;
   if (!data) {
-    return <main className="px-4 py-8 text-sm text-danger">{tm('generateFailed')}</main>;
+    return (
+      <main className="pb-2">
+        <div className="bg-card px-4 py-8 text-sm text-danger">{tm('generateFailed')}</div>
+      </main>
+    );
   }
 
   const shortfall = paise(data.shortfallPaise);
@@ -147,8 +157,8 @@ export function ApprovalScreen({ mealPlanId }: { mealPlanId: string }) {
     data.canApprove && hasAddress && Boolean(addressId) && !approve.isPending && Boolean(wallet.data);
 
   return (
-    <main className="px-4 py-4">
-      <header className="mb-5 flex items-center gap-2">
+    <>
+      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-card px-3 py-3">
         <Link
           href="/meal-plan"
           aria-label={tc('back')}
@@ -156,11 +166,12 @@ export function ApprovalScreen({ mealPlanId }: { mealPlanId: string }) {
         >
           <ChevronLeft className="size-5" aria-hidden />
         </Link>
-        <h1 className="text-lg font-bold">{t('title')}</h1>
+        <h1 className="text-base font-bold">{t('title')}</h1>
       </header>
 
+      <main className="space-y-2 pb-2">
       {/* ── B5: 7 / 15 / 30 days. First plan defaults to the free trial. */}
-      <section className="rounded-[var(--radius)] bg-card p-4">
+      <section className="bg-card px-4 py-4">
         <h2 className="text-sm font-semibold">{t('duration')}</h2>
         <div className="mt-3 grid grid-cols-3 gap-2">
           {data.durationOptions.map((option) => {
@@ -193,7 +204,7 @@ export function ApprovalScreen({ mealPlanId }: { mealPlanId: string }) {
         <label htmlFor="start-date" className="mt-4 block text-sm font-semibold">
           {t('startDate')}
         </label>
-        <div className="mt-1.5 flex items-center gap-2 rounded-[var(--radius)] border border-border bg-background px-3">
+        <div className="input-3d mt-1.5 flex items-center gap-2 rounded-[var(--radius)] border border-border/60 bg-background px-3">
           <CalendarDays className="size-4 shrink-0 text-primary" aria-hidden />
           <input
             id="start-date"
@@ -210,7 +221,7 @@ export function ApprovalScreen({ mealPlanId }: { mealPlanId: string }) {
       </section>
 
       {/* ── B1: one delivery per day, both meals together. */}
-      <section className="mt-4 flex items-start gap-3 rounded-[var(--radius)] bg-card p-4">
+      <section className="flex items-start gap-3 bg-card px-4 py-4">
         <Truck className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
         <div>
           <p className="text-sm font-semibold">{t('slot')}</p>
@@ -219,7 +230,7 @@ export function ApprovalScreen({ mealPlanId }: { mealPlanId: string }) {
       </section>
 
       {/* ── Address */}
-      <section className="mt-4 rounded-[var(--radius)] bg-card p-4">
+      <section className="bg-card px-4 py-4">
         <div className="flex items-start justify-between gap-3">
           <h2 className="text-sm font-semibold">{t('address')}</h2>
           <Link href="/addresses" className="text-xs font-semibold text-primary">
@@ -260,7 +271,7 @@ export function ApprovalScreen({ mealPlanId }: { mealPlanId: string }) {
       </section>
 
       {/* ── B2: the four things this screen must show. */}
-      <section className="mt-4 rounded-[var(--radius)] bg-card p-4">
+      <section className="bg-card px-4 py-4">
         <h2 className="mb-3 text-sm font-semibold">{t('costTitle')}</h2>
 
         <dl className="space-y-2 text-sm">
@@ -300,8 +311,9 @@ export function ApprovalScreen({ mealPlanId }: { mealPlanId: string }) {
         </p>
       </section>
 
+      <section className="bg-card px-4 py-4">
       {/* B2 — "a clear 'prices vary daily with market rates' line". */}
-      <p className="mt-3 rounded-[var(--radius)] bg-secondary px-4 py-3 text-[11px] leading-relaxed text-muted-foreground">
+      <p className="rounded-[var(--radius)] bg-secondary px-4 py-3 text-[11px] leading-relaxed text-muted-foreground">
         {t('priceWarning')}
       </p>
 
@@ -339,6 +351,7 @@ export function ApprovalScreen({ mealPlanId }: { mealPlanId: string }) {
         {approve.isPending && <Loader2 className="size-4 animate-spin" aria-hidden />}
         {approve.isPending ? t('confirming') : t('confirm')}
       </button>
+      </section>
 
       {topupOpen && wallet.data && (
         <TopupSheet
@@ -351,7 +364,8 @@ export function ApprovalScreen({ mealPlanId }: { mealPlanId: string }) {
           }}
         />
       )}
-    </main>
+      </main>
+    </>
   );
 }
 

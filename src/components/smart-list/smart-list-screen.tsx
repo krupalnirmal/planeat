@@ -118,22 +118,28 @@ export function SmartListScreen() {
   });
 
   if (sessionLoading) {
-    return <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>;
+    return (
+      <main className="pb-2">
+        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+      </main>
+    );
   }
 
   // B17 — the Smart List builds a cart, so it needs a login.
   if (!isLoggedIn) {
     return (
-      <main className="px-6 py-16 text-center">
-        <h1 className="text-lg font-bold">{t('title')}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
-        <button
-          type="button"
-          onClick={() => router.push('/login?next=/smart-list')}
-          className="mt-6 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-        >
-          {te('unauthorized')}
-        </button>
+      <main className="pb-2">
+        <div className="bg-card px-6 py-16 text-center">
+          <h1 className="text-lg font-bold">{t('title')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
+          <button
+            type="button"
+            onClick={() => router.push('/login?next=/smart-list')}
+            className="mt-6 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+          >
+            {te('unauthorized')}
+          </button>
+        </div>
       </main>
     );
   }
@@ -141,7 +147,8 @@ export function SmartListScreen() {
   const busy = uploadVoice.isPending || uploadPhoto.isPending || reparse.isPending || parseTyped.isPending;
 
   return (
-    <main className="px-4 py-4">
+    <main className="pb-2">
+      <div className="bg-card px-4 py-4">
       <h1 className="text-xl font-bold">{t('title')}</h1>
       <p className="mt-1 mb-5 text-sm text-muted-foreground">{t('subtitle')}</p>
 
@@ -160,7 +167,7 @@ export function SmartListScreen() {
 
       {/* ── Transcript editing (M4's editable transcript) */}
       {mode === 'transcript' ? (
-        <section className="rounded-[var(--radius)] bg-card p-4">
+        <section className="rounded-[var(--radius)] border border-border/60 bg-background p-4">
           <h2 className="text-sm font-semibold">{t('transcriptTitle')}</h2>
           <p className="mt-0.5 text-xs text-muted-foreground">{t('transcriptHint')}</p>
 
@@ -168,7 +175,7 @@ export function SmartListScreen() {
             value={transcript}
             onChange={(event) => setTranscript(event.target.value.slice(0, 4000))}
             rows={5}
-            className="mt-3 w-full resize-none rounded-[var(--radius)] border border-border bg-background px-3 py-2 text-sm leading-relaxed outline-none focus:border-primary"
+            className="input-3d mt-3 w-full resize-none rounded-[var(--radius)] border border-border/60 bg-card px-3 py-2 text-sm leading-relaxed outline-none focus:border-primary"
           />
 
           <div className="mt-3 flex gap-3">
@@ -194,14 +201,14 @@ export function SmartListScreen() {
           </div>
         </section>
       ) : mode === 'type' ? (
-        <section className="rounded-[var(--radius)] bg-card p-4">
+        <section className="rounded-[var(--radius)] border border-border/60 bg-background p-4">
           <h2 className="text-sm font-semibold">{t('typeTitle')}</h2>
           <textarea
             value={typed}
             onChange={(event) => setTyped(event.target.value.slice(0, 4000))}
             placeholder={t('typePlaceholder')}
             rows={6}
-            className="mt-3 w-full resize-none rounded-[var(--radius)] border border-border bg-background px-3 py-2 text-sm leading-relaxed outline-none focus:border-primary"
+            className="input-3d mt-3 w-full resize-none rounded-[var(--radius)] border border-border/60 bg-card px-3 py-2 text-sm leading-relaxed outline-none focus:border-primary"
           />
           <div className="mt-3 flex gap-3">
             <button
@@ -234,7 +241,7 @@ export function SmartListScreen() {
               type="button"
               onClick={() => photoInputRef.current?.click()}
               disabled={busy}
-              className="flex h-14 items-center gap-3 rounded-[var(--radius)] border border-border bg-card px-4 text-left disabled:opacity-50"
+              className="flex h-14 items-center gap-3 rounded-[var(--radius)] border border-border bg-background px-4 text-left disabled:opacity-50"
             >
               <Camera className="size-5 shrink-0 text-primary" aria-hidden />
               <span className="text-sm font-semibold">{t('photo')}</span>
@@ -259,7 +266,7 @@ export function SmartListScreen() {
               type="button"
               onClick={() => setMode('type')}
               disabled={busy}
-              className="flex h-14 items-center gap-3 rounded-[var(--radius)] border border-border bg-card px-4 text-left disabled:opacity-50"
+              className="flex h-14 items-center gap-3 rounded-[var(--radius)] border border-border bg-background px-4 text-left disabled:opacity-50"
             >
               <Keyboard className="size-5 shrink-0 text-primary" aria-hidden />
               <span className="text-sm font-semibold">{t('typeInstead')}</span>
@@ -275,7 +282,7 @@ export function SmartListScreen() {
                   <li key={saved.id}>
                     <Link
                       href={`/smart-list/${saved.id}`}
-                      className="flex min-h-14 items-center gap-3 rounded-[var(--radius)] bg-card px-4"
+                      className="flex min-h-14 items-center gap-3 rounded-[var(--radius)] border border-border/60 bg-background px-4"
                     >
                       <Clock className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                       <span className="min-w-0 flex-1">
@@ -294,6 +301,7 @@ export function SmartListScreen() {
           )}
         </>
       )}
+      </div>
     </main>
   );
 }

@@ -102,16 +102,22 @@ export function SubscriptionManageScreen() {
   });
 
   if (current.isLoading) {
-    return <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>;
+    return (
+      <main className="pb-2">
+        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+      </main>
+    );
   }
 
   if (!subscription) {
     return (
-      <main className="px-6 py-16 text-center">
-        <p className="text-sm text-muted-foreground">{t('noSubscription')}</p>
-        <Link href="/meal-plan" className="mt-4 inline-block text-sm font-semibold text-primary">
-          {tc('back')}
-        </Link>
+      <main className="pb-2">
+        <div className="bg-card px-6 py-16 text-center">
+          <p className="text-sm text-muted-foreground">{t('noSubscription')}</p>
+          <Link href="/meal-plan" className="mt-4 inline-block text-sm font-semibold text-primary">
+            {tc('back')}
+          </Link>
+        </div>
       </main>
     );
   }
@@ -120,8 +126,8 @@ export function SubscriptionManageScreen() {
   const isOver = subscription.status === 'CANCELLED' || subscription.status === 'COMPLETED';
 
   return (
-    <main className="px-4 py-4">
-      <header className="mb-5 flex items-center gap-2">
+    <>
+      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-card px-3 py-3">
         <Link
           href="/meal-plan"
           aria-label={tc('back')}
@@ -130,7 +136,7 @@ export function SubscriptionManageScreen() {
           <ChevronLeft className="size-5" aria-hidden />
         </Link>
         <div className="min-w-0">
-          <h1 className="text-lg font-bold">{t('manage')}</h1>
+          <h1 className="text-base font-bold">{t('manage')}</h1>
           <p className="text-xs text-muted-foreground">
             {t('activeUntil', { date: subscription.endDate })} ·{' '}
             {t('daysLeft', { count: subscription.daysUntilEnd })}
@@ -138,19 +144,24 @@ export function SubscriptionManageScreen() {
         </div>
       </header>
 
-      {notice && (
-        <p className="mb-4 rounded-[var(--radius)] bg-primary/5 px-3 py-2.5 text-sm text-success">
-          {notice}
-        </p>
-      )}
-      {error && (
-        <p className="mb-4 rounded-[var(--radius)] bg-danger/10 px-3 py-2.5 text-sm text-danger">
-          {error}
-        </p>
+      <main className="space-y-2 pb-2">
+      {(notice || error) && (
+        <div className="bg-card px-4 py-4">
+          {notice && (
+            <p className="rounded-[var(--radius)] bg-primary/5 px-3 py-2.5 text-sm text-success">
+              {notice}
+            </p>
+          )}
+          {error && (
+            <p className="mt-2 rounded-[var(--radius)] bg-danger/10 px-3 py-2.5 text-sm text-danger">
+              {error}
+            </p>
+          )}
+        </div>
       )}
 
       {/* ── Address for future deliveries */}
-      <section className="rounded-[var(--radius)] bg-card p-4">
+      <section className="bg-card px-4 py-4">
         <h2 className="text-sm font-semibold">{t('changeAddress')}</h2>
         <p className="mt-0.5 text-[11px] text-muted-foreground">{t('addressNote')}</p>
 
@@ -183,7 +194,7 @@ export function SubscriptionManageScreen() {
       </section>
 
       {/* ── Pause / resume */}
-      <section className="mt-4 rounded-[var(--radius)] bg-card p-4">
+      <section className="bg-card px-4 py-4">
         <h2 className="flex items-center gap-2 text-sm font-semibold">
           <CalendarRange className="size-4 text-primary" aria-hidden />
           {t('pauseTitle')}
@@ -213,7 +224,7 @@ export function SubscriptionManageScreen() {
                   min={subscription.startDate}
                   max={subscription.endDate}
                   onChange={(event) => setPauseFrom(event.target.value)}
-                  className="mt-1 h-12 w-full rounded-[var(--radius)] border border-border bg-background px-2 text-sm outline-none focus:border-primary"
+                  className="input-3d mt-1 h-12 w-full rounded-[var(--radius)] border border-border/60 bg-background px-2 text-sm outline-none focus:border-primary"
                 />
               </div>
               <div>
@@ -227,7 +238,7 @@ export function SubscriptionManageScreen() {
                   min={pauseFrom || subscription.startDate}
                   max={subscription.endDate}
                   onChange={(event) => setPauseTo(event.target.value)}
-                  className="mt-1 h-12 w-full rounded-[var(--radius)] border border-border bg-background px-2 text-sm outline-none focus:border-primary"
+                  className="input-3d mt-1 h-12 w-full rounded-[var(--radius)] border border-border/60 bg-background px-2 text-sm outline-none focus:border-primary"
                 />
               </div>
             </div>
@@ -247,7 +258,7 @@ export function SubscriptionManageScreen() {
 
       {/* ── Cancel. B3: unused money always goes back. */}
       {!isOver && (
-        <section className="mt-4 rounded-[var(--radius)] border border-danger/30 bg-card p-4">
+        <section className="border-t-2 border-danger/30 bg-card px-4 py-4">
           <h2 className="text-sm font-semibold text-danger">{t('cancelTitle')}</h2>
           <button
             type="button"
@@ -262,6 +273,7 @@ export function SubscriptionManageScreen() {
           </button>
         </section>
       )}
-    </main>
+      </main>
+    </>
   );
 }

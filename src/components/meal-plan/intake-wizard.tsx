@@ -168,10 +168,12 @@ export function IntakeWizard({
 
   if (generate.isPending) {
     return (
-      <main className="flex flex-col items-center px-6 py-24 text-center">
-        <Loader2 className="size-10 animate-spin text-primary" aria-hidden />
-        <p className="mt-4 text-base font-semibold">{tm('generating')}</p>
-        <p className="mt-1 text-sm text-muted-foreground">{tm('generatingHint')}</p>
+      <main className="pb-2">
+        <div className="flex flex-col items-center bg-card px-6 py-24 text-center">
+          <Loader2 className="size-10 animate-spin text-primary" aria-hidden />
+          <p className="mt-4 text-base font-semibold">{tm('generating')}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{tm('generatingHint')}</p>
+        </div>
       </main>
     );
   }
@@ -187,7 +189,8 @@ export function IntakeWizard({
   ];
 
   return (
-    <main className="px-4 py-4">
+    <main className="pb-2">
+      <div className="bg-card px-4 py-4">
       <header className="mb-5 flex items-center gap-2">
         <button
           type="button"
@@ -353,7 +356,7 @@ export function IntakeWizard({
                   }
                 }}
                 placeholder={t('allergyOtherPlaceholder')}
-                className="h-12 min-w-0 flex-1 rounded-[var(--radius)] border border-border bg-card px-3 text-base outline-none focus:border-primary"
+                className="input-3d h-12 min-w-0 flex-1 rounded-[var(--radius)] border border-border/60 bg-background px-3 text-base outline-none focus:border-primary"
               />
               <button
                 type="button"
@@ -451,7 +454,7 @@ export function IntakeWizard({
         <div className="space-y-4">
           <MedicalDisclaimer />
 
-          <label className="flex cursor-pointer items-start gap-3 rounded-[var(--radius)] border border-border bg-card p-4">
+          <label className="flex cursor-pointer items-start gap-3 rounded-[var(--radius)] border border-border bg-background p-4">
             <input
               type="checkbox"
               checked={draft.consentGiven}
@@ -518,6 +521,7 @@ export function IntakeWizard({
           </button>
         )}
       </div>
+      </div>
     </main>
   );
 }
@@ -572,7 +576,7 @@ function NumberField({
         inputMode="numeric"
         value={value}
         onChange={(event) => onChange(event.target.value.replace(/\D/g, '').slice(0, 3))}
-        className="mt-1.5 h-12 w-full rounded-[var(--radius)] border border-border bg-card px-3 text-center text-base outline-none focus:border-primary"
+        className="input-3d mt-1.5 h-12 w-full rounded-[var(--radius)] border border-border/60 bg-background px-3 text-center text-base outline-none focus:border-primary"
       />
       <p className="mt-1 text-center text-[10px] text-muted-foreground">{unit}</p>
     </div>
@@ -606,7 +610,7 @@ function TextField({
           value={value}
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value.slice(0, 1000))}
-          className="mt-1.5 w-full resize-none rounded-[var(--radius)] border border-border bg-card px-3 py-2 text-sm outline-none focus:border-primary"
+          className="input-3d mt-1.5 w-full resize-none rounded-[var(--radius)] border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-primary"
         />
       ) : (
         <input
@@ -614,7 +618,7 @@ function TextField({
           value={value}
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value.slice(0, 500))}
-          className="mt-1.5 h-12 w-full rounded-[var(--radius)] border border-border bg-card px-3 text-base outline-none focus:border-primary"
+          className="input-3d mt-1.5 h-12 w-full rounded-[var(--radius)] border border-border/60 bg-background px-3 text-base outline-none focus:border-primary"
         />
       )}
     </div>
@@ -639,7 +643,7 @@ function Chip({
         'min-h-11 rounded-full border px-3.5 text-sm transition-colors',
         selected
           ? 'border-primary bg-primary text-primary-foreground font-semibold'
-          : 'border-border bg-card text-muted-foreground',
+          : 'border-border bg-background text-muted-foreground',
       )}
     >
       {label}
@@ -675,7 +679,7 @@ function ChoiceGroup({
               stacked ? 'text-left' : '',
               selected === option.value
                 ? 'border-primary bg-primary/5 font-semibold text-primary'
-                : 'border-border bg-card text-muted-foreground',
+                : 'border-border bg-background text-muted-foreground',
             )}
           >
             {option.label}
@@ -700,7 +704,7 @@ function Counter({
   onChange: (value: number) => void;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-[var(--radius)] border border-border bg-card px-4 py-3">
+    <div className="flex items-center justify-between rounded-[var(--radius)] border border-border bg-background px-4 py-3">
       <span className="text-sm font-medium">{label}</span>
       <div className="flex items-center gap-3">
         <button

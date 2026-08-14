@@ -61,7 +61,8 @@ export function SearchScreen() {
   const products = results.data?.products ?? [];
 
   return (
-    <main className="px-4 py-4">
+    <main className="pb-2">
+      <div className="bg-card px-4 py-4">
       <SearchBar defaultValue={input} autoFocus onChange={setInput} className="mb-4" />
 
       {debounced.length <= 1 && (
@@ -88,7 +89,7 @@ export function SearchScreen() {
                         setInput(term);
                         setDebounced(term);
                       }}
-                      className="flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-sm"
+                      className="flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-sm"
                     >
                       <Clock className="size-3.5 text-muted-foreground" aria-hidden />
                       {term}
@@ -132,6 +133,7 @@ export function SearchScreen() {
           )}
         </>
       )}
+      </div>
     </main>
   );
 }

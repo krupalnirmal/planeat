@@ -121,7 +121,11 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
   });
 
   if (list.isLoading) {
-    return <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>;
+    return (
+      <main className="pb-2">
+        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+      </main>
+    );
   }
 
   const items = list.data?.list.items ?? [];
@@ -131,23 +135,26 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
 
   if (items.length === 0) {
     return (
-      <main className="px-6 py-16 text-center">
-        <AlertCircle className="mx-auto size-10 text-muted-foreground/40" aria-hidden />
-        <p className="mt-4 text-sm font-medium">{t('emptyList')}</p>
-        <p className="mt-1 text-xs text-muted-foreground">{t('emptyPhotoHint')}</p>
-        <button
-          type="button"
-          onClick={() => router.push('/smart-list')}
-          className="mt-6 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-        >
-          {t('typeInstead')}
-        </button>
+      <main className="pb-2">
+        <div className="bg-card px-6 py-16 text-center">
+          <AlertCircle className="mx-auto size-10 text-muted-foreground/40" aria-hidden />
+          <p className="mt-4 text-sm font-medium">{t('emptyList')}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{t('emptyPhotoHint')}</p>
+          <button
+            type="button"
+            onClick={() => router.push('/smart-list')}
+            className="mt-6 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+          >
+            {t('typeInstead')}
+          </button>
+        </div>
       </main>
     );
   }
 
   return (
-    <main className="px-4 py-4">
+    <main className="pb-2">
+      <div className="bg-card px-4 py-4">
       <h1 className="text-xl font-bold">{t('reviewTitle')}</h1>
       <p className="mt-1 mb-4 text-sm text-muted-foreground">{t('reviewHint')}</p>
 
@@ -232,6 +239,7 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
           </li>
         ))}
       </ul>
+      </div>
 
       <div
         className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card px-4 py-3"

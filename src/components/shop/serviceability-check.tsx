@@ -76,7 +76,8 @@ export function ServiceabilityCheck() {
   const phoneValid = /^[6-9]\d{9}$/.test(phone);
 
   return (
-    <main className="px-5 py-8">
+    <main className="pb-2">
+      <div className="bg-card px-5 py-8">
       <h1 className="text-xl font-bold">{t('title')}</h1>
 
       <form
@@ -100,7 +101,7 @@ export function ServiceabilityCheck() {
               setPincode(event.target.value.replace(/\D/g, '').slice(0, 6));
               setResult(null);
             }}
-            className="h-12 min-w-0 flex-1 rounded-[var(--radius)] border border-border bg-card px-3 text-base tracking-wider outline-none focus:border-primary"
+            className="input-3d h-12 min-w-0 flex-1 rounded-[var(--radius)] border border-border/60 bg-background px-3 text-base tracking-wider outline-none focus:border-primary"
           />
           <button
             type="submit"
@@ -140,7 +141,7 @@ export function ServiceabilityCheck() {
       )}
 
       {result && !result.serviceable && result.reason !== 'NO_INPUT' && (
-        <section className="mt-6 rounded-[var(--radius)] border border-border bg-card p-4">
+        <section className="mt-6 rounded-[var(--radius)] border border-border bg-background p-4">
           <p className="flex items-center gap-2 text-sm font-semibold">
             <MapPinOff className="size-5 shrink-0 text-warning" aria-hidden />
             {result.reason === 'OUTSIDE_RADIUS' ? t('outsideRadius') : t('unavailable')}
@@ -173,7 +174,7 @@ export function ServiceabilityCheck() {
                 value={phone}
                 onChange={(event) => setPhone(event.target.value.replace(/\D/g, '').slice(0, 10))}
                 placeholder={ta('phonePlaceholder')}
-                className="mt-1.5 h-12 w-full rounded-[var(--radius)] border border-border bg-background px-3 text-base outline-none focus:border-primary"
+                className="input-3d mt-1.5 h-12 w-full rounded-[var(--radius)] border border-border/60 bg-card px-3 text-base outline-none focus:border-primary"
               />
 
               <button
@@ -197,6 +198,7 @@ export function ServiceabilityCheck() {
           </Link>
         </section>
       )}
+      </div>
     </main>
   );
 }

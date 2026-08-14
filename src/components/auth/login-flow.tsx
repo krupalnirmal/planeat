@@ -210,7 +210,7 @@ export function LoginFlow({ collageImages = [] }: { collageImages?: string[] }) 
                 if (phoneValid && !busy) void sendCode('sms');
               }}
             >
-              <div className="flex h-14 items-center gap-3 rounded-[var(--radius)] border border-border bg-card px-4 focus-within:border-foreground">
+              <div className="input-3d flex h-14 items-center gap-3 rounded-[var(--radius)] border border-border/60 bg-card px-4 focus-within:border-foreground">
                 <span className="text-base font-bold">+91</span>
                 <span aria-hidden className="h-6 w-px bg-border" />
                 <input
@@ -293,7 +293,7 @@ export function LoginFlow({ collageImages = [] }: { collageImages?: string[] }) 
               if (digits.length === 6 && !busy) void verify(digits);
             }}
             className={cn(
-              'mt-1.5 h-14 w-full rounded-[var(--radius)] border border-border bg-card text-center text-2xl font-bold tracking-[0.5em] outline-none focus:border-primary',
+              'input-3d mt-1.5 h-14 w-full rounded-[var(--radius)] border border-border/60 bg-card text-center text-2xl font-bold tracking-[0.5em] outline-none focus:border-primary',
               error && 'border-danger',
             )}
           />

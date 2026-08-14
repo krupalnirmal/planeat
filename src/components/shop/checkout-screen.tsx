@@ -129,7 +129,11 @@ export function CheckoutScreen() {
   });
 
   if (sessionLoading || !user) {
-    return <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>;
+    return (
+      <main className="pb-2">
+        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+      </main>
+    );
   }
 
   const bill = quote.data?.bill;
@@ -144,8 +148,8 @@ export function CheckoutScreen() {
     payment !== 'RAZORPAY';
 
   return (
-    <main className="px-4 py-4">
-      <div className="mb-4 flex items-center gap-2">
+    <>
+      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-card px-3 py-3">
         <Link
           href="/cart"
           aria-label={tc('back')}
@@ -153,11 +157,12 @@ export function CheckoutScreen() {
         >
           <ChevronLeft className="size-5" aria-hidden />
         </Link>
-        <h1 className="text-lg font-bold">{t('title')}</h1>
-      </div>
+        <h1 className="text-base font-bold">{t('title')}</h1>
+      </header>
 
+      <main className="space-y-2 pb-2">
       {/* ── Address */}
-      <section className="rounded-[var(--radius)] bg-card p-4">
+      <section className="bg-card px-4 py-4">
         <div className="flex items-start justify-between gap-3">
           <h2 className="text-sm font-semibold">{t('deliveryAddress')}</h2>
           <Link href="/addresses" className="text-xs font-semibold text-primary">
@@ -211,7 +216,7 @@ export function CheckoutScreen() {
       </section>
 
       {/* ── Slot */}
-      <section className="mt-4 rounded-[var(--radius)] bg-card p-4">
+      <section className="bg-card px-4 py-4">
         <h2 className="text-sm font-semibold">{t('slot')}</h2>
         <div className="mt-3 grid gap-2">
           {SLOTS.map((option) => (
@@ -237,7 +242,7 @@ export function CheckoutScreen() {
       </section>
 
       {/* ── Payment */}
-      <section className="mt-4 rounded-[var(--radius)] bg-card p-4">
+      <section className="bg-card px-4 py-4">
         <h2 className="text-sm font-semibold">{t('payment')}</h2>
         <div className="mt-3 grid gap-2">
           <PaymentOption
@@ -290,7 +295,7 @@ export function CheckoutScreen() {
       </section>
 
       {/* ── Notes */}
-      <section className="mt-4 rounded-[var(--radius)] bg-card p-4">
+      <section className="bg-card px-4 py-4">
         <label htmlFor="notes" className="text-sm font-semibold">
           {t('notes')}
         </label>
@@ -300,20 +305,22 @@ export function CheckoutScreen() {
           onChange={(event) => setNotes(event.target.value.slice(0, 500))}
           placeholder={t('notesPlaceholder')}
           rows={2}
-          className="mt-2 w-full resize-none rounded-[var(--radius)] border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+          className="input-3d mt-2 w-full resize-none rounded-[var(--radius)] border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-primary"
         />
       </section>
 
       {bill && (
-        <div className="mt-4">
+        <div className="bg-card px-4 py-4">
           <BillSummary bill={bill} />
         </div>
       )}
 
       {error && (
-        <p className="mt-4 rounded-[var(--radius)] bg-danger/10 px-3 py-2.5 text-sm text-danger">
-          {error}
-        </p>
+        <div className="bg-card px-4 py-4">
+          <p className="rounded-[var(--radius)] bg-danger/10 px-3 py-2.5 text-sm text-danger">
+            {error}
+          </p>
+        </div>
       )}
 
       <div
@@ -335,7 +342,8 @@ export function CheckoutScreen() {
       </div>
 
       <div aria-hidden className="h-16" />
-    </main>
+      </main>
+    </>
   );
 }
 

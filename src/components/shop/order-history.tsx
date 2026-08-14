@@ -59,20 +59,26 @@ export function OrderHistory() {
   });
 
   if (sessionLoading) {
-    return <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>;
+    return (
+      <main className="pb-2">
+        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+      </main>
+    );
   }
 
   if (!isLoggedIn) {
     return (
-      <main className="px-6 py-16 text-center">
-        <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
-        <button
-          type="button"
-          onClick={() => router.push('/login?next=/orders')}
-          className="mt-4 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-        >
-          {tc('next')}
-        </button>
+      <main className="pb-2">
+        <div className="bg-card px-6 py-16 text-center">
+          <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
+          <button
+            type="button"
+            onClick={() => router.push('/login?next=/orders')}
+            className="mt-4 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+          >
+            {tc('next')}
+          </button>
+        </div>
       </main>
     );
   }
@@ -80,7 +86,8 @@ export function OrderHistory() {
   const list = orders.data?.orders ?? [];
 
   return (
-    <main className="px-4 py-4">
+    <main className="pb-2">
+      <div className="bg-card px-4 py-4">
       <h1 className="mb-4 text-xl font-bold">{t('title')}</h1>
 
       {notice && (
@@ -106,7 +113,7 @@ export function OrderHistory() {
 
       <ul className="space-y-3">
         {list.map((order) => (
-          <li key={order.id} className="rounded-[var(--radius)] bg-card p-4">
+          <li key={order.id} className="rounded-[var(--radius)] border border-border/60 bg-background p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-sm font-semibold">
@@ -169,6 +176,7 @@ export function OrderHistory() {
           </li>
         ))}
       </ul>
+      </div>
     </main>
   );
 }

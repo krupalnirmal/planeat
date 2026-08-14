@@ -77,10 +77,11 @@ export function ProfileScreen() {
   ] as const;
 
   return (
-    <main className="px-4 py-6">
+    <main className="space-y-2 pb-2">
+      <div className="bg-card px-4 py-6">
       <h1 className="text-xl font-bold">{t('title')}</h1>
 
-      <section className="mt-4 flex items-center gap-3 rounded-[var(--radius)] bg-card p-4">
+      <section className="mt-4 flex items-center gap-3 rounded-[var(--radius)] border border-border/60 bg-background p-4">
         <span className="grid size-12 shrink-0 place-items-center rounded-full bg-primary/10 text-lg font-bold text-primary">
           {user?.name?.trim().charAt(0) ?? <UserRound className="size-6" aria-hidden />}
         </span>
@@ -107,8 +108,9 @@ export function ProfileScreen() {
         <p className="mb-2 text-sm font-medium text-muted-foreground">{tl('label')}</p>
         <LanguageSwitcher />
       </section>
+      </div>
 
-      <ul className="mt-6 divide-y divide-border overflow-hidden rounded-[var(--radius)] bg-card">
+      <ul className="divide-y divide-border bg-card">
         {liveRows.map(({ key, icon: Icon, href }) => (
           <li key={key}>
             <Link href={href} className="flex items-center gap-3 px-4 py-3.5">
@@ -135,7 +137,7 @@ export function ProfileScreen() {
       </ul>
 
       {isLoggedIn && (
-        <ul className="mt-4 divide-y divide-border overflow-hidden rounded-[var(--radius)] bg-card">
+        <ul className="divide-y divide-border bg-card">
           <li>
             <button
               type="button"

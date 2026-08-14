@@ -90,23 +90,29 @@ export function MealPlanScreen() {
   });
 
   if (sessionLoading || (isLoggedIn && current.isLoading)) {
-    return <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>;
+    return (
+      <main className="pb-2">
+        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+      </main>
+    );
   }
 
   // B17 — the meal plan is a commitment point, so it needs a login.
   if (!isLoggedIn) {
     return (
-      <main className="px-6 py-16 text-center">
-        <Salad className="mx-auto size-12 text-muted-foreground/30" aria-hidden />
-        <h1 className="mt-4 text-lg font-bold">{t('title')}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
-        <button
-          type="button"
-          onClick={() => router.push('/login?next=/meal-plan')}
-          className="mt-6 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-        >
-          {te('unauthorized')}
-        </button>
+      <main className="pb-2">
+        <div className="bg-card px-6 py-16 text-center">
+          <Salad className="mx-auto size-12 text-muted-foreground/30" aria-hidden />
+          <h1 className="mt-4 text-lg font-bold">{t('title')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
+          <button
+            type="button"
+            onClick={() => router.push('/login?next=/meal-plan')}
+            className="mt-6 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+          >
+            {te('unauthorized')}
+          </button>
+        </div>
       </main>
     );
   }
@@ -123,27 +129,30 @@ export function MealPlanScreen() {
   // ── No plan yet.
   if (!plan) {
     return (
-      <main className="px-6 py-16 text-center">
-        <Salad className="mx-auto size-12 text-primary/40" aria-hidden />
-        <h1 className="mt-4 text-lg font-bold">{t('title')}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t('startHint')}</p>
+      <main className="pb-2">
+        <div className="bg-card px-6 py-16 text-center">
+          <Salad className="mx-auto size-12 text-primary/40" aria-hidden />
+          <h1 className="mt-4 text-lg font-bold">{t('title')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('startHint')}</p>
 
-        <Link
-          href="/meal-plan/onboarding"
-          className="mt-6 flex h-12 items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-        >
-          {t('start')}
-        </Link>
+          <Link
+            href="/meal-plan/onboarding"
+            className="mt-6 flex h-12 items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+          >
+            {t('start')}
+          </Link>
 
-        <div className="mt-8 text-left">
-          <MedicalDisclaimer />
+          <div className="mt-8 text-left">
+            <MedicalDisclaimer />
+          </div>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="px-4 py-4">
+    <main className="pb-2">
+      <div className="bg-card px-4 py-4">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-xl font-bold">{t('title')}</h1>
@@ -243,7 +252,7 @@ export function MealPlanScreen() {
 
       {/* B2 — the approval screen shows an estimated daily cost and says plainly
           that prices move. The full period total and prepay land in Phase 5. */}
-      <section className="mt-5 rounded-[var(--radius)] bg-card p-4">
+      <section className="mt-5 rounded-[var(--radius)] border border-border/60 bg-background p-4">
         <div className="flex items-baseline justify-between">
           <span className="text-sm text-muted-foreground">{t('estimatedDaily')}</span>
           <span className="text-lg font-bold">
@@ -298,6 +307,7 @@ export function MealPlanScreen() {
 
       <div className="mt-6">
         <MedicalDisclaimer />
+      </div>
       </div>
     </main>
   );

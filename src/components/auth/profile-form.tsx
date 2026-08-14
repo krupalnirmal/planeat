@@ -63,7 +63,8 @@ export function ProfileForm() {
   }
 
   return (
-    <main className="px-5 py-8">
+    <main className="pb-2">
+      <div className="bg-card px-5 py-8">
       <h1 className="text-xl font-bold">{t('completeTitle')}</h1>
       <p className="mt-1 text-sm text-muted-foreground">{t('completeSubtitle')}</p>
 
@@ -84,7 +85,7 @@ export function ProfileForm() {
             onChange={(event) => setName(event.target.value)}
             placeholder={t('namePlaceholder')}
             autoComplete="name"
-            className="mt-1.5 h-12 w-full rounded-[var(--radius)] border border-border bg-card px-3 text-base outline-none focus:border-primary"
+            className="input-3d mt-1.5 h-12 w-full rounded-[var(--radius)] border border-border/60 bg-background px-3 text-base outline-none focus:border-primary"
           />
         </div>
 
@@ -99,7 +100,7 @@ export function ProfileForm() {
             value={dob}
             max={new Date().toISOString().slice(0, 10)}
             onChange={(event) => setDob(event.target.value)}
-            className="mt-1.5 h-12 w-full rounded-[var(--radius)] border border-border bg-card px-3 text-base outline-none focus:border-primary"
+            className="input-3d mt-1.5 h-12 w-full rounded-[var(--radius)] border border-border/60 bg-background px-3 text-base outline-none focus:border-primary"
           />
         </div>
 
@@ -119,7 +120,7 @@ export function ProfileForm() {
                   'min-h-11 rounded-full border px-4 text-sm transition-colors',
                   gender === option
                     ? 'border-primary bg-primary text-primary-foreground font-semibold'
-                    : 'border-border bg-card text-muted-foreground',
+                    : 'border-border bg-background text-muted-foreground',
                 )}
               >
                 {t(GENDER_KEYS[option])}
@@ -146,6 +147,7 @@ export function ProfileForm() {
           {tc('skip')}
         </button>
       </form>
+      </div>
     </main>
   );
 }

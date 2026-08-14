@@ -155,7 +155,7 @@ export function Recorder({
   }
 
   return (
-    <div className="rounded-[var(--radius)] bg-card p-5 text-center">
+    <div className="rounded-[var(--radius)] border border-border/60 bg-background p-5 text-center">
       {recording ? (
         <>
           <div

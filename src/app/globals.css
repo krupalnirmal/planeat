@@ -158,4 +158,23 @@
   .app-scroll {
     padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
   }
+
+  /* A soft, "pressed-in" field rather than a flat outlined box — a faint
+     inner shadow reading as depth, an inset highlight along the top edge
+     for the bevel, the whole thing lifting slightly on focus. Used on every
+     text input across the app (address form, PIN check, search). */
+  .input-3d {
+    box-shadow:
+      inset 0 1px 3px 0 rgb(0 0 0 / 0.07),
+      inset 0 1px 0 0 rgb(255 255 255 / 0.7),
+      0 1px 0 0 rgb(255 255 255 / 0.6);
+    transition: box-shadow 150ms ease, border-color 150ms ease;
+  }
+
+  .input-3d:focus {
+    box-shadow:
+      inset 0 1px 3px 0 rgb(0 0 0 / 0.07),
+      inset 0 1px 0 0 rgb(255 255 255 / 0.7),
+      0 0 0 3px var(--brand-tint-green);
+  }
 }

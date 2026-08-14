@@ -64,20 +64,26 @@ export function AddressManager() {
   });
 
   if (isLoading) {
-    return <main className="px-5 py-8 text-sm text-muted-foreground">{tc('loading')}</main>;
+    return (
+      <main className="pb-2">
+        <div className="bg-card px-5 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+      </main>
+    );
   }
 
   if (!isLoggedIn) {
     return (
-      <main className="px-5 py-8">
-        <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
-        <button
-          type="button"
-          onClick={() => router.push('/login?next=/addresses')}
-          className="mt-4 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-        >
-          {tc('next')}
-        </button>
+      <main className="pb-2">
+        <div className="bg-card px-5 py-8">
+          <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
+          <button
+            type="button"
+            onClick={() => router.push('/login?next=/addresses')}
+            className="mt-4 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+          >
+            {tc('next')}
+          </button>
+        </div>
       </main>
     );
   }
@@ -85,7 +91,8 @@ export function AddressManager() {
   const list = addresses.data?.addresses ?? [];
 
   return (
-    <main className="px-5 py-6">
+    <main className="space-y-2 pb-2">
+      <div className="bg-card px-5 py-6">
       <h1 className="text-xl font-bold">{t('title')}</h1>
 
       {adding ? (
@@ -169,6 +176,7 @@ export function AddressManager() {
           </button>
         </>
       )}
+      </div>
     </main>
   );
 }
@@ -381,7 +389,7 @@ function Field({
         value={value}
         inputMode={inputMode}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-1.5 h-12 w-full rounded-[var(--radius)] border border-border bg-card px-3 text-base outline-none focus:border-primary"
+        className="input-3d mt-1.5 h-12 w-full rounded-[var(--radius)] border border-border/60 bg-background px-3 text-base outline-none focus:border-primary"
       />
     </div>
   );

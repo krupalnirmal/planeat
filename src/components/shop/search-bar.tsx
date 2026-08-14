@@ -48,7 +48,7 @@ export function SearchBar({
         if (query) router.push(`/search?q=${encodeURIComponent(query)}`);
       }}
       className={cn(
-        'flex h-12 items-center gap-2.5 rounded-[var(--radius)] bg-card pr-1 pl-3.5 shadow-sm',
+        'input-3d flex h-12 items-center gap-2.5 rounded-[var(--radius)] bg-card pr-1 pl-3.5',
         className,
       )}
     >

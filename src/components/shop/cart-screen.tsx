@@ -52,21 +52,27 @@ export function CartScreen() {
     .toString();
 
   if (sessionLoading || cart.isLoading) {
-    return <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>;
+    return (
+      <main className="pb-2">
+        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+      </main>
+    );
   }
 
   if (cart.lines.length === 0) {
     return (
-      <main className="flex flex-col items-center px-6 py-16 text-center">
-        <ShoppingCart className="size-12 text-muted-foreground/30" aria-hidden />
-        <h1 className="mt-4 text-base font-semibold">{t('empty')}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t('emptyHint')}</p>
-        <Link
-          href="/"
-          className="mt-6 flex h-12 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-        >
-          {t('startShopping')}
-        </Link>
+      <main className="pb-2">
+        <div className="flex flex-col items-center bg-card px-6 py-16 text-center">
+          <ShoppingCart className="size-12 text-muted-foreground/30" aria-hidden />
+          <h1 className="mt-4 text-base font-semibold">{t('empty')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('emptyHint')}</p>
+          <Link
+            href="/"
+            className="mt-6 flex h-12 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+          >
+            {t('startShopping')}
+          </Link>
+        </div>
       </main>
     );
   }
@@ -76,15 +82,17 @@ export function CartScreen() {
   // which is where B17 puts the commitment point anyway.
   if (!isLoggedIn) {
     return (
-      <main className="px-6 py-16 text-center">
-        <ShoppingCart className="mx-auto size-12 text-muted-foreground/30" aria-hidden />
-        <p className="mt-4 text-sm font-medium">{t('itemCount', { count: cart.itemCount })}</p>
-        <Link
-          href="/login?next=/cart"
-          className="mt-6 flex h-12 items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-        >
-          {t('proceed')}
-        </Link>
+      <main className="pb-2">
+        <div className="bg-card px-6 py-16 text-center">
+          <ShoppingCart className="mx-auto size-12 text-muted-foreground/30" aria-hidden />
+          <p className="mt-4 text-sm font-medium">{t('itemCount', { count: cart.itemCount })}</p>
+          <Link
+            href="/login?next=/cart"
+            className="mt-6 flex h-12 items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+          >
+            {t('proceed')}
+          </Link>
+        </div>
       </main>
     );
   }
@@ -92,7 +100,8 @@ export function CartScreen() {
   const blocked = (quote.data?.unavailableLines.length ?? 0) > 0;
 
   return (
-    <main className="px-4 py-4">
+    <main className="space-y-2 pb-2">
+      <div className="bg-card px-4 py-4">
       <h1 className="mb-1 text-xl font-bold">{t('title')}</h1>
       <p className="mb-4 text-sm text-muted-foreground">
         {t('itemCount', { count: cart.itemCount })}
@@ -113,7 +122,7 @@ export function CartScreen() {
             <li
               key={line.id}
               className={cn(
-                'flex gap-3 rounded-[var(--radius)] bg-card p-3',
+                'flex gap-3 rounded-[var(--radius)] border border-border/60 bg-background p-3',
                 unavailable && 'opacity-70',
               )}
             >
@@ -178,6 +187,7 @@ export function CartScreen() {
           <BillSummary bill={quote.data.bill} savedPaise={savedPaise} />
         </div>
       )}
+      </div>
 
       {/* Sticky above the bottom nav so the total and the next step are always
           on screen, however long the cart gets. */}
