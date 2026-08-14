@@ -186,6 +186,7 @@ function AddressForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: () 
   const [city, setCity] = useState('');
   const [pincode, setPincode] = useState('');
   const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [detectedAddress, setDetectedAddress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
 
@@ -218,13 +219,38 @@ function AddressForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: () 
       return;
     }
     setLocating(true);
+    setError(null);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setCoords({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-        setLocating(false);
+      async (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        setCoords({ latitude, longitude });
+
+        // A pair of coordinates isn't an address a customer can recognise —
+        // resolve it to one and fill the form, rather than leaving them to
+        // type the same details GPS just found.
+        try {
+          const resolved = await api.get<{
+            line1: string;
+            landmark: string;
+            city: string;
+            state: string;
+            pincode: string;
+            displayName: string;
+          }>(`/api/geocode/reverse?lat=${latitude}&lng=${longitude}`);
+
+          if (resolved.line1) setLine1(resolved.line1);
+          if (resolved.landmark) setLandmark(resolved.landmark);
+          if (resolved.city) setCity(resolved.city);
+          if (resolved.pincode) setPincode(resolved.pincode);
+          setDetectedAddress(resolved.displayName || null);
+        } catch {
+          // Coordinates are still attached to the address even if reverse
+          // geocoding fails — the customer just has to type the rest.
+          setDetectedAddress(null);
+        } finally {
+          setLocating(false);
+        }
       },
       () => {
         setError(t('locationDenied'));
@@ -269,6 +295,30 @@ function AddressForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: () 
         </div>
       </fieldset>
 
+      <div>
+        <button
+          type="button"
+          onClick={useCurrentLocation}
+          disabled={locating}
+          className="flex min-h-11 w-full items-center justify-center gap-2 rounded-[var(--radius)] border border-primary text-sm font-semibold text-primary disabled:opacity-60"
+        >
+          <LocateFixed className={cn('size-4', locating && 'animate-pulse')} aria-hidden />
+          {locating ? t('locating') : t('useCurrentLocation')}
+        </button>
+        {detectedAddress && (
+          <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
+            <MapPin className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden />
+            <span>{t('detectedAddress', { address: detectedAddress })}</span>
+          </p>
+        )}
+      </div>
+
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="h-px flex-1 bg-border" aria-hidden />
+        {t('orEnterManually')}
+        <span className="h-px flex-1 bg-border" aria-hidden />
+      </div>
+
       <Field id="line1" label={t('line1')} value={line1} onChange={setLine1} />
       <Field id="line2" label={t('line2')} value={line2} onChange={setLine2} optional />
       <Field id="landmark" label={t('landmark')} value={landmark} onChange={setLandmark} optional />
@@ -280,15 +330,6 @@ function AddressForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: () 
         onChange={(value) => setPincode(value.replace(/\D/g, '').slice(0, 6))}
         inputMode="numeric"
       />
-
-      <button
-        type="button"
-        onClick={useCurrentLocation}
-        className="flex min-h-11 w-full items-center justify-center gap-2 rounded-[var(--radius)] border border-border text-sm font-medium"
-      >
-        <LocateFixed className={cn('size-4 text-primary', locating && 'animate-pulse')} aria-hidden />
-        {coords ? `${coords.latitude.toFixed(4)}, ${coords.longitude.toFixed(4)}` : t('useCurrentLocation')}
-      </button>
 
       {error && <p className="text-sm text-danger">{error}</p>}
 

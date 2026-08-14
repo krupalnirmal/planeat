@@ -151,6 +151,9 @@
     "empty": "अजून एकही पत्ता जोडलेला नाही",
     "deleteConfirm": "हा पत्ता काढून टाकायचा का?",
     "useCurrentLocation": "सध्याचे ठिकाण वापरा",
+    "locating": "ठिकाण शोधत आहोत…",
+    "detectedAddress": "सापडलेला पत्ता: {address}",
+    "orEnterManually": "किंवा हाताने टाका",
     "locationDenied": "ठिकाणाची परवानगी मिळाली नाही. पिन कोड हाताने टाका."
   },
   "cart": {

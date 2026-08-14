@@ -151,6 +151,9 @@
     "empty": "अभी कोई पता नहीं जोड़ा गया",
     "deleteConfirm": "यह पता हटाना है?",
     "useCurrentLocation": "मौजूदा जगह लें",
+    "locating": "जगह ढूंढ रहे हैं…",
+    "detectedAddress": "मिला पता: {address}",
+    "orEnterManually": "या ख़ुद डालें",
     "locationDenied": "जगह की अनुमति नहीं मिली। पिन कोड ख़ुद डालें।"
   },
   "cart": {

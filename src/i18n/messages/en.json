@@ -151,6 +151,9 @@
     "empty": "No addresses saved yet",
     "deleteConfirm": "Delete this address?",
     "useCurrentLocation": "Use my current location",
+    "locating": "Finding your location…",
+    "detectedAddress": "Detected: {address}",
+    "orEnterManually": "or enter manually",
     "locationDenied": "Location permission denied. Enter the PIN code manually."
   },
   "cart": {
