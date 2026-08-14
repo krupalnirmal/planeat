@@ -42,6 +42,8 @@ export interface CategoryView {
   name: string;
   iconUrl: string | null;
   isMealPlanEligible: boolean;
+  imageUrl: string | null;
+  productCount: number;
 }
 
 const CARD_IMAGE_WIDTH = 300;
@@ -211,6 +213,8 @@ export async function getHomePayload(locale: Locale): Promise<HomePayload> {
       name: pickName(c, locale),
       iconUrl: c.iconUrl,
       isMealPlanEligible: c.products.some((p) => p.isMealPlanEligible),
+      imageUrl: firstImageUrl(c.products[0]?.imageUrls),
+      productCount: c._count.products,
     })),
 
     banners: banners.map((b) => ({
@@ -252,7 +256,13 @@ export async function getCategories(locale: Locale): Promise<CategoryView[]> {
       nameMr: true,
       nameHi: true,
       iconUrl: true,
-      products: { where: { isActive: true }, select: { isMealPlanEligible: true }, take: 1 },
+      products: {
+        where: { isActive: true },
+        orderBy: { sortOrder: 'asc' },
+        select: { isMealPlanEligible: true, imageUrls: true },
+        take: 1,
+      },
+      _count: { select: { products: { where: { isActive: true } } } },
     },
   });
 
@@ -262,11 +272,13 @@ export async function getCategories(locale: Locale): Promise<CategoryView[]> {
     name: pickName(c, locale),
     iconUrl: c.iconUrl,
     isMealPlanEligible: c.products.some((p) => p.isMealPlanEligible),
+    imageUrl: firstImageUrl(c.products[0]?.imageUrls),
+    productCount: c._count.products,
   }));
 }
 
 export interface CategoryProductsResult {
-  category: CategoryView;
+  category: Pick<CategoryView, 'id' | 'slug' | 'name' | 'iconUrl' | 'isMealPlanEligible'>;
   products: ProductCardView[];
   total: number;
 }

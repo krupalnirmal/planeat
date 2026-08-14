@@ -83,7 +83,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           id="categories-heading"
           title={t('categories')}
           icon={<LayoutGrid className="size-4.5 text-primary" aria-hidden />}
-          seeAllHref="/category/vegetables"
+          seeAllHref="/categories"
           seeAllLabel={tc('seeAll')}
         >
           {categories.length > 0 ? (

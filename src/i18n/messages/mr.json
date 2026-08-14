@@ -113,7 +113,14 @@
     "grocery": "किराणा",
     "empty": "या श्रेणीत सध्या काहीही नाही",
     "productCount": "{count} वस्तू",
-    "other": "इतर"
+    "other": "इतर",
+    "title": "श्रेण्या",
+    "searchPlaceholder": "{category} शोधा",
+    "filter": "फिल्टर",
+    "sortDefault": "शिफारस केलेले",
+    "sortPriceAsc": "किंमत: कमी ते जास्त",
+    "sortPriceDesc": "किंमत: जास्त ते कमी",
+    "sortNameAsc": "नावाप्रमाणे (A-Z)"
   },
   "product": {
     "add": "घाला",
@@ -128,7 +135,11 @@
     "nutrition": "पोषणमूल्ये",
     "similar": "अशीच उत्पादने",
     "lowStock": "फक्त {count} शिल्लक",
-    "notFound": "हे उत्पादन सापडले नाही"
+    "notFound": "हे उत्पादन सापडले नाही",
+    "selectQuantity": "प्रमाण निवडा",
+    "decreaseQuantity": "प्रमाण कमी करा",
+    "increaseQuantity": "प्रमाण वाढवा",
+    "addToCart": "कार्टमध्ये टाका"
   },
   "search": {
     "placeholder": "कांदा, टोमॅटो, दूध…",
@@ -184,7 +195,8 @@
     "belowMinimum": "किमान {amount} ची ऑर्डर आवश्यक आहे",
     "unavailableItems": "काही वस्तू आता उपलब्ध नाहीत",
     "removeUnavailable": "त्या काढून टाका",
-    "outOfStockLine": "फक्त {count} शिल्लक"
+    "outOfStockLine": "फक्त {count} शिल्लक",
+    "deliverTo": "डिलिव्हरीचा पत्ता"
   },
   "checkout": {
     "title": "ऑर्डर निश्चित करा",
@@ -232,8 +244,6 @@
     "deliveryOtpHint": "डिलिव्हरी बॉय आल्यावर हा कोड त्याला सांगा",
     "deliveryOtpWithRider": "{rider} आल्यावर हा कोड त्याला सांगा",
     "notFound": "ही ऑर्डर सापडली नाही",
-    "successTitle": "ऑर्डर मिळाली!",
-    "successBody": "आम्ही लवकरच तुमच्याकडे पोहोचतो.",
     "status": {
       "PLACED": "ऑर्डर नोंदवली",
       "CONFIRMED": "स्वीकारली",
@@ -249,7 +259,12 @@
       "WALLET": "वॉलेट",
       "RAZORPAY": "ऑनलाइन",
       "COD": "रोख"
-    }
+    },
+    "confirmedTitle": "ऑर्डर कन्फर्म झाली!",
+    "confirmedBody": "तुमच्या ऑर्डरसाठी धन्यवाद. तुमची ऑर्डर यशस्वीरित्या नोंदवली गेली आहे.",
+    "orderIdLabel": "ऑर्डर आयडी",
+    "trackOrder": "ऑर्डर ट्रॅक करा",
+    "backToHome": "मुख्यपृष्ठावर परत जा"
   },
   "issue": {
     "title": "काय अडचण आली?",

@@ -1,9 +1,8 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Check, ChevronLeft, CircleAlert, ImageIcon, MapPin, PartyPopper } from 'lucide-react';
+import { Check, ChevronLeft, CircleAlert, ImageIcon, MapPin } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { OrderStatusBadge, type OrderStatusValue } from '@/components/shop/order-status-badge';
@@ -68,14 +67,11 @@ export function OrderDetail({ orderId }: { orderId: string }) {
   const tc = useTranslations('common');
   const te = useTranslations('errors');
   const format = useFormatter();
-  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const { isLoading: sessionLoading } = useSession();
 
   const [notice, setNotice] = useState<string | null>(null);
   const [reporting, setReporting] = useState(false);
-
-  const justPlaced = searchParams.get('placed') === '1';
 
   const detail = useQuery({
     queryKey: ['order', orderId],
@@ -160,25 +156,11 @@ export function OrderDetail({ orderId }: { orderId: string }) {
       </header>
 
       <div className="space-y-2 pt-2 pb-2">
-        {(justPlaced && !cancelled) || notice ? (
+        {notice && (
           <div className="bg-card px-4 py-4">
-            {justPlaced && !cancelled && (
-              <section className="flex items-start gap-3 rounded-[var(--radius)] bg-primary/5 px-4 py-3">
-                <PartyPopper className="mt-0.5 size-5 shrink-0 text-success" aria-hidden />
-                <div>
-                  <p className="text-sm font-semibold text-success">{t('successTitle')}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{t('successBody')}</p>
-                </div>
-              </section>
-            )}
-
-            {notice && (
-              <p className="mt-3 rounded-[var(--radius)] bg-secondary px-3 py-2.5 text-sm first:mt-0">
-                {notice}
-              </p>
-            )}
+            <p className="rounded-[var(--radius)] bg-secondary px-3 py-2.5 text-sm">{notice}</p>
           </div>
-        ) : null}
+        )}
 
         {/* ── Status timeline */}
         {!cancelled && (

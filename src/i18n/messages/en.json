@@ -113,7 +113,14 @@
     "grocery": "Grocery",
     "empty": "Nothing in this category yet",
     "productCount": "{count} items",
-    "other": "Other"
+    "other": "Other",
+    "title": "Categories",
+    "searchPlaceholder": "Search {category}",
+    "filter": "Filter",
+    "sortDefault": "Recommended",
+    "sortPriceAsc": "Price: Low to High",
+    "sortPriceDesc": "Price: High to Low",
+    "sortNameAsc": "Name: A to Z"
   },
   "product": {
     "add": "ADD",
@@ -128,7 +135,11 @@
     "nutrition": "Nutrition",
     "similar": "Similar products",
     "lowStock": "Only {count} left",
-    "notFound": "We couldn't find that product"
+    "notFound": "We couldn't find that product",
+    "selectQuantity": "Select Quantity",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity",
+    "addToCart": "Add to Cart"
   },
   "search": {
     "placeholder": "Onion, tomato, milk…",
@@ -184,7 +195,8 @@
     "belowMinimum": "Minimum order value is {amount}",
     "unavailableItems": "Some items are no longer available",
     "removeUnavailable": "Remove them",
-    "outOfStockLine": "Only {count} left"
+    "outOfStockLine": "Only {count} left",
+    "deliverTo": "Deliver to"
   },
   "checkout": {
     "title": "Confirm your order",
@@ -232,8 +244,6 @@
     "deliveryOtpHint": "Read this code out when the delivery partner arrives",
     "deliveryOtpWithRider": "Read this code out to {rider} when they arrive",
     "notFound": "We couldn't find that order",
-    "successTitle": "Order received!",
-    "successBody": "We'll be with you shortly.",
     "status": {
       "PLACED": "Placed",
       "CONFIRMED": "Confirmed",
@@ -249,7 +259,12 @@
       "WALLET": "Wallet",
       "RAZORPAY": "Online",
       "COD": "Cash"
-    }
+    },
+    "confirmedTitle": "Order Confirmed!",
+    "confirmedBody": "Thank you for your order. Your order has been placed successfully.",
+    "orderIdLabel": "Order ID",
+    "trackOrder": "Track Order",
+    "backToHome": "Back to Home"
   },
   "issue": {
     "title": "What went wrong?",

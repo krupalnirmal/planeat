@@ -113,7 +113,14 @@
     "grocery": "किराना",
     "empty": "इस श्रेणी में अभी कुछ नहीं है",
     "productCount": "{count} चीज़ें",
-    "other": "अन्य"
+    "other": "अन्य",
+    "title": "श्रेणियाँ",
+    "searchPlaceholder": "{category} खोजें",
+    "filter": "फ़िल्टर",
+    "sortDefault": "अनुशंसित",
+    "sortPriceAsc": "कीमत: कम से ज़्यादा",
+    "sortPriceDesc": "कीमत: ज़्यादा से कम",
+    "sortNameAsc": "नाम अनुसार (A-Z)"
   },
   "product": {
     "add": "जोड़ें",
@@ -128,7 +135,11 @@
     "nutrition": "पोषण",
     "similar": "ऐसे ही उत्पाद",
     "lowStock": "सिर्फ़ {count} बचे",
-    "notFound": "यह उत्पाद नहीं मिला"
+    "notFound": "यह उत्पाद नहीं मिला",
+    "selectQuantity": "मात्रा चुनें",
+    "decreaseQuantity": "मात्रा घटाएँ",
+    "increaseQuantity": "मात्रा बढ़ाएँ",
+    "addToCart": "कार्ट में डालें"
   },
   "search": {
     "placeholder": "प्याज, टमाटर, दूध…",
@@ -184,7 +195,8 @@
     "belowMinimum": "कम से कम {amount} का ऑर्डर ज़रूरी है",
     "unavailableItems": "कुछ चीज़ें अब उपलब्ध नहीं हैं",
     "removeUnavailable": "उन्हें हटाएँ",
-    "outOfStockLine": "सिर्फ़ {count} बचे"
+    "outOfStockLine": "सिर्फ़ {count} बचे",
+    "deliverTo": "डिलीवरी का पता"
   },
   "checkout": {
     "title": "ऑर्डर पक्का करें",
@@ -232,8 +244,6 @@
     "deliveryOtpHint": "डिलीवरी बॉय के आने पर यह कोड उसे बताएँ",
     "deliveryOtpWithRider": "{rider} के आने पर यह कोड उसे बताएँ",
     "notFound": "यह ऑर्डर नहीं मिला",
-    "successTitle": "ऑर्डर मिल गया!",
-    "successBody": "हम जल्द ही आप तक पहुँचते हैं।",
     "status": {
       "PLACED": "ऑर्डर दर्ज",
       "CONFIRMED": "स्वीकार किया",
@@ -249,7 +259,12 @@
       "WALLET": "वॉलेट",
       "RAZORPAY": "ऑनलाइन",
       "COD": "नकद"
-    }
+    },
+    "confirmedTitle": "ऑर्डर कन्फर्म हो गई!",
+    "confirmedBody": "आपके ऑर्डर के लिए धन्यवाद। आपका ऑर्डर सफलतापूर्वक दर्ज हो गया है।",
+    "orderIdLabel": "ऑर्डर आईडी",
+    "trackOrder": "ऑर्डर ट्रैक करें",
+    "backToHome": "होम पर वापस जाएँ"
   },
   "issue": {
     "title": "क्या दिक्कत हुई?",

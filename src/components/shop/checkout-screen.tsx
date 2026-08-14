@@ -53,6 +53,7 @@ export function CheckoutScreen() {
   const { user, defaultAddress, isLoading: sessionLoading } = useSession();
 
   const [pickedAddressId, setPickedAddressId] = useState<string | null>(null);
+  const [addressExpanded, setAddressExpanded] = useState(false);
   const [slot, setSlot] = useState<SlotValue>('EXPRESS');
   const [payment, setPayment] = useState<PaymentValue>('WALLET');
   const [notes, setNotes] = useState('');
@@ -62,6 +63,7 @@ export function CheckoutScreen() {
   // customer picks one, and an effect that mirrors a prop into state is just a
   // second copy that can go stale.
   const addressId = pickedAddressId ?? defaultAddress?.id ?? null;
+  const selectedAddress = user?.addresses.find((address) => address.id === addressId) ?? null;
 
   /**
    * R5 — ONE idempotency key per visit to this screen, generated on first use
@@ -105,7 +107,7 @@ export function CheckoutScreen() {
         },
       ),
     onSuccess: (data) => {
-      router.replace(`/orders/${data.orderId}?placed=1`);
+      router.replace(`/orders/${data.orderId}/confirmed`);
     },
     onError: (err) => {
       if (!(err instanceof ApiClientError)) {
@@ -164,26 +166,55 @@ export function CheckoutScreen() {
       {/* ── Address */}
       <section className="bg-card px-4 py-4">
         <div className="flex items-start justify-between gap-3">
-          <h2 className="text-sm font-semibold">{t('deliveryAddress')}</h2>
-          <Link href="/addresses" className="text-xs font-semibold text-primary">
-            {user.addresses.length > 0 ? t('changeAddress') : t('addAddress')}
-          </Link>
+          <h2 className="flex items-center gap-2 text-sm font-semibold">
+            <StepBadge step={1} />
+            {t('deliveryAddress')}
+          </h2>
+          {user.addresses.length === 0 ? (
+            <Link href="/addresses" className="text-xs font-semibold text-primary">
+              {t('addAddress')}
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setAddressExpanded((open) => !open)}
+              className="text-xs font-semibold text-primary"
+            >
+              {t('changeAddress')}
+            </button>
+          )}
         </div>
 
         {user.addresses.length === 0 ? (
           <p className="mt-2 text-sm text-muted-foreground">{t('noAddress')}</p>
+        ) : !addressExpanded && selectedAddress ? (
+          <div className="mt-3 flex gap-2 rounded-[var(--radius)] border border-primary bg-tint-green p-3">
+            <MapPin className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+            <span className="min-w-0">
+              <span className="block text-sm font-medium">{selectedAddress.label}</span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+                {[selectedAddress.line1, selectedAddress.line2, selectedAddress.landmark]
+                  .filter(Boolean)
+                  .join(', ')}
+                , {selectedAddress.city} — {selectedAddress.pincode}
+              </span>
+            </span>
+          </div>
         ) : (
           <ul className="mt-3 space-y-2">
             {user.addresses.map((address) => (
               <li key={address.id}>
                 <button
                   type="button"
-                  onClick={() => setPickedAddressId(address.id)}
+                  onClick={() => {
+                    setPickedAddressId(address.id);
+                    setAddressExpanded(false);
+                  }}
                   aria-pressed={addressId === address.id}
                   className={cn(
                     'flex w-full gap-2 rounded-[var(--radius)] border p-3 text-left',
                     addressId === address.id
-                      ? 'border-primary bg-primary/5'
+                      ? 'border-primary bg-tint-green'
                       : 'border-border bg-background',
                   )}
                 >
@@ -243,7 +274,10 @@ export function CheckoutScreen() {
 
       {/* ── Payment */}
       <section className="bg-card px-4 py-4">
-        <h2 className="text-sm font-semibold">{t('payment')}</h2>
+        <h2 className="flex items-center gap-2 text-sm font-semibold">
+          <StepBadge step={2} />
+          {t('payment')}
+        </h2>
         <div className="mt-3 grid gap-2">
           <PaymentOption
             icon={Wallet}
@@ -371,9 +405,9 @@ function PaymentOption({
       disabled={disabled}
       aria-pressed={selected}
       className={cn(
-        'flex min-h-12 items-center gap-3 rounded-[var(--radius)] border px-3 text-left text-sm',
+        'flex min-h-13 items-center gap-3 rounded-[var(--radius)] border px-3 text-left text-sm',
         selected && !disabled
-          ? 'border-primary bg-primary/5 font-semibold'
+          ? 'border-primary bg-tint-green font-semibold'
           : 'border-border bg-background',
         disabled && 'opacity-55',
       )}
@@ -387,6 +421,29 @@ function PaymentOption({
           </span>
         )}
       </span>
+      {!disabled && (
+        <span
+          aria-hidden
+          className={cn(
+            'grid size-5 shrink-0 place-items-center rounded-full border-2',
+            selected ? 'border-primary' : 'border-border',
+          )}
+        >
+          {selected && <span className="size-2.5 rounded-full bg-primary" />}
+        </span>
+      )}
     </button>
+  );
+}
+
+/** A purely typographic echo of the reference's numbered steps — this screen
+    stays one scrollable page (R5's idempotency key and the quote query both
+    live for the whole visit), so the numbers order the sections rather than
+    track a live wizard state. */
+function StepBadge({ step }: { step: number }) {
+  return (
+    <span className="grid size-5 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+      {step}
+    </span>
   );
 }

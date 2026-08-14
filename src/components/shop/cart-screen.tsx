@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { AlertTriangle, ImageIcon, ShoppingCart, Trash2 } from 'lucide-react';
+import { AlertTriangle, ImageIcon, MapPin, ShoppingCart, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { BillSummary, type BillView } from '@/components/shop/bill-summary';
@@ -32,7 +32,7 @@ export function CartScreen() {
   const t = useTranslations('cart');
   const tc = useTranslations('common');
   const locale = useLocale();
-  const { isLoggedIn, isLoading: sessionLoading } = useSession();
+  const { isLoggedIn, isLoading: sessionLoading, defaultAddress } = useSession();
   const cart = useCart();
 
   const quote = useQuery({
@@ -117,6 +117,20 @@ export function CartScreen() {
     <>
       <PageHeader title={t('title')} backHref="/" backLabel={tc('back')} />
       <main className="space-y-2 pb-2">
+      {defaultAddress && (
+        <div className="flex items-center gap-2.5 bg-card px-4 py-3">
+          <MapPin className="size-4 shrink-0 text-primary" aria-hidden />
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-muted-foreground">{t('deliverTo')}</p>
+            <p className="truncate text-sm font-semibold">
+              {[defaultAddress.line1, defaultAddress.city].filter(Boolean).join(', ')}
+            </p>
+          </div>
+          <Link href="/addresses" className="shrink-0 text-xs font-bold text-primary">
+            {tc('edit')}
+          </Link>
+        </div>
+      )}
       <div className="bg-card px-4 py-4">
       <p className="mb-4 text-sm text-muted-foreground">
         {t('itemCount', { count: cart.itemCount })}

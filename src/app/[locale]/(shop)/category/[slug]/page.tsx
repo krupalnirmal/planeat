@@ -2,42 +2,15 @@ import { ChevronLeft } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
-import { ProductCard } from '@/components/shop/product-card';
-import { getCategoryProducts, type ProductCardView } from '@/lib/catalog/queries';
-import { VEGETABLE_TYPES, vegetableTypeLabel } from '@/lib/catalog/vegetable-types';
+import { CategoryProductList, type CategoryProduct } from '@/components/shop/category-product-list';
+import { HeaderCartLink } from '@/components/shop/header-cart-link';
+import { getCategoryProducts } from '@/lib/catalog/queries';
 import type { AppLocale } from '@/i18n/routing';
 
 /** Category listing (M2). Server-rendered, cached for a minute. */
 export const revalidate = 60;
 
 const PER_PAGE = 24;
-
-function ProductGrid({ products }: { products: ProductCardView[] }) {
-  return (
-    <ul className="grid grid-cols-2 gap-3">
-      {products.map((product) => (
-        <li key={product.id}>
-          <ProductCard
-            product={{
-              id: product.id,
-              name: product.name,
-              imageUrl: product.imageUrl,
-              unitType: product.unitType,
-              inStock: product.inStock,
-              variant: product.variant
-                ? {
-                    ...product.variant,
-                    pricePaise: product.variant.pricePaise.toString(),
-                    mrpPaise: product.variant.mrpPaise.toString(),
-                  }
-                : null,
-            }}
-          />
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 export default async function CategoryPage({
   params,
@@ -64,17 +37,21 @@ export default async function CategoryPage({
 
   const hasMore = page * PER_PAGE < result.total;
 
-  // Client-requested grouping, Vegetables only (PER_PAGE comfortably covers
-  // the whole category today, so every group is complete on page 1 — no
-  // cross-page split to reconcile).
-  const groups =
-    slug === 'vegetables'
-      ? VEGETABLE_TYPES.map((type) => ({
-          type,
-          products: result.products.filter((p) => p.vegetableType === type.id),
-        })).filter((group) => group.products.length > 0)
-      : null;
-  const ungrouped = groups ? result.products.filter((p) => !p.vegetableType) : [];
+  const products: CategoryProduct[] = result.products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    imageUrl: product.imageUrl,
+    unitType: product.unitType,
+    inStock: product.inStock,
+    vegetableType: product.vegetableType,
+    variant: product.variant
+      ? {
+          ...product.variant,
+          pricePaise: product.variant.pricePaise.toString(),
+          mrpPaise: product.variant.mrpPaise.toString(),
+        }
+      : null,
+  }));
 
   return (
     <>
@@ -86,45 +63,23 @@ export default async function CategoryPage({
         >
           <ChevronLeft className="size-5" aria-hidden />
         </Link>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h1 className="truncate text-base font-bold">{result.category.name}</h1>
           <p className="text-xs text-muted-foreground">{t('productCount', { count: result.total })}</p>
         </div>
+        <HeaderCartLink />
       </header>
 
       {/* Stacked white slabs on the page colour, same as home — a group
           heading sitting directly on the background is what made these read
           as scattered rather than as one list. */}
       <main className="space-y-2 pb-2">
-        {result.products.length === 0 ? (
-          <div className="bg-card px-4 py-4">
-            <p className="rounded-[var(--radius)] border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
-              {t('empty')}
-            </p>
-          </div>
-        ) : groups ? (
-          <>
-            {groups.map(({ type, products }) => (
-              <section key={type.id} className="bg-card px-4 py-4">
-                <h2 className="mb-3 flex items-center gap-1.5 text-[15px] font-bold">
-                  <span aria-hidden>{type.emoji}</span>
-                  {vegetableTypeLabel(type, locale as AppLocale)}
-                </h2>
-                <ProductGrid products={products} />
-              </section>
-            ))}
-            {ungrouped.length > 0 && (
-              <section className="bg-card px-4 py-4">
-                <h2 className="mb-3 text-[15px] font-bold">{t('other')}</h2>
-                <ProductGrid products={ungrouped} />
-              </section>
-            )}
-          </>
-        ) : (
-          <div className="bg-card px-4 py-4">
-            <ProductGrid products={result.products} />
-          </div>
-        )}
+        <CategoryProductList
+          products={products}
+          slug={slug}
+          categoryName={result.category.name}
+          locale={locale as AppLocale}
+        />
 
         {(page > 1 || hasMore) && (
           <nav className="flex items-center justify-between gap-3 bg-card px-4 py-4">

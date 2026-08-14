@@ -46,10 +46,23 @@ export function VariantPicker({
   const [selectedId, setSelectedId] = useState(
     variants.find((v) => v.isDefault)?.id ?? variants[0]?.id ?? '',
   );
+  // Pre-add quantity, the reference's "Select Quantity" stepper — a single
+  // count picked before the first tap of "Add to Cart", not the post-add
+  // stepper (which takes over once the line already exists).
+  const [selectedQty, setSelectedQty] = useState(1);
 
   const selected = variants.find((v) => v.id === selectedId) ?? null;
   const cart = useCart();
   const quantity = selected ? cart.quantityOf(selected.id) : 0;
+
+  // Reset the pre-add count when the customer switches weight variants —
+  // done during render (React's documented pattern for "adjust state when a
+  // prop changes"), not an effect, so there is no extra render in between.
+  const [prevSelectedId, setPrevSelectedId] = useState(selectedId);
+  if (selectedId !== prevSelectedId) {
+    setPrevSelectedId(selectedId);
+    setSelectedQty(1);
+  }
 
   if (!selected) {
     return <p className="mt-4 text-sm text-muted-foreground">{t('outOfStock')}</p>;
@@ -64,7 +77,7 @@ export function VariantPicker({
       router.push(`/login?next=/product/${productId}`);
       return;
     }
-    cart.add({ productId, variantId: selected.id });
+    cart.add({ productId, variantId: selected.id, quantity: selectedQty });
   }
 
   return (
@@ -119,6 +132,38 @@ export function VariantPicker({
         </p>
       )}
 
+      {/* Picking how many before the first ADD tap — the reference's
+          "Select Quantity" stepper. Once a line exists, the sticky bar below
+          switches to the ordinary post-add stepper for further changes. */}
+      {inStock && quantity === 0 && isLoggedIn && (
+        <div className="mt-5">
+          <p className="text-sm font-semibold">{t('selectQuantity')}</p>
+          <div className="mt-2 flex h-11 w-fit items-center rounded-[var(--radius)] border border-border">
+            <button
+              type="button"
+              onClick={() => setSelectedQty((q) => Math.max(1, q - 1))}
+              disabled={selectedQty <= 1}
+              aria-label={`${t('decreaseQuantity')} — ${productName}`}
+              className="grid h-11 w-11 shrink-0 place-items-center text-lg font-bold disabled:opacity-40"
+            >
+              −
+            </button>
+            <span className="min-w-10 text-center text-sm font-bold tabular-nums">
+              {selectedQty}
+            </span>
+            <button
+              type="button"
+              onClick={() => setSelectedQty((q) => Math.min(selected.stockQty, q + 1))}
+              disabled={selectedQty >= selected.stockQty}
+              aria-label={`${t('increaseQuantity')} — ${productName}`}
+              className="grid h-11 w-11 shrink-0 place-items-center text-lg font-bold disabled:opacity-40"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Sticky above the bottom nav, so ADD stays reachable however long the
           page gets. */}
       <div
@@ -139,7 +184,7 @@ export function VariantPicker({
             onClick={handleAdd}
             className="h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
           >
-            {isLoggedIn ? t('add') : ta('loginRequiredCart')}
+            {isLoggedIn ? t('addToCart') : ta('loginRequiredCart')}
           </button>
         ) : (
           <QtyStepper
