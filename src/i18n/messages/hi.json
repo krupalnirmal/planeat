@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "Planeat",
-    "tagline": "ताज़ी सब्ज़ियाँ, रोज़ आपके दरवाज़े पर"
+    "tagline": "ताज़ी सब्ज़ियाँ, सीधे आपके घर तक"
   },
   "common": {
     "loading": "लोड हो रहा है…",
@@ -50,26 +50,33 @@
     "skipLogin": "अभी नहीं",
     "termsNote": "आगे बढ़कर आप हमारी नियम व शर्तें और गोपनीयता नीति स्वीकार करते हैं",
     "phoneLabel": "मोबाइल नंबर",
-    "phonePlaceholder": "जैसे ९८७६५४३२१०",
+    "phonePlaceholder": "मोबाइल नंबर डालें",
     "invalidPhone": "कृपया १० अंकों का मोबाइल नंबर डालें",
     "sendOtp": "OTP भेजें",
     "sending": "भेज रहे हैं…",
-    "otpTitle": "OTP डालें",
+    "otpTitle": "OTP सत्यापित करें",
     "otpSubtitle": "{phone} पर भेजा गया ६ अंकों का कोड डालें",
     "otpLabel": "छह अंकों का कोड",
-    "verify": "जाँचें",
+    "verify": "सत्यापित करें और आगे बढ़ें",
     "verifying": "जाँच रहे हैं…",
     "invalidOtp": "कोड ग़लत है। फिर से कोशिश करें।",
     "expiredOtp": "कोड की मियाद ख़त्म हो गई। नया कोड मँगाएँ।",
     "tooManyAttempts": "बहुत बार ग़लत कोड डाला। नया कोड मँगाएँ।",
     "tooManyRequests": "बहुत बार OTP मँगाया। थोड़ी देर बाद कोशिश करें।",
-    "resendIn": "{seconds} सेकंड में दोबारा भेजें",
-    "resend": "दोबारा भेजें",
-    "resendWhatsapp": "WhatsApp पर भेजें",
+    "resendIn": "{time} में OTP दोबारा भेजें",
+    "resend": "OTP दोबारा भेजें",
+    "resendWhatsapp": "WhatsApp पर OTP पाएँ",
     "changeNumber": "नंबर बदलें",
     "devOtpHint": "डेवलपमेंट मोड: OTP {code} है",
     "loginRequired": "आगे बढ़ने के लिए लॉगिन करें",
-    "loginRequiredCart": "कार्ट में डालने के लिए लॉगिन करें"
+    "loginRequiredCart": "कार्ट में डालने के लिए लॉगिन करें",
+    "featureFreshHandpicked": "ताज़ा और हाथ से चुना हुआ",
+    "featureNoPreservatives": "कोई परिरक्षक नहीं",
+    "featureOnTime": "समय पर डिलीवरी",
+    "otpChangeLink": "बदलें",
+    "otpDigitAria": "अंक {position}, कुल ६",
+    "otpFallbackBody": "कोड नहीं मिला? हम इसे WhatsApp पर दोबारा भेज सकते हैं।",
+    "otpSecuredFooter": "सुरक्षित · १००% सुरक्षित"
   },
   "home": {
     "deliveryIn": "{minutes} मिनट में डिलीवरी",
@@ -912,5 +919,14 @@
     "trustFreshBody": "खेत से दरवाज़े तक",
     "promoTitle": "रोज़ ताज़ी सब्ज़ियाँ, घर तक!",
     "promoBody": "हज़ारों खुश ग्राहकों की तरह आप भी खेत से सीधी ताज़ी सब्ज़ियाँ पाएं।"
+  },
+  "intro": {
+    "splashFooter": "स्वस्थ खाएं, स्वस्थ जिएं",
+    "onboardingTitle": "ताज़ी और सेहतमंद सब्ज़ियाँ",
+    "onboardingSubtitle": "सावधानी से चुनी गई और आपके दरवाज़े तक पहुँचाई गई",
+    "next": "आगे",
+    "chooseLanguageTitle": "भाषा चुनें",
+    "chooseLanguageSubtitle": "अपनी पसंदीदा भाषा चुनें",
+    "continue": "आगे बढ़ें"
   }
 }

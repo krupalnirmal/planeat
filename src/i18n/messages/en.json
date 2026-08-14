@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "Planeat",
-    "tagline": "Fresh vegetables, at your door every day"
+    "tagline": "Fresh Vegetables Delivered to Your Home"
   },
   "common": {
     "loading": "Loading…",
@@ -50,26 +50,33 @@
     "skipLogin": "Skip for now",
     "termsNote": "By continuing, you agree to our Terms of Service and Privacy Policy",
     "phoneLabel": "Mobile number",
-    "phonePlaceholder": "e.g. 9876543210",
+    "phonePlaceholder": "Enter mobile number",
     "invalidPhone": "Please enter a 10-digit mobile number",
-    "sendOtp": "Send code",
+    "sendOtp": "Send OTP",
     "sending": "Sending…",
-    "otpTitle": "Enter the code",
+    "otpTitle": "Verify OTP",
     "otpSubtitle": "Enter the 6-digit code sent to {phone}",
     "otpLabel": "Six-digit code",
-    "verify": "Verify",
+    "verify": "Verify & Continue",
     "verifying": "Checking…",
     "invalidOtp": "That code is wrong. Please try again.",
     "expiredOtp": "That code has expired. Request a new one.",
     "tooManyAttempts": "Too many wrong attempts. Request a new code.",
     "tooManyRequests": "Too many codes requested. Please try again later.",
-    "resendIn": "Resend in {seconds}s",
-    "resend": "Resend code",
-    "resendWhatsapp": "Send on WhatsApp",
+    "resendIn": "Resend OTP in {time}",
+    "resend": "Resend OTP",
+    "resendWhatsapp": "Get OTP on WhatsApp",
     "changeNumber": "Change number",
     "devOtpHint": "Development mode: the code is {code}",
     "loginRequired": "Log in to continue",
-    "loginRequiredCart": "Log in to add items to your cart"
+    "loginRequiredCart": "Log in to add items to your cart",
+    "featureFreshHandpicked": "Fresh & Handpicked",
+    "featureNoPreservatives": "No Preservatives",
+    "featureOnTime": "On-time Delivery",
+    "otpChangeLink": "Change",
+    "otpDigitAria": "Digit {position} of 6",
+    "otpFallbackBody": "Didn't receive the code? We can resend it on WhatsApp.",
+    "otpSecuredFooter": "Secured · 100% Secure"
   },
   "home": {
     "deliveryIn": "Delivery in {minutes} min",
@@ -912,5 +919,14 @@
     "trustFreshBody": "Farm to door",
     "promoTitle": "Fresh Vegetables, Delivered Daily!",
     "promoBody": "Join thousands of happy customers getting farm-fresh produce at their doorstep."
+  },
+  "intro": {
+    "splashFooter": "Eat healthy, live healthy",
+    "onboardingTitle": "Fresh & Healthy Vegetables",
+    "onboardingSubtitle": "Handpicked with care and delivered to your door",
+    "next": "Next",
+    "chooseLanguageTitle": "Choose Language",
+    "chooseLanguageSubtitle": "Select your preferred language",
+    "continue": "Continue"
   }
 }

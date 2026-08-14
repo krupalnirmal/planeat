@@ -460,28 +460,6 @@ export async function searchProducts(
 }
 
 /**
- * A handful of product photos for the login screen's decorative wall.
- *
- * Deliberately a query rather than a hard-coded list of `/products/*.jpg`
- * paths: those paths come from SKUs, and a SKU rename would leave the login
- * screen full of broken images that nobody would notice, since they are
- * `alt=""` decoration. Reading the catalogue means the wall is always made of
- * things the shop genuinely sells.
- */
-export async function getLoginCollageImages(limit = 12): Promise<string[]> {
-  const products = await db.product.findMany({
-    where: { isActive: true, NOT: { imageUrls: { equals: [] } } },
-    take: limit,
-    orderBy: { sortOrder: 'asc' },
-    select: { imageUrls: true },
-  });
-
-  return products
-    .map((product) => firstImageUrl(product.imageUrls))
-    .filter((url): url is string => url !== null);
-}
-
-/**
  * "Order again" — distinct products this customer has bought before, newest
  * order first, still sellable today.
  *

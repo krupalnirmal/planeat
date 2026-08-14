@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "Planeat",
-    "tagline": "ताज्या भाज्या, रोज दारात"
+    "tagline": "ताज्या भाज्या, तुमच्या घरपोच"
   },
   "common": {
     "loading": "लोड होत आहे…",
@@ -50,26 +50,33 @@
     "skipLogin": "आत्ता नको",
     "termsNote": "पुढे जाऊन तुम्ही आमच्या अटी व शर्ती आणि गोपनीयता धोरण मान्य करता",
     "phoneLabel": "मोबाइल नंबर",
-    "phonePlaceholder": "उदा. ९८७६५४३२१०",
+    "phonePlaceholder": "मोबाइल नंबर टाका",
     "invalidPhone": "कृपया १० अंकी मोबाइल नंबर टाका",
     "sendOtp": "OTP पाठवा",
     "sending": "पाठवत आहोत…",
-    "otpTitle": "OTP टाका",
+    "otpTitle": "OTP पडताळणी करा",
     "otpSubtitle": "{phone} या नंबरवर पाठवलेला ६ अंकी कोड टाका",
     "otpLabel": "सहा अंकी कोड",
-    "verify": "पडताळणी करा",
+    "verify": "पडताळणी करा आणि पुढे जा",
     "verifying": "तपासत आहोत…",
     "invalidOtp": "कोड चुकीचा आहे. पुन्हा प्रयत्न करा.",
     "expiredOtp": "कोडची मुदत संपली. नवीन कोड मागवा.",
     "tooManyAttempts": "खूप वेळा चुकीचा कोड टाकला. नवीन कोड मागवा.",
     "tooManyRequests": "खूप वेळा OTP मागवला. थोड्या वेळाने प्रयत्न करा.",
-    "resendIn": "{seconds} सेकंदात पुन्हा पाठवा",
-    "resend": "पुन्हा पाठवा",
-    "resendWhatsapp": "WhatsApp वर पाठवा",
+    "resendIn": "{time} मध्ये OTP पुन्हा पाठवा",
+    "resend": "OTP पुन्हा पाठवा",
+    "resendWhatsapp": "WhatsApp वर OTP मिळवा",
     "changeNumber": "नंबर बदला",
     "devOtpHint": "विकास मोड: OTP {code} आहे",
     "loginRequired": "पुढे जाण्यासाठी लॉगिन करा",
-    "loginRequiredCart": "कार्टमध्ये टाकण्यासाठी लॉगिन करा"
+    "loginRequiredCart": "कार्टमध्ये टाकण्यासाठी लॉगिन करा",
+    "featureFreshHandpicked": "ताजे व हाताने निवडलेले",
+    "featureNoPreservatives": "कोणतेही प्रिझर्वेटिव्ह्ज नाहीत",
+    "featureOnTime": "वेळेवर डिलिव्हरी",
+    "otpChangeLink": "बदला",
+    "otpDigitAria": "अंक {position}, एकूण ६",
+    "otpFallbackBody": "कोड मिळाला नाही? आम्ही तो WhatsApp वर पुन्हा पाठवू शकतो.",
+    "otpSecuredFooter": "सुरक्षित · १००% सुरक्षित"
   },
   "home": {
     "deliveryIn": "{minutes} मिनिटांत डिलिव्हरी",
@@ -912,5 +919,14 @@
     "trustFreshBody": "शेतापासून दारापर्यंत",
     "promoTitle": "दररोज ताज्या भाज्या, घरपोच!",
     "promoBody": "हजारो समाधानी ग्राहकांप्रमाणे तुम्हीही शेतातील ताजा माल घरबसल्या मिळवा."
+  },
+  "intro": {
+    "splashFooter": "आरोग्यदायी खा, आरोग्यदायी जगा",
+    "onboardingTitle": "ताज्या व आरोग्यदायी भाज्या",
+    "onboardingSubtitle": "काळजीपूर्वक निवडलेल्या आणि तुमच्या दारापर्यंत पोहोचवलेल्या",
+    "next": "पुढे",
+    "chooseLanguageTitle": "भाषा निवडा",
+    "chooseLanguageSubtitle": "तुमची आवडती भाषा निवडा",
+    "continue": "पुढे चला"
   }
 }
