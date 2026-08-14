@@ -75,9 +75,14 @@
   --primary-fg: #ffffff;
   --accent: #ffd400; /* small badges/flags only — never a background field */
   --accent-fg: #111111;
-  --surface: #f8f7f2; /* soft warm cream, not grey */
+  /* The page sits a clear step BELOW white, so full-width white section
+     panels read as surfaces stacked on it rather than cards floating on a
+     field almost the same colour. At #f8f7f2 the difference from #fff was
+     about 3%, which is why every section looked detached and the background
+     looked empty. */
+  --surface: #eeece5;
   --surface-raised: #ffffff;
-  --surface-sunken: #f0efe8;
+  --surface-sunken: #e4e2da;
   --text: #14140f;
   --text-muted: #6b7280;
   --success: #1b7a3a;

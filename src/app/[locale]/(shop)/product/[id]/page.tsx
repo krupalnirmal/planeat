@@ -48,23 +48,28 @@ export default async function ProductPage({
         <h1 className="truncate text-base font-bold">{product.name}</h1>
       </header>
 
-      <main className="pb-6">
-        <div className="grid aspect-square w-full place-items-center bg-secondary">
-          {product.images[0] ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={product.images[0]}
-              alt={product.name}
-              className="size-full object-cover"
-              decoding="async"
-            />
-          ) : (
-            <ImageIcon className="size-16 text-muted-foreground/30" aria-hidden />
-          )}
-        </div>
+      {/* Stacked white slabs on the page colour, same as home. */}
+      <main className="space-y-2 pb-2">
+        <div className="bg-card px-4 pt-2 pb-4">
+          {/* The photo is a product shot, not a hero image: a full-width
+              square ran ~390px tall on a phone and pushed the price and the
+              ADD button below the fold. Capped and centred, it stays the
+              first thing you see without being the only thing. */}
+          <div className="mx-auto grid aspect-square w-full max-w-[240px] place-items-center overflow-hidden rounded-[var(--radius)] bg-white">
+            {product.images[0] ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={product.images[0]}
+                alt={product.name}
+                className="size-full object-cover"
+                decoding="async"
+              />
+            ) : (
+              <ImageIcon className="size-16 text-muted-foreground/30" aria-hidden />
+            )}
+          </div>
 
-        <div className="px-4 pt-4">
-          <p className="text-xs text-muted-foreground">{product.categoryName}</p>
+          <p className="mt-4 text-xs text-muted-foreground">{product.categoryName}</p>
           <h2 className="mt-0.5 text-lg leading-snug font-bold">{product.name}</h2>
 
           <VariantPicker
@@ -83,57 +88,58 @@ export default async function ProductPage({
             }))}
           />
 
-          {product.description && (
-            <section className="mt-6">
-              <h3 className="text-sm font-semibold">{t('description')}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                {product.description}
-              </p>
-            </section>
-          )}
-
-          {nutrition && Object.keys(nutrition).length > 0 && (
-            <section className="mt-6">
-              <h3 className="text-sm font-semibold">{t('nutrition')}</h3>
-              <dl className="mt-2 divide-y divide-border overflow-hidden rounded-[var(--radius)] bg-card">
-                {Object.entries(nutrition).map(([key, value]) => (
-                  <div key={key} className="flex justify-between px-3 py-2.5 text-sm">
-                    <dt className="text-muted-foreground capitalize">{key.replace(/_/g, ' ')}</dt>
-                    <dd className="font-medium">{String(value)}</dd>
-                  </div>
-                ))}
-              </dl>
-            </section>
-          )}
-
-          {product.similar.length > 0 && (
-            <section className="mt-8">
-              <h3 className="mb-3 text-sm font-semibold">{t('similar')}</h3>
-              <ul className="grid grid-cols-2 gap-3">
-                {product.similar.map((item) => (
-                  <li key={item.id}>
-                    <ProductCard
-                      product={{
-                        id: item.id,
-                        name: item.name,
-                        imageUrl: item.imageUrl,
-                        unitType: item.unitType,
-                        inStock: item.inStock,
-                        variant: item.variant
-                          ? {
-                              ...item.variant,
-                              pricePaise: item.variant.pricePaise.toString(),
-                              mrpPaise: item.variant.mrpPaise.toString(),
-                            }
-                          : null,
-                      }}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
         </div>
+
+        {product.description && (
+          <section className="bg-card px-4 py-4">
+            <h3 className="text-sm font-semibold">{t('description')}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              {product.description}
+            </p>
+          </section>
+        )}
+
+        {nutrition && Object.keys(nutrition).length > 0 && (
+          <section className="bg-card px-4 py-4">
+            <h3 className="text-sm font-semibold">{t('nutrition')}</h3>
+            <dl className="mt-2 divide-y divide-border overflow-hidden rounded-[var(--radius)] border border-border">
+              {Object.entries(nutrition).map(([key, value]) => (
+                <div key={key} className="flex justify-between px-3 py-2.5 text-sm">
+                  <dt className="text-muted-foreground capitalize">{key.replace(/_/g, ' ')}</dt>
+                  <dd className="font-medium">{String(value)}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        )}
+
+        {product.similar.length > 0 && (
+          <section className="bg-card px-4 py-4">
+            <h3 className="mb-3 text-sm font-semibold">{t('similar')}</h3>
+            <ul className="grid grid-cols-2 gap-3">
+              {product.similar.map((item) => (
+                <li key={item.id}>
+                  <ProductCard
+                    product={{
+                      id: item.id,
+                      name: item.name,
+                      imageUrl: item.imageUrl,
+                      unitType: item.unitType,
+                      inStock: item.inStock,
+                      variant: item.variant
+                        ? {
+                            ...item.variant,
+                            pricePaise: item.variant.pricePaise.toString(),
+                            mrpPaise: item.variant.mrpPaise.toString(),
+                          }
+                        : null,
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </main>
     </>
   );

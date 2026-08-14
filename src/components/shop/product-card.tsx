@@ -1,6 +1,6 @@
 'use client';
 
-import { ImageIcon, Plus } from 'lucide-react';
+import { Clock, ImageIcon, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useCart } from '@/hooks/use-cart';
@@ -37,7 +37,14 @@ export interface ProductCardData {
   } | null;
 }
 
-export function ProductCard({ product }: { product: ProductCardData }) {
+export function ProductCard({
+  product,
+  etaMinutes = 30,
+}: {
+  product: ProductCardData;
+  /** The instant-delivery promise shown on the card. Matches the header's. */
+  etaMinutes?: number;
+}) {
   const t = useTranslations('product');
   const router = useRouter();
   const { isLoggedIn } = useSession();
@@ -62,7 +69,9 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   }
 
   return (
-    <article className="flex h-full flex-col rounded-[var(--radius)] bg-card p-2.5 shadow-sm">
+    // A hairline border, not a shadow: these cards sit on white section
+    // panels now, and a white-on-white shadow reads as nothing at all.
+    <article className="flex h-full flex-col rounded-[var(--radius)] border border-border bg-card p-2.5">
       <Link
         href={`/product/${product.id}`}
         className="group flex flex-1 flex-col"
@@ -98,6 +107,16 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           )}
         </div>
 
+        {/* Delivery time per product, as in the reference — quick commerce
+            sells speed, so it sits above the name rather than being buried
+            once at the top of the page. */}
+        {product.inStock && (
+          <p className="mb-0.5 flex items-center gap-0.5 text-[10px] font-bold text-muted-foreground">
+            <Clock className="size-3" aria-hidden />
+            {t('etaMinutes', { minutes: etaMinutes })}
+          </p>
+        )}
+
         <h3 className="line-clamp-2 text-[13px] leading-tight font-medium">{product.name}</h3>
 
         {variant && (
@@ -105,7 +124,6 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             {formatQuantity(variant.quantity, variant.unit as QuantityUnit)}
           </p>
         )}
-
       </Link>
 
       {/* Price and the add control share one row, as in the reference — the

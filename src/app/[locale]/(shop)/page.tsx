@@ -4,6 +4,8 @@ import { Link } from '@/i18n/navigation';
 import { AppHeader } from '@/components/shop/app-header';
 import { BannerCarousel } from '@/components/shop/banner-carousel';
 import { CategoryCollageTile } from '@/components/shop/category-collage-tile';
+import { HomeSection } from '@/components/shop/home-section';
+import { OrderAgainRow } from '@/components/shop/order-again-row';
 import { ProductCard } from '@/components/shop/product-card';
 import { getHomePayload } from '@/lib/catalog/queries';
 import type { AppLocale } from '@/i18n/routing';
@@ -55,40 +57,35 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <>
       <AppHeader />
 
-      <main className="px-4 py-4">
-        {banners.length > 0 ? (
-          <BannerCarousel banners={banners} />
-        ) : (
-          <div className="mb-6">
+      {/* Stacked slabs: white panels separated by a thin strip of page
+          colour (`space-y-2`), so the screen reads as one document rather
+          than a scatter of floating cards. */}
+      <main className="space-y-2 pb-2">
+        <div className="bg-card px-4 pt-1 pb-4">
+          {banners.length > 0 ? (
+            <BannerCarousel banners={banners} />
+          ) : (
             <HeroBanner
               headline={t('heroHeadline')}
               subtitle={t('heroSubtitle')}
               badge={t('deliveryIn', { minutes: 30 })}
               images={heroImages}
             />
-          </div>
-        )}
+          )}
 
-        <BenefitsRow />
+          <BenefitsRow />
+        </div>
 
-        <section aria-labelledby="categories-heading" className="mb-8">
-          <div className="mb-3 flex items-baseline justify-between">
-            <h2
-              id="categories-heading"
-              className="flex items-center gap-1.5 text-[17px] font-bold"
-            >
-              <LayoutGrid className="size-4.5 text-primary" aria-hidden />
-              {t('categories')}
-            </h2>
-            <Link
-              href="/category/vegetables"
-              className="flex items-center text-xs font-semibold text-primary"
-            >
-              {tc('seeAll')}
-              <ChevronRight className="size-3.5" aria-hidden />
-            </Link>
-          </div>
+        {/* Renders nothing for a guest or a first-time buyer. */}
+        <OrderAgainRow />
 
+        <HomeSection
+          id="categories-heading"
+          title={t('categories')}
+          icon={<LayoutGrid className="size-4.5 text-primary" aria-hidden />}
+          seeAllHref="/category/vegetables"
+          seeAllLabel={tc('seeAll')}
+        >
           {categories.length > 0 ? (
             <ul className="grid grid-cols-2 gap-3">
               {collages.map((collage) => (
@@ -107,23 +104,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               {t('emptyCatalogue')}
             </p>
           )}
-        </section>
+        </HomeSection>
 
         {bestsellers.length > 0 && (
-          <section aria-labelledby="bestsellers-heading" className="mb-8">
-            <div className="mb-3 flex items-baseline justify-between">
-              <h2 id="bestsellers-heading" className="text-[17px] font-bold">
-                {t('bestsellers')}
-              </h2>
-              <Link
-                href="/category/vegetables"
-                className="flex items-center text-xs font-semibold text-primary"
-              >
-                {tc('seeAll')}
-                <ChevronRight className="size-3.5" aria-hidden />
-              </Link>
-            </div>
-
+          <HomeSection
+            id="bestsellers-heading"
+            title={t('bestsellers')}
+            seeAllHref="/category/vegetables"
+            seeAllLabel={tc('seeAll')}
+          >
             {/* A horizontal rail, not a 2-column grid: the reference shows
                 four narrow cards side by side that scroll sideways, which
                 keeps "Top Picks" one glanceable row instead of a block that
@@ -150,10 +139,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 </li>
               ))}
             </ul>
-          </section>
+          </HomeSection>
         )}
 
-        <FastDeliveryBanner />
+        <div className="bg-card px-4 py-4">
+          <FastDeliveryBanner />
+        </div>
       </main>
     </>
   );
@@ -241,7 +232,9 @@ async function BenefitsRow() {
   ] as const;
 
   return (
-    <div className="mb-6 grid grid-cols-4 divide-x divide-border rounded-[var(--radius)] bg-card py-4 shadow-sm">
+    // Sits inside the banner's white panel, so it needs no card of its own —
+    // just a rule separating it from the banner above.
+    <div className="mt-4 grid grid-cols-4 divide-x divide-border border-t border-border pt-4">
       {items.map(({ icon: Icon, titleKey, bodyKey }) => (
         <div key={titleKey} className="flex flex-col items-center gap-1.5 px-1 text-center">
           <span className="grid size-9 place-items-center rounded-full bg-tint-green text-primary">

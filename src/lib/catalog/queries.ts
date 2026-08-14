@@ -480,3 +480,59 @@ export async function getLoginCollageImages(limit = 12): Promise<string[]> {
     .map((product) => firstImageUrl(product.imageUrls))
     .filter((url): url is string => url !== null);
 }
+
+/**
+ * "Order again" — distinct products this customer has bought before, newest
+ * order first, still sellable today.
+ *
+ * The reference recording leans on this heavily ("Previously bought",
+ * "Bought Earlier", the whole Order Again tab): in grocery, most of a basket
+ * is the same things as last week, and making those one tap away is most of
+ * what makes a quick-commerce app feel fast.
+ *
+ * Deliberately NOT part of `getHomePayload`: that payload is cached per
+ * locale (`revalidate = 60`), and this is per-customer. Mixing them would
+ * serve one person's history to everybody.
+ */
+export async function getPreviouslyBought(
+  userId: string,
+  locale: Locale,
+  limit = 10,
+): Promise<ProductCardView[]> {
+  const items = await db.orderItem.findMany({
+    where: { order: { userId } },
+    orderBy: { order: { placedAt: 'desc' } },
+    // Enough rows to survive de-duplication — a customer who orders the same
+    // four vegetables every week would otherwise yield four cards from forty.
+    take: limit * 8,
+    select: { productId: true },
+  });
+
+  const seen = new Set<string>();
+  const productIds: string[] = [];
+  for (const item of items) {
+    if (seen.has(item.productId)) continue;
+    seen.add(item.productId);
+    productIds.push(item.productId);
+    if (productIds.length >= limit) break;
+  }
+
+  if (productIds.length === 0) return [];
+
+  const products = await db.product.findMany({
+    where: {
+      id: { in: productIds },
+      isActive: true,
+      variants: { some: { isActive: true, stockQty: { gt: 0 } } },
+    },
+    select: productCardSelect,
+  });
+
+  // `findMany` returns them in the database's order, not the order they were
+  // last bought in — restore the recency ranking the query established.
+  const byId = new Map(products.map((product) => [product.id, product]));
+  return productIds
+    .map((id) => byId.get(id))
+    .filter((product): product is (typeof products)[number] => product !== undefined)
+    .map((product) => toProductCard(product, locale));
+}

@@ -59,3 +59,10 @@ next-env.d.ts
 
 # Local uploads (STORAGE_PROVIDER=local)
 /public/uploads
+
+# Reference videos/screen recordings. Anything in `public/` is served by Next
+# and shipped in the deployment bundle, so a 50MB recording there is paid for
+# on every deploy. Keep them outside the repo (../planeat-reference/).
+*.mp4
+*.mov
+*.webm

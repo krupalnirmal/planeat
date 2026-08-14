@@ -1,5 +1,6 @@
 import { setRequestLocale } from 'next-intl/server';
 import { BottomNav } from '@/components/shop/bottom-nav';
+import { CartBar } from '@/components/shop/cart-bar';
 
 /**
  * The customer shell: a single centred column sized for a 390px viewport, with
@@ -21,6 +22,7 @@ export default async function ShopLayout({
   return (
     <div className="app-shell">
       <div className="app-scroll">{children}</div>
+      <CartBar />
       <BottomNav />
     </div>
   );

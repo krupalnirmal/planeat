@@ -58,7 +58,10 @@ export function useCart() {
 
   const serverCart = useQuery({
     queryKey: [...CART_QUERY_KEY, locale],
-    queryFn: () => api.get<{ cart: CartView }>(`/api/cart${qs({ locale })}`),
+    queryFn: () =>
+      api.get<{ cart: CartView; amountForFreeDeliveryPaise: string }>(
+        `/api/cart${qs({ locale })}`,
+      ),
     enabled: isLoggedIn,
     staleTime: 10_000,
   });
@@ -166,6 +169,10 @@ export function useCart() {
     lines,
     itemCount: lines.reduce((sum, line) => sum + line.quantity, 0),
     itemTotalPaise: isLoggedIn ? (serverCart.data?.cart.itemTotalPaise ?? '0') : '0',
+    /** B10, computed server-side — 0 once free delivery is already earned. */
+    amountForFreeDeliveryPaise: isLoggedIn
+      ? (serverCart.data?.amountForFreeDeliveryPaise ?? '0')
+      : '0',
     isLoading: isLoggedIn && serverCart.isLoading,
     isMutating: addMutation.isPending || updateMutation.isPending,
     quantityOf,

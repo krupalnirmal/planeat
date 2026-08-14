@@ -92,15 +92,20 @@ export default async function CategoryPage({
         </div>
       </header>
 
-      <main className="px-4 py-4">
+      {/* Stacked white slabs on the page colour, same as home — a group
+          heading sitting directly on the background is what made these read
+          as scattered rather than as one list. */}
+      <main className="space-y-2 pb-2">
         {result.products.length === 0 ? (
-          <p className="rounded-[var(--radius)] border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
-            {t('empty')}
-          </p>
+          <div className="bg-card px-4 py-4">
+            <p className="rounded-[var(--radius)] border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
+              {t('empty')}
+            </p>
+          </div>
         ) : groups ? (
-          <div className="space-y-6">
+          <>
             {groups.map(({ type, products }) => (
-              <section key={type.id}>
+              <section key={type.id} className="bg-card px-4 py-4">
                 <h2 className="mb-3 flex items-center gap-1.5 text-[15px] font-bold">
                   <span aria-hidden>{type.emoji}</span>
                   {vegetableTypeLabel(type, locale as AppLocale)}
@@ -109,18 +114,20 @@ export default async function CategoryPage({
               </section>
             ))}
             {ungrouped.length > 0 && (
-              <section>
+              <section className="bg-card px-4 py-4">
                 <h2 className="mb-3 text-[15px] font-bold">{t('other')}</h2>
                 <ProductGrid products={ungrouped} />
               </section>
             )}
-          </div>
+          </>
         ) : (
-          <ProductGrid products={result.products} />
+          <div className="bg-card px-4 py-4">
+            <ProductGrid products={result.products} />
+          </div>
         )}
 
         {(page > 1 || hasMore) && (
-          <nav className="mt-6 flex items-center justify-between gap-3">
+          <nav className="flex items-center justify-between gap-3 bg-card px-4 py-4">
             {page > 1 ? (
               <Link
                 href={`/category/${slug}?page=${page - 1}`}

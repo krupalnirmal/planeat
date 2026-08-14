@@ -40,6 +40,17 @@ export function CartScreen() {
     enabled: isLoggedIn && cart.lines.length > 0,
   });
 
+  // MRP minus price, per sellable line. The quote does not carry MRP — only
+  // the cart lines do — so this is the one place that can total it up.
+  const savedPaise = cart.lines
+    .filter((line) => line.isActive)
+    .reduce(
+      (sum, line) =>
+        sum + (paise(line.mrpPaise) - paise(line.unitPricePaise)) * BigInt(line.quantity),
+      0n,
+    )
+    .toString();
+
   if (sessionLoading || cart.isLoading) {
     return <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>;
   }
@@ -164,7 +175,7 @@ export function CartScreen() {
 
       {quote.data && (
         <div className="mt-5">
-          <BillSummary bill={quote.data.bill} />
+          <BillSummary bill={quote.data.bill} savedPaise={savedPaise} />
         </div>
       )}
 

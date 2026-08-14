@@ -46,7 +46,9 @@ export function AppHeader() {
   const initial = user?.name?.trim().charAt(0) || 'आ';
 
   return (
-    <header className="sticky top-0 z-30 bg-background px-4 pt-3 pb-3">
+    // White, so the header and the banner panel beneath it read as one block
+    // at the top of the stack rather than a grey strip above a white one.
+    <header className="sticky top-0 z-30 bg-card px-4 pt-3 pb-3">
       <div className="flex items-center justify-between gap-3">
         {/* The wordmark itself carries the brand colour — a leaf mark and a
             two-tone "Plan" / "eat", exactly as the client's logo sheet does.

@@ -24,7 +24,15 @@ export interface BillView {
   meetsMinimum: boolean;
 }
 
-export function BillSummary({ bill }: { bill: BillView }) {
+export function BillSummary({
+  bill,
+  savedPaise,
+}: {
+  bill: BillView;
+  /** MRP minus what they actually pay, summed over the cart. Optional: the
+      cart screen knows each line's MRP, the checkout quote does not. */
+  savedPaise?: string;
+}) {
   const t = useTranslations('cart');
 
   const itemTotal = paise(bill.itemTotalPaise);
@@ -33,6 +41,7 @@ export function BillSummary({ bill }: { bill: BillView }) {
   const discount = paise(bill.discountPaise);
   const total = paise(bill.totalPaise);
   const forFreeDelivery = paise(bill.amountForFreeDeliveryPaise);
+  const saved = savedPaise ? paise(savedPaise) : 0n;
 
   return (
     <section className="rounded-[var(--radius)] bg-card p-4">
@@ -62,6 +71,14 @@ export function BillSummary({ bill }: { bill: BillView }) {
           <dd>{formatPaise(total)}</dd>
         </div>
       </dl>
+
+      {/* "You saved ₹X" — the reference puts this right under the total, and
+          it is the one number a customer actually reads twice. */}
+      {saved > 0n && (
+        <p className="mt-2.5 rounded-[var(--radius)] bg-tint-green px-3 py-2 text-center text-xs font-bold text-primary-dark">
+          {t('youSaved', { amount: formatPaise(saved, { hidePaise: true }) })}
+        </p>
+      )}
 
       {forFreeDelivery > 0n ? (
         <p className="mt-3 flex items-center gap-2 rounded-[var(--radius)] bg-secondary px-3 py-2 text-xs">
