@@ -20,7 +20,10 @@ import '../globals.css';
 const appFont = Mukta({
   variable: '--font-app',
   subsets: ['latin', 'devanagari'],
-  weight: ['400', '500', '600', '700'],
+  // 800 is Mukta's heaviest real weight (there is no 900) — loaded so
+  // `font-black` renders as a genuine extra-bold rather than falling back
+  // to 700 with no visible difference from `font-bold`.
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
 });
 

@@ -63,6 +63,32 @@
 
   /* R10 — the design target is a 390px viewport. */
   --spacing-touch: 2.75rem; /* 44px minimum touch target */
+
+  /* The client's reference reads noticeably bigger and bolder than
+     Tailwind's defaults — every named size step up by ~12-15%, so the
+     hundreds of existing text-xs/text-sm/etc. classes across the app read
+     larger without touching each file individually. */
+  --text-xs: 0.8125rem; /* 13px */
+  --text-xs--line-height: calc(1.125 / 0.8125);
+  --text-sm: 0.9375rem; /* 15px */
+  --text-sm--line-height: calc(1.375 / 0.9375);
+  --text-base: 1.0625rem; /* 17px */
+  --text-base--line-height: calc(1.625 / 1.0625);
+  --text-lg: 1.1875rem; /* 19px */
+  --text-lg--line-height: calc(1.75 / 1.1875);
+  --text-xl: 1.3125rem; /* 21px */
+  --text-xl--line-height: calc(1.875 / 1.3125);
+  --text-2xl: 1.625rem; /* 26px */
+  --text-2xl--line-height: calc(2.125 / 1.625);
+  --text-3xl: 2rem; /* 32px */
+  --text-3xl--line-height: calc(2.375 / 2);
+  --text-4xl: 2.375rem; /* 38px */
+  --text-4xl--line-height: calc(2.625 / 2.375);
+
+  /* Mukta's heaviest real weight is 800 (ExtraBold) — it has no 900. Without
+     this, every `font-black` in the app (splash, headings) asked the
+     browser for a weight that was never loaded. */
+  --font-weight-black: 800;
 }
 
 :root {
@@ -72,21 +98,20 @@
      same cream as the rest of the page, the way the client's reference
      does. Yellow survives only as a small accent (badges, the Fruits card's
      tint), never as a large field. */
-  --primary: #1b7a3a; /* buttons, ADD, active tab, Shop Now */
+  /* Lighter than the original brand green (#1b7a3a) — the client found the
+     deep forest-green too dark across the app. */
+  --primary: #2fa355; /* buttons, ADD, active tab, Shop Now */
   --primary-fg: #ffffff;
   --accent: #ffd400; /* small badges/flags only — never a background field */
   --accent-fg: #111111;
-  /* The page sits a clear step BELOW white, so full-width white section
-     panels read as surfaces stacked on it rather than cards floating on a
-     field almost the same colour. At #f8f7f2 the difference from #fff was
-     about 3%, which is why every section looked detached and the background
-     looked empty. */
-  --surface: #eeece5;
+  /* The client wants a plain white page, not a tinted one — no grey/cream
+     showing anywhere behind the white section panels. */
+  --surface: #ffffff;
   --surface-raised: #ffffff;
   --surface-sunken: #e4e2da;
   --text: #14140f;
   --text-muted: #6b7280;
-  --success: #1b7a3a;
+  --success: #2fa355;
   --warning: #c97a17;
   --danger: #c0392b;
   --border: #ebe9e1;
@@ -94,8 +119,8 @@
 
   /* One step darker than --primary — the header's icon circles and small
      dark-green chips, the way the reference's cart/profile icons read
-     against the cream page. */
-  --brand-green-dark: #14532d;
+     against the cream page. Lightened in step with --primary. */
+  --brand-green-dark: #1f7a3e;
 
   /* The two light tints from the reference: green behind the welcome
      banner and the Vegetables card, warm cream-yellow behind Fruits. */

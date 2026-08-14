@@ -2,7 +2,9 @@ import { ArrowRight, Bike, Leaf, Lock, ShieldCheck, type LucideIcon } from 'luci
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 
-const VEG_BASKET_URL = 'https://res.cloudinary.com/kf9nvvpv/image/upload/f_auto,q_auto,w_300/planeat/promo/veg-basket.jpg';
+// The same basket photo the client supplied for splash/onboarding/login —
+// one consistent hero image across the app instead of two different baskets.
+const VEG_BASKET_URL = '/promo/veg-basket-hero.jpg';
 
 /**
  * The "please log in" screen every gated tab shares (wallet, orders,
