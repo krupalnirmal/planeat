@@ -1,11 +1,18 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ArrowDownLeft, ArrowUpRight, Clock, Plus, TriangleAlert } from 'lucide-react';
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Clock,
+  Plus,
+  TriangleAlert,
+  Wallet as WalletIcon,
+} from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { useRouter } from '@/i18n/navigation';
-import { CenteredState, PageHeader } from '@/components/shop/page-header';
+import { PageHeader } from '@/components/shop/page-header';
+import { LoginPrompt } from '@/components/shop/login-prompt';
 import { TopupSheet } from '@/components/wallet/topup-sheet';
 import { useSession } from '@/hooks/use-session';
 import { api, qs } from '@/lib/api/client';
@@ -49,9 +56,7 @@ type Filter = 'ALL' | 'CREDIT' | 'DEBIT';
 export function WalletScreen() {
   const t = useTranslations('wallet');
   const tc = useTranslations('common');
-  const te = useTranslations('errors');
   const format = useFormatter();
-  const router = useRouter();
   const { isLoggedIn, isLoading: sessionLoading } = useSession();
 
   const [filter, setFilter] = useState<Filter>('ALL');
@@ -85,23 +90,13 @@ export function WalletScreen() {
 
   if (!isLoggedIn) {
     return (
-      <>
-        <PageHeader title={t('title')} />
-        <main className="pb-2">
-          <div className="bg-card">
-            <CenteredState>
-              <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
-              <button
-                type="button"
-                onClick={() => router.push('/login?next=/wallet')}
-                className="mt-4 h-12 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-              >
-                {tc('next')}
-              </button>
-            </CenteredState>
-          </div>
-        </main>
-      </>
+      <LoginPrompt
+        icon={WalletIcon}
+        title={t('title')}
+        bandSubtitle={t('loginBandSubtitle')}
+        description={t('loginDescription')}
+        loginHref="/login?next=/wallet"
+      />
     );
   }
 

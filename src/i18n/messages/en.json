@@ -263,6 +263,8 @@
   },
   "wallet": {
     "title": "Wallet",
+    "loginBandSubtitle": "Manage your balance & transactions",
+    "loginDescription": "Access your wallet, track top-ups, and enjoy a seamless shopping experience by logging into your account.",
     "balance": "Balance",
     "topUp": "Add money",
     "transactions": "Transactions",
@@ -899,5 +901,16 @@
     "outOfStock": "This product is currently unavailable.",
     "insufficientBalance": "Not enough balance in your wallet.",
     "notServiceable": "We don't deliver to that PIN code."
+  },
+  "loginPrompt": {
+    "cta": "Login / Sign Up",
+    "trustSecureTitle": "Secure Payments",
+    "trustSecureBody": "100% protected",
+    "trustFastTitle": "Fast Delivery",
+    "trustFastBody": "Same-day slots",
+    "trustFreshTitle": "Fresh & Quality",
+    "trustFreshBody": "Farm to door",
+    "promoTitle": "Fresh Vegetables, Delivered Daily!",
+    "promoBody": "Join thousands of happy customers getting farm-fresh produce at their doorstep."
   }
 }
