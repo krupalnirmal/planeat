@@ -18,6 +18,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/shop/language-switcher';
+import { PageHeader } from '@/components/shop/page-header';
 import { useInvalidateSession, useSession } from '@/hooks/use-session';
 import { api } from '@/lib/api/client';
 
@@ -77,11 +78,11 @@ export function ProfileScreen() {
   ] as const;
 
   return (
-    <main className="space-y-2 pb-2">
-      <div className="bg-card px-4 py-6">
-      <h1 className="text-xl font-bold">{t('title')}</h1>
-
-      <section className="mt-4 flex items-center gap-3 rounded-[var(--radius)] border border-border/60 bg-background p-4">
+    <>
+      <PageHeader title={t('title')} />
+      <main className="space-y-2 pb-2">
+      <div className="bg-card px-4 py-4">
+      <section className="flex items-center gap-3 rounded-[var(--radius)] border border-border/60 bg-background p-4">
         <span className="grid size-12 shrink-0 place-items-center rounded-full bg-primary/10 text-lg font-bold text-primary">
           {user?.name?.trim().charAt(0) ?? <UserRound className="size-6" aria-hidden />}
         </span>
@@ -174,6 +175,7 @@ export function ProfileScreen() {
           </li>
         </ul>
       )}
-    </main>
+      </main>
+    </>
   );
 }

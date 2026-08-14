@@ -4,8 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, ImageIcon, ShoppingCart, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { QtyStepper } from '@/components/shop/qty-stepper';
 import { BillSummary, type BillView } from '@/components/shop/bill-summary';
+import { CenteredState, PageHeader } from '@/components/shop/page-header';
+import { QtyStepper } from '@/components/shop/qty-stepper';
 import { useCart } from '@/hooks/use-cart';
 import { useSession } from '@/hooks/use-session';
 import { api, qs } from '@/lib/api/client';
@@ -53,27 +54,35 @@ export function CartScreen() {
 
   if (sessionLoading || cart.isLoading) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
-      </main>
+      <>
+        <PageHeader title={t('title')} backHref="/" backLabel={tc('back')} />
+        <main className="pb-2">
+          <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+        </main>
+      </>
     );
   }
 
   if (cart.lines.length === 0) {
     return (
-      <main className="pb-2">
-        <div className="flex flex-col items-center bg-card px-6 py-16 text-center">
-          <ShoppingCart className="size-12 text-muted-foreground/30" aria-hidden />
-          <h1 className="mt-4 text-base font-semibold">{t('empty')}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t('emptyHint')}</p>
-          <Link
-            href="/"
-            className="mt-6 flex h-12 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-          >
-            {t('startShopping')}
-          </Link>
-        </div>
-      </main>
+      <>
+        <PageHeader title={t('title')} backHref="/" backLabel={tc('back')} />
+        <main className="pb-2">
+          <div className="bg-card">
+            <CenteredState>
+              <ShoppingCart className="size-12 text-muted-foreground/30" aria-hidden />
+              <p className="mt-4 text-base font-semibold">{t('empty')}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{t('emptyHint')}</p>
+              <Link
+                href="/"
+                className="mt-6 flex h-12 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+              >
+                {t('startShopping')}
+              </Link>
+            </CenteredState>
+          </div>
+        </main>
+      </>
     );
   }
 
@@ -82,27 +91,33 @@ export function CartScreen() {
   // which is where B17 puts the commitment point anyway.
   if (!isLoggedIn) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-6 py-16 text-center">
-          <ShoppingCart className="mx-auto size-12 text-muted-foreground/30" aria-hidden />
-          <p className="mt-4 text-sm font-medium">{t('itemCount', { count: cart.itemCount })}</p>
-          <Link
-            href="/login?next=/cart"
-            className="mt-6 flex h-12 items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-          >
-            {t('proceed')}
-          </Link>
-        </div>
-      </main>
+      <>
+        <PageHeader title={t('title')} backHref="/" backLabel={tc('back')} />
+        <main className="pb-2">
+          <div className="bg-card">
+            <CenteredState>
+              <ShoppingCart className="size-12 text-muted-foreground/30" aria-hidden />
+              <p className="mt-4 text-sm font-medium">{t('itemCount', { count: cart.itemCount })}</p>
+              <Link
+                href="/login?next=/cart"
+                className="mt-6 flex h-12 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+              >
+                {t('proceed')}
+              </Link>
+            </CenteredState>
+          </div>
+        </main>
+      </>
     );
   }
 
   const blocked = (quote.data?.unavailableLines.length ?? 0) > 0;
 
   return (
-    <main className="space-y-2 pb-2">
+    <>
+      <PageHeader title={t('title')} backHref="/" backLabel={tc('back')} />
+      <main className="space-y-2 pb-2">
       <div className="bg-card px-4 py-4">
-      <h1 className="mb-1 text-xl font-bold">{t('title')}</h1>
       <p className="mb-4 text-sm text-muted-foreground">
         {t('itemCount', { count: cart.itemCount })}
       </p>
@@ -209,6 +224,7 @@ export function CartScreen() {
       </div>
 
       <div aria-hidden className="h-16" />
-    </main>
+      </main>
+    </>
   );
 }

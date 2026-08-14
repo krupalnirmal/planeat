@@ -189,9 +189,8 @@ export function IntakeWizard({
   ];
 
   return (
-    <main className="pb-2">
-      <div className="bg-card px-4 py-4">
-      <header className="mb-5 flex items-center gap-2">
+    <>
+      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-accent-faint px-3 py-3">
         <button
           type="button"
           onClick={() => (step === 1 ? router.back() : setStep(step - 1))}
@@ -204,10 +203,12 @@ export function IntakeWizard({
           <p className="text-xs text-muted-foreground">
             {t('stepOf', { current: step, total: TOTAL_STEPS })}
           </p>
-          <h1 className="truncate text-lg font-bold">{stepTitles[step - 1]}</h1>
+          <h1 className="truncate text-base font-bold">{stepTitles[step - 1]}</h1>
         </div>
       </header>
 
+      <main className="pb-2">
+      <div className="bg-card px-4 py-4">
       <div
         className="mb-6 h-1 w-full overflow-hidden rounded-full bg-secondary"
         role="progressbar"
@@ -522,7 +523,8 @@ export function IntakeWizard({
         )}
       </div>
       </div>
-    </main>
+      </main>
+    </>
   );
 }
 

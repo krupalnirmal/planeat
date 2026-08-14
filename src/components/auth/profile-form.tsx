@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
+import { PageHeader } from '@/components/shop/page-header';
 import { useInvalidateSession, useSession } from '@/hooks/use-session';
 import { api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
@@ -63,10 +64,11 @@ export function ProfileForm() {
   }
 
   return (
-    <main className="pb-2">
+    <>
+      <PageHeader title={t('completeTitle')} />
+      <main className="pb-2">
       <div className="bg-card px-5 py-8">
-      <h1 className="text-xl font-bold">{t('completeTitle')}</h1>
-      <p className="mt-1 text-sm text-muted-foreground">{t('completeSubtitle')}</p>
+      <p className="text-sm text-muted-foreground">{t('completeSubtitle')}</p>
 
       <form
         className="mt-6 space-y-5"
@@ -148,6 +150,7 @@ export function ProfileForm() {
         </button>
       </form>
       </div>
-    </main>
+      </main>
+    </>
   );
 }

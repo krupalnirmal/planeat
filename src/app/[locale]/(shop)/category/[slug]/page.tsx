@@ -78,7 +78,7 @@ export default async function CategoryPage({
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-card px-3 py-3">
+      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-accent-faint px-3 py-3">
         <Link
           href="/"
           aria-label={tc('back')}

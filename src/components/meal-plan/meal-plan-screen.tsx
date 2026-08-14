@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { DoctorBanner, MedicalDisclaimer } from '@/components/meal-plan/medical-disclaimer';
 import { PlanWeekView, type PlanDayView } from '@/components/meal-plan/plan-week-view';
+import { CenteredState, PageHeader } from '@/components/shop/page-header';
 import { MyWeek, type WeekDay } from '@/components/subscription/my-week';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api, qs } from '@/lib/api/client';
@@ -91,29 +92,36 @@ export function MealPlanScreen() {
 
   if (sessionLoading || (isLoggedIn && current.isLoading)) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
-      </main>
+      <>
+        <PageHeader title={t('title')} />
+        <main className="pb-2">
+          <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+        </main>
+      </>
     );
   }
 
   // B17 — the meal plan is a commitment point, so it needs a login.
   if (!isLoggedIn) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-6 py-16 text-center">
-          <Salad className="mx-auto size-12 text-muted-foreground/30" aria-hidden />
-          <h1 className="mt-4 text-lg font-bold">{t('title')}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
-          <button
-            type="button"
-            onClick={() => router.push('/login?next=/meal-plan')}
-            className="mt-6 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-          >
-            {te('unauthorized')}
-          </button>
-        </div>
-      </main>
+      <>
+        <PageHeader title={t('title')} />
+        <main className="pb-2">
+          <div className="bg-card">
+            <CenteredState>
+              <Salad className="size-12 text-muted-foreground/30" aria-hidden />
+              <p className="mt-4 text-sm text-muted-foreground">{t('subtitle')}</p>
+              <button
+                type="button"
+                onClick={() => router.push('/login?next=/meal-plan')}
+                className="mt-6 h-12 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+              >
+                {te('unauthorized')}
+              </button>
+            </CenteredState>
+          </div>
+        </main>
+      </>
     );
   }
 
@@ -129,45 +137,48 @@ export function MealPlanScreen() {
   // ── No plan yet.
   if (!plan) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-6 py-16 text-center">
-          <Salad className="mx-auto size-12 text-primary/40" aria-hidden />
-          <h1 className="mt-4 text-lg font-bold">{t('title')}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t('startHint')}</p>
+      <>
+        <PageHeader title={t('title')} />
+        <main className="pb-2">
+          <div className="bg-card px-6 pt-10 pb-6">
+            <div className="flex flex-col items-center text-center">
+              <Salad className="size-12 text-primary/40" aria-hidden />
+              <p className="mt-4 text-sm text-muted-foreground">{t('startHint')}</p>
 
-          <Link
-            href="/meal-plan/onboarding"
-            className="mt-6 flex h-12 items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-          >
-            {t('start')}
-          </Link>
+              <Link
+                href="/meal-plan/onboarding"
+                className="mt-6 flex h-12 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+              >
+                {t('start')}
+              </Link>
+            </div>
 
-          <div className="mt-8 text-left">
-            <MedicalDisclaimer />
+            <div className="mt-10 text-left">
+              <MedicalDisclaimer />
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </>
     );
   }
 
   return (
-    <main className="pb-2">
+    <>
+      <PageHeader
+        title={t('title')}
+        subtitle={t('planVersion', { version: plan.version })}
+        trailing={
+          <Link
+            href="/meal-plan/onboarding"
+            className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-[var(--radius)] border border-border px-3 text-xs font-semibold"
+          >
+            <SlidersHorizontal className="size-3.5" aria-hidden />
+            {t('editProfile')}
+          </Link>
+        }
+      />
+      <main className="pb-2">
       <div className="bg-card px-4 py-4">
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-xl font-bold">{t('title')}</h1>
-          <p className="text-xs text-muted-foreground">
-            {t('planVersion', { version: plan.version })}
-          </p>
-        </div>
-        <Link
-          href="/meal-plan/onboarding"
-          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-[var(--radius)] border border-border px-3 text-xs font-semibold"
-        >
-          <SlidersHorizontal className="size-3.5" aria-hidden />
-          {t('editProfile')}
-        </Link>
-      </div>
 
       {/* B8 / S3 — a flagged plan still displays. The banner and the disclaimer
           are the safeguard; the review queue is the second layer. */}
@@ -309,6 +320,7 @@ export function MealPlanScreen() {
         <MedicalDisclaimer />
       </div>
       </div>
-    </main>
+      </main>
+    </>
   );
 }

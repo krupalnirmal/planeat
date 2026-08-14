@@ -5,6 +5,7 @@ import { Check, LocateFixed, MapPin, Plus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
+import { CenteredState, PageHeader } from '@/components/shop/page-header';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
@@ -65,36 +66,44 @@ export function AddressManager() {
 
   if (isLoading) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-5 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
-      </main>
+      <>
+        <PageHeader title={t('title')} backHref="/profile" backLabel={tc('back')} />
+        <main className="pb-2">
+          <div className="bg-card px-5 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+        </main>
+      </>
     );
   }
 
   if (!isLoggedIn) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-5 py-8">
-          <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
-          <button
-            type="button"
-            onClick={() => router.push('/login?next=/addresses')}
-            className="mt-4 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-          >
-            {tc('next')}
-          </button>
-        </div>
-      </main>
+      <>
+        <PageHeader title={t('title')} backHref="/profile" backLabel={tc('back')} />
+        <main className="pb-2">
+          <div className="bg-card">
+            <CenteredState>
+              <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
+              <button
+                type="button"
+                onClick={() => router.push('/login?next=/addresses')}
+                className="mt-4 h-12 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+              >
+                {tc('next')}
+              </button>
+            </CenteredState>
+          </div>
+        </main>
+      </>
     );
   }
 
   const list = addresses.data?.addresses ?? [];
 
   return (
-    <main className="space-y-2 pb-2">
+    <>
+      <PageHeader title={t('title')} backHref="/profile" backLabel={tc('back')} />
+      <main className="space-y-2 pb-2">
       <div className="bg-card px-5 py-6">
-      <h1 className="text-xl font-bold">{t('title')}</h1>
-
       {adding ? (
         <AddressForm
           onCancel={() => setAdding(false)}
@@ -177,7 +186,8 @@ export function AddressManager() {
         </>
       )}
       </div>
-    </main>
+      </main>
+    </>
   );
 }
 

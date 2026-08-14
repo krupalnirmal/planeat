@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { Recorder } from '@/components/smart-list/recorder';
+import { CenteredState, PageHeader } from '@/components/shop/page-header';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api, qs } from '@/lib/api/client';
 
@@ -119,39 +120,45 @@ export function SmartListScreen() {
 
   if (sessionLoading) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
-      </main>
+      <>
+        <PageHeader title={t('title')} />
+        <main className="pb-2">
+          <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+        </main>
+      </>
     );
   }
 
   // B17 — the Smart List builds a cart, so it needs a login.
   if (!isLoggedIn) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-6 py-16 text-center">
-          <h1 className="text-lg font-bold">{t('title')}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
-          <button
-            type="button"
-            onClick={() => router.push('/login?next=/smart-list')}
-            className="mt-6 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-          >
-            {te('unauthorized')}
-          </button>
-        </div>
-      </main>
+      <>
+        <PageHeader title={t('title')} />
+        <main className="pb-2">
+          <div className="bg-card">
+            <CenteredState>
+              <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+              <button
+                type="button"
+                onClick={() => router.push('/login?next=/smart-list')}
+                className="mt-6 h-12 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+              >
+                {te('unauthorized')}
+              </button>
+            </CenteredState>
+          </div>
+        </main>
+      </>
     );
   }
 
   const busy = uploadVoice.isPending || uploadPhoto.isPending || reparse.isPending || parseTyped.isPending;
 
   return (
-    <main className="pb-2">
+    <>
+      <PageHeader title={t('title')} subtitle={t('subtitle')} />
+      <main className="pb-2">
       <div className="bg-card px-4 py-4">
-      <h1 className="text-xl font-bold">{t('title')}</h1>
-      <p className="mt-1 mb-5 text-sm text-muted-foreground">{t('subtitle')}</p>
-
       {error && (
         <p className="mb-4 rounded-[var(--radius)] bg-danger/10 px-3 py-2.5 text-sm text-danger">
           {error}
@@ -302,6 +309,7 @@ export function SmartListScreen() {
         </>
       )}
       </div>
-    </main>
+      </main>
+    </>
   );
 }

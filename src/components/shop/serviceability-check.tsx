@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Link } from '@/i18n/navigation';
+import { PageHeader } from '@/components/shop/page-header';
 import { api, qs } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
 
@@ -76,10 +77,10 @@ export function ServiceabilityCheck() {
   const phoneValid = /^[6-9]\d{9}$/.test(phone);
 
   return (
-    <main className="pb-2">
+    <>
+      <PageHeader title={t('title')} backHref="/" backLabel={tc('back')} />
+      <main className="pb-2">
       <div className="bg-card px-5 py-8">
-      <h1 className="text-xl font-bold">{t('title')}</h1>
-
       <form
         className="mt-6"
         onSubmit={(event) => {
@@ -199,6 +200,7 @@ export function ServiceabilityCheck() {
         </section>
       )}
       </div>
-    </main>
+      </main>
+    </>
   );
 }

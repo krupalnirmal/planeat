@@ -6,6 +6,7 @@ import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { OrderStatusBadge, type OrderStatusValue } from '@/components/shop/order-status-badge';
+import { CenteredState, PageHeader } from '@/components/shop/page-header';
 import { CART_QUERY_KEY } from '@/hooks/use-cart';
 import { useSession } from '@/hooks/use-session';
 import { api, qs } from '@/lib/api/client';
@@ -60,36 +61,44 @@ export function OrderHistory() {
 
   if (sessionLoading) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
-      </main>
+      <>
+        <PageHeader title={t('title')} backHref="/profile" backLabel={tc('back')} />
+        <main className="pb-2">
+          <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+        </main>
+      </>
     );
   }
 
   if (!isLoggedIn) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-6 py-16 text-center">
-          <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
-          <button
-            type="button"
-            onClick={() => router.push('/login?next=/orders')}
-            className="mt-4 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-          >
-            {tc('next')}
-          </button>
-        </div>
-      </main>
+      <>
+        <PageHeader title={t('title')} backHref="/profile" backLabel={tc('back')} />
+        <main className="pb-2">
+          <div className="bg-card">
+            <CenteredState>
+              <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
+              <button
+                type="button"
+                onClick={() => router.push('/login?next=/orders')}
+                className="mt-4 h-12 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+              >
+                {tc('next')}
+              </button>
+            </CenteredState>
+          </div>
+        </main>
+      </>
     );
   }
 
   const list = orders.data?.orders ?? [];
 
   return (
-    <main className="pb-2">
+    <>
+      <PageHeader title={t('title')} backHref="/profile" backLabel={tc('back')} />
+      <main className="pb-2">
       <div className="bg-card px-4 py-4">
-      <h1 className="mb-4 text-xl font-bold">{t('title')}</h1>
-
       {notice && (
         <p className="mb-4 rounded-[var(--radius)] bg-primary/5 px-3 py-2.5 text-sm text-success">
           {notice}
@@ -99,7 +108,7 @@ export function OrderHistory() {
       {orders.isLoading && <p className="text-sm text-muted-foreground">{tc('loading')}</p>}
 
       {!orders.isLoading && list.length === 0 && (
-        <div className="flex flex-col items-center py-16 text-center">
+        <CenteredState>
           <Package className="size-12 text-muted-foreground/30" aria-hidden />
           <p className="mt-4 text-sm font-medium">{t('empty')}</p>
           <Link
@@ -108,7 +117,7 @@ export function OrderHistory() {
           >
             {tc('next')}
           </Link>
-        </div>
+        </CenteredState>
       )}
 
       <ul className="space-y-3">
@@ -177,6 +186,7 @@ export function OrderHistory() {
         ))}
       </ul>
       </div>
-    </main>
+      </main>
+    </>
   );
 }

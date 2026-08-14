@@ -5,6 +5,7 @@ import { Clock, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { PageHeader } from '@/components/shop/page-header';
 import { ProductCard, type ProductCardData } from '@/components/shop/product-card';
 import { SearchBar } from '@/components/shop/search-bar';
 import { api, qs } from '@/lib/api/client';
@@ -61,7 +62,9 @@ export function SearchScreen() {
   const products = results.data?.products ?? [];
 
   return (
-    <main className="pb-2">
+    <>
+      <PageHeader title={tc('search')} backHref="/" backLabel={tc('back')} />
+      <main className="pb-2">
       <div className="bg-card px-4 py-4">
       <SearchBar defaultValue={input} autoFocus onChange={setInput} className="mb-4" />
 
@@ -134,6 +137,7 @@ export function SearchScreen() {
         </>
       )}
       </div>
-    </main>
+      </main>
+    </>
   );
 }

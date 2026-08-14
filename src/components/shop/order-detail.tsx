@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { OrderStatusBadge, type OrderStatusValue } from '@/components/shop/order-status-badge';
+import { CenteredState, PageHeader } from '@/components/shop/page-header';
 import { ReportIssueForm } from '@/components/shop/report-issue-form';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api } from '@/lib/api/client';
@@ -100,22 +101,30 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
   if (sessionLoading || detail.isLoading) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
-      </main>
+      <>
+        <PageHeader title={t('title')} backHref="/orders" backLabel={tc('back')} />
+        <main className="pb-2">
+          <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+        </main>
+      </>
     );
   }
 
   if (detail.isError || !detail.data) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-6 py-16 text-center">
-          <p className="text-sm text-muted-foreground">{t('notFound')}</p>
-          <Link href="/orders" className="mt-4 inline-block text-sm font-semibold text-primary">
-            {tc('back')}
-          </Link>
-        </div>
-      </main>
+      <>
+        <PageHeader title={t('title')} backHref="/orders" backLabel={tc('back')} />
+        <main className="pb-2">
+          <div className="bg-card">
+            <CenteredState>
+              <p className="text-sm text-muted-foreground">{t('notFound')}</p>
+              <Link href="/orders" className="mt-4 inline-block text-sm font-semibold text-primary">
+                {tc('back')}
+              </Link>
+            </CenteredState>
+          </div>
+        </main>
+      </>
     );
   }
 
@@ -124,7 +133,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
   return (
     <main className="pb-2">
-      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-card px-3 py-3">
+      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-accent-faint px-3 py-3">
         <Link
           href="/orders"
           aria-label={tc('back')}

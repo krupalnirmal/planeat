@@ -5,6 +5,7 @@ import { CalendarDays, CheckCircle2, ChevronLeft, Loader2, MapPin, Truck } from 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
+import { CenteredState, PageHeader } from '@/components/shop/page-header';
 import { TopupSheet } from '@/components/wallet/topup-sheet';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api, qs } from '@/lib/api/client';
@@ -113,38 +114,49 @@ export function ApprovalScreen({ mealPlanId }: { mealPlanId: string }) {
 
   if (sessionLoading || quote.isLoading) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
-      </main>
+      <>
+        <PageHeader title={t('title')} backHref="/meal-plan" backLabel={tc('back')} />
+        <main className="pb-2">
+          <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+        </main>
+      </>
     );
   }
 
   if (done) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-6 py-20 text-center">
-          <CheckCircle2 className="mx-auto size-14 text-success" aria-hidden />
-          <h1 className="mt-4 text-lg font-bold">{t('successTitle')}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t('successBody', { date: done.startDate })}
-          </p>
-          <Link
-            href="/meal-plan"
-            className="mt-8 flex h-12 items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-          >
-            {t('viewPlan')}
-          </Link>
-        </div>
-      </main>
+      <>
+        <PageHeader title={t('title')} backHref="/meal-plan" backLabel={tc('back')} />
+        <main className="pb-2">
+          <div className="bg-card">
+            <CenteredState>
+              <CheckCircle2 className="size-14 text-success" aria-hidden />
+              <p className="mt-4 text-lg font-bold">{t('successTitle')}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t('successBody', { date: done.startDate })}
+              </p>
+              <Link
+                href="/meal-plan"
+                className="mt-8 flex h-12 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+              >
+                {t('viewPlan')}
+              </Link>
+            </CenteredState>
+          </div>
+        </main>
+      </>
     );
   }
 
   const data = quote.data;
   if (!data) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-4 py-8 text-sm text-danger">{tm('generateFailed')}</div>
-      </main>
+      <>
+        <PageHeader title={t('title')} backHref="/meal-plan" backLabel={tc('back')} />
+        <main className="pb-2">
+          <div className="bg-card px-4 py-8 text-sm text-danger">{tm('generateFailed')}</div>
+        </main>
+      </>
     );
   }
 
@@ -158,7 +170,7 @@ export function ApprovalScreen({ mealPlanId }: { mealPlanId: string }) {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-card px-3 py-3">
+      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-accent-faint px-3 py-3">
         <Link
           href="/meal-plan"
           aria-label={tc('back')}

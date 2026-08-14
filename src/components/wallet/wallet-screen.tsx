@@ -5,6 +5,7 @@ import { ArrowDownLeft, ArrowUpRight, Clock, Plus, TriangleAlert } from 'lucide-
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
+import { CenteredState, PageHeader } from '@/components/shop/page-header';
 import { TopupSheet } from '@/components/wallet/topup-sheet';
 import { useSession } from '@/hooks/use-session';
 import { api, qs } from '@/lib/api/client';
@@ -73,26 +74,34 @@ export function WalletScreen() {
 
   if (sessionLoading) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
-      </main>
+      <>
+        <PageHeader title={t('title')} />
+        <main className="pb-2">
+          <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
+        </main>
+      </>
     );
   }
 
   if (!isLoggedIn) {
     return (
-      <main className="pb-2">
-        <div className="bg-card px-6 py-16 text-center">
-          <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
-          <button
-            type="button"
-            onClick={() => router.push('/login?next=/wallet')}
-            className="mt-4 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-          >
-            {tc('next')}
-          </button>
-        </div>
-      </main>
+      <>
+        <PageHeader title={t('title')} />
+        <main className="pb-2">
+          <div className="bg-card">
+            <CenteredState>
+              <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
+              <button
+                type="button"
+                onClick={() => router.push('/login?next=/wallet')}
+                className="mt-4 h-12 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+              >
+                {tc('next')}
+              </button>
+            </CenteredState>
+          </div>
+        </main>
+      </>
     );
   }
 
@@ -101,10 +110,10 @@ export function WalletScreen() {
   const rows = transactions.data?.transactions ?? [];
 
   return (
-    <main className="space-y-2 pb-2">
+    <>
+      <PageHeader title={t('title')} />
+      <main className="space-y-2 pb-2">
       <div className="bg-card px-4 py-4">
-      <h1 className="mb-4 text-xl font-bold">{t('title')}</h1>
-
       <section className="rounded-[var(--radius)] bg-primary px-5 py-6 text-primary-foreground">
         <p className="text-xs opacity-85">{t('balance')}</p>
         <p className="mt-1 text-3xl font-bold">{formatPaise(balance)}</p>
@@ -235,6 +244,7 @@ export function WalletScreen() {
         />
       )}
       </div>
-    </main>
+      </main>
+    </>
   );
 }

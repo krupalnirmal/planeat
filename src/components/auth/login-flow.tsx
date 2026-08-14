@@ -250,21 +250,24 @@ export function LoginFlow({ collageImages = [] }: { collageImages?: string[] }) 
   }
 
   return (
-    <main className="px-5 py-8">
-      <button
-        type="button"
-        onClick={() => {
-          setStep('phone');
-          setError(null);
-        }}
-        className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground"
-      >
-        <ArrowLeft className="size-4" aria-hidden />
-        {t('changeNumber')}
-      </button>
+    <>
+      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-accent-faint px-3 py-3">
+        <button
+          type="button"
+          onClick={() => {
+            setStep('phone');
+            setError(null);
+          }}
+          aria-label={t('changeNumber')}
+          className="grid size-11 shrink-0 place-items-center rounded-full"
+        >
+          <ArrowLeft className="size-5" aria-hidden />
+        </button>
+        <h1 className="text-base font-bold">{t('otpTitle')}</h1>
+      </header>
 
-      <h1 className="text-xl font-bold">{t('otpTitle')}</h1>
-      <p className="mt-1 text-sm text-muted-foreground">{t('otpSubtitle', { phone })}</p>
+      <main className="px-5 py-6">
+      <p className="text-sm text-muted-foreground">{t('otpSubtitle', { phone })}</p>
 
       <form
         className="mt-6"
@@ -345,6 +348,7 @@ export function LoginFlow({ collageImages = [] }: { collageImages?: string[] }) 
             )}
         </div>
       </form>
-    </main>
+      </main>
+    </>
   );
 }
