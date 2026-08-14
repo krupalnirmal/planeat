@@ -3,6 +3,7 @@ import { Mukta } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import NextTopLoader from 'nextjs-toploader';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { ServiceWorkerRegistration } from '@/components/providers/service-worker-registration';
 import { routing } from '@/i18n/routing';
@@ -79,6 +80,10 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={`${appFont.variable} h-full`} suppressHydrationWarning>
       <body className="min-h-full">
+        {/* A visible loading bar on every navigation — without it, tapping a
+            link during the round trip to the database (Singapore, on rural
+            4G) looked like the tap did nothing. */}
+        <NextTopLoader color="#1b7a3a" height={3} showSpinner={false} shadow={false} />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <QueryProvider>{children}</QueryProvider>
           <ServiceWorkerRegistration />
