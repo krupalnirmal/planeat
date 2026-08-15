@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { PageHeader } from '@/components/shop/page-header';
 import { api, qs } from '@/lib/api/client';
+import { useDeliveryArea } from '@/stores/delivery-area';
 import { cn } from '@/lib/utils';
 
 interface ServiceabilityResult {
@@ -34,7 +35,18 @@ export function ServiceabilityCheck() {
   const check = useMutation({
     mutationFn: (query: { pincode?: string; lat?: number; lng?: number }) =>
       api.get<ServiceabilityResult>(`/api/serviceability${qs(query)}`),
-    onSuccess: setResult,
+    onSuccess: (data) => {
+      setResult(data);
+      // Remembered so the home header can say "delivering to X" the moment
+      // someone lands back there, instead of a bare "Select address" right
+      // after they confirmed exactly where they are.
+      if (data.serviceable) {
+        useDeliveryArea.getState().set({
+          areaName: data.area?.name ?? null,
+          pincode: data.area?.pincode ?? null,
+        });
+      }
+    },
     onError: () => setError(te('generic')),
   });
 

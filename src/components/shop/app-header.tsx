@@ -9,6 +9,7 @@ import { useCart } from '@/hooks/use-cart';
 import { useSession } from '@/hooks/use-session';
 import { api } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
+import { useDeliveryArea } from '@/stores/delivery-area';
 
 /**
  * PART 5 — the sticky home header: wordmark, delivery address, wallet
@@ -29,6 +30,7 @@ export function AppHeader() {
   const tCart = useTranslations('cart');
   const { user, defaultAddress, isLoggedIn } = useSession();
   const cart = useCart();
+  const rememberedArea = useDeliveryArea((s) => s.areaName ?? s.pincode);
 
   // Shares the ['wallet'] key with the wallet screen, so a top-up updates the
   // chip without a second request.
@@ -39,9 +41,12 @@ export function AppHeader() {
     staleTime: 30_000,
   });
 
+  // A real saved address always wins; a merely-checked area (no login, or
+  // logged in but never finished saving an address) is still worth showing
+  // instead of a bare placeholder.
   const addressLine = defaultAddress
     ? `${defaultAddress.label} · ${defaultAddress.line1}`
-    : t('selectAddress');
+    : (rememberedArea ?? t('selectAddress'));
 
   const initial = user?.name?.trim().charAt(0) || 'आ';
 
