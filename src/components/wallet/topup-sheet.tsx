@@ -241,7 +241,7 @@ export function TopupSheet({
                 initiate.mutate();
               }}
               disabled={belowMinimum || initiate.isPending}
-              className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+              className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
             >
               {initiate.isPending && <Loader2 className="size-4 animate-spin" aria-hidden />}
               {t('payNow')} · {formatPaise(amountPaise, { hidePaise: true })}
@@ -289,7 +289,7 @@ export function TopupSheet({
             <button
               type="button"
               onClick={onClose}
-              className="mt-6 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+              className="mt-6 h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
             >
               {tc('done')}
             </button>

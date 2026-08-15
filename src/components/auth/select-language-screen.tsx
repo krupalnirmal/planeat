@@ -58,7 +58,7 @@ export function SelectLanguageScreen() {
       <button
         type="button"
         onClick={confirm}
-        className="h-12 w-full rounded-[var(--radius)] bg-primary text-base font-bold text-primary-foreground"
+        className="h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
       >
         {t('continue')}
       </button>

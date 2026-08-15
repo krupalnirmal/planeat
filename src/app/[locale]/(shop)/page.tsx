@@ -268,8 +268,12 @@ async function FastDeliveryBanner() {
         <p className="mt-0.5 text-[11px] text-muted-foreground">{t('fastDeliveryBody')}</p>
       </div>
 
+      {/* R10 — a plain <a> doesn't pick up the global 44px-touch-target rule
+          (that only targets `button`/`a[role="button"]`), so this was
+          quietly under the floor despite looking fine. */}
       <Link
         href="/category/vegetables"
+        role="button"
         className="flex shrink-0 items-center gap-1 rounded-full bg-primary-dark px-3.5 py-2 text-xs font-bold text-white"
       >
         {t('shopNow')}

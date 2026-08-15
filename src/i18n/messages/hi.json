@@ -120,7 +120,8 @@
     "sortDefault": "अनुशंसित",
     "sortPriceAsc": "कीमत: कम से ज़्यादा",
     "sortPriceDesc": "कीमत: ज़्यादा से कम",
-    "sortNameAsc": "नाम अनुसार (A-Z)"
+    "sortNameAsc": "नाम अनुसार (A-Z)",
+    "vegetablesBannerAlt": "प्रचार बैनर: ताज़ी सब्ज़ियाँ रोज़ 30 मिनट में घर पहुँचाई जाती हैं"
   },
   "product": {
     "add": "जोड़ें",

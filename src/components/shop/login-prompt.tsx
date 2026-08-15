@@ -59,9 +59,14 @@ export function LoginPrompt({
           <p className="mt-4 text-xl font-black">{te('unauthorized')}</p>
           <p className="mt-1.5 max-w-xs text-sm text-muted-foreground">{description}</p>
 
+          {/* Sized like the home page's "Shop Now" chip — a self-width pill,
+              not a bar stretched across the screen — with `role="button"`
+              so it still clears R10's 44px floor via the global rule despite
+              being padding-sized rather than height-fixed. */}
           <Link
             href={loginHref}
-            className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground"
+            role="button"
+            className="mt-6 flex w-fit items-center justify-center gap-1.5 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground"
           >
             <ArrowRight className="size-4" aria-hidden />
             {t('cta')}

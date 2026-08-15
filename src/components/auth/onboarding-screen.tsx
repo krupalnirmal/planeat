@@ -42,7 +42,7 @@ export function OnboardingScreen() {
       <button
         type="button"
         onClick={() => router.replace('/select-language')}
-        className="mt-6 h-12 w-full rounded-[var(--radius)] bg-primary text-base font-bold text-primary-foreground"
+        className="mt-6 h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
       >
         {t('next')}
       </button>

@@ -174,7 +174,7 @@ export function VariantPicker({
           <button
             type="button"
             disabled
-            className="h-12 w-full rounded-[var(--radius)] border border-border text-sm font-semibold text-muted-foreground"
+            className="h-11 w-full rounded-[var(--radius)] border border-border text-sm font-semibold text-muted-foreground"
           >
             {t('outOfStock')}
           </button>
@@ -182,7 +182,7 @@ export function VariantPicker({
           <button
             type="button"
             onClick={handleAdd}
-            className="h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+            className="h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
           >
             {isLoggedIn ? t('addToCart') : ta('loginRequiredCart')}
           </button>
@@ -194,7 +194,7 @@ export function VariantPicker({
             disabled={cart.isMutating}
             max={selected.stockQty}
             label={productName}
-            className="h-12"
+            className="h-11"
           />
         )}
       </div>

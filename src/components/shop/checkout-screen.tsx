@@ -368,7 +368,7 @@ export function CheckoutScreen() {
             place.mutate();
           }}
           disabled={!canSubmit}
-          className="flex h-12 w-full items-center justify-between rounded-[var(--radius)] bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-50"
+          className="flex h-11 w-full items-center justify-between rounded-[var(--radius)] bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
           <span>{bill ? formatPaise(paise(bill.totalPaise)) : '—'}</span>
           <span>{place.isPending ? t('placing') : t('placeOrder')}</span>

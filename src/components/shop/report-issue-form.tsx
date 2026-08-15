@@ -174,7 +174,7 @@ export function ReportIssueForm({
         <button
           type="submit"
           disabled={submit.isPending || !amount}
-          className="h-12 flex-1 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+          className="h-11 flex-1 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
           {submit.isPending ? tc('saving') : t('submit')}
         </button>

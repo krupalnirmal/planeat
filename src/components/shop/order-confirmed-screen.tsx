@@ -76,7 +76,7 @@ export function OrderConfirmedScreen({ orderId }: { orderId: string }) {
       <div className="mt-8 space-y-3">
         <Link
           href={`/orders/${orderId}`}
-          className="flex h-12 w-full items-center justify-center rounded-[var(--radius)] bg-primary text-base font-bold text-primary-foreground"
+          className="flex h-11 w-full items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
         >
           {t('trackOrder')}
         </Link>

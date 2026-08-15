@@ -274,7 +274,7 @@ export function LoginFlow() {
           <button
             type="submit"
             disabled={!phoneValid || busy}
-            className="mt-4 h-12 w-full rounded-[var(--radius)] bg-primary text-base font-bold text-primary-foreground transition-colors disabled:bg-muted-foreground/45 disabled:text-white"
+            className="mt-4 h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground transition-colors disabled:bg-muted-foreground/45 disabled:text-white"
           >
             {busy ? t('sending') : t('sendOtp')}
           </button>
@@ -404,7 +404,7 @@ export function LoginFlow() {
           <button
             type="submit"
             disabled={code.length !== OTP_LENGTH || busy}
-            className="mt-6 h-12 w-full rounded-[var(--radius)] bg-primary text-base font-bold text-primary-foreground disabled:opacity-50"
+            className="mt-6 h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
           >
             {busy ? t('verifying') : t('verify')}
           </button>

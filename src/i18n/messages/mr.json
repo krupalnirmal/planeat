@@ -120,7 +120,8 @@
     "sortDefault": "शिफारस केलेले",
     "sortPriceAsc": "किंमत: कमी ते जास्त",
     "sortPriceDesc": "किंमत: जास्त ते कमी",
-    "sortNameAsc": "नावाप्रमाणे (A-Z)"
+    "sortNameAsc": "नावाप्रमाणे (A-Z)",
+    "vegetablesBannerAlt": "जाहिरात बॅनर: ताजा भाजीपाला रोज ३० मिनिटांत घरपोच"
   },
   "product": {
     "add": "घाला",

@@ -120,7 +120,8 @@
     "sortDefault": "Recommended",
     "sortPriceAsc": "Price: Low to High",
     "sortPriceDesc": "Price: High to Low",
-    "sortNameAsc": "Name: A to Z"
+    "sortNameAsc": "Name: A to Z",
+    "vegetablesBannerAlt": "Promotional banner: fresh vegetables delivered daily, in 30 minutes"
   },
   "product": {
     "add": "ADD",

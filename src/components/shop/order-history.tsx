@@ -81,7 +81,7 @@ export function OrderHistory() {
               <button
                 type="button"
                 onClick={() => router.push('/login?next=/orders')}
-                className="mt-4 h-12 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+                className="mt-4 h-11 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
               >
                 {tc('next')}
               </button>
@@ -113,7 +113,7 @@ export function OrderHistory() {
           <p className="mt-4 text-sm font-medium">{t('empty')}</p>
           <Link
             href="/"
-            className="mt-6 flex h-12 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+            className="mt-6 flex h-11 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
           >
             {tc('next')}
           </Link>

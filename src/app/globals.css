@@ -128,8 +128,10 @@
   --brand-tint-yellow: #fdf1de;
 
   /* A faint wash of the brand's status-bar yellow (--accent, #FFD400) —
-     for a header/footer band that echoes it without shouting. */
-  --accent-faint: #fff3c4;
+     for a header/footer band that echoes it without shouting. Lightened
+     further per client feedback — even the "faint" version was still
+     reading as a solid yellow band. */
+  --accent-faint: #fdf6e6;
 
   /* Safe-area aware height of the 5-tab bottom navigation. */
   --bottom-nav-height: 4.25rem;

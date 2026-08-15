@@ -13,6 +13,12 @@ export interface CategoryProduct extends ProductCardData {
   vegetableType: string | null;
 }
 
+// Client-supplied (public/banners/category_banner.png) — its copy ("Fresh
+// vegetables, delivered daily") only makes sense on this one category, so
+// it isn't a generic per-category banner slot.
+const VEGETABLES_BANNER_URL =
+  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1786779984/planeat/banners/category-banner.jpg';
+
 type SortOption = 'default' | 'priceAsc' | 'priceDesc' | 'nameAsc';
 
 const SORT_OPTIONS: Array<{
@@ -145,6 +151,21 @@ export function CategoryProductList({
           )}
         </div>
       </div>
+
+      {slug === 'vegetables' && (
+        <div className="bg-card px-4 pb-3">
+          <div className="overflow-hidden rounded-[var(--radius)] shadow-sm">
+            {/* Whole creative, never cropped — same rule as the home
+                carousel's banners. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={VEGETABLES_BANNER_URL}
+              alt={t('vegetablesBannerAlt')}
+              className="block h-auto w-full"
+            />
+          </div>
+        </div>
+      )}
 
       {sorted.length === 0 ? (
         <div className="bg-card px-4 pb-4">

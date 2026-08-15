@@ -75,7 +75,7 @@ export function CartScreen() {
               <p className="mt-1 text-sm text-muted-foreground">{t('emptyHint')}</p>
               <Link
                 href="/"
-                className="mt-6 flex h-12 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+                className="mt-6 flex h-11 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
               >
                 {t('startShopping')}
               </Link>
@@ -100,7 +100,7 @@ export function CartScreen() {
               <p className="mt-4 text-sm font-medium">{t('itemCount', { count: cart.itemCount })}</p>
               <Link
                 href="/login?next=/cart"
-                className="mt-6 flex h-12 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+                className="mt-6 flex h-11 w-full max-w-xs items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
               >
                 {t('proceed')}
               </Link>
@@ -228,7 +228,7 @@ export function CartScreen() {
           href="/checkout"
           aria-disabled={!quote.data?.canPlaceOrder}
           className={cn(
-            'flex h-12 items-center justify-between rounded-[var(--radius)] bg-primary px-4 text-sm font-bold text-primary-foreground',
+            'flex h-11 items-center justify-between rounded-[var(--radius)] bg-primary px-4 text-sm font-bold text-primary-foreground',
             !quote.data?.canPlaceOrder && 'pointer-events-none opacity-50',
           )}
         >

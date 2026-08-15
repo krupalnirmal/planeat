@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 import { getStorageProvider } from '@/lib/services/storage';
 import type { Prisma } from '@/generated/prisma/client';
 import type { Locale, UnitType } from '@/generated/prisma/enums';
+import { CATEGORY_TILE_IMAGES } from './category-tile-images';
 import { pickName, scoreMatch, searchTerms } from './text';
 
 /**
@@ -227,10 +228,16 @@ export async function getHomePayload(locale: Locale): Promise<HomePayload> {
     bestsellers: bestsellers.map((p) => toProductCard(p, locale)),
 
     collages: categories.map((c) => {
-      const images = c.products
-        .map((p) => firstImageUrl(p.imageUrls))
-        .filter((url): url is string => url !== null)
-        .slice(0, 4);
+      // Curated, watermark-checked stock photos take priority over whatever
+      // happened to be the first few product photos in the category — see
+      // CATEGORY_TILE_IMAGES. The "+N more" count still reflects the real
+      // catalogue, only the four small preview photos are curated.
+      const images =
+        CATEGORY_TILE_IMAGES[c.slug] ??
+        c.products
+          .map((p) => firstImageUrl(p.imageUrls))
+          .filter((url): url is string => url !== null)
+          .slice(0, 4);
       return {
         categorySlug: c.slug,
         categoryName: pickName(c, locale),

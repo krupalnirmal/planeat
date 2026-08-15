@@ -136,7 +136,7 @@ export function ProfileForm() {
         <button
           type="submit"
           disabled={name.trim().length < 2 || busy}
-          className="h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+          className="h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
           {busy ? tc('saving') : tc('save')}
         </button>

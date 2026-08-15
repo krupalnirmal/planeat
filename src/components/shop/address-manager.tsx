@@ -86,7 +86,7 @@ export function AddressManager() {
               <button
                 type="button"
                 onClick={() => router.push('/login?next=/addresses')}
-                className="mt-4 h-12 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+                className="mt-4 h-11 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
               >
                 {tc('next')}
               </button>
@@ -362,7 +362,7 @@ function AddressForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: () 
         <button
           type="submit"
           disabled={!valid || save.isPending}
-          className="h-12 flex-1 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+          className="h-11 flex-1 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
           {save.isPending ? tc('saving') : tc('save')}
         </button>

@@ -107,7 +107,7 @@ export function ServiceabilityCheck() {
           <button
             type="submit"
             disabled={!pincodeValid || check.isPending}
-            className="h-12 shrink-0 rounded-[var(--radius)] bg-primary px-5 text-sm font-bold text-primary-foreground disabled:opacity-50"
+            className="h-11 shrink-0 rounded-[var(--radius)] bg-primary px-5 text-sm font-bold text-primary-foreground disabled:opacity-50"
           >
             {check.isPending ? tc('loading') : tc('next')}
           </button>
@@ -134,7 +134,7 @@ export function ServiceabilityCheck() {
           </p>
           <Link
             href="/"
-            className="mt-4 flex h-12 items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+            className="mt-4 flex h-11 items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
           >
             {tc('next')}
           </Link>
@@ -182,7 +182,7 @@ export function ServiceabilityCheck() {
                 type="submit"
                 disabled={!phoneValid || join.isPending}
                 className={cn(
-                  'mt-4 h-12 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground',
+                  'mt-4 h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground',
                   (!phoneValid || join.isPending) && 'opacity-50',
                 )}
               >
