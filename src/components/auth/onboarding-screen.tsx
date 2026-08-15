@@ -26,7 +26,7 @@ export function OnboardingScreen() {
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/promo/veg-basket-hero.jpg"
+          src="/promo/veg-basket-hero.png"
           alt=""
           aria-hidden
           className="mt-8 w-full max-w-[300px] rounded-[var(--radius)]"

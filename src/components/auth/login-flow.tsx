@@ -204,9 +204,9 @@ export function LoginFlow() {
     return (
       <main className="flex min-h-dvh flex-col px-6 pt-6 pb-6">
         <div className="relative flex items-center justify-center">
-          <div className="flex items-center gap-1.5">
-            <Leaf className="size-7 -rotate-12 text-primary" aria-hidden />
-            <p className="text-2xl font-black tracking-tight">
+          <div className="flex items-center gap-2">
+            <Leaf className="size-9 -rotate-12 text-primary" aria-hidden />
+            <p className="text-4xl font-black tracking-tight">
               <span className="text-primary-dark">Plan</span>
               <span className="text-primary">eat</span>
             </p>
@@ -224,17 +224,19 @@ export function LoginFlow() {
           </Link>
         </div>
 
-        <h1 className="mt-6 text-[26px] leading-tight font-black text-balance">{ta('tagline')}</h1>
+        <h1 className="mt-3 text-center text-lg leading-tight font-bold whitespace-pre-line">
+          {ta('tagline')}
+        </h1>
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/promo/veg-basket-hero.jpg"
+          src="/promo/veg-basket-hero.png"
           alt=""
           aria-hidden
           className="mx-auto mt-6 w-full max-w-[260px]"
         />
 
-        <ul className="mt-6 space-y-2.5">
+        <ul className="mt-6 flex flex-col items-center space-y-2.5">
           {FEATURE_KEYS.map((key) => (
             <li key={key} className="flex items-center gap-2.5 text-sm font-semibold">
               <span className="grid size-5 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
@@ -246,7 +248,7 @@ export function LoginFlow() {
         </ul>
 
         <form
-          className="mt-6"
+          className="mx-auto mt-6 w-full max-w-xs"
           onSubmit={(event) => {
             event.preventDefault();
             if (phoneValid && !busy) void sendCode('sms');

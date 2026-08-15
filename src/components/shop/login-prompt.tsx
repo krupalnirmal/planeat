@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation';
 
 // The same basket photo the client supplied for splash/onboarding/login —
 // one consistent hero image across the app instead of two different baskets.
-const VEG_BASKET_URL = '/promo/veg-basket-hero.jpg';
+const VEG_BASKET_URL = '/promo/veg-basket-hero.png';
 
 /**
  * The "please log in" screen every gated tab shares (wallet, orders,

@@ -42,11 +42,11 @@ export function SplashScreen() {
           </p>
         </div>
 
-        <h1 className="mt-6 text-2xl leading-snug font-black text-balance">{ta('tagline')}</h1>
+        <h1 className="mt-3 text-2xl leading-snug font-bold whitespace-pre-line">{ta('tagline')}</h1>
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/promo/veg-basket-hero.jpg"
+          src="/promo/veg-basket-hero.png"
           alt=""
           aria-hidden
           className="mt-10 w-full max-w-[280px] rounded-[var(--radius)]"
