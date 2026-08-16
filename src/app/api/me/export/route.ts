@@ -46,7 +46,7 @@ export const GET = route(async () => {
 
   return ok({
     exportedAt: new Date().toISOString(),
-    format: 'planeat.user-export.v1',
+    format: 'getfresh.user-export.v1',
     user,
   });
 });

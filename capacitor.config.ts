@@ -23,8 +23,8 @@ import type { CapacitorConfig } from '@capacitor/cli';
  *   npx cap open android   # requires Android Studio
  */
 const config: CapacitorConfig = {
-  appId: 'com.planeat.app',
-  appName: 'Planeat',
+  appId: 'com.getfresh.app',
+  appName: 'Get Fresh',
   webDir: 'public',
   server: {
     // Swap for the production URL before a real release build; kept as

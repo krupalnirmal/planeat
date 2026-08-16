@@ -15,7 +15,7 @@ import { useCallback, useSyncExternalStore } from 'react';
  * populated client one.
  */
 
-const STORAGE_KEY = 'planeat.recent-searches.v1';
+const STORAGE_KEY = 'getfresh.recent-searches.v1';
 const MAX_ENTRIES = 8;
 
 const EMPTY: string[] = [];

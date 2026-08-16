@@ -37,8 +37,8 @@ export function SplashScreen() {
         <div className="flex items-center gap-1.5">
           <Leaf className="size-9 -rotate-12 text-primary" aria-hidden />
           <p className="text-4xl font-black tracking-tight">
-            <span className="text-primary-dark">Plan</span>
-            <span className="text-primary">eat</span>
+            <span className="text-primary-dark">Get</span>{' '}
+            <span className="text-primary">Fresh</span>
           </p>
         </div>
 

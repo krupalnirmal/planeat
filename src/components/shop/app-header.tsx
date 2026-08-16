@@ -63,8 +63,8 @@ export function AppHeader() {
         <div className="flex min-w-0 items-center gap-1">
           <Leaf className="size-6 shrink-0 -rotate-12 text-primary" aria-hidden />
           <p className="truncate text-2xl font-black tracking-tight">
-            <span className="text-primary-dark">Plan</span>
-            <span className="text-primary">eat</span>
+            <span className="text-primary-dark">Get</span>{' '}
+            <span className="text-primary">Fresh</span>
           </p>
         </div>
 

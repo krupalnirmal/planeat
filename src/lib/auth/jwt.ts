@@ -11,9 +11,9 @@ import type { UserRole } from '@/generated/prisma/enums';
  * attacker mint 30-day refresh tokens.
  */
 
-const ISSUER = 'planeat';
-const AUDIENCE_ACCESS = 'planeat:access';
-const AUDIENCE_REFRESH = 'planeat:refresh';
+const ISSUER = 'getfresh';
+const AUDIENCE_ACCESS = 'getfresh:access';
+const AUDIENCE_REFRESH = 'getfresh:refresh';
 
 export interface AccessClaims {
   userId: string;

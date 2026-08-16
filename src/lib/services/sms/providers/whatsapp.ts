@@ -35,7 +35,7 @@ export class WhatsAppProvider implements SmsProvider {
   constructor(
     private readonly accessToken: string = process.env.WHATSAPP_ACCESS_TOKEN ?? '',
     private readonly phoneNumberId: string = process.env.WHATSAPP_PHONE_NUMBER_ID ?? '',
-    private readonly otpTemplateName: string = process.env.WHATSAPP_OTP_TEMPLATE ?? 'planeat_otp',
+    private readonly otpTemplateName: string = process.env.WHATSAPP_OTP_TEMPLATE ?? 'getfresh_otp',
   ) {}
 
   private async post(payload: Record<string, unknown>): Promise<SmsResult> {

@@ -108,9 +108,9 @@ export function VariantPicker({
                 aria-pressed={variant.id === selectedId}
                 disabled={variant.stockQty === 0}
                 className={cn(
-                  'min-h-11 rounded-[var(--radius)] border px-4 text-sm transition-colors disabled:opacity-40',
+                  'min-h-11 rounded-[var(--radius)] border-2 px-4 text-sm transition-colors disabled:opacity-40',
                   variant.id === selectedId
-                    ? 'border-primary bg-primary/5 font-semibold text-primary'
+                    ? 'border-primary bg-primary font-bold text-primary-foreground shadow-sm'
                     : 'border-border bg-card text-muted-foreground',
                 )}
               >

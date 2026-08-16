@@ -85,7 +85,7 @@ export const useGuestCart = create<CartState>()(
       totalItems: () => get().lines.reduce((sum, l) => sum + l.quantity, 0),
     }),
     {
-      name: 'planeat.cart.v1',
+      name: 'getfresh.cart.v1',
       partialize: (state) => ({ lines: state.lines }),
       onRehydrateStorage: () => (state) => {
         if (state) state.hydrated = true;

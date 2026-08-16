@@ -31,10 +31,10 @@ const flatEn = flatten(en);
  * Keys that are proper nouns or technical acronyms with no Marathi form —
  * "SKU" is written SKU on an Indian invoice, in a Marathi conversation, and in
  * this admin table. Translating it would make the column harder to read, not
- * easier. "Planeat" is the brand wordmark: the client's own marketing
- * material renders it in Latin script inside Marathi and Hindi copy alike
- * ("आजच Planeat करा"), the same way "Swiggy" or "Zomato" never gets a
- * Devanagari spelling — a brand name is not a word that translates.
+ * easier. "Get Fresh" is the brand wordmark: the client's own marketing
+ * renders it in Latin script inside Marathi and Hindi copy alike, the same
+ * way "Swiggy" or "Zomato" never gets a Devanagari spelling — a brand name
+ * is not a word that translates.
  *
  * This list stays short on purpose: it is the escape hatch from R7, and every
  * entry has to be a word that genuinely does not translate. `home.benefitsFreshTitle`

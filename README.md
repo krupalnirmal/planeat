@@ -1,4 +1,4 @@
-# Planeat
+# Get Fresh
 
 A Blinkit-style quick-commerce grocery app for Maharashtra, with an AI-generated personalised weekly vegetable meal plan and daily subscription delivery.
 

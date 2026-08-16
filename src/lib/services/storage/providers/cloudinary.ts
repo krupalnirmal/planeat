@@ -45,7 +45,7 @@ export class CloudinaryProvider implements StorageProvider {
     this.assertConfigured();
 
     const timestamp = Math.floor(Date.now() / 1000);
-    const folder = `planeat/${opts.folder}`;
+    const folder = `getfresh/${opts.folder}`;
     const publicId = `${opts.fileName ?? 'file'}-${timestamp}`.replace(/[^a-z0-9-]/gi, '-');
 
     // Signature covers the alphabetically sorted params, secret appended.

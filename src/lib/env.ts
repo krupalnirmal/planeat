@@ -52,7 +52,7 @@ export const env = {
   nodeEnv: str('NODE_ENV', 'development'),
   isProduction: process.env.NODE_ENV === 'production',
   appUrl: str('NEXT_PUBLIC_APP_URL', 'http://localhost:3000'),
-  appName: str('NEXT_PUBLIC_APP_NAME', 'Planeat'),
+  appName: str('NEXT_PUBLIC_APP_NAME', 'Get Fresh'),
 
   databaseUrl: str('DATABASE_URL', ''),
 

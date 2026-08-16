@@ -58,7 +58,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           third of the page. */}
       <aside className="hidden w-56 shrink-0 border-r border-border bg-card lg:block print:hidden">
         <div className="border-b border-border px-5 py-4">
-          <p className="text-sm font-bold">Planeat</p>
+          <p className="text-sm font-bold">Get Fresh</p>
           <p className="text-xs text-muted-foreground">{tAdmin('title')}</p>
         </div>
 

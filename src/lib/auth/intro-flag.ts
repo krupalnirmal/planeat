@@ -4,4 +4,4 @@
  * the sequence) so someone who drops off partway through never gets routed
  * back into it on their next visit.
  */
-export const INTRO_SEEN_FLAG = 'planeat_intro_seen';
+export const INTRO_SEEN_FLAG = 'getfresh_intro_seen';

@@ -46,7 +46,7 @@ export const GET = route(async (request: Request) => {
   url.searchParams.set('zoom', '18');
 
   const res = await fetch(url, {
-    headers: { 'User-Agent': 'Planeat-app/1.0 (delivery address lookup)' },
+    headers: { 'User-Agent': 'GetFresh-app/1.0 (delivery address lookup)' },
   });
 
   if (!res.ok) throw ApiError.badRequest('Could not look up that location');

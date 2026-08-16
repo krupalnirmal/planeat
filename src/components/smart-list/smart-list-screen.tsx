@@ -38,7 +38,7 @@ interface SavedListsResponse {
   lists: Array<{ id: string; name: string | null; source: string; itemCount: number }>;
 }
 
-type Mode = 'choose' | 'transcript' | 'type';
+type Mode = 'choose' | 'record' | 'transcript' | 'type';
 
 export function SmartListScreen() {
   const t = useTranslations('smartList');
@@ -226,22 +226,51 @@ export function SmartListScreen() {
             </button>
           </div>
         </section>
-      ) : (
-        <>
+      ) : mode === 'record' ? (
+        <section>
+          <button
+            type="button"
+            onClick={() => setMode('choose')}
+            className="mb-3 text-sm font-medium text-muted-foreground"
+          >
+            ← {tc('back')}
+          </button>
           <Recorder
             disabled={busy}
             onRecorded={(blob, mimeType) => uploadVoice.mutate({ blob, mimeType })}
           />
+        </section>
+      ) : (
+        <>
+          {/* Three equal, tap-first choices — the reference the client sent
+              replaces what used to be one dominant recorder card sitting
+              above two smaller rows, which read as "record is the real
+              option, the rest are fallbacks" even though M4 treats typing as
+              a first-class path, not a fallback. */}
+          <p className="text-sm text-muted-foreground">{t('chooseMethodHint')}</p>
+          <div className="mt-3 grid grid-cols-3 gap-2.5">
+            <button
+              type="button"
+              onClick={() => setMode('record')}
+              disabled={busy}
+              className="flex aspect-square flex-col items-center justify-center gap-2 rounded-[var(--radius)] border border-border bg-background px-2 text-center disabled:opacity-50"
+            >
+              <span className="grid size-11 place-items-center rounded-full bg-tint-green text-primary">
+                <Mic className="size-5" aria-hidden />
+              </span>
+              <span className="text-xs font-semibold">{t('tileRecord')}</span>
+            </button>
 
-          <div className="mt-3 grid gap-3">
             <button
               type="button"
               onClick={() => photoInputRef.current?.click()}
               disabled={busy}
-              className="flex h-14 items-center gap-3 rounded-[var(--radius)] border border-border bg-background px-4 text-left disabled:opacity-50"
+              className="flex aspect-square flex-col items-center justify-center gap-2 rounded-[var(--radius)] border border-border bg-background px-2 text-center disabled:opacity-50"
             >
-              <Camera className="size-5 shrink-0 text-primary" aria-hidden />
-              <span className="text-sm font-semibold">{t('photo')}</span>
+              <span className="grid size-11 place-items-center rounded-full bg-tint-green text-primary">
+                <Camera className="size-5" aria-hidden />
+              </span>
+              <span className="text-xs font-semibold">{t('tilePhoto')}</span>
             </button>
 
             <input
@@ -257,16 +286,19 @@ export function SmartListScreen() {
               }}
             />
 
-            {/* M4 — manual entry is the stated fallback, so it is a real
-                option on the first screen, not hidden behind a failure. */}
+            {/* M4 — manual entry is the stated fallback, so it is a real,
+                equal-weight option on the first screen, not hidden behind a
+                failure. */}
             <button
               type="button"
               onClick={() => setMode('type')}
               disabled={busy}
-              className="flex h-14 items-center gap-3 rounded-[var(--radius)] border border-border bg-background px-4 text-left disabled:opacity-50"
+              className="flex aspect-square flex-col items-center justify-center gap-2 rounded-[var(--radius)] border border-border bg-background px-2 text-center disabled:opacity-50"
             >
-              <Keyboard className="size-5 shrink-0 text-primary" aria-hidden />
-              <span className="text-sm font-semibold">{t('typeInstead')}</span>
+              <span className="grid size-11 place-items-center rounded-full bg-tint-green text-primary">
+                <Keyboard className="size-5" aria-hidden />
+              </span>
+              <span className="text-xs font-semibold">{t('tileType')}</span>
             </button>
           </div>
 

@@ -31,6 +31,6 @@ export const useDeliveryArea = create<DeliveryAreaState>()(
       set: (area) => set(area),
       clear: () => set({ areaName: null, pincode: null }),
     }),
-    { name: 'planeat.delivery-area.v1' },
+    { name: 'getfresh.delivery-area.v1' },
   ),
 );
