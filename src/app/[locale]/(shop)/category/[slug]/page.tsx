@@ -51,6 +51,11 @@ export default async function CategoryPage({
           mrpPaise: product.variant.mrpPaise.toString(),
         }
       : null,
+    variants: product.variants.map((variant) => ({
+      ...variant,
+      pricePaise: variant.pricePaise.toString(),
+      mrpPaise: variant.mrpPaise.toString(),
+    })),
   }));
 
   return (

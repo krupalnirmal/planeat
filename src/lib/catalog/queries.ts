@@ -15,6 +15,17 @@ import { pickName, scoreMatch, searchTerms } from './text';
  * avoided round trip is worth 2 ms; from Mumbai it would be 60.
  */
 
+export interface ProductCardVariantView {
+  id: string;
+  label: string;
+  quantity: number;
+  unit: UnitType;
+  pricePaise: bigint;
+  mrpPaise: bigint;
+  stockQty: number;
+  lowStockThreshold: number;
+}
+
 export interface ProductCardView {
   id: string;
   slug: string;
@@ -24,16 +35,11 @@ export interface ProductCardView {
   unitType: UnitType;
   isMealPlanEligible: boolean;
   vegetableType: string | null;
-  variant: {
-    id: string;
-    label: string;
-    quantity: number;
-    unit: UnitType;
-    pricePaise: bigint;
-    mrpPaise: bigint;
-    stockQty: number;
-    lowStockThreshold: number;
-  } | null;
+  /** The default variant — every existing card/grid view shows just this one. */
+  variant: ProductCardVariantView | null;
+  /** Every active variant, default first — the category list's row shows all
+      of these as separate weight/price choices instead of only the default. */
+  variants: ProductCardVariantView[];
   inStock: boolean;
 }
 
@@ -116,6 +122,19 @@ const productCardSelect = {
   },
 } satisfies Prisma.ProductSelect;
 
+function toVariantView(variant: ProductWithVariants['variants'][number]): ProductCardVariantView {
+  return {
+    id: variant.id,
+    label: variant.label,
+    quantity: variant.quantity,
+    unit: variant.unit,
+    pricePaise: variant.pricePaise,
+    mrpPaise: variant.mrpPaise,
+    stockQty: variant.stockQty,
+    lowStockThreshold: variant.lowStockThreshold,
+  };
+}
+
 export function toProductCard(product: ProductWithVariants, locale: Locale): ProductCardView {
   const variant = product.variants[0] ?? null;
   return {
@@ -127,18 +146,8 @@ export function toProductCard(product: ProductWithVariants, locale: Locale): Pro
     unitType: product.unitType,
     isMealPlanEligible: product.isMealPlanEligible,
     vegetableType: product.vegetableType,
-    variant: variant
-      ? {
-          id: variant.id,
-          label: variant.label,
-          quantity: variant.quantity,
-          unit: variant.unit,
-          pricePaise: variant.pricePaise,
-          mrpPaise: variant.mrpPaise,
-          stockQty: variant.stockQty,
-          lowStockThreshold: variant.lowStockThreshold,
-        }
-      : null,
+    variant: variant ? toVariantView(variant) : null,
+    variants: product.variants.map(toVariantView),
     inStock: (variant?.stockQty ?? 0) > 0,
   };
 }

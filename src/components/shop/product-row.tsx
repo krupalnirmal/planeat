@@ -1,6 +1,6 @@
 'use client';
 
-import { ImageIcon } from 'lucide-react';
+import { ImageIcon, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useCart } from '@/hooks/use-cart';
@@ -10,84 +10,143 @@ import { formatQuantity, type QuantityUnit } from '@/lib/quantity';
 import type { ProductCardData } from './product-card';
 import { QtyStepper } from './qty-stepper';
 
+export interface ProductRowVariant {
+  id: string;
+  label: string;
+  quantity: number;
+  unit: string;
+  pricePaise: string;
+  mrpPaise: string;
+  stockQty: number;
+  lowStockThreshold: number;
+}
+
 /**
- * The single-column list row the client's reference uses for a category
- * listing — image, name, weight and price on the left, ADD/stepper on the
- * right. `ProductCard` stays as the grid tile used on the home rails; this is
- * the same cart wiring in the reference's row shape rather than a second
- * cart implementation.
+ * The category listing row: image + name on top, then every weight the
+ * product comes in as its own priced chip below — the client's reference
+ * showed all of a product's variants side by side, not just the default
+ * one with a single ADD. Each chip carries its own cart state, since a
+ * customer can genuinely have both the 500 g and the 1 kg of the same
+ * vegetable in their cart as separate lines.
  */
-export function ProductRow({ product }: { product: ProductCardData }) {
+export function ProductRow({
+  product,
+}: {
+  product: ProductCardData & { variants?: ProductRowVariant[] };
+}) {
   const t = useTranslations('product');
   const router = useRouter();
   const { isLoggedIn } = useSession();
 
-  const variant = product.variant;
-  const cart = useCart();
-  const quantity = variant ? cart.quantityOf(variant.id) : 0;
+  // Falls back to the single `variant` for any caller that hasn't been
+  // updated to pass the full list yet, so this stays a safe drop-in.
+  const variants = product.variants ?? (product.variant ? [product.variant] : []);
 
-  const price = variant ? paise(variant.pricePaise) : 0n;
-  const mrp = variant ? paise(variant.mrpPaise) : 0n;
-  const hasDiscount = mrp > price;
-
-  function handleAdd() {
-    if (!variant) return;
-    if (!isLoggedIn) {
-      router.push(`/login?next=/product/${product.id}`);
-      return;
-    }
-    cart.add({ productId: product.id, variantId: variant.id });
+  function goToLogin() {
+    router.push(`/login?next=/product/${product.id}`);
   }
 
   return (
-    <div className="flex items-center gap-3 py-3">
-      <Link
-        href={`/product/${product.id}`}
-        className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] border border-border bg-white"
-      >
-        {product.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={product.imageUrl}
-            alt=""
-            aria-hidden
-            loading="lazy"
-            className="size-full object-cover"
-          />
-        ) : (
-          <ImageIcon className="size-5 text-muted-foreground/40" aria-hidden />
-        )}
-      </Link>
-
-      <Link href={`/product/${product.id}`} className="min-w-0 flex-1">
-        <p className="line-clamp-1 text-sm font-semibold">{product.name}</p>
-        {variant && (
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            {formatQuantity(variant.quantity, variant.unit as QuantityUnit)}
-          </p>
-        )}
-        <div className="mt-0.5 flex items-baseline gap-1.5">
-          <span className="text-sm font-bold">{formatPaise(price, { hidePaise: true })}</span>
-          {hasDiscount && (
-            <span className="text-xs text-muted-foreground line-through">
-              {formatPaise(mrp, { hidePaise: true })}
-            </span>
+    <div className="py-3">
+      <div className="flex items-center gap-3">
+        <Link
+          href={`/product/${product.id}`}
+          className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] border border-border bg-white"
+        >
+          {product.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={product.imageUrl}
+              alt=""
+              aria-hidden
+              loading="lazy"
+              className="size-full object-cover"
+            />
+          ) : (
+            <ImageIcon className="size-5 text-muted-foreground/40" aria-hidden />
           )}
-        </div>
-      </Link>
+        </Link>
 
-      <div className="shrink-0">
-        {!product.inStock || !variant ? (
-          <span className="text-[11px] font-semibold text-muted-foreground">
-            {t('outOfStock')}
+        <Link href={`/product/${product.id}`} className="min-w-0 flex-1">
+          <p className="line-clamp-1 text-sm font-semibold">{product.name}</p>
+        </Link>
+      </div>
+
+      {variants.length > 0 ? (
+        <div className="mt-2.5 -mx-4 flex gap-2 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {variants.map((variant) => (
+            <VariantChip
+              key={variant.id}
+              productId={product.id}
+              productName={product.name}
+              variant={variant}
+              isLoggedIn={isLoggedIn}
+              onNeedsLogin={goToLogin}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="mt-2 text-xs font-semibold text-muted-foreground">{t('outOfStock')}</p>
+      )}
+    </div>
+  );
+}
+
+function VariantChip({
+  productId,
+  productName,
+  variant,
+  isLoggedIn,
+  onNeedsLogin,
+}: {
+  productId: string;
+  productName: string;
+  variant: ProductRowVariant;
+  isLoggedIn: boolean;
+  onNeedsLogin: () => void;
+}) {
+  const t = useTranslations('product');
+  const cart = useCart();
+  const quantity = cart.quantityOf(variant.id);
+
+  const price = paise(variant.pricePaise);
+  const mrp = paise(variant.mrpPaise);
+  const hasDiscount = mrp > price;
+  const outOfStock = variant.stockQty <= 0;
+
+  function handleAdd() {
+    if (!isLoggedIn) {
+      onNeedsLogin();
+      return;
+    }
+    cart.add({ productId, variantId: variant.id });
+  }
+
+  return (
+    <div className="flex w-28 shrink-0 flex-col items-center gap-1 rounded-[var(--radius)] border border-border px-2 py-2.5 text-center">
+      <span className="text-xs font-medium text-muted-foreground">
+        {formatQuantity(variant.quantity, variant.unit as QuantityUnit)}
+      </span>
+      <span className="flex items-baseline gap-1">
+        <span className="text-sm font-bold">{formatPaise(price, { hidePaise: true })}</span>
+        {hasDiscount && (
+          <span className="text-[10px] text-muted-foreground line-through">
+            {formatPaise(mrp, { hidePaise: true })}
           </span>
+        )}
+      </span>
+
+      <div className="mt-0.5">
+        {outOfStock ? (
+          <span className="text-[10px] font-semibold text-muted-foreground">{t('outOfStock')}</span>
         ) : quantity === 0 ? (
           <button
             type="button"
             onClick={handleAdd}
-            className="flex h-9 min-w-[4.5rem] items-center justify-center rounded-[var(--radius)] border border-primary px-3 text-sm font-bold text-primary"
+            aria-label={`${t('add')} — ${productName} ${formatQuantity(variant.quantity, variant.unit as QuantityUnit)}`}
+            className="grid size-11 place-items-center rounded-full border border-primary text-primary"
           >
-            {t('add')}
+            <Plus className="size-4.5" strokeWidth={2.4} aria-hidden />
           </button>
         ) : (
           <QtyStepper
@@ -96,8 +155,8 @@ export function ProductRow({ product }: { product: ProductCardData }) {
             onDecrement={() => cart.decrement(variant.id)}
             disabled={cart.isMutating}
             max={variant.stockQty}
-            label={product.name}
-            className="w-24"
+            label={`${productName} ${formatQuantity(variant.quantity, variant.unit as QuantityUnit)}`}
+            className="h-11 w-full"
           />
         )}
       </div>

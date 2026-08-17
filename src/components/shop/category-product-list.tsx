@@ -7,10 +7,11 @@ import { vegetableTypeLabel, VEGETABLE_TYPES } from '@/lib/catalog/vegetable-typ
 import type { AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import type { ProductCardData } from './product-card';
-import { ProductRow } from './product-row';
+import { ProductRow, type ProductRowVariant } from './product-row';
 
 export interface CategoryProduct extends ProductCardData {
   vegetableType: string | null;
+  variants: ProductRowVariant[];
 }
 
 // Client-supplied (public/banners/category_banner.png) — its copy ("Fresh
@@ -99,13 +100,22 @@ export function CategoryProductList({
       : null;
   const rest = groups ? sorted.filter((p) => !p.vegetableType) : sorted;
 
+  // Default the rail's active item to the first group the moment groups
+  // become available — done during render (React's documented pattern for
+  // "adjust state when a dependency changes"), not in the effect below,
+  // which is reserved for the actual scroll-driven IntersectionObserver.
+  const groupsKey = groups?.map((g) => g.type.id).join(',') ?? '';
+  const [seenGroupsKey, setSeenGroupsKey] = useState('');
+  if (groupsKey !== seenGroupsKey) {
+    setSeenGroupsKey(groupsKey);
+    setActiveTypeId(groups?.[0]?.type.id ?? null);
+  }
+
   // Scroll-spy: whichever section is nearest the top of the visible area
   // (just below the sticky header/rail) is the one that reads as selected
   // on the left, whether the customer tapped a rail item or just scrolled.
   useEffect(() => {
     if (!groups || groups.length === 0) return;
-
-    setActiveTypeId((current) => current ?? groups[0].type.id);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -275,13 +285,27 @@ export function CategoryProductList({
                 }}
                 data-type-id={type.id}
                 style={{ scrollMarginTop: HEADER_OFFSET_PX + 8 }}
-                className="px-4 pb-2"
+                className="pb-2"
               >
-                <h2 className="flex items-center gap-1.5 text-[15px] font-bold">
-                  <span aria-hidden>{type.emoji}</span>
-                  {vegetableTypeLabel(type, locale)}
+                {/* Sticky within its own section: pinned while its products
+                    scroll past, then swapped for the next section's own
+                    heading — an unmistakable "you're in a new sub-category
+                    now" signal, not just bold text sitting in the list. */}
+                <h2
+                  className="sticky z-10 flex items-center gap-2 border-b border-border bg-tint-green px-4 py-2.5"
+                  style={{ top: HEADER_OFFSET_PX }}
+                >
+                  <span
+                    className="grid size-7 shrink-0 place-items-center rounded-full bg-card text-base shadow-sm"
+                    aria-hidden
+                  >
+                    {type.emoji}
+                  </span>
+                  <span className="text-[15px] font-black text-primary-dark">
+                    {vegetableTypeLabel(type, locale)}
+                  </span>
                 </h2>
-                <div className="divide-y divide-border">
+                <div className="divide-y divide-border px-4">
                   {groupProducts.map((product) => (
                     <ProductRow key={product.id} product={product} />
                   ))}
@@ -289,9 +313,14 @@ export function CategoryProductList({
               </section>
             ))}
             {rest.length > 0 && (
-              <section className="px-4 pb-2">
-                <h2 className="text-[15px] font-bold">{t('other')}</h2>
-                <div className="divide-y divide-border">
+              <section className="pb-2">
+                <h2
+                  className="sticky z-10 border-b border-border bg-tint-green px-4 py-2.5 text-[15px] font-black text-primary-dark"
+                  style={{ top: HEADER_OFFSET_PX }}
+                >
+                  {t('other')}
+                </h2>
+                <div className="divide-y divide-border px-4">
                   {rest.map((product) => (
                     <ProductRow key={product.id} product={product} />
                   ))}
