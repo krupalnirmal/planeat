@@ -23,11 +23,16 @@ export interface ProductRowVariant {
 
 /**
  * The category listing row: image + name on top, then every weight the
- * product comes in as its own priced chip below — the client's reference
- * showed all of a product's variants side by side, not just the default
- * one with a single ADD. Each chip carries its own cart state, since a
- * customer can genuinely have both the 500 g and the 1 kg of the same
- * vegetable in their cart as separate lines.
+ * product comes in as its own priced chip in a horizontally-scrollable
+ * strip below (250 g through 2 kg comfortably reachable by a swipe, rather
+ * than wrapping into a cramped second row).
+ *
+ * Picking a weight is a single choice per product here, not an independent
+ * add per variant: choosing 500 g after already having 250 g in the cart
+ * swaps the line rather than leaving both — a customer scanning this list
+ * reads "how much carrot am I getting", and two simultaneous weights read
+ * as a mistake, not a deliberate double purchase. (The product detail
+ * page's own variant picker is a separate, unchanged flow.)
  */
 export function ProductRow({
   product,
@@ -37,10 +42,12 @@ export function ProductRow({
   const t = useTranslations('product');
   const router = useRouter();
   const { isLoggedIn } = useSession();
+  const cart = useCart();
 
   // Falls back to the single `variant` for any caller that hasn't been
   // updated to pass the full list yet, so this stays a safe drop-in.
   const variants = product.variants ?? (product.variant ? [product.variant] : []);
+  const activeVariantId = variants.find((v) => cart.quantityOf(v.id) > 0)?.id ?? null;
 
   function goToLogin() {
     router.push(`/login?next=/product/${product.id}`);
@@ -74,7 +81,7 @@ export function ProductRow({
       </div>
 
       {variants.length > 0 ? (
-        <div className="mt-2.5 flex flex-wrap gap-x-1 gap-y-2">
+        <div className="mt-2.5 -mx-4 flex gap-3 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {variants.map((variant) => (
             <VariantChip
               key={variant.id}
@@ -83,6 +90,7 @@ export function ProductRow({
               variant={variant}
               isLoggedIn={isLoggedIn}
               onNeedsLogin={goToLogin}
+              otherActiveVariantId={activeVariantId !== variant.id ? activeVariantId : null}
             />
           ))}
         </div>
@@ -99,12 +107,16 @@ function VariantChip({
   variant,
   isLoggedIn,
   onNeedsLogin,
+  otherActiveVariantId,
 }: {
   productId: string;
   productName: string;
   variant: ProductRowVariant;
   isLoggedIn: boolean;
   onNeedsLogin: () => void;
+  /** A sibling variant of the same product that already has a cart line —
+      picking this one swaps it out rather than adding alongside it. */
+  otherActiveVariantId: string | null;
 }) {
   const t = useTranslations('product');
   const cart = useCart();
@@ -120,15 +132,16 @@ function VariantChip({
       onNeedsLogin();
       return;
     }
+    if (otherActiveVariantId) cart.remove(otherActiveVariantId);
     cart.add({ productId, variantId: variant.id });
   }
 
   return (
-    <div className="flex min-w-[4.25rem] flex-1 basis-16 flex-col items-center gap-1 text-center">
+    <div className="flex w-16 shrink-0 flex-col items-center gap-1 text-center">
       <span className="text-xs font-medium text-muted-foreground">
         {formatQuantity(variant.quantity, variant.unit as QuantityUnit)}
       </span>
-      <span className="flex items-baseline gap-1">
+      <span className="flex flex-col items-center leading-tight">
         <span className="text-sm font-bold">{formatPaise(price, { hidePaise: true })}</span>
         {hasDiscount && (
           <span className="text-[10px] text-muted-foreground line-through">
@@ -157,7 +170,7 @@ function VariantChip({
             disabled={cart.isMutating}
             max={variant.stockQty}
             label={`${productName} ${formatQuantity(variant.quantity, variant.unit as QuantityUnit)}`}
-            className="h-11 w-full"
+            className="h-11 w-16"
           />
         )}
       </div>
