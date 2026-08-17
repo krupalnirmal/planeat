@@ -53,49 +53,148 @@ export function ProductRow({
     router.push(`/login?next=/product/${product.id}`);
   }
 
+  const image = (
+    <Link
+      href={`/product/${product.id}`}
+      className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] border border-border bg-white"
+    >
+      {product.imageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={product.imageUrl}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          className="size-full object-cover"
+        />
+      ) : (
+        <ImageIcon className="size-5 text-muted-foreground/40" aria-hidden />
+      )}
+    </Link>
+  );
+
+  // A product that only comes one way (a bunch of coriander, a dozen eggs)
+  // doesn't need the name-on-top / chip-strip-below split that multi-weight
+  // products use — that layout leaves a single lonely chip under the name.
+  // One inline row (image, name, price, add) reads as one complete item.
+  if (variants.length <= 1) {
+    const variant = variants[0] ?? null;
+    return (
+      <div className="flex items-center gap-3 py-3">
+        {image}
+        <Link href={`/product/${product.id}`} className="min-w-0 flex-1">
+          <p className="line-clamp-1 text-sm font-semibold">{product.name}</p>
+          <p className="text-xs text-muted-foreground">
+            {t('freshQualityTag')}
+            {variant && ` · ${formatQuantity(variant.quantity, variant.unit as QuantityUnit)}`}
+          </p>
+        </Link>
+        {variant ? (
+          <SingleVariantControl
+            productId={product.id}
+            productName={product.name}
+            variant={variant}
+            isLoggedIn={isLoggedIn}
+            onNeedsLogin={goToLogin}
+          />
+        ) : (
+          <span className="shrink-0 text-xs font-semibold text-muted-foreground">
+            {t('outOfStock')}
+          </span>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="py-3">
       <div className="flex items-center gap-3">
-        <Link
-          href={`/product/${product.id}`}
-          className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] border border-border bg-white"
-        >
-          {product.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={product.imageUrl}
-              alt=""
-              aria-hidden
-              loading="lazy"
-              className="size-full object-cover"
-            />
-          ) : (
-            <ImageIcon className="size-5 text-muted-foreground/40" aria-hidden />
-          )}
-        </Link>
-
+        {image}
         <Link href={`/product/${product.id}`} className="min-w-0 flex-1">
           <p className="line-clamp-1 text-sm font-semibold">{product.name}</p>
           <p className="text-xs text-muted-foreground">{t('freshQualityTag')}</p>
         </Link>
       </div>
 
-      {variants.length > 0 ? (
-        <div className="mt-2.5 -mx-4 flex gap-3 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {variants.map((variant) => (
-            <VariantChip
-              key={variant.id}
-              productId={product.id}
-              productName={product.name}
-              variant={variant}
-              isLoggedIn={isLoggedIn}
-              onNeedsLogin={goToLogin}
-              otherActiveVariantId={activeVariantId !== variant.id ? activeVariantId : null}
-            />
-          ))}
-        </div>
+      <div className="mt-2.5 -mx-4 flex gap-3 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {variants.map((variant) => (
+          <VariantChip
+            key={variant.id}
+            productId={product.id}
+            productName={product.name}
+            variant={variant}
+            isLoggedIn={isLoggedIn}
+            onNeedsLogin={goToLogin}
+            otherActiveVariantId={activeVariantId !== variant.id ? activeVariantId : null}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SingleVariantControl({
+  productId,
+  productName,
+  variant,
+  isLoggedIn,
+  onNeedsLogin,
+}: {
+  productId: string;
+  productName: string;
+  variant: ProductRowVariant;
+  isLoggedIn: boolean;
+  onNeedsLogin: () => void;
+}) {
+  const t = useTranslations('product');
+  const cart = useCart();
+  const quantity = cart.quantityOf(variant.id);
+
+  const price = paise(variant.pricePaise);
+  const mrp = paise(variant.mrpPaise);
+  const hasDiscount = mrp > price;
+  const outOfStock = variant.stockQty <= 0;
+
+  function handleAdd() {
+    if (!isLoggedIn) {
+      onNeedsLogin();
+      return;
+    }
+    cart.add({ productId, variantId: variant.id });
+  }
+
+  return (
+    <div className="flex shrink-0 flex-col items-end gap-1">
+      <span className="flex items-baseline gap-1">
+        <span className="text-sm font-bold">{formatPaise(price, { hidePaise: true })}</span>
+        {hasDiscount && (
+          <span className="text-[10px] text-muted-foreground line-through">
+            {formatPaise(mrp, { hidePaise: true })}
+          </span>
+        )}
+      </span>
+
+      {outOfStock ? (
+        <span className="text-[10px] font-semibold text-muted-foreground">{t('outOfStock')}</span>
+      ) : quantity === 0 ? (
+        <button
+          type="button"
+          onClick={handleAdd}
+          aria-label={`${t('add')} — ${productName}`}
+          className="grid size-11 place-items-center rounded-full border border-primary text-primary"
+        >
+          <Plus className="size-4.5" strokeWidth={2.4} aria-hidden />
+        </button>
       ) : (
-        <p className="mt-2 text-xs font-semibold text-muted-foreground">{t('outOfStock')}</p>
+        <QtyStepper
+          quantity={quantity}
+          onIncrement={() => cart.increment(variant.id)}
+          onDecrement={() => cart.decrement(variant.id)}
+          disabled={cart.isMutating}
+          max={variant.stockQty}
+          label={productName}
+          className="h-11"
+        />
       )}
     </div>
   );
