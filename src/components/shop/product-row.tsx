@@ -1,7 +1,8 @@
 'use client';
 
-import { ImageIcon, Plus } from 'lucide-react';
+import { ImageIcon, Mic, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useCart } from '@/hooks/use-cart';
 import { useSession } from '@/hooks/use-session';
@@ -9,6 +10,7 @@ import { formatPaise, paise } from '@/lib/money';
 import { formatQuantity, type QuantityUnit } from '@/lib/quantity';
 import type { ProductCardData } from './product-card';
 import { QtyStepper } from './qty-stepper';
+import { VoiceQuantitySheet } from './voice-quantity-sheet';
 
 export interface ProductRowVariant {
   id: string;
@@ -43,14 +45,27 @@ export function ProductRow({
   const router = useRouter();
   const { isLoggedIn } = useSession();
   const cart = useCart();
+  const [voiceSheetOpen, setVoiceSheetOpen] = useState(false);
 
   // Falls back to the single `variant` for any caller that hasn't been
   // updated to pass the full list yet, so this stays a safe drop-in.
   const variants = product.variants ?? (product.variant ? [product.variant] : []);
-  const activeVariantId = variants.find((v) => cart.quantityOf(v.id) > 0)?.id ?? null;
+  // Every sibling that currently has a cart line — normally at most one
+  // (D-210), but a voice-built combo can legitimately leave several active
+  // at once, so tapping a chip or re-opening voice-add has to clear all of
+  // them, not just the first.
+  const activeVariantIds = variants.filter((v) => cart.quantityOf(v.id) > 0).map((v) => v.id);
 
   function goToLogin() {
     router.push(`/login?next=/product/${product.id}`);
+  }
+
+  function openVoiceSheet() {
+    if (!isLoggedIn) {
+      goToLogin();
+      return;
+    }
+    setVoiceSheetOpen(true);
   }
 
   const image = (
@@ -114,6 +129,14 @@ export function ProductRow({
           <p className="line-clamp-1 text-sm font-semibold">{product.name}</p>
           <p className="text-xs text-muted-foreground">{t('freshQualityTag')}</p>
         </Link>
+        <button
+          type="button"
+          onClick={openVoiceSheet}
+          aria-label={t('voiceQuantity.micLabel')}
+          className="grid size-11 shrink-0 place-items-center rounded-full text-primary"
+        >
+          <Mic className="size-5" aria-hidden />
+        </button>
       </div>
 
       <div className="mt-2.5 -mx-4 flex gap-3 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -125,10 +148,21 @@ export function ProductRow({
             variant={variant}
             isLoggedIn={isLoggedIn}
             onNeedsLogin={goToLogin}
-            otherActiveVariantId={activeVariantId !== variant.id ? activeVariantId : null}
+            otherActiveVariantIds={activeVariantIds.filter((id) => id !== variant.id)}
           />
         ))}
       </div>
+
+      {voiceSheetOpen && (
+        <VoiceQuantitySheet
+          productId={product.id}
+          productName={product.name}
+          productUnitType={product.unitType}
+          variants={variants}
+          activeVariantIds={activeVariantIds}
+          onClose={() => setVoiceSheetOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -206,16 +240,16 @@ function VariantChip({
   variant,
   isLoggedIn,
   onNeedsLogin,
-  otherActiveVariantId,
+  otherActiveVariantIds,
 }: {
   productId: string;
   productName: string;
   variant: ProductRowVariant;
   isLoggedIn: boolean;
   onNeedsLogin: () => void;
-  /** A sibling variant of the same product that already has a cart line —
-      picking this one swaps it out rather than adding alongside it. */
-  otherActiveVariantId: string | null;
+  /** Sibling variants of the same product that already have a cart line —
+      picking this one swaps them out rather than adding alongside them. */
+  otherActiveVariantIds: string[];
 }) {
   const t = useTranslations('product');
   const cart = useCart();
@@ -231,7 +265,7 @@ function VariantChip({
       onNeedsLogin();
       return;
     }
-    if (otherActiveVariantId) cart.remove(otherActiveVariantId);
+    for (const id of otherActiveVariantIds) cart.remove(id);
     cart.add({ productId, variantId: variant.id });
   }
 

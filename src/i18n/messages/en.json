@@ -142,7 +142,17 @@
     "decreaseQuantity": "Decrease quantity",
     "increaseQuantity": "Increase quantity",
     "addToCart": "Add to Cart",
-    "freshQualityTag": "Fresh & Quality"
+    "freshQualityTag": "Fresh & Quality",
+    "voiceQuantity": {
+      "micLabel": "Say a quantity",
+      "sheetTitle": "How much {product}?",
+      "hint": "Tap the mic and say how much you need, like \"2.5 kg\"",
+      "heard": "We heard: \"{transcript}\"",
+      "noQuantity": "Couldn't catch a quantity in that — please try again",
+      "noMatch": "That size isn't available for this product right now",
+      "confirmAdd": "Add {total}",
+      "tryAgain": "Try again"
+    }
   },
   "search": {
     "placeholder": "Onion, tomato, milk…",

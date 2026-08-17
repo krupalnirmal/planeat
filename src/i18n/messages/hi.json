@@ -142,7 +142,17 @@
     "decreaseQuantity": "मात्रा घटाएँ",
     "increaseQuantity": "मात्रा बढ़ाएँ",
     "addToCart": "कार्ट में डालें",
-    "freshQualityTag": "ताज़ा और गुणवत्तापूर्ण"
+    "freshQualityTag": "ताज़ा और गुणवत्तापूर्ण",
+    "voiceQuantity": {
+      "micLabel": "मात्रा बोलें",
+      "sheetTitle": "कितना {product} चाहिए?",
+      "hint": "माइक पर टैप करें और कितना चाहिए बोलें, जैसे \"ढाई किलो\"",
+      "heard": "हमने सुना: \"{transcript}\"",
+      "noQuantity": "उसमें मात्रा समझ नहीं आई — फिर से कोशिश करें",
+      "noMatch": "यह मात्रा अभी इस प्रोडक्ट के लिए उपलब्ध नहीं है",
+      "confirmAdd": "{total} जोड़ें",
+      "tryAgain": "फिर से कोशिश करें"
+    }
   },
   "search": {
     "placeholder": "प्याज, टमाटर, दूध…",

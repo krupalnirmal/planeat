@@ -142,7 +142,17 @@
     "decreaseQuantity": "प्रमाण कमी करा",
     "increaseQuantity": "प्रमाण वाढवा",
     "addToCart": "कार्टमध्ये टाका",
-    "freshQualityTag": "ताजे आणि दर्जेदार"
+    "freshQualityTag": "ताजे आणि दर्जेदार",
+    "voiceQuantity": {
+      "micLabel": "प्रमाण सांगा",
+      "sheetTitle": "किती {product} हवं?",
+      "hint": "माईकवर टॅप करा आणि किती हवं ते सांगा, जसं \"अडीच किलो\"",
+      "heard": "आम्ही ऐकलं: \"{transcript}\"",
+      "noQuantity": "त्यात प्रमाण समजलं नाही — पुन्हा सांगून पहा",
+      "noMatch": "हे प्रमाण सध्या या उत्पादनासाठी उपलब्ध नाही",
+      "confirmAdd": "{total} जोडा",
+      "tryAgain": "पुन्हा प्रयत्न करा"
+    }
   },
   "search": {
     "placeholder": "कांदा, टोमॅटो, दूध…",
