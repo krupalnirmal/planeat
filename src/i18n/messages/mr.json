@@ -26,7 +26,8 @@
     "required": "हे भरणे आवश्यक आहे",
     "optional": "ऐच्छिक",
     "comingSoon": "लवकरच येत आहे",
-    "phase": "हा भाग पुढच्या टप्प्यात तयार होईल."
+    "phase": "हा भाग पुढच्या टप्प्यात तयार होईल.",
+    "showLess": "कमी दाखवा"
   },
   "nav": {
     "home": "होम",
@@ -140,7 +141,8 @@
     "selectQuantity": "प्रमाण निवडा",
     "decreaseQuantity": "प्रमाण कमी करा",
     "increaseQuantity": "प्रमाण वाढवा",
-    "addToCart": "कार्टमध्ये टाका"
+    "addToCart": "कार्टमध्ये टाका",
+    "freshQualityTag": "ताजे आणि दर्जेदार"
   },
   "search": {
     "placeholder": "कांदा, टोमॅटो, दूध…",

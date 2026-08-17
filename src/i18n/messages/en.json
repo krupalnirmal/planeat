@@ -26,7 +26,8 @@
     "required": "This field is required",
     "optional": "Optional",
     "comingSoon": "Coming soon",
-    "phase": "This part gets built in a later phase."
+    "phase": "This part gets built in a later phase.",
+    "showLess": "Show less"
   },
   "nav": {
     "home": "Home",
@@ -140,7 +141,8 @@
     "selectQuantity": "Select Quantity",
     "decreaseQuantity": "Decrease quantity",
     "increaseQuantity": "Increase quantity",
-    "addToCart": "Add to Cart"
+    "addToCart": "Add to Cart",
+    "freshQualityTag": "Fresh & Quality"
   },
   "search": {
     "placeholder": "Onion, tomato, milk…",

@@ -69,11 +69,12 @@ export function ProductRow({
 
         <Link href={`/product/${product.id}`} className="min-w-0 flex-1">
           <p className="line-clamp-1 text-sm font-semibold">{product.name}</p>
+          <p className="text-xs text-muted-foreground">{t('freshQualityTag')}</p>
         </Link>
       </div>
 
       {variants.length > 0 ? (
-        <div className="mt-2.5 -mx-4 flex gap-2 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="mt-2.5 flex flex-wrap gap-x-1 gap-y-2">
           {variants.map((variant) => (
             <VariantChip
               key={variant.id}
@@ -123,7 +124,7 @@ function VariantChip({
   }
 
   return (
-    <div className="flex w-28 shrink-0 flex-col items-center gap-1 rounded-[var(--radius)] border border-border px-2 py-2.5 text-center">
+    <div className="flex min-w-[4.25rem] flex-1 basis-16 flex-col items-center gap-1 text-center">
       <span className="text-xs font-medium text-muted-foreground">
         {formatQuantity(variant.quantity, variant.unit as QuantityUnit)}
       </span>

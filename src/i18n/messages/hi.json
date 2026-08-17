@@ -26,7 +26,8 @@
     "required": "यह भरना ज़रूरी है",
     "optional": "वैकल्पिक",
     "comingSoon": "जल्द आ रहा है",
-    "phase": "यह हिस्सा अगले चरण में बनेगा।"
+    "phase": "यह हिस्सा अगले चरण में बनेगा।",
+    "showLess": "कम दिखाएँ"
   },
   "nav": {
     "home": "होम",
@@ -140,7 +141,8 @@
     "selectQuantity": "मात्रा चुनें",
     "decreaseQuantity": "मात्रा घटाएँ",
     "increaseQuantity": "मात्रा बढ़ाएँ",
-    "addToCart": "कार्ट में डालें"
+    "addToCart": "कार्ट में डालें",
+    "freshQualityTag": "ताज़ा और गुणवत्तापूर्ण"
   },
   "search": {
     "placeholder": "प्याज, टमाटर, दूध…",

@@ -37,6 +37,11 @@ const SORT_OPTIONS: Array<{
 // it, and the sidebar sticks exactly where the header ends, not under it.
 const HEADER_OFFSET_PX = 68;
 
+// Each sub-type section previews this many products before "See all" —
+// a category page is an overview of every sub-type, not the place to
+// scroll through all 9 fruit-vegetable products at once.
+const GROUP_PREVIEW_COUNT = 2;
+
 /**
  * The reference's list-row category screen: an in-page search that filters
  * the products already on the page (a category comfortably fits on one
@@ -68,8 +73,18 @@ export function CategoryProductList({
   const [sort, setSort] = useState<SortOption>('default');
   const [sortOpen, setSortOpen] = useState(false);
   const [activeTypeId, setActiveTypeId] = useState<string | null>(null);
+  const [expandedTypes, setExpandedTypes] = useState<Set<string>>(() => new Set());
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  function toggleExpanded(typeId: string) {
+    setExpandedTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(typeId)) next.delete(typeId);
+      else next.add(typeId);
+      return next;
+    });
+  }
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -277,41 +292,58 @@ export function CategoryProductList({
           {/* Right pane — the actual scrolling list; the rail above just
               rides along with the page's normal scroll via `sticky`. */}
           <div className="min-w-0 flex-1">
-            {groups.map(({ type, products: groupProducts }) => (
-              <section
-                key={type.id}
-                ref={(el) => {
-                  sectionRefs.current[type.id] = el;
-                }}
-                data-type-id={type.id}
-                style={{ scrollMarginTop: HEADER_OFFSET_PX + 8 }}
-                className="pb-2"
-              >
-                {/* Sticky within its own section: pinned while its products
-                    scroll past, then swapped for the next section's own
-                    heading — an unmistakable "you're in a new sub-category
-                    now" signal, not just bold text sitting in the list. */}
-                <h2
-                  className="sticky z-10 flex items-center gap-2 border-b border-border bg-tint-green px-4 py-2.5"
-                  style={{ top: HEADER_OFFSET_PX }}
+            {groups.map(({ type, products: groupProducts }) => {
+              const expanded = expandedTypes.has(type.id);
+              const visibleProducts = expanded
+                ? groupProducts
+                : groupProducts.slice(0, GROUP_PREVIEW_COUNT);
+              const hasMore = groupProducts.length > GROUP_PREVIEW_COUNT;
+
+              return (
+                <section
+                  key={type.id}
+                  ref={(el) => {
+                    sectionRefs.current[type.id] = el;
+                  }}
+                  data-type-id={type.id}
+                  style={{ scrollMarginTop: HEADER_OFFSET_PX + 8 }}
+                  className="pb-2"
                 >
-                  <span
-                    className="grid size-7 shrink-0 place-items-center rounded-full bg-card text-base shadow-sm"
-                    aria-hidden
+                  {/* Sticky within its own section: pinned while its products
+                      scroll past, then swapped for the next section's own
+                      heading — an unmistakable "you're in a new sub-category
+                      now" signal, not just bold text sitting in the list. */}
+                  <h2
+                    className="sticky z-10 flex items-center gap-2 border-b border-border bg-tint-green px-4 py-2.5"
+                    style={{ top: HEADER_OFFSET_PX }}
                   >
-                    {type.emoji}
-                  </span>
-                  <span className="text-[15px] font-black text-primary-dark">
-                    {vegetableTypeLabel(type, locale)}
-                  </span>
-                </h2>
-                <div className="divide-y divide-border px-4">
-                  {groupProducts.map((product) => (
-                    <ProductRow key={product.id} product={product} />
-                  ))}
-                </div>
-              </section>
-            ))}
+                    <span
+                      className="grid size-7 shrink-0 place-items-center rounded-full bg-card text-base shadow-sm"
+                      aria-hidden
+                    >
+                      {type.emoji}
+                    </span>
+                    <span className="flex-1 text-[15px] font-black text-primary-dark">
+                      {vegetableTypeLabel(type, locale)}
+                    </span>
+                    {hasMore && (
+                      <button
+                        type="button"
+                        onClick={() => toggleExpanded(type.id)}
+                        className="text-xs font-bold text-primary"
+                      >
+                        {expanded ? tc('showLess') : tc('seeAll')}
+                      </button>
+                    )}
+                  </h2>
+                  <div className="divide-y divide-border px-4">
+                    {visibleProducts.map((product) => (
+                      <ProductRow key={product.id} product={product} />
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
             {rest.length > 0 && (
               <section className="pb-2">
                 <h2
