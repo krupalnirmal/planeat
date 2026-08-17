@@ -2,7 +2,7 @@
 
 import { Filter, Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { vegetableTypeLabel, VEGETABLE_TYPES } from '@/lib/catalog/vegetable-types';
 import type { AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
@@ -31,12 +31,23 @@ const SORT_OPTIONS: Array<{
   { value: 'nameAsc', labelKey: 'sortNameAsc' },
 ];
 
+// Roughly this screen's own sticky header's height — sections need the same
+// amount of top scroll-margin so "jump to section" doesn't land underneath
+// it, and the sidebar sticks exactly where the header ends, not under it.
+const HEADER_OFFSET_PX = 68;
+
 /**
  * The reference's list-row category screen: an in-page search that filters
  * the products already on the page (a category comfortably fits on one
  * load, per the pagination above), plus a real sort menu standing in for
  * the reference's "Filter" button — no fake filter facets the catalogue
  * cannot actually answer.
+ *
+ * When the category has sub-type groups (vegetables today), the client
+ * asked for a Blinkit-style two-pane layout: a sticky left rail of the
+ * groups, tapping one jumps the right list to that section, and scrolling
+ * the right list updates which rail item reads as selected — the two stay
+ * in sync in either direction, not just tap-to-scroll.
  */
 export function CategoryProductList({
   products,
@@ -55,6 +66,9 @@ export function CategoryProductList({
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortOption>('default');
   const [sortOpen, setSortOpen] = useState(false);
+  const [activeTypeId, setActiveTypeId] = useState<string | null>(null);
+
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -84,6 +98,39 @@ export function CategoryProductList({
         })).filter((group) => group.products.length > 0)
       : null;
   const rest = groups ? sorted.filter((p) => !p.vegetableType) : sorted;
+
+  // Scroll-spy: whichever section is nearest the top of the visible area
+  // (just below the sticky header/rail) is the one that reads as selected
+  // on the left, whether the customer tapped a rail item or just scrolled.
+  useEffect(() => {
+    if (!groups || groups.length === 0) return;
+
+    setActiveTypeId((current) => current ?? groups[0].type.id);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        const topId = visible[0]?.target.getAttribute('data-type-id');
+        if (topId) setActiveTypeId(topId);
+      },
+      { rootMargin: `-${HEADER_OFFSET_PX + 8}px 0px -65% 0px`, threshold: 0 },
+    );
+
+    for (const group of groups) {
+      const el = sectionRefs.current[group.type.id];
+      if (el) observer.observe(el);
+    }
+    return () => observer.disconnect();
+    // Re-observe whenever the set of visible groups changes (sort/filter).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groups?.map((g) => g.type.id).join(',')]);
+
+  function jumpTo(typeId: string) {
+    setActiveTypeId(typeId);
+    sectionRefs.current[typeId]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   return (
     <>
@@ -152,7 +199,7 @@ export function CategoryProductList({
         </div>
       </div>
 
-      {slug === 'vegetables' && (
+      {slug === 'vegetables' && !searching && (
         <div className="bg-card px-4 pb-3">
           <div className="overflow-hidden rounded-[var(--radius)] shadow-sm">
             {/* Whole creative, never cropped — same rule as the home
@@ -174,31 +221,85 @@ export function CategoryProductList({
           </p>
         </div>
       ) : groups ? (
-        <>
-          {groups.map(({ type, products: groupProducts }) => (
-            <section key={type.id} className="bg-card px-4 pb-2">
-              <h2 className="flex items-center gap-1.5 text-[15px] font-bold">
-                <span aria-hidden>{type.emoji}</span>
-                {vegetableTypeLabel(type, locale)}
-              </h2>
-              <div className="divide-y divide-border">
-                {groupProducts.map((product) => (
-                  <ProductRow key={product.id} product={product} />
-                ))}
-              </div>
-            </section>
-          ))}
-          {rest.length > 0 && (
-            <section className="bg-card px-4 pb-2">
-              <h2 className="text-[15px] font-bold">{t('other')}</h2>
-              <div className="divide-y divide-border">
-                {rest.map((product) => (
-                  <ProductRow key={product.id} product={product} />
-                ))}
-              </div>
-            </section>
-          )}
-        </>
+        <div className="flex items-start gap-0 bg-card">
+          {/* Left rail — sticks right under the page's own sticky header. */}
+          <nav
+            aria-label={categoryName}
+            className="sticky w-[76px] shrink-0 self-start overflow-y-auto border-r border-border"
+            style={{ top: HEADER_OFFSET_PX, maxHeight: `calc(100dvh - ${HEADER_OFFSET_PX}px)` }}
+          >
+            {groups.map(({ type, products: groupProducts }) => {
+              const active = activeTypeId === type.id;
+              return (
+                <button
+                  key={type.id}
+                  type="button"
+                  onClick={() => jumpTo(type.id)}
+                  aria-current={active}
+                  className={cn(
+                    'flex w-full flex-col items-center gap-1 border-l-4 px-1.5 py-3 text-center',
+                    active ? 'border-primary bg-tint-green' : 'border-transparent',
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'grid size-10 shrink-0 place-items-center rounded-full text-lg',
+                      active ? 'bg-card shadow-sm' : 'bg-background',
+                    )}
+                    aria-hidden
+                  >
+                    {type.emoji}
+                  </span>
+                  <span
+                    className={cn(
+                      'text-[10.5px] leading-tight',
+                      active ? 'font-bold text-primary-dark' : 'font-medium text-muted-foreground',
+                    )}
+                  >
+                    {vegetableTypeLabel(type, locale)}
+                  </span>
+                  <span className="text-[9px] text-muted-foreground">{groupProducts.length}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Right pane — the actual scrolling list; the rail above just
+              rides along with the page's normal scroll via `sticky`. */}
+          <div className="min-w-0 flex-1">
+            {groups.map(({ type, products: groupProducts }) => (
+              <section
+                key={type.id}
+                ref={(el) => {
+                  sectionRefs.current[type.id] = el;
+                }}
+                data-type-id={type.id}
+                style={{ scrollMarginTop: HEADER_OFFSET_PX + 8 }}
+                className="px-4 pb-2"
+              >
+                <h2 className="flex items-center gap-1.5 text-[15px] font-bold">
+                  <span aria-hidden>{type.emoji}</span>
+                  {vegetableTypeLabel(type, locale)}
+                </h2>
+                <div className="divide-y divide-border">
+                  {groupProducts.map((product) => (
+                    <ProductRow key={product.id} product={product} />
+                  ))}
+                </div>
+              </section>
+            ))}
+            {rest.length > 0 && (
+              <section className="px-4 pb-2">
+                <h2 className="text-[15px] font-bold">{t('other')}</h2>
+                <div className="divide-y divide-border">
+                  {rest.map((product) => (
+                    <ProductRow key={product.id} product={product} />
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        </div>
       ) : (
         <div className="bg-card px-4 pb-2">
           <div className="divide-y divide-border">
