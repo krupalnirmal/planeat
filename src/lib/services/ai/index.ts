@@ -1,4 +1,5 @@
 import { env } from '@/lib/env';
+import { FallbackAIProvider } from './fallback';
 import { MockAIProvider } from './mock';
 import { AnthropicProvider } from './providers/anthropic';
 import { GeminiProvider } from './providers/gemini';
@@ -7,6 +8,7 @@ import type { AIProvider } from './types';
 
 export * from './types';
 export { MockAIProvider } from './mock';
+export { FallbackAIProvider } from './fallback';
 
 /**
  * The env-var factory. `AI_PROVIDER` is the only thing that decides which
@@ -36,10 +38,23 @@ function build(name: string): AIProvider {
   }
 }
 
+/**
+ * `AI_FALLBACK_PROVIDER` applies to every caller of `getAIProvider()` — Smart
+ * List's text/photo parsing, swap suggestions, product rationale, and meal
+ * plan generation all get the same "try the primary, fall back on failure"
+ * behaviour with no call-site changes, since they only ever hold an
+ * `AIProvider` and never know whether it's a single vendor or a pair.
+ */
 export function getAIProvider(): AIProvider {
-  if (cached && cachedKey === env.providers.ai) return cached;
-  cached = build(env.providers.ai);
-  cachedKey = env.providers.ai;
+  const key = `${env.providers.ai}::${env.ai.fallbackProvider}`;
+  if (cached && cachedKey === key) return cached;
+
+  const primary = build(env.providers.ai);
+  cached =
+    env.ai.fallbackProvider && env.ai.fallbackProvider !== env.providers.ai
+      ? new FallbackAIProvider(primary, build(env.ai.fallbackProvider))
+      : primary;
+  cachedKey = key;
   return cached;
 }
 

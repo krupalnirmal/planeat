@@ -50,7 +50,10 @@ interface ProductSeed {
   hi: string;
   unitType: UnitType;
   tags: string[];
-  /** B13 — only Vegetables and Fruits are meal-plan eligible. */
+  /** B13 — Vegetables, Fruits, Dairy, Bakery & Biscuits and Grocery are
+      meal-plan eligible (Ice Cream is not: desserts aren't a meal-plan
+      category). Per-product override for exceptions within an eligible
+      category. */
   mealPlanEligible?: boolean;
   /** Client-requested culinary grouping, Vegetables only — see VEGETABLE_TYPES in vegetable-types.ts. */
   vegetableType?: string;
@@ -471,7 +474,7 @@ const CATEGORIES: CategorySeed[] = [
     mr: 'दूध व दुग्धजन्य',
     hi: 'दूध और डेयरी',
     sortOrder: 3,
-    mealPlanEligible: false,
+    mealPlanEligible: true,
     products: [
       {
         sku: 'DRY-MILK-500',
@@ -521,7 +524,7 @@ const CATEGORIES: CategorySeed[] = [
     mr: 'बेकरी व बिस्किटे',
     hi: 'बेकरी और बिस्कुट',
     sortOrder: 4,
-    mealPlanEligible: false,
+    mealPlanEligible: true,
     products: [
       {
         sku: 'BKY-BREAD-400',
@@ -529,7 +532,7 @@ const CATEGORIES: CategorySeed[] = [
         mr: 'गव्हाचा ब्रेड',
         hi: 'गेहूँ की ब्रेड',
         unitType: UnitType.G,
-        tags: ['bakery', 'allergen:gluten'],
+        tags: ['bakery', 'breakfast', 'allergen:gluten'],
         aliases: ['bread', 'pav bread', 'ब्रेड'],
         variants: pack('400 g', 400, UnitType.G, 45, 50, 25),
       },
@@ -539,7 +542,7 @@ const CATEGORIES: CategorySeed[] = [
         mr: 'लादी पाव',
         hi: 'लादी पाव',
         unitType: UnitType.PIECE,
-        tags: ['bakery', 'allergen:gluten'],
+        tags: ['bakery', 'breakfast', 'allergen:gluten'],
         aliases: ['pav', 'ladi pav', 'पाव'],
         variants: pack('6 नग', 6, UnitType.PIECE, 25, 28, 30),
       },
@@ -591,8 +594,50 @@ const CATEGORIES: CategorySeed[] = [
     mr: 'किराणा',
     hi: 'किराना',
     sortOrder: 6,
-    mealPlanEligible: false,
+    mealPlanEligible: true,
     products: [
+      {
+        // Placeholder prices, same as the rest of this seed file — the
+        // owner should confirm before launch (DECISIONS.md).
+        sku: 'GRC-POHA-500',
+        en: 'Poha (Flattened Rice)',
+        mr: 'पोहे',
+        hi: 'पोहा',
+        unitType: UnitType.G,
+        tags: ['staple', 'breakfast'],
+        aliases: ['poha', 'pohe', 'flattened rice', 'पोहे'],
+        variants: pack('500 g', 500, UnitType.G, 35, 40, 30),
+      },
+      {
+        sku: 'GRC-RAVA-500',
+        en: 'Rava / Sooji',
+        mr: 'रवा',
+        hi: 'सूजी',
+        unitType: UnitType.G,
+        tags: ['staple', 'breakfast', 'allergen:gluten'],
+        aliases: ['rava', 'sooji', 'suji', 'रवा', 'सूजी'],
+        variants: pack('500 g', 500, UnitType.G, 28, 32, 30),
+      },
+      {
+        sku: 'GRC-BESAN-500',
+        en: 'Besan (Gram Flour)',
+        mr: 'बेसन',
+        hi: 'बेसन',
+        unitType: UnitType.G,
+        tags: ['staple', 'breakfast', 'protein'],
+        aliases: ['besan', 'gram flour', 'बेसन'],
+        variants: pack('500 g', 500, UnitType.G, 48, 55, 25),
+      },
+      {
+        sku: 'GRC-CORNFLAKES-500',
+        en: 'Cornflakes',
+        mr: 'कॉर्नफ्लेक्स',
+        hi: 'कॉर्नफ्लेक्स',
+        unitType: UnitType.G,
+        tags: ['breakfast'],
+        aliases: ['cornflakes', 'corn flakes', 'कॉर्नफ्लेक्स'],
+        variants: pack('500 g', 500, UnitType.G, 145, 165, 20),
+      },
       {
         sku: 'GRC-RICE-5KG',
         en: 'Sona Masoori Rice',
@@ -758,7 +803,7 @@ async function seedCatalogue(): Promise<void> {
 
     for (const [index, product] of category.products.entries()) {
       // B13 — meal-plan eligibility is a property of the category, applied to
-      // every product in it. Nothing outside Vegetables and Fruits is eligible.
+      // every product in it, with a per-product override for exceptions.
       const eligible = product.mealPlanEligible ?? category.mealPlanEligible;
 
       const searchKeywords = [product.en, product.mr, product.hi, ...product.aliases]

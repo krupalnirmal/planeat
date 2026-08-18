@@ -377,11 +377,12 @@
       "continueButton": "मला मान्य आहे आणि पुढे जा"
     },
     "basePlan": {
-      "categorySprouts": "स्प्राऊट्स",
+      "categoryBreakfast": "नाश्ता",
       "categoryFruits": "फळे",
       "categoryDairy": "डेरी प्रॉडक्ट",
-      "categoryExtras": "इतर",
-      "categoryMainMeal": "दुपारचे आणि रात्रीचे जेवण",
+      "categoryOther": "इतर वस्तू",
+      "categoryVegetables": "भाजीपाला",
+      "multiSelectHint": "एकापेक्षा जास्त निवडू शकता",
       "builderTitle": "तुमचा साप्ताहिक प्लॅन तयार करा",
       "builderHint": "प्रत्येक दिवसासाठी हवं ते निवडण्यासाठी टॅप करा. हा तुमच्या फॅमिलीचा सामान्य बेस प्लॅन आहे.",
       "confirmButton": "माझा प्लॅन कन्फर्म करा",
@@ -389,11 +390,41 @@
       "congratsMessage": "अभिनंदन! आपण आपल्या फॅमिलीचा बेस्ट मील प्लॅन तयार केला आहे.",
       "congratsSubtext": "दररोज प्लॅन नुसार घरपोच भाजीपाला मिळवण्यासाठी ओके दाबा.",
       "okButton": "ओके, सुरू करा",
-      "editPlan": "प्लॅन बदला",
-      "quickFill": "या आठवड्याचे डिफॉल्ट पर्याय पटकन भरा",
-      "addOwn": "+ स्टोअरमधून निवडा",
-      "addOwnPlaceholder": "उत्पादन शोधा…",
-      "addOwnNoResults": "जुळणारं उत्पादन सापडलं नाही"
+      "editPlan": "प्लॅन बदला"
+    },
+    "planType": {
+      "title": "प्लॅनचा प्रकार निवडा",
+      "personalTitle": "वैयक्तिक प्लॅन",
+      "personalDescription": "फक्त एका व्यक्तीसाठी वैयक्तिक मील प्लॅन",
+      "familyTitle": "फॅमिली प्लॅन",
+      "familyDescription": "संपूर्ण कुटुंबासाठी मील प्लॅन"
+    },
+    "family": {
+      "countTitle": "किती सदस्य आहेत?",
+      "countHint": "तुमच्या कुटुंबात किती जण आहेत ते निवडा",
+      "memberTitle": "सदस्याची माहिती",
+      "memberProgress": "सदस्य {current} / {total}",
+      "memberName": "नाव",
+      "memberNamePlaceholder": "उदा. सुनिता पवार",
+      "memberAge": "वय",
+      "memberAgeUnit": "वर्षे",
+      "memberAllergies": "ऍलर्जी आहे का?",
+      "memberAllergiesPlaceholder": "इथे लिहा",
+      "memberAllergiesAdd": "जोडा",
+      "memberDislikes": "कोणत्या भाज्या नको?",
+      "preferencesTitle": "फॅमिलीच्या आवडीनिवडी",
+      "spicePreference": "तिखटपणा",
+      "spiceLOW": "कमी",
+      "spiceMEDIUM": "मध्यम",
+      "spiceHIGH": "जास्त",
+      "dietaryPreference": "आहाराचा प्रकार",
+      "dietVEG": "शाकाहारी",
+      "dietVEGAN": "पूर्ण शाकाहारी (दूध नाही)",
+      "dietJAIN": "जैन",
+      "dietEGGETARIAN": "अंडी चालतात",
+      "breakfastStyle": "नाश्त्यासाठी काय आवडते?",
+      "breakfastStylePlaceholder": "उदा. पोहे, उपमा",
+      "finish": "प्लॅन तयार करा"
     }
   },
   "subscription": {

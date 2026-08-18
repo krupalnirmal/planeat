@@ -18,7 +18,7 @@ import type { CandidateProduct } from './candidates';
  */
 
 /** Tag-based affinities. Crude, transparent, and defensible — which is the point. */
-const GOAL_AFFINITIES: Record<string, readonly string[]> = {
+export const GOAL_AFFINITIES: Record<string, readonly string[]> = {
   WEIGHT_LOSS: ['low-calorie', 'fibre', 'hydrating', 'leafy'],
   WEIGHT_GAIN: ['starchy', 'protein', 'energy'],
   MAINTENANCE: ['fibre', 'vitamin-c', 'vitamin-a'],
@@ -26,7 +26,7 @@ const GOAL_AFFINITIES: Record<string, readonly string[]> = {
   MANAGE_CONDITION: ['fibre', 'diabetes-friendly', 'low-calorie'],
 };
 
-const CONDITION_AFFINITIES: Record<string, readonly string[]> = {
+export const CONDITION_AFFINITIES: Record<string, readonly string[]> = {
   DIABETES_TYPE_2: ['diabetes-friendly', 'fibre', 'low-calorie'],
   DIABETES_TYPE_1: ['diabetes-friendly', 'fibre'],
   HYPERTENSION: ['low-calorie', 'hydrating', 'fibre'],
@@ -48,7 +48,7 @@ export interface FallbackInput {
 }
 
 /** A tiny deterministic hash, so "seeded" never means "unpredictable". */
-function hash(input: string): number {
+export function hash(input: string): number {
   let value = 2166136261;
   for (let i = 0; i < input.length; i++) {
     value ^= input.charCodeAt(i);
@@ -57,7 +57,7 @@ function hash(input: string): number {
   return value >>> 0;
 }
 
-function scoreCandidate(
+export function scoreCandidate(
   candidate: CandidateProduct,
   wanted: ReadonlySet<string>,
   seed: number,

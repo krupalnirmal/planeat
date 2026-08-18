@@ -81,6 +81,8 @@ export const env = {
     anthropicModel: str('ANTHROPIC_MODEL', 'claude-sonnet-5'),
     groqApiKey: str('GROQ_API_KEY', ''),
     groqModel: str('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+    /** Tried when AI_PROVIDER fails a call. Empty = no fallback (default). */
+    fallbackProvider: str('AI_FALLBACK_PROVIDER', ''),
     sttProvider: str('AI_STT_PROVIDER', 'gemini'),
     maxRetries: num('AI_MAX_RETRIES', 1),
     /** R3 — free AI tiers may train on prompt data. Default OFF. */

@@ -4,7 +4,6 @@ import { useMutation } from '@tanstack/react-query';
 import { ChevronLeft, Loader2, Stethoscope, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { useRouter } from '@/i18n/navigation';
 import { MedicalDisclaimer } from '@/components/meal-plan/medical-disclaimer';
 import { ApiClientError, api, qs } from '@/lib/api/client';
 import {
@@ -70,9 +69,15 @@ const EMPTY: Draft = {
 export function IntakeWizard({
   initial,
   dislikeOptions,
+  onBack,
+  onDraftReady,
 }: {
   initial?: Partial<Draft>;
   dislikeOptions: Array<{ id: string; name: string }>;
+  /** Step 1's back button — returns to the plan-type chooser. */
+  onBack: () => void;
+  /** The options draft finished generating; move to the day-by-day picker. */
+  onDraftReady: (draftId: string) => void;
 }) {
   const t = useTranslations('intake');
   const tm = useTranslations('mealPlan');
@@ -81,7 +86,6 @@ export function IntakeWizard({
   const tp = useTranslations('profile');
   const ts = useTranslations('safety');
   const locale = useLocale();
-  const router = useRouter();
 
   const [step, setStep] = useState(1);
   const [draft, setDraft] = useState<Draft>({ ...EMPTY, ...initial });
@@ -128,6 +132,7 @@ export function IntakeWizard({
   const save = useMutation({
     mutationFn: () =>
       api.put<{ flaggedForReview: boolean }>('/api/health-profile', {
+        planType: 'PERSONAL',
         age: draft.age ? Number(draft.age) : null,
         heightCm: draft.heightCm ? Number(draft.heightCm) : null,
         weightKg: draft.weightKg ? Number(draft.weightKg) : null,
@@ -151,10 +156,12 @@ export function IntakeWizard({
     },
   });
 
+  // "Make My Meal Plan" — options generation (AI-1b), not the old
+  // single-pick pipeline. `onDraftReady` hands control back to the
+  // onboarding state machine, which moves to the day-by-day picker step.
   const generate = useMutation({
-    mutationFn: () =>
-      api.post<{ mealPlanId: string }>(`/api/meal-plan/generate${qs({ locale })}`),
-    onSuccess: (data) => router.replace(`/meal-plan/${data.mealPlanId}`),
+    mutationFn: () => api.post<{ draftId: string }>(`/api/meal-plan/draft${qs({ locale })}`),
+    onSuccess: (data) => onDraftReady(data.draftId),
     onError: (err) => {
       if (err instanceof ApiClientError && err.code === 'BAD_REQUEST') {
         setError(tm('notEnoughVeg'));
@@ -193,7 +200,7 @@ export function IntakeWizard({
       <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-accent-faint px-3 py-3">
         <button
           type="button"
-          onClick={() => (step === 1 ? router.back() : setStep(step - 1))}
+          onClick={() => (step === 1 ? onBack() : setStep(step - 1))}
           aria-label={tc('back')}
           className="grid size-11 shrink-0 place-items-center rounded-full"
         >
@@ -555,7 +562,7 @@ function hasRedFlagAnswers(draft: Draft): boolean {
 // Field primitives — R10: every target clears 44px.
 // ─────────────────────────────────────────────────────────────
 
-function NumberField({
+export function NumberField({
   id,
   label,
   unit,
@@ -585,7 +592,7 @@ function NumberField({
   );
 }
 
-function TextField({
+export function TextField({
   id,
   label,
   placeholder,
@@ -627,7 +634,7 @@ function TextField({
   );
 }
 
-function Chip({
+export function Chip({
   label,
   selected,
   onClick,
@@ -653,7 +660,7 @@ function Chip({
   );
 }
 
-function ChoiceGroup({
+export function ChoiceGroup({
   legend,
   options,
   selected,
@@ -692,7 +699,7 @@ function ChoiceGroup({
   );
 }
 
-function Counter({
+export function Counter({
   label,
   value,
   min,

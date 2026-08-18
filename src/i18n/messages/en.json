@@ -377,11 +377,12 @@
       "continueButton": "I Agree & Continue"
     },
     "basePlan": {
-      "categorySprouts": "Sprouts",
+      "categoryBreakfast": "Breakfast",
       "categoryFruits": "Fruits",
       "categoryDairy": "Dairy Products",
-      "categoryExtras": "Others",
-      "categoryMainMeal": "Lunch & Dinner",
+      "categoryOther": "Other Items",
+      "categoryVegetables": "Vegetables",
+      "multiSelectHint": "you can pick more than one",
       "builderTitle": "Build Your Weekly Plan",
       "builderHint": "Tap to select what you want for each day. This is your family’s common base plan.",
       "confirmButton": "Confirm My Plan",
@@ -389,11 +390,41 @@
       "congratsMessage": "Congratulations — you’ve created your family’s best meal plan!",
       "congratsSubtext": "Press OK to start getting fresh vegetables delivered to your home, every day, as per this plan.",
       "okButton": "OK, Get Started",
-      "editPlan": "Edit plan",
-      "quickFill": "Quick-fill this week’s default picks",
-      "addOwn": "+ Choose from store",
-      "addOwnPlaceholder": "Search products…",
-      "addOwnNoResults": "No matching products"
+      "editPlan": "Edit plan"
+    },
+    "planType": {
+      "title": "Choose plan type",
+      "personalTitle": "Personal Plan",
+      "personalDescription": "A personal meal plan for just one person",
+      "familyTitle": "Family Plan",
+      "familyDescription": "A meal plan for the whole family"
+    },
+    "family": {
+      "countTitle": "How many family members?",
+      "countHint": "Choose how many people are in your household",
+      "memberTitle": "Member details",
+      "memberProgress": "Member {current} of {total}",
+      "memberName": "Name",
+      "memberNamePlaceholder": "e.g. Sunita Pawar",
+      "memberAge": "Age",
+      "memberAgeUnit": "years",
+      "memberAllergies": "Any allergies?",
+      "memberAllergiesPlaceholder": "Type here",
+      "memberAllergiesAdd": "Add",
+      "memberDislikes": "Which vegetables to avoid?",
+      "preferencesTitle": "Family preferences",
+      "spicePreference": "Spice level",
+      "spiceLOW": "Low",
+      "spiceMEDIUM": "Medium",
+      "spiceHIGH": "High",
+      "dietaryPreference": "Diet type",
+      "dietVEG": "Vegetarian",
+      "dietVEGAN": "Fully vegetarian (no dairy)",
+      "dietJAIN": "Jain",
+      "dietEGGETARIAN": "Eggetarian",
+      "breakfastStyle": "Preferred breakfast style",
+      "breakfastStylePlaceholder": "e.g. poha, upma",
+      "finish": "Create plan"
     }
   },
   "subscription": {

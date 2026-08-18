@@ -111,6 +111,42 @@ enum HealthGoal {
   MANAGE_CONDITION
 }
 
+enum PlanType {
+  PERSONAL
+  FAMILY
+}
+
+/// "Make My Meal Plan" draft staging — mirrors the doc's own status list.
+enum MealPlanDraftStatus {
+  DRAFT
+  PROFILE_COMPLETED
+  GENERATING
+  GENERATED
+  SELECTING
+  FINAL_PREVIEW
+  APPROVED
+  REGENERATED
+  FAILED
+}
+
+/// The 5 fixed day/category slots a draft is generated into. Which
+/// categories are deliverable (become real MealPlanItem rows) is a business
+/// decision, not a schema one — see MealPlanDraft's finalize step.
+enum PlanCategory {
+  BREAKFAST
+  FRUITS
+  DAIRY
+  OTHER
+  VEGETABLES
+}
+
+/// Fixed per category in code (Breakfast/Fruits/Dairy/Other = SINGLE,
+/// Vegetables = MULTIPLE) — never AI-decided, same discipline as B4 quantity.
+enum SelectionType {
+  SINGLE
+  MULTIPLE
+}
+
 enum MealPlanStatus {
   DRAFT
   PENDING_CUSTOMER
@@ -255,21 +291,22 @@ enum OtpPurpose {
 // ─────────────────────────────────────────────────────────────
 
 model User {
-  id                String   @id
-  phone             String   @unique @db.VarChar(20)
-  name              String?  @db.VarChar(120)
-  email             String?  @db.VarChar(190)
+  id                String    @id
+  phone             String    @unique @db.VarChar(20)
+  name              String?   @db.VarChar(120)
+  email             String?   @db.VarChar(190)
   dob               DateTime?
   gender            Gender?
-  role              UserRole @default(CUSTOMER)
-  preferredLanguage Locale   @default(mr)
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  role              UserRole  @default(CUSTOMER)
+  preferredLanguage Locale    @default(mr)
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   addresses          Address[]
   healthProfile      HealthProfile?
   mealPlans          MealPlan[]
+  mealPlanDrafts     MealPlanDraft[]
   subscriptions      Subscription[]
   cart               Cart?
   orders             Order[]
@@ -281,7 +318,7 @@ model User {
   pushTokens         PushToken[]
   deliveryPartner    DeliveryPartner?
   aiLogs             AiGenerationLog[]
-  auditLogs          AuditLog[]            @relation("AuditActor")
+  auditLogs          AuditLog[]               @relation("AuditActor")
   otpRequests        OtpRequest[]
   healthAccessLogs   HealthProfileAccessLog[]
 
@@ -419,7 +456,9 @@ model Product {
   imageUrls          Json
   unitType           UnitType @default(G)
   tags               Json
-  /** Culinary grouping, currently only populated for the Vegetables category — see VEGETABLE_TYPES. */
+  /**
+   * Culinary grouping, currently only populated for the Vegetables category — see VEGETABLE_TYPES.
+   */
   vegetableType      String?  @db.VarChar(40)
   nutrition          Json?
   isMealPlanEligible Boolean  @default(false)
@@ -429,10 +468,11 @@ model Product {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  category      Category         @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  variants      ProductVariant[]
-  aliases       ProductAlias[]
-  mealPlanItems MealPlanItem[]
+  category             Category              @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variants             ProductVariant[]
+  aliases              ProductAlias[]
+  mealPlanItems        MealPlanItem[]
+  mealPlanDraftOptions MealPlanDraftOption[]
 
   @@index([categoryId])
   @@index([isActive, isMealPlanEligible])
@@ -455,10 +495,11 @@ model ProductVariant {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  product       Product        @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  cartItems     CartItem[]
-  orderItems    OrderItem[]
-  mealPlanItems MealPlanItem[]
+  product              Product               @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  cartItems            CartItem[]
+  orderItems           OrderItem[]
+  mealPlanItems        MealPlanItem[]
+  mealPlanDraftOptions MealPlanDraftOption[]
 
   @@index([productId])
   @@index([isActive])
@@ -543,8 +584,8 @@ model Order {
   cancelledAt      DateTime?
   updatedAt        DateTime      @updatedAt
 
-  user          User                @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  subscription  Subscription?       @relation(fields: [subscriptionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user          User                 @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subscription  Subscription?        @relation(fields: [subscriptionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   items         OrderItem[]
   statusHistory OrderStatusHistory[]
   assignment    DeliveryAssignment?
@@ -561,17 +602,17 @@ model Order {
 }
 
 model OrderItem {
-  id                String  @id
+  id                String    @id
   orderId           String
   productId         String
   variantId         String
-  nameSnapshot      String  @db.VarChar(160)
-  imageSnapshot     String? @db.VarChar(500)
+  nameSnapshot      String    @db.VarChar(160)
+  imageSnapshot     String?   @db.VarChar(500)
   mealSlot          MealSlot?
-  quantity          Int     @default(1)
+  quantity          Int       @default(1)
   unitPricePaise    BigInt
   totalPaise        BigInt
-  isSubstituted     Boolean @default(false)
+  isSubstituted     Boolean   @default(false)
   originalProductId String?
 
   order   Order          @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -601,20 +642,20 @@ model OrderStatusHistory {
 }
 
 model OrderIssue {
-  id             String   @id
-  orderId        String
-  userId         String
-  orderItemId    String?
-  reasonCode     String   @db.VarChar(60)
-  description    String?  @db.Text
-  photoUrls      Json?
-  claimedPaise   BigInt   @default(0)
-  creditedPaise  BigInt   @default(0)
-  autoApproved   Boolean  @default(false)
-  status         String   @default("OPEN") @db.VarChar(30)
-  resolvedBy     String?
-  resolvedAt     DateTime?
-  createdAt      DateTime @default(now())
+  id            String    @id
+  orderId       String
+  userId        String
+  orderItemId   String?
+  reasonCode    String    @db.VarChar(60)
+  description   String?   @db.Text
+  photoUrls     Json?
+  claimedPaise  BigInt    @default(0)
+  creditedPaise BigInt    @default(0)
+  autoApproved  Boolean   @default(false)
+  status        String    @default("OPEN") @db.VarChar(30)
+  resolvedBy    String?
+  resolvedAt    DateTime?
+  createdAt     DateTime  @default(now())
 
   order Order @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -631,33 +672,68 @@ model OrderIssue {
 // ─────────────────────────────────────────────────────────────
 
 model HealthProfile {
-  id                 String             @id
-  userId             String             @unique
+  id                 String            @id
+  userId             String            @unique
+  /// "Make My Meal Plan" doc §6 — which intake flow this household used.
+  /// Existing single-profile rows default to PERSONAL, unaffected.
+  planType           PlanType          @default(PERSONAL)
   age                Int?
   heightCm           Int?
   weightKg           Int?
   gender             Gender?
   activityLevel      ActivityLevel?
-  householdAdults    Int                @default(1)
-  householdChildren  Int                @default(0)
+  householdAdults    Int               @default(1)
+  householdChildren  Int               @default(0)
   medicalConditions  Json
   allergies          Json
-  medications        String?            @db.Text
-  dietaryPreference  DietaryPreference  @default(VEG)
+  medications        String?           @db.Text
+  dietaryPreference  DietaryPreference @default(VEG)
   likedProductIds    Json
   dislikedProductIds Json
-  goal               HealthGoal         @default(GENERAL_HEALTH)
-  notes              String?            @db.Text
+  goal               HealthGoal        @default(GENERAL_HEALTH)
+  notes              String?           @db.Text
+  /// Family-plan-only UI inputs (spice level, breakfast style, delivery
+  /// preference) that don't drive hard business logic yet — informational
+  /// context for the AI prompt, same as `notes`. Null for Personal plans.
+  familyPreferences  Json?
   consentGivenAt     DateTime?
-  consentVersion     String?            @db.VarChar(20)
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  consentVersion     String?           @db.VarChar(20)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
 
-  user       User                     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  accessLogs HealthProfileAccessLog[]
+  user          User                     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  accessLogs    HealthProfileAccessLog[]
+  familyMembers FamilyMember[]
+  drafts        MealPlanDraft[]
 
   @@index([userId])
   @@map("health_profiles")
+}
+
+/// One row per named family member, collected "one by one" per doc §8 —
+/// richer than `HealthProfile.householdAdults/Children` counts, which stay
+/// for the Personal flow. Access to this data goes through the same
+/// consent/S6 discipline as `HealthProfile` itself, since it's the same
+/// class of sensitive information about someone in the household.
+model FamilyMember {
+  id                 String   @id
+  healthProfileId    String
+  name               String   @db.VarChar(80)
+  age                Int?
+  gender             Gender?
+  likedProductIds    Json
+  dislikedProductIds Json
+  allergies          Json
+  medicalConditions  Json
+  notes              String?  @db.Text
+  sortOrder          Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  healthProfile HealthProfile @relation(fields: [healthProfileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([healthProfileId])
+  @@map("family_members")
 }
 
 /// S6 — every admin read of a health profile is logged.
@@ -737,7 +813,14 @@ model MealPlanItem {
   variant      ProductVariant?       @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   swapRequests MealPlanSwapRequest[]
 
-  @@unique([mealPlanDayId, slot])
+  /// Relaxed from a single [mealPlanDayId, slot] uniqueness (which allowed
+  /// exactly one item per slot) so a day can carry several vegetables in
+  /// one slot — required once "Make My Meal Plan" lets Vegetables be a
+  /// multi-select category. Downstream order generation already loops
+  /// `day.items` as a list (src/lib/subscription/generate-orders.ts), so
+  /// this is additive there; PlanWeekView was the one place still doing a
+  /// single `.find()` and was updated to render a list per slot.
+  @@unique([mealPlanDayId, slot, productId])
   @@index([mealPlanDayId])
   @@index([productId])
   @@index([variantId])
@@ -768,29 +851,120 @@ model MealPlanSwapRequest {
 }
 
 // ─────────────────────────────────────────────────────────────
+// "Make My Meal Plan" draft staging
+//
+// Sits BEFORE MealPlan/MealPlanDay/MealPlanItem: the AI proposes 2-3
+// candidate options per day/category here, the customer selects and sets
+// quantities in place on MealPlanDraftOption, and only `finalize` resolves
+// the selections into real MealPlanItem rows. MealPlan itself stays the
+// single, unchanged source of truth for what's actually delivered/
+// subscribed — this hierarchy is scaffolding around it, not a replacement.
+// ─────────────────────────────────────────────────────────────
+
+model MealPlanDraft {
+  id                 String              @id
+  userId             String
+  healthProfileId    String
+  planType           PlanType
+  durationDays       Int
+  status             MealPlanDraftStatus @default(DRAFT)
+  aiProvider         String?             @db.VarChar(40)
+  aiModel            String?             @db.VarChar(80)
+  promptVersion      String?             @db.VarChar(20)
+  flaggedForReview   Boolean             @default(false)
+  flagReason         String?             @db.Text
+  /// Set once `finalize` has resolved this draft into a real MealPlan.
+  resolvedMealPlanId String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  user          User               @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  healthProfile HealthProfile      @relation(fields: [healthProfileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  days          MealPlanDraftDay[]
+
+  @@index([userId])
+  @@index([healthProfileId])
+  @@map("meal_plan_drafts")
+}
+
+model MealPlanDraftDay {
+  id        String @id
+  draftId   String
+  dayNumber Int
+
+  draft      MealPlanDraft           @relation(fields: [draftId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  categories MealPlanDraftCategory[]
+
+  @@unique([draftId, dayNumber])
+  @@index([draftId])
+  @@map("meal_plan_draft_days")
+}
+
+model MealPlanDraftCategory {
+  id            String        @id
+  draftDayId    String
+  category      PlanCategory
+  /// Fixed per category in code at generation time, not chosen by the AI.
+  selectionType SelectionType
+
+  day     MealPlanDraftDay      @relation(fields: [draftDayId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  options MealPlanDraftOption[]
+
+  @@unique([draftDayId, category])
+  @@index([draftDayId])
+  @@map("meal_plan_draft_categories")
+}
+
+model MealPlanDraftOption {
+  id                String    @id
+  categoryId        String
+  /// Always a real, already-fetched candidate — the AI returns only ids
+  /// from the list it was given (same discipline as MealPlanItem/generate.ts),
+  /// never a freestanding name.
+  productId         String
+  variantId         String?
+  suggestedQuantity Int?
+  quantityUnit      UnitType?
+  /// Live selection state — toggled by PATCH .../select, cleared for
+  /// siblings in the same category when selectionType is SINGLE.
+  selected          Boolean   @default(false)
+  chosenQuantity    Int?
+  sortOrder         Int       @default(0)
+
+  category MealPlanDraftCategory @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  product  Product               @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variant  ProductVariant?       @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([categoryId])
+  @@index([productId])
+  @@index([variantId])
+  @@map("meal_plan_draft_options")
+}
+
+// ─────────────────────────────────────────────────────────────
 // Subscriptions
 // ─────────────────────────────────────────────────────────────
 
 model Subscription {
-  id            String             @id
-  userId        String
-  mealPlanId    String
-  addressId     String
-  deliverySlot  DeliverySlot       @default(SUBSCRIPTION_0630_0900)
-  startDate     DateTime           @db.Date
-  endDate       DateTime           @db.Date
-  status        SubscriptionStatus @default(ACTIVE)
-  pricingMode   PricingMode        @default(PER_DELIVERY)
-  planFeePaise  BigInt             @default(0)
-  prepaidPaise  BigInt             @default(0)
-  autoRenew     Boolean            @default(false)
-  cancelledAt   DateTime?
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  id           String             @id
+  userId       String
+  mealPlanId   String
+  addressId    String
+  deliverySlot DeliverySlot       @default(SUBSCRIPTION_0630_0900)
+  startDate    DateTime           @db.Date
+  endDate      DateTime           @db.Date
+  status       SubscriptionStatus @default(ACTIVE)
+  pricingMode  PricingMode        @default(PER_DELIVERY)
+  planFeePaise BigInt             @default(0)
+  prepaidPaise BigInt             @default(0)
+  autoRenew    Boolean            @default(false)
+  cancelledAt  DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 
-  user       User                      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  mealPlan   MealPlan                  @relation(fields: [mealPlanId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  address    Address                   @relation(fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user       User                    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mealPlan   MealPlan                @relation(fields: [mealPlanId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  address    Address                 @relation(fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   orders     Order[]
   exceptions SubscriptionException[]
 
@@ -1048,18 +1222,18 @@ model AppSetting {
 }
 
 model Banner {
-  id        String   @id
-  titleEn   String   @db.VarChar(160)
-  titleMr   String   @db.VarChar(160)
-  titleHi   String   @db.VarChar(160)
-  imageUrl  String   @db.VarChar(500)
-  linkUrl   String?  @db.VarChar(500)
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
+  id        String    @id
+  titleEn   String    @db.VarChar(160)
+  titleMr   String    @db.VarChar(160)
+  titleHi   String    @db.VarChar(160)
+  imageUrl  String    @db.VarChar(500)
+  linkUrl   String?   @db.VarChar(500)
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
   startsAt  DateTime?
   endsAt    DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([isActive, sortOrder])
   @@map("banners")

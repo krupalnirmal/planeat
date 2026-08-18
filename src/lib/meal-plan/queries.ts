@@ -17,6 +17,8 @@ import type { Locale, MealPlanStatus, MealSlot, UnitType } from '@/generated/pri
 // ─────────────────────────────────────────────────────────────
 
 export interface HealthProfileView {
+  planType: string;
+  familyPreferences: Record<string, unknown> | null;
   age: number | null;
   heightCm: number | null;
   weightKg: number | null;
@@ -46,6 +48,8 @@ export async function getOwnHealthProfile(userId: string): Promise<HealthProfile
   if (!profile) return null;
 
   return {
+    planType: profile.planType,
+    familyPreferences: (profile.familyPreferences as Record<string, unknown> | null) ?? null,
     age: profile.age,
     heightCm: profile.heightCm,
     weightKg: profile.weightKg,

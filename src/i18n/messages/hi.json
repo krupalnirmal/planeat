@@ -377,11 +377,12 @@
       "continueButton": "मुझे स्वीकार है, आगे बढ़ें"
     },
     "basePlan": {
-      "categorySprouts": "स्प्राउट्स",
+      "categoryBreakfast": "नाश्ता",
       "categoryFruits": "फल",
       "categoryDairy": "डेयरी उत्पाद",
-      "categoryExtras": "अन्य",
-      "categoryMainMeal": "दोपहर और रात का भोजन",
+      "categoryOther": "अन्य सामान",
+      "categoryVegetables": "सब्ज़ियाँ",
+      "multiSelectHint": "एक से ज़्यादा चुन सकते हैं",
       "builderTitle": "अपना साप्ताहिक प्लान बनाएं",
       "builderHint": "हर दिन के लिए जो चाहिए उसे चुनने के लिए टैप करें. यह आपके परिवार का सामान्य बेस प्लान है.",
       "confirmButton": "मेरा प्लान कन्फर्म करें",
@@ -389,11 +390,41 @@
       "congratsMessage": "बधाई हो! आपने अपने परिवार का सबसे अच्छा मील प्लान तैयार कर लिया है.",
       "congratsSubtext": "रोज़ इस प्लान के अनुसार ताज़ी सब्ज़ियाँ घर पर मंगवाने के लिए ओके दबाएँ.",
       "okButton": "ओके, शुरू करें",
-      "editPlan": "प्लान बदलें",
-      "quickFill": "इस हफ़्ते के डिफ़ॉल्ट विकल्प जल्दी भरें",
-      "addOwn": "+ स्टोर से चुनें",
-      "addOwnPlaceholder": "उत्पाद खोजें…",
-      "addOwnNoResults": "कोई मिलता उत्पाद नहीं मिला"
+      "editPlan": "प्लान बदलें"
+    },
+    "planType": {
+      "title": "प्लान का प्रकार चुनें",
+      "personalTitle": "व्यक्तिगत प्लान",
+      "personalDescription": "सिर्फ एक व्यक्ति के लिए व्यक्तिगत मील प्लान",
+      "familyTitle": "फैमिली प्लान",
+      "familyDescription": "पूरे परिवार के लिए मील प्लान"
+    },
+    "family": {
+      "countTitle": "परिवार में कितने सदस्य हैं?",
+      "countHint": "अपने घर में कितने लोग हैं चुनें",
+      "memberTitle": "सदस्य की जानकारी",
+      "memberProgress": "सदस्य {current} / {total}",
+      "memberName": "नाम",
+      "memberNamePlaceholder": "जैसे सुनीता पवार",
+      "memberAge": "उम्र",
+      "memberAgeUnit": "साल",
+      "memberAllergies": "कोई एलर्जी है?",
+      "memberAllergiesPlaceholder": "यहाँ लिखें",
+      "memberAllergiesAdd": "जोड़ें",
+      "memberDislikes": "कौन सी सब्ज़ियाँ नहीं चाहिए?",
+      "preferencesTitle": "परिवार की पसंद",
+      "spicePreference": "तीखापन",
+      "spiceLOW": "कम",
+      "spiceMEDIUM": "मध्यम",
+      "spiceHIGH": "ज़्यादा",
+      "dietaryPreference": "आहार का प्रकार",
+      "dietVEG": "शाकाहारी",
+      "dietVEGAN": "पूर्ण शाकाहारी (डेयरी नहीं)",
+      "dietJAIN": "जैन",
+      "dietEGGETARIAN": "अंडा चलता है",
+      "breakfastStyle": "नाश्ते में क्या पसंद है?",
+      "breakfastStylePlaceholder": "जैसे पोहा, उपमा",
+      "finish": "प्लान बनाएं"
     }
   },
   "subscription": {

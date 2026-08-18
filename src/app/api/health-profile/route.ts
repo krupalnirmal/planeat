@@ -2,6 +2,7 @@ import { parseJson, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
 import { requireUser } from '@/lib/auth/session';
 import { db } from '@/lib/db';
+import { Prisma } from '@/generated/prisma/client';
 import { ID_PREFIX, newId } from '@/lib/ids';
 import { getOwnHealthProfile } from '@/lib/meal-plan/queries';
 import { assessSafety } from '@/lib/meal-plan/safety';
@@ -54,6 +55,8 @@ export const PUT = route(async (request: Request) => {
       : now;
 
   const data = {
+    planType: input.planType,
+    familyPreferences: input.familyPreferences ?? Prisma.JsonNull,
     age: input.age ?? null,
     heightCm: input.heightCm ?? null,
     weightKg: input.weightKg ?? null,

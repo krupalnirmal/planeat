@@ -24,7 +24,19 @@ import { cuidSchema } from './common';
  */
 const allergyEntrySchema = z.string().trim().min(1).max(80);
 
+/** Doc §6/§8 — the family-only extras, none of which drive hard business
+    logic yet (see HealthProfile.familyPreferences in schema.prisma). */
+export const familyPreferencesSchema = z.object({
+  spicePreference: z.enum(['LOW', 'MEDIUM', 'HIGH']).nullable().optional(),
+  breakfastStyle: z.string().trim().max(200).nullable().optional(),
+  deliveryPreference: z.enum(['DAILY', 'ALTERNATE', 'WEEKLY']).nullable().optional(),
+});
+
 export const healthProfileSchema = z.object({
+  // "Make My Meal Plan" §6 — which intake flow this household used.
+  planType: z.enum(['PERSONAL', 'FAMILY']).default('PERSONAL'),
+  familyPreferences: familyPreferencesSchema.nullable().optional(),
+
   // Step 1 — basics
   age: z.coerce.number().int().min(1).max(120).nullable().optional(),
   heightCm: z.coerce.number().int().min(50).max(250).nullable().optional(),

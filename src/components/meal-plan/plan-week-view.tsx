@@ -9,8 +9,14 @@ import { formatQuantity, type QuantityUnit } from '@/lib/quantity';
 import { cn } from '@/lib/utils';
 
 /**
- * M5 — the week view: 7 day cards, each with a Morning and an Evening item
- * showing image, name, quantity and a one-line rationale. Tap a day to expand.
+ * M5 — the week view: 7 day cards, each with a Morning and an Evening group
+ * of items showing image, name, quantity and a one-line rationale. Tap a
+ * day to expand.
+ *
+ * A slot can hold more than one item — "Make My Meal Plan" lets Vegetables
+ * be a multi-select category, so a day's MORNING or EVENING group is a
+ * list, not a single resolved pick (D-211-adjacent: `MealPlanItem` dropped
+ * its one-per-slot uniqueness for exactly this reason).
  *
  * The quantity shown here came from B4 in code, never from the model.
  * B6 — each item carries its own swap button, and a swap applies instantly.
@@ -59,8 +65,8 @@ export function PlanWeekView({
       <ul className="space-y-3">
         {days.map((day) => {
         const isOpen = expanded === day.dayOfWeek;
-        const morning = day.items.find((item) => item.slot === 'MORNING');
-        const evening = day.items.find((item) => item.slot === 'EVENING');
+        const morningItems = day.items.filter((item) => item.slot === 'MORNING');
+        const eveningItems = day.items.filter((item) => item.slot === 'EVENING');
 
         return (
           <li key={day.dayOfWeek} className="overflow-hidden rounded-[var(--radius)] bg-card">
@@ -76,7 +82,7 @@ export function PlanWeekView({
 
               {!isOpen && (
                 <span className="truncate text-xs text-muted-foreground">
-                  {[morning?.name, evening?.name].filter(Boolean).join(' · ')}
+                  {[...morningItems, ...eveningItems].map((item) => item.name).join(' · ')}
                 </span>
               )}
 
@@ -91,23 +97,29 @@ export function PlanWeekView({
 
             {isOpen && (
               <div className="divide-y divide-border border-t border-border">
-                {morning && (
-                  <MealRow
-                    item={morning}
-                    label={t('morning')}
-                    icon={Sunrise}
-                    swappable={swappable}
-                    onSwap={() => setSwapping(morning)}
-                  />
+                {morningItems.length > 0 && (
+                  <SlotGroup label={t('morning')} icon={Sunrise}>
+                    {morningItems.map((item) => (
+                      <MealRow
+                        key={item.id}
+                        item={item}
+                        swappable={swappable}
+                        onSwap={() => setSwapping(item)}
+                      />
+                    ))}
+                  </SlotGroup>
                 )}
-                {evening && (
-                  <MealRow
-                    item={evening}
-                    label={t('evening')}
-                    icon={Sunset}
-                    swappable={swappable}
-                    onSwap={() => setSwapping(evening)}
-                  />
+                {eveningItems.length > 0 && (
+                  <SlotGroup label={t('evening')} icon={Sunset}>
+                    {eveningItems.map((item) => (
+                      <MealRow
+                        key={item.id}
+                        item={item}
+                        swappable={swappable}
+                        onSwap={() => setSwapping(item)}
+                      />
+                    ))}
+                  </SlotGroup>
                 )}
               </div>
             )}
@@ -129,16 +141,32 @@ export function PlanWeekView({
   );
 }
 
-function MealRow({
-  item,
+function SlotGroup({
   label,
   icon: Icon,
+  children,
+}: {
+  label: string;
+  icon: typeof Sunrise;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <p className="flex items-center gap-1.5 px-4 pt-3 text-[11px] font-semibold text-muted-foreground">
+        <Icon className="size-3.5 text-accent" aria-hidden />
+        {label}
+      </p>
+      <div className="divide-y divide-border">{children}</div>
+    </div>
+  );
+}
+
+function MealRow({
+  item,
   swappable,
   onSwap,
 }: {
   item: PlanItemView;
-  label: string;
-  icon: typeof Sunrise;
   swappable: boolean;
   onSwap: () => void;
 }) {
@@ -156,12 +184,7 @@ function MealRow({
       </span>
 
       <div className="min-w-0 flex-1">
-        <p className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
-          <Icon className="size-3.5 text-accent" aria-hidden />
-          {label}
-        </p>
-
-        <p className="mt-0.5 text-sm font-semibold">{item.name}</p>
+        <p className="text-sm font-semibold">{item.name}</p>
 
         <p className="text-xs text-muted-foreground">
           {/* B4 — computed in code from the household, never by the model. */}
