@@ -362,6 +362,15 @@
       "6": "Saturday",
       "7": "Sunday"
     },
+    "daysShort": {
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat",
+      "7": "Sun"
+    },
     "loginDescription": "Log in to build a personalised weekly meal plan and get it delivered on your schedule.",
     "terms": {
       "title": "Make My Meal Plan — Terms & Conditions",

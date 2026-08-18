@@ -15,7 +15,7 @@ import { ID_PREFIX, newId } from '@/lib/ids';
 import { computeQuantity, type QuantityUnit } from '@/lib/quantity';
 import { getAIProvider } from '@/lib/services/ai';
 import { SETTING_KEYS, getSettingNumber } from '@/lib/settings';
-import type { Locale } from '@/generated/prisma/enums';
+import type { Locale, UnitType } from '@/generated/prisma/enums';
 import { buildCandidates, type CandidateProduct } from './candidates';
 import { NotEnoughCandidatesError } from './fallback';
 import { MINIMUM_CANDIDATES_PER_CATEGORY, buildFallbackOptions } from './fallback-options';
@@ -349,7 +349,7 @@ export async function generateMealPlanOptions(
     productId: string;
     variantId: string | null;
     suggestedQuantity: number | null;
-    quantityUnit: string | null;
+    quantityUnit: UnitType | null;
     sortOrder: number;
   }[] = [];
 

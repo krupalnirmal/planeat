@@ -1,8 +1,9 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Check, Loader2, Sprout } from 'lucide-react';
+import { Check, Loader2, Sprout, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
 import { formatQuantity, type QuantityUnit } from '@/lib/quantity';
@@ -10,10 +11,12 @@ import { cn } from '@/lib/utils';
 
 /**
  * The real, AI-backed successor to the interim static `BasePlanBuilder`
- * (D-204/205): same visual language — pill options that turn green and get
- * a checkmark on tap, a sticky "N/total selected" confirm bar — driven by a
- * real `MealPlanDraft` instead of a hand-authored template. Vegetables is
- * the one multi-select category (doc §10/§11); everything else is single.
+ * (D-204/205): one day visible at a time behind a horizontal day-tab strip
+ * — doc §19's own guidance ("for longer plans, use pagination/accordion/
+ * day navigation rather than loading an overwhelming full screen") — with
+ * a selected option showing an inline quantity stepper right in its pill.
+ * Vegetables is the one multi-select category (doc §10/§11); everything
+ * else is single.
  */
 
 export interface DraftOptionView {
@@ -67,8 +70,10 @@ function stepFor(unit: string | null): number {
 export function DraftPlanBuilder({ onConfirm }: { onConfirm: () => void }) {
   const t = useTranslations('mealPlan.basePlan');
   const tDays = useTranslations('mealPlan.days');
+  const tDaysShort = useTranslations('mealPlan.daysShort');
   const locale = useLocale();
   const queryClient = useQueryClient();
+  const [activeDayIndex, setActiveDayIndex] = useState(0);
 
   const draftQuery = useQuery({
     queryKey: ['meal-plan-draft-current', locale],
@@ -104,6 +109,7 @@ export function DraftPlanBuilder({ onConfirm }: { onConfirm: () => void }) {
     0,
   );
   const allSelected = selectedCells === totalCells;
+  const activeDay = draft.days[Math.min(activeDayIndex, draft.days.length - 1)];
 
   function toggleOption(category: DraftCategoryView, option: DraftOptionView) {
     if (category.selectionType === 'SINGLE' && option.selected) return; // Tap a selected single pick again does nothing.
@@ -134,73 +140,127 @@ export function DraftPlanBuilder({ onConfirm }: { onConfirm: () => void }) {
         </div>
       </div>
 
-      {draft.days.map((day) => (
-        <section
-          key={day.dayNumber}
-          className="rounded-[var(--radius)] border border-border bg-card px-4 py-4"
-        >
-          <h2 className="text-sm font-black">{tDays(String(day.dayNumber))}</h2>
+      {/* Day-tab strip — one day's categories on screen at a time, doc §19. */}
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {draft.days.map((day, index) => {
+          const dayDone = day.categories.every((cat) => cat.options.some((o) => o.selected));
+          return (
+            <button
+              key={day.dayNumber}
+              type="button"
+              onClick={() => setActiveDayIndex(index)}
+              aria-pressed={index === activeDayIndex}
+              className={cn(
+                'flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition-colors',
+                index === activeDayIndex
+                  ? 'bg-foreground text-background'
+                  : 'border border-border bg-card text-muted-foreground',
+              )}
+            >
+              {dayDone && index !== activeDayIndex && (
+                <Check className="size-3.5 text-primary" aria-hidden />
+              )}
+              {tDaysShort(String(day.dayNumber))}
+            </button>
+          );
+        })}
+      </div>
 
-          <div className="mt-3 space-y-4">
-            {day.categories.map((category) => (
-              <div key={category.id}>
-                <p className="text-xs font-semibold text-muted-foreground">
-                  {t(CATEGORY_LABEL_KEY[category.category])}
-                  {category.selectionType === 'MULTIPLE' && ` · ${t('multiSelectHint')}`}
-                </p>
-                <div className="mt-1.5 flex flex-wrap items-start gap-2">
-                  {category.options.map((option) => (
-                    <div key={option.id} className="flex flex-col items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => toggleOption(category, option)}
-                        disabled={!option.inStock || select.isPending}
-                        aria-pressed={option.selected}
-                        className={cn(
-                          'flex min-h-11 items-center gap-1.5 rounded-full border-2 px-3.5 text-sm font-semibold transition-colors disabled:opacity-40',
-                          option.selected
-                            ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-background text-foreground',
-                        )}
+      {activeDay && (
+        <section className="divide-y divide-border rounded-[var(--radius)] border border-border bg-card px-4">
+          <h2 className="py-3 text-sm font-black">{tDays(String(activeDay.dayNumber))}</h2>
+
+          {activeDay.categories.map((category) => (
+            <div key={category.id} className="py-3">
+              <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
+                {t(CATEGORY_LABEL_KEY[category.category])}
+                {category.selectionType === 'MULTIPLE' && ` · ${t('multiSelectHint')}`}
+              </p>
+
+              <div className="mt-2 flex flex-wrap gap-2">
+                {category.options.map((option) => {
+                  const price = option.pricePaise
+                    ? formatPaise(paise(option.pricePaise), { hidePaise: true })
+                    : null;
+
+                  if (option.selected) {
+                    return (
+                      <div
+                        key={option.id}
+                        className="flex w-full items-center justify-between gap-2 rounded-[var(--radius)] border-2 border-primary bg-tint-green px-3 py-2"
                       >
-                        {option.selected && <Check className="size-3.5" aria-hidden />}
-                        {option.name}
-                        {option.pricePaise && (
-                          <span className="opacity-80">
-                            · {formatPaise(paise(option.pricePaise), { hidePaise: true })}
+                        <span className="flex min-w-0 items-center gap-2 text-sm font-semibold text-primary-dark">
+                          <Check className="size-4 shrink-0" aria-hidden />
+                          <span className="truncate">
+                            {option.name}
+                            {price && ` · ${price}`}
                           </span>
-                        )}
-                      </button>
+                        </span>
 
-                      {option.selected && option.chosenQuantity && option.quantityUnit && (
-                        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                          <button
-                            type="button"
-                            onClick={() => nudgeQuantity(option, -stepFor(option.quantityUnit))}
-                            aria-label={`${option.name} −`}
-                            className="grid size-6 place-items-center rounded-full border border-border"
-                          >
-                            −
-                          </button>
-                          {formatQuantity(option.chosenQuantity, option.quantityUnit as QuantityUnit)}
-                          <button
-                            type="button"
-                            onClick={() => nudgeQuantity(option, stepFor(option.quantityUnit))}
-                            aria-label={`${option.name} +`}
-                            className="grid size-6 place-items-center rounded-full border border-border"
-                          >
-                            +
-                          </button>
+                        <div className="flex shrink-0 items-center gap-1.5">
+                          {option.chosenQuantity && option.quantityUnit && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => nudgeQuantity(option, -stepFor(option.quantityUnit))}
+                                disabled={select.isPending}
+                                aria-label={`${option.name} −`}
+                                className="grid size-8 place-items-center rounded-full bg-card text-primary-dark disabled:opacity-40"
+                              >
+                                −
+                              </button>
+                              <span className="min-w-10 text-center text-xs font-bold whitespace-nowrap text-primary-dark">
+                                {formatQuantity(option.chosenQuantity, option.quantityUnit as QuantityUnit)}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => nudgeQuantity(option, stepFor(option.quantityUnit))}
+                                disabled={select.isPending}
+                                aria-label={`${option.name} +`}
+                                className="grid size-8 place-items-center rounded-full bg-card text-primary-dark disabled:opacity-40"
+                              >
+                                +
+                              </button>
+                            </>
+                          )}
+
+                          {/* Only MULTIPLE (Vegetables) needs an explicit remove —
+                              a SINGLE category's pick is replaced by tapping a
+                              different option, never left with nothing selected. */}
+                          {category.selectionType === 'MULTIPLE' && (
+                            <button
+                              type="button"
+                              onClick={() => toggleOption(category, option)}
+                              disabled={select.isPending}
+                              aria-label={`${option.name} — remove`}
+                              className="grid size-8 place-items-center rounded-full bg-card text-primary-dark disabled:opacity-40"
+                            >
+                              <X className="size-3.5" aria-hidden />
+                            </button>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => toggleOption(category, option)}
+                      disabled={!option.inStock || select.isPending}
+                      className="min-h-11 rounded-[var(--radius)] border border-border px-3.5 text-sm font-medium disabled:opacity-40"
+                    >
+                      {option.name}
+                      {price && ` · ${price}`}
+                    </button>
+                  );
+                })}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </section>
-      ))}
+      )}
 
       <div
         className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card px-4 py-3"
