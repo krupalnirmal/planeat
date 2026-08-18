@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, Loader2, Sprout, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
 import { formatQuantity, type QuantityUnit } from '@/lib/quantity';
@@ -74,6 +74,14 @@ export function DraftPlanBuilder({ onConfirm }: { onConfirm: () => void }) {
   const locale = useLocale();
   const queryClient = useQueryClient();
   const [activeDayIndex, setActiveDayIndex] = useState(0);
+  const activeTabRef = useRef<HTMLButtonElement>(null);
+
+  // The active day can be scrolled off-screen in the tab strip (e.g. arriving
+  // straight on a later day after a page refresh) — bring it into view rather
+  // than leaving the customer unsure which day they're looking at.
+  useEffect(() => {
+    activeTabRef.current?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }, [activeDayIndex]);
 
   const draftQuery = useQuery({
     queryKey: ['meal-plan-draft-current', locale],
@@ -147,6 +155,7 @@ export function DraftPlanBuilder({ onConfirm }: { onConfirm: () => void }) {
           return (
             <button
               key={day.dayNumber}
+              ref={index === activeDayIndex ? activeTabRef : undefined}
               type="button"
               onClick={() => setActiveDayIndex(index)}
               aria-pressed={index === activeDayIndex}

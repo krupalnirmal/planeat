@@ -82,7 +82,11 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className={`${appFont.variable} h-full`} suppressHydrationWarning>
-      <body className="min-h-full">
+      {/* suppressHydrationWarning: browser extensions (Grammarly, password
+          managers) inject attributes onto <body> before React hydrates,
+          which is a false-positive mismatch, not an app bug — dev-only,
+          never shown in a production build. */}
+      <body className="min-h-full" suppressHydrationWarning>
         {/* A visible loading bar on every navigation — without it, tapping a
             link during the round trip to the database (Singapore, on rural
             4G) looked like the tap did nothing. */}
