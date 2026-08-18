@@ -148,8 +148,12 @@ export function DraftPlanBuilder({ onConfirm }: { onConfirm: () => void }) {
         </div>
       </div>
 
-      {/* Day-tab strip — one day's categories on screen at a time, doc §19. */}
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* Day-tab strip — one day's categories on screen at a time, doc §19.
+          No edge-to-edge bleed trick here (kept within `<main>`'s own
+          padding): a negative-margin scroller is exactly the kind of thing
+          that can drag the whole page sideways instead of staying
+          self-contained if anything about its width is a hair off. */}
+      <div className="flex w-full gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {draft.days.map((day, index) => {
           const dayDone = day.categories.every((cat) => cat.options.some((o) => o.selected));
           return (
