@@ -121,8 +121,8 @@ export function DraftPlanBuilder({ onConfirm }: { onConfirm: () => void }) {
   }
 
   return (
-    <main className="space-y-2 pb-24">
-      <div className="bg-card px-4 py-5">
+    <main className="space-y-3 bg-secondary px-4 py-4 pb-24">
+      <div className="rounded-[var(--radius)] border border-border bg-card px-4 py-5">
         <div className="flex items-start gap-3">
           <span className="grid size-10 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
             <Sprout className="size-5" aria-hidden />
@@ -135,7 +135,10 @@ export function DraftPlanBuilder({ onConfirm }: { onConfirm: () => void }) {
       </div>
 
       {draft.days.map((day) => (
-        <section key={day.dayNumber} className="bg-card px-4 py-4">
+        <section
+          key={day.dayNumber}
+          className="rounded-[var(--radius)] border border-border bg-card px-4 py-4"
+        >
           <h2 className="text-sm font-black">{tDays(String(day.dayNumber))}</h2>
 
           <div className="mt-3 space-y-4">
