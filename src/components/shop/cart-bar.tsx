@@ -2,6 +2,7 @@
 
 import { ShoppingCart, Truck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useEffect, useRef } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
 import { useCart } from '@/hooks/use-cart';
 import { formatPaise, paise } from '@/lib/money';
@@ -43,15 +44,48 @@ export function CartBar() {
   const t = useTranslations('cart');
   const pathname = usePathname();
   const cart = useCart();
+  const barRef = useRef<HTMLDivElement>(null);
 
-  if (cart.itemCount === 0) return null;
-  if (HIDDEN_ON.some((path) => pathname === path || pathname.startsWith(`${path}/`))) return null;
+  const visible =
+    cart.itemCount > 0 &&
+    !HIDDEN_ON.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+
+  // Every scrollable page reserves exactly this much extra bottom padding
+  // (`.app-scroll` in globals.css) so the bar — and its free-delivery
+  // nudge, when shown — never floats over a product row's own controls.
+  // Measured, not guessed: the nudge appearing/disappearing and locale
+  // text wrapping both change the bar's real height.
+  useEffect(() => {
+    const root = document.documentElement;
+
+    if (!visible || !barRef.current) {
+      root.style.setProperty('--cart-bar-reserve', '0px');
+      return;
+    }
+
+    const el = barRef.current;
+    const GAP_PX = 8; // The 0.5rem gap between the bar and the bottom nav.
+
+    const observer = new ResizeObserver(() => {
+      root.style.setProperty('--cart-bar-reserve', `${el.offsetHeight + GAP_PX}px`);
+    });
+    observer.observe(el);
+    root.style.setProperty('--cart-bar-reserve', `${el.offsetHeight + GAP_PX}px`);
+
+    return () => {
+      observer.disconnect();
+      root.style.setProperty('--cart-bar-reserve', '0px');
+    };
+  }, [visible]);
+
+  if (!visible) return null;
 
   const forFreeDelivery = paise(cart.amountForFreeDeliveryPaise);
   const total = paise(cart.itemTotalPaise);
 
   return (
     <div
+      ref={barRef}
       className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-3"
       style={{
         bottom: `calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 0.5rem)`,

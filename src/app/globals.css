@@ -135,6 +135,12 @@
 
   /* Safe-area aware height of the 5-tab bottom navigation. */
   --bottom-nav-height: 4.25rem;
+
+  /* The floating cart bar's actual rendered height, written by CartBar
+     itself (0px when it isn't showing) — see .app-scroll below. Never
+     hand-guessed: the bar's height changes with the free-delivery nudge
+     and locale text length, so measuring beats a fixed constant. */
+  --cart-bar-reserve: 0px;
 }
 
 .dark {
@@ -203,7 +209,14 @@
   }
 
   .app-scroll {
-    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+    /* Reserves space for the floating cart bar too, not just the bottom
+       nav — without it the bar (and its free-delivery nudge, when shown)
+       floats directly over the last visible row's own +/- controls
+       instead of there being room to scroll them clear of it. */
+    padding-bottom: calc(
+      var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + var(--cart-bar-reserve)
+    );
+    transition: padding-bottom 0.15s ease-out;
   }
 
   /* A soft, "pressed-in" field rather than a flat outlined box — a faint
