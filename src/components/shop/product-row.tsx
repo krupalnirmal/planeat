@@ -71,7 +71,7 @@ export function ProductRow({
   const image = (
     <Link
       href={`/product/${product.id}`}
-      className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] border border-border bg-white"
+      className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] border border-border bg-white"
     >
       {product.imageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element

@@ -170,15 +170,22 @@
        element computing a hair wider than the viewport (a horizontal-scroll
        strip built with a negative-margin bleed trick, most often) would
        otherwise drag the entire page sideways instead of staying contained
-       in its own overflow-x-auto box. */
-    overflow-x: hidden;
+       in its own overflow-x-auto box.
+
+       `clip`, not `hidden`: any `overflow` value (hidden included) on an
+       ancestor turns it into a scroll container, which breaks every
+       `position: sticky` element in the app (the category page's rail
+       stopped sticking the moment `hidden` landed here). `clip` still
+       prevents the paint/layout overflow without creating that scroll
+       container. */
+    overflow-x: clip;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     /* Mobile-first: the storefront is a single centred column on any screen. */
     text-rendering: optimizeLegibility;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   /* R10 — every interactive element clears 44×44px. */
