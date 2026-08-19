@@ -34,6 +34,11 @@ const HIDDEN_ON = [
   '/profile/complete',
   '/addresses',
   '/subscription',
+  // The PDP's own sticky ADD/qty-stepper bar sits at this exact same
+  // bottom offset (variant-picker.tsx) — CartBar rendering here too was
+  // painting directly over it, hiding ADD whenever the cart already had
+  // items from elsewhere.
+  '/product',
   // The whole meal-plan section (tab, onboarding wizard, plan view, approval)
   // shares the same in-flow bottom button, not a fixed bar of its own.
   '/meal-plan',
