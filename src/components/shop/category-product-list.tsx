@@ -1,6 +1,6 @@
 'use client';
 
-import { Filter, Search, X } from 'lucide-react';
+import { Filter, LayoutGrid, Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CATEGORY_SUBGROUPS, vegetableTypeLabel } from '@/lib/catalog/vegetable-types';
@@ -43,6 +43,12 @@ const HEADER_OFFSET_PX = 68;
 // 4, not 2: a 2-column grid makes a 2-item preview exactly one row, which
 // read as stingier than the old list's 2-row preview did.
 const GROUP_PREVIEW_COUNT = 4;
+
+// Blinkit's rail always leads with a non-photo "All" tab, active by
+// default, that just scrolls back to the top of the whole list — it is
+// not one of the real sub-groups, so it needs an id no real group can
+// collide with.
+const ALL_ID = '__all__';
 
 /**
  * The reference's list-row category screen: an in-page search that filters
@@ -129,7 +135,7 @@ export function CategoryProductList({
   const [seenGroupsKey, setSeenGroupsKey] = useState('');
   if (groupsKey !== seenGroupsKey) {
     setSeenGroupsKey(groupsKey);
-    setActiveTypeId(groups?.[0]?.type.id ?? null);
+    setActiveTypeId(groups ? ALL_ID : null);
   }
 
   // Scroll-spy: whichever section is nearest the top of the visible area
@@ -161,6 +167,14 @@ export function CategoryProductList({
   function jumpTo(typeId: string) {
     setActiveTypeId(typeId);
     sectionRefs.current[typeId]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function jumpToTop() {
+    setActiveTypeId(ALL_ID);
+    const firstGroupId = groups?.[0]?.type.id;
+    if (firstGroupId) {
+      sectionRefs.current[firstGroupId]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   return (
@@ -244,11 +258,44 @@ export function CategoryProductList({
             className="sticky w-[76px] shrink-0 self-start overflow-y-auto border-r border-border"
             style={{ top: HEADER_OFFSET_PX, maxHeight: `calc(100dvh - ${HEADER_OFFSET_PX}px)` }}
           >
+            {/* Blinkit's rail always leads with a non-photo "All" tab,
+                active by default — a plain icon glyph, not a catalogue
+                photo, since it doesn't represent any one sub-group. */}
+            <button
+              type="button"
+              onClick={jumpToTop}
+              aria-current={activeTypeId === ALL_ID}
+              className={cn(
+                'flex w-full flex-col items-center gap-1 border-l-4 px-1.5 py-3 text-center',
+                activeTypeId === ALL_ID ? 'border-primary bg-tint-green' : 'border-transparent',
+              )}
+            >
+              <span
+                className={cn(
+                  'grid size-10 shrink-0 place-items-center rounded-[calc(var(--radius)-6px)]',
+                  activeTypeId === ALL_ID ? 'bg-card text-primary shadow-sm' : 'bg-background text-muted-foreground',
+                )}
+                aria-hidden
+              >
+                <LayoutGrid className="size-4.5" aria-hidden />
+              </span>
+              <span
+                className={cn(
+                  'text-[11px] leading-tight',
+                  activeTypeId === ALL_ID ? 'font-bold text-primary-dark' : 'font-normal text-muted-foreground',
+                )}
+              >
+                {t('all')}
+              </span>
+            </button>
+
             {groups.map(({ type, products: groupProducts }) => {
               const active = activeTypeId === type.id;
               // Blinkit-matched (session 2026-08-25): a real product photo,
               // not an emoji glyph — the same rounded-square treatment as
-              // the home category tiles. Our own catalogue photo, never
+              // the home category tiles, inset with a little padding
+              // rather than bled to the edge, matching Blinkit's own
+              // slightly-framed look. Our own catalogue photo, never
               // Blinkit's own (see product-image sourcing note elsewhere).
               const thumbUrl = groupProducts[0]?.imageUrl ?? null;
               return (
@@ -264,14 +311,14 @@ export function CategoryProductList({
                 >
                   <span
                     className={cn(
-                      'grid size-10 shrink-0 place-items-center overflow-hidden rounded-[calc(var(--radius)-6px)]',
+                      'grid size-10 shrink-0 place-items-center overflow-hidden rounded-[calc(var(--radius)-6px)] p-1',
                       active ? 'bg-card shadow-sm' : 'bg-background',
                     )}
                     aria-hidden
                   >
                     {thumbUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={thumbUrl} alt="" className="size-full object-cover" />
+                      <img src={thumbUrl} alt="" className="size-full rounded-[4px] object-cover" />
                     ) : (
                       <span className="text-lg">{type.emoji}</span>
                     )}
@@ -319,7 +366,7 @@ export function CategoryProductList({
                     style={{ top: HEADER_OFFSET_PX }}
                   >
                     <span
-                      className="grid size-7 shrink-0 place-items-center overflow-hidden rounded-[calc(var(--radius)-8px)] bg-card shadow-sm"
+                      className="grid size-7 shrink-0 place-items-center overflow-hidden rounded-[calc(var(--radius)-8px)] bg-card p-0.5 shadow-sm"
                       aria-hidden
                     >
                       {groupProducts[0]?.imageUrl ? (
@@ -327,7 +374,7 @@ export function CategoryProductList({
                         <img
                           src={groupProducts[0].imageUrl}
                           alt=""
-                          className="size-full object-cover"
+                          className="size-full rounded-[3px] object-cover"
                         />
                       ) : (
                         <span className="text-base">{type.emoji}</span>

@@ -115,6 +115,7 @@
     "empty": "Nothing in this category yet",
     "productCount": "{count} items",
     "other": "Other",
+    "all": "All",
     "title": "Categories",
     "searchPlaceholder": "Search {category}",
     "filter": "Filter",
