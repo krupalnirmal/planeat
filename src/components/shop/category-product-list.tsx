@@ -3,6 +3,7 @@
 import { Filter, LayoutGrid, Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { SUBGROUP_TILE_IMAGES } from '@/lib/catalog/subgroup-tile-images';
 import { CATEGORY_SUBGROUPS, vegetableTypeLabel } from '@/lib/catalog/vegetable-types';
 import type { AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
@@ -291,13 +292,14 @@ export function CategoryProductList({
 
             {groups.map(({ type, products: groupProducts }) => {
               const active = activeTypeId === type.id;
-              // Blinkit-matched (session 2026-08-25): a real product photo,
-              // not an emoji glyph — the same rounded-square treatment as
-              // the home category tiles, inset with a little padding
-              // rather than bled to the edge, matching Blinkit's own
-              // slightly-framed look. Our own catalogue photo, never
-              // Blinkit's own (see product-image sourcing note elsewhere).
-              const thumbUrl = groupProducts[0]?.imageUrl ?? null;
+              // Blinkit-matched (session 2026-08-25): a real photo, not an
+              // emoji glyph — the same rounded-square treatment as the home
+              // category tiles, inset with a little padding rather than
+              // bled to the edge, matching Blinkit's own slightly-framed
+              // look. A curated client photo (SUBGROUP_TILE_IMAGES) wins
+              // over whichever product happens to be first in the group.
+              const thumbUrl =
+                SUBGROUP_TILE_IMAGES[type.id] ?? groupProducts[0]?.imageUrl ?? null;
               return (
                 <button
                   key={type.id}
@@ -369,10 +371,10 @@ export function CategoryProductList({
                       className="grid size-7 shrink-0 place-items-center overflow-hidden rounded-[calc(var(--radius)-8px)] bg-card p-0.5 shadow-sm"
                       aria-hidden
                     >
-                      {groupProducts[0]?.imageUrl ? (
+                      {(SUBGROUP_TILE_IMAGES[type.id] ?? groupProducts[0]?.imageUrl) ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={groupProducts[0].imageUrl}
+                          src={SUBGROUP_TILE_IMAGES[type.id] ?? groupProducts[0].imageUrl!}
                           alt=""
                           className="size-full rounded-[3px] object-cover"
                         />
