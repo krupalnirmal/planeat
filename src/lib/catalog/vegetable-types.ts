@@ -37,20 +37,32 @@ export function vegetableTypeLabel(type: VegetableType, locale: AppLocale): stri
 // and shape — it is just a generic "sub-group id" per product, not
 // vegetable-specific despite the field's name.
 //
-// Fruits, Dairy, Bakery & Biscuits and Ice Cream are deliberately left
-// without a rail: at 6, 4, 3 and 2 products respectively, splitting them
-// further would put one item in most groups, which reads as broken rather
-// than organised — a rail earns its keep only once a category has real
-// breadth (Blinkit itself does not sub-group its own thin categories
-// either). Add a `groceryType` per product and a new entry to
-// `CATEGORY_SUBGROUPS` below once the catalogue grows enough there.
+// Dairy, Bakery & Biscuits and Ice Cream are deliberately left without a
+// rail: at 4, 3 and 2 products respectively, splitting them further would
+// put one item in most groups, which reads as broken rather than organised
+// — a rail earns its keep only once a category has real breadth (Blinkit
+// itself does not sub-group its own thin categories either).
 export const GROCERY_TYPES: VegetableType[] = [
   { id: 'grains', emoji: '🌾', labelEn: 'Grains & Flour', labelMr: 'पीठ व धान्य', labelHi: 'आटा और अनाज' },
   { id: 'pulses', emoji: '🫘', labelEn: 'Pulses & Staples', labelMr: 'डाळी व इतर', labelHi: 'दाल और अन्य' },
   { id: 'pantry', emoji: '🫗', labelEn: 'Oil & Beverages', labelMr: 'तेल व पेय', labelHi: 'तेल और पेय' },
 ];
 
+// Fruits' own sub-grouping (session 2026-08-25) — client-specified groups
+// and examples (Citrus: Orange/Mosambi/Lemon, Seasonal: Mango/Watermelon/
+// Jamun, Exotic: Kiwi/Dragon Fruit/Avocado/Blueberry, Dry Fruits: Almond/
+// Cashew/Walnut/Raisins). The catalogue only had Citrus and Seasonal
+// products before this — Exotic and Dry Fruits SKUs were added to the seed
+// alongside this so the rail has real breadth in every group.
+export const FRUIT_TYPES: VegetableType[] = [
+  { id: 'citrus', emoji: '🍊', labelEn: 'Citrus Fruits', labelMr: 'लिंबूवर्गीय फळे', labelHi: 'खट्टे फल' },
+  { id: 'seasonal', emoji: '🥭', labelEn: 'Seasonal Fruits', labelMr: 'हंगामी फळे', labelHi: 'मौसमी फल' },
+  { id: 'exotic', emoji: '🥝', labelEn: 'Exotic Fruits', labelMr: 'विदेशी फळे', labelHi: 'विदेशी फल' },
+  { id: 'dryfruits', emoji: '🌰', labelEn: 'Dry Fruits', labelMr: 'सुका मेवा', labelHi: 'सूखे मेवे' },
+];
+
 export const CATEGORY_SUBGROUPS: Record<string, VegetableType[]> = {
   vegetables: VEGETABLE_TYPES,
+  fruits: FRUIT_TYPES,
   grocery: GROCERY_TYPES,
 };
