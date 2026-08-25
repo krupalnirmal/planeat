@@ -1,4 +1,4 @@
-import { Bike, ChevronRight, Heart, LayoutGrid, Leaf, Sprout, Truck } from 'lucide-react';
+import { Bike, ChevronRight, Heart, Leaf, Sprout, Truck } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { AppHeader } from '@/components/shop/app-header';
@@ -59,30 +59,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {/* Stacked slabs: white panels separated by a thin strip of page
           colour (`space-y-2`), so the screen reads as one document rather
-          than a scatter of floating cards. */}
+          than a scatter of floating cards.
+          Blinkit-matched (session 2026-08-25): the category grid is the
+          FIRST thing under the search bar, exactly like Blinkit's own
+          fold — the promo banner and the trust strip (built earlier from
+          the client's own reference) still exist, just lower, after
+          shopping itself has been offered. */}
       <main className="space-y-2 pb-2">
-        <div className="bg-card px-4 pt-1 pb-4">
-          {banners.length > 0 ? (
-            <BannerCarousel banners={banners} />
-          ) : (
-            <HeroBanner
-              headline={t('heroHeadline')}
-              subtitle={t('heroSubtitle')}
-              badge={t('deliveryIn', { minutes: 30 })}
-              images={heroImages}
-            />
-          )}
-
-          <BenefitsRow />
-        </div>
-
-        {/* Renders nothing for a guest or a first-time buyer. */}
-        <OrderAgainRow />
-
         <HomeSection
           id="categories-heading"
           title={t('categories')}
-          icon={<LayoutGrid className="size-4.5 text-primary" aria-hidden />}
           seeAllHref="/categories"
           seeAllLabel={tc('seeAll')}
         >
@@ -104,6 +90,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </p>
           )}
         </HomeSection>
+
+        {/* Renders nothing for a guest or a first-time buyer. */}
+        <OrderAgainRow />
 
         {bestsellers.length > 0 && (
           <HomeSection
@@ -140,6 +129,21 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </ul>
           </HomeSection>
         )}
+
+        <div className="bg-card px-4 pt-1 pb-4">
+          {banners.length > 0 ? (
+            <BannerCarousel banners={banners} />
+          ) : (
+            <HeroBanner
+              headline={t('heroHeadline')}
+              subtitle={t('heroSubtitle')}
+              badge={t('deliveryIn', { minutes: 30 })}
+              images={heroImages}
+            />
+          )}
+
+          <BenefitsRow />
+        </div>
 
         <div className="bg-card px-4 py-4">
           <FastDeliveryBanner />

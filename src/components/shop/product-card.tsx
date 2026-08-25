@@ -182,7 +182,7 @@ export function ProductCard({
             )}
         </div>
 
-        <div className="flex shrink-0 flex-col items-end gap-0.5">
+        <div className="flex shrink-0 flex-col items-end">
           {!product.inStock || !activeVariant ? (
             <span className="text-[10px] font-semibold text-muted-foreground">
               {t('outOfStock')}
@@ -192,30 +192,39 @@ export function ProductCard({
               type="button"
               onClick={handleAdd}
               aria-label={`${t('add')} ${product.name}`}
-              className="h-9 min-w-[64px] rounded-[calc(var(--radius)-4px)] border border-primary bg-card px-3 text-xs font-bold text-primary"
+              className="flex min-w-[64px] flex-col items-center justify-center gap-0 rounded-[calc(var(--radius)-4px)] border border-primary bg-card px-3 py-1 text-xs font-bold text-primary"
             >
               {t('add')}
+              {/* Blinkit-matched (session 2026-08-25): "N options" sits
+                  inside the same bordered button as a second line, not as
+                  a separate underlined link below it. */}
+              {multiVariant && (
+                <span className="text-[9px] leading-tight font-medium text-muted-foreground">
+                  {t('nOptions', { count: variants!.length })}
+                </span>
+              )}
             </button>
           ) : (
-            <QtyStepper
-              quantity={quantity}
-              onIncrement={() => cart.increment(activeVariant.id)}
-              onDecrement={() => cart.decrement(activeVariant.id)}
-              disabled={cart.isMutating}
-              max={activeVariant.stockQty}
-              label={product.name}
-              className="h-9"
-            />
-          )}
-
-          {multiVariant && (
-            <button
-              type="button"
-              onClick={() => (isLoggedIn ? setPickerOpen(true) : goToLogin())}
-              className="text-[10px] font-semibold text-muted-foreground underline underline-offset-2"
-            >
-              {t('nOptions', { count: variants!.length })}
-            </button>
+            <>
+              <QtyStepper
+                quantity={quantity}
+                onIncrement={() => cart.increment(activeVariant.id)}
+                onDecrement={() => cart.decrement(activeVariant.id)}
+                disabled={cart.isMutating}
+                max={activeVariant.stockQty}
+                label={product.name}
+                className="h-9"
+              />
+              {multiVariant && (
+                <button
+                  type="button"
+                  onClick={() => setPickerOpen(true)}
+                  className="mt-0.5 text-[9px] font-semibold text-muted-foreground underline underline-offset-2"
+                >
+                  {t('nOptions', { count: variants!.length })}
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -226,21 +226,6 @@ export function CategoryProductList({
         </div>
       </div>
 
-      {slug === 'vegetables' && !searching && (
-        <div className="bg-card px-4 pb-3">
-          <div className="overflow-hidden rounded-[var(--radius)] shadow-sm">
-            {/* Whole creative, never cropped — same rule as the home
-                carousel's banners. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={VEGETABLES_BANNER_URL}
-              alt={t('vegetablesBannerAlt')}
-              className="block h-auto w-full"
-            />
-          </div>
-        </div>
-      )}
-
       {sorted.length === 0 ? (
         <div className="bg-card px-4 pb-4">
           <p className="rounded-[var(--radius)] border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
@@ -369,6 +354,23 @@ export function CategoryProductList({
             {rest.map((product) => (
               <ProductCard key={product.id} product={product} variants={product.variants} />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Blinkit-matched (session 2026-08-25): products lead the fold, the
+          way Blinkit's own category page does — no banner above the grid.
+          The client's own promo creative still runs, just after the
+          products it advertises rather than blocking them. */}
+      {slug === 'vegetables' && !searching && sorted.length > 0 && (
+        <div className="bg-card px-4 pb-3">
+          <div className="overflow-hidden rounded-[var(--radius)] shadow-sm">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={VEGETABLES_BANNER_URL}
+              alt={t('vegetablesBannerAlt')}
+              className="block h-auto w-full"
+            />
           </div>
         </div>
       )}
