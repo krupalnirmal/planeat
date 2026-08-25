@@ -1,6 +1,6 @@
 'use client';
 
-import { ShoppingCart, Truck } from 'lucide-react';
+import { ChevronRight, ShoppingCart, Truck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
@@ -107,20 +107,29 @@ export function CartBar() {
         </p>
       )}
 
+      {/* Blinkit-matched (session 2026-08-25): the bar's own box (52px
+          tall, 12px radius, no shadow, asymmetric padding) read off
+          Blinkit's live "View Cart" bar, and the same slide-up + fade-in
+          it plays the moment the bar first mounts — this component
+          renders nothing at all while the cart is empty (`visible` above),
+          so every appearance is a fresh mount the animation can play on. */}
       <Link
         href="/cart"
-        className="relative flex min-h-14 items-center justify-between gap-3 rounded-[var(--radius)] bg-primary px-4 text-primary-foreground shadow-lg"
+        className="animate-in slide-in-from-bottom-4 fade-in relative flex h-[52px] items-center justify-between gap-3 rounded-[12px] bg-primary py-2 pr-[18px] pl-3 text-primary-foreground duration-300"
       >
         <span className="flex items-center gap-2">
           <ShoppingCart className="size-5 shrink-0" aria-hidden />
-          <span className="text-sm font-bold">{t('itemCount', { count: cart.itemCount })}</span>
+          <span className="text-[12px] font-medium">{t('itemCount', { count: cart.itemCount })}</span>
+          {total > 0n && (
+            <span className="text-[12px] font-semibold">
+              {formatPaise(total, { hidePaise: true })}
+            </span>
+          )}
         </span>
 
-        <span className="flex items-center gap-2">
-          {total > 0n && (
-            <span className="text-sm font-bold">{formatPaise(total, { hidePaise: true })}</span>
-          )}
-          <span className="text-sm font-black">{t('viewCart')}</span>
+        <span className="flex items-center gap-1">
+          <span className="text-[17px] font-normal">{t('viewCart')}</span>
+          <ChevronRight className="size-4 shrink-0" aria-hidden />
         </span>
       </Link>
     </div>

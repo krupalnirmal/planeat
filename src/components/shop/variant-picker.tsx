@@ -234,7 +234,7 @@ export function VariantPicker({
             disabled={cart.isMutating}
             max={selected.stockQty}
             label={productName}
-            className="h-11 shrink-0"
+            className="animate-in zoom-in-95 fade-in h-11 shrink-0 duration-200"
           />
         )}
       </div>

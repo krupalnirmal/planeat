@@ -210,6 +210,9 @@ export function ProductCard({
             </button>
           ) : (
             <>
+              {/* Blinkit-matched (session 2026-08-25): the ADD button pops
+                  into the stepper rather than swapping instantly — the
+                  same brief scale+fade Blinkit plays on its own button. */}
               <QtyStepper
                 quantity={quantity}
                 onIncrement={() => cart.increment(activeVariant.id)}
@@ -217,7 +220,7 @@ export function ProductCard({
                 disabled={cart.isMutating}
                 max={activeVariant.stockQty}
                 label={product.name}
-                className="h-9"
+                className="animate-in zoom-in-95 fade-in h-9 duration-200"
               />
               {multiVariant && (
                 <button

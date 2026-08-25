@@ -141,7 +141,7 @@ export function VariantPickerSheet({
                     disabled={cart.isMutating}
                     max={variant.stockQty}
                     label={`${productName} ${formatQuantity(variant.quantity, variant.unit as QuantityUnit)}`}
-                    className="h-11 w-28 shrink-0"
+                    className="animate-in zoom-in-95 fade-in h-11 w-28 shrink-0 duration-200"
                   />
                 )}
               </div>
