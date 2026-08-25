@@ -1,21 +1,33 @@
 'use client';
 
-import { Clock, ImageIcon, Plus } from 'lucide-react';
+import { Clock, ImageIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useCart } from '@/hooks/use-cart';
 import { useSession } from '@/hooks/use-session';
 import { formatPaise, paise } from '@/lib/money';
 import { formatQuantity, type QuantityUnit } from '@/lib/quantity';
 import { cn } from '@/lib/utils';
+import type { ProductRowVariant } from './product-row';
 import { QtyStepper } from './qty-stepper';
+import { VariantPickerSheet } from './variant-picker-sheet';
 
 /**
  * M2 product card: image, localised name, weight/unit, struck-through MRP,
- * price, ADD → quantity stepper.
+ * price, ADD → quantity stepper. Blinkit-matched (session 2026-08-25): a
+ * white, primary-bordered "ADD" text button rather than a round "+" icon —
+ * same structure as the reference, this app's own green rather than
+ * Blinkit's blue, since the two are different brands.
  *
  * B17 — a guest may browse but not add. Tapping ADD sends them to login with a
  * `next` parameter, so they land back on the product they were looking at.
+ *
+ * `variants` is optional and additive: home rails and search only ever pass
+ * a single `variant` and behave exactly as before. The category grid passes
+ * the full list — with more than one, the card shows "N options" (Blinkit's
+ * own wording) instead of an immediate add, and tapping opens
+ * `VariantPickerSheet` instead of adding the default weight sight unseen.
  */
 
 export interface ProductCardData {
@@ -39,33 +51,53 @@ export interface ProductCardData {
 
 export function ProductCard({
   product,
+  variants,
   etaMinutes = 30,
 }: {
   product: ProductCardData;
+  /** The full weight lineup — only the category grid passes this. */
+  variants?: ProductRowVariant[];
   /** The instant-delivery promise shown on the card. Matches the header's. */
   etaMinutes?: number;
 }) {
   const t = useTranslations('product');
   const router = useRouter();
   const { isLoggedIn } = useSession();
-
-  const variant = product.variant;
   const cart = useCart();
-  const quantity = variant ? cart.quantityOf(variant.id) : 0;
+  const [pickerOpen, setPickerOpen] = useState(false);
 
-  const price = variant ? paise(variant.pricePaise) : 0n;
-  const mrp = variant ? paise(variant.mrpPaise) : 0n;
+  const multiVariant = (variants?.length ?? 0) > 1;
+
+  // With multiple weights, the card shows whichever one is already in the
+  // cart (if any) — the same "one active weight at a time" rule the old
+  // per-row chips used (D-210) — falling back to the default/first weight
+  // for display only, before anything has been picked.
+  const activeVariant = multiVariant
+    ? (variants!.find((v) => cart.quantityOf(v.id) > 0) ?? variants![0])
+    : product.variant;
+
+  const quantity = activeVariant ? cart.quantityOf(activeVariant.id) : 0;
+  const price = activeVariant ? paise(activeVariant.pricePaise) : 0n;
+  const mrp = activeVariant ? paise(activeVariant.mrpPaise) : 0n;
   const hasDiscount = mrp > price;
 
+  function goToLogin() {
+    router.push(`/login?next=/product/${product.id}`);
+  }
+
   function handleAdd() {
-    if (!variant) return;
-    // B17 — browsing is open to everyone; login is required at the commitment
-    // point. The guest's cart survives the detour via `POST /api/cart/merge`.
     if (!isLoggedIn) {
-      router.push(`/login?next=/product/${product.id}`);
+      goToLogin();
       return;
     }
-    cart.add({ productId: product.id, variantId: variant.id });
+    if (multiVariant) {
+      setPickerOpen(true);
+      return;
+    }
+    if (!product.variant) return;
+    // B17 — browsing is open to everyone; login is required at the commitment
+    // point. The guest's cart survives the detour via `POST /api/cart/merge`.
+    cart.add({ productId: product.id, variantId: product.variant.id });
   }
 
   return (
@@ -119,16 +151,16 @@ export function ProductCard({
 
         <h3 className="line-clamp-2 text-[13px] leading-tight font-medium">{product.name}</h3>
 
-        {variant && (
+        {activeVariant && (
           <p className="mt-0.5 text-[11px] text-muted-foreground">
-            {formatQuantity(variant.quantity, variant.unit as QuantityUnit)}
+            {formatQuantity(activeVariant.quantity, activeVariant.unit as QuantityUnit)}
           </p>
         )}
       </Link>
 
       {/* Price and the add control share one row, as in the reference — the
-          price sits bottom-left and a compact round + sits bottom-right,
-          rather than a full-width ADD bar under the card. */}
+          price sits bottom-left and the add control bottom-right, rather
+          than a full-width ADD bar under the card. */}
       <div className="mt-1.5 flex items-end justify-between gap-2">
         <div className="min-w-0">
           <div className="flex items-baseline gap-1">
@@ -141,39 +173,62 @@ export function ProductCard({
               </span>
             )}
           </div>
-          {variant && product.inStock && variant.stockQty <= variant.lowStockThreshold && (
-            <p className="mt-0.5 text-[10px] font-medium text-warning">
-              {t('lowStock', { count: variant.stockQty })}
-            </p>
-          )}
+          {activeVariant &&
+            product.inStock &&
+            activeVariant.stockQty <= activeVariant.lowStockThreshold && (
+              <p className="mt-0.5 text-[10px] font-medium text-warning">
+                {t('lowStock', { count: activeVariant.stockQty })}
+              </p>
+            )}
         </div>
 
-        {!product.inStock || !variant ? (
-          <span className="shrink-0 text-[10px] font-semibold text-muted-foreground">
-            {t('outOfStock')}
-          </span>
-        ) : quantity === 0 ? (
-          <button
-            type="button"
-            onClick={handleAdd}
-            aria-label={`${t('add')} ${product.name}`}
-            className="grid size-9 shrink-0 place-items-center rounded-xl bg-tint-green text-primary-dark"
-          >
-            <Plus className="size-4.5" strokeWidth={2.6} aria-hidden />
-          </button>
-        ) : (
-          <div className="shrink-0">
+        <div className="flex shrink-0 flex-col items-end gap-0.5">
+          {!product.inStock || !activeVariant ? (
+            <span className="text-[10px] font-semibold text-muted-foreground">
+              {t('outOfStock')}
+            </span>
+          ) : quantity === 0 ? (
+            <button
+              type="button"
+              onClick={handleAdd}
+              aria-label={`${t('add')} ${product.name}`}
+              className="h-9 min-w-[64px] rounded-[calc(var(--radius)-4px)] border border-primary bg-card px-3 text-xs font-bold text-primary"
+            >
+              {t('add')}
+            </button>
+          ) : (
             <QtyStepper
               quantity={quantity}
-              onIncrement={() => cart.increment(variant.id)}
-              onDecrement={() => cart.decrement(variant.id)}
+              onIncrement={() => cart.increment(activeVariant.id)}
+              onDecrement={() => cart.decrement(activeVariant.id)}
               disabled={cart.isMutating}
-              max={variant.stockQty}
+              max={activeVariant.stockQty}
               label={product.name}
+              className="h-9"
             />
-          </div>
-        )}
+          )}
+
+          {multiVariant && (
+            <button
+              type="button"
+              onClick={() => (isLoggedIn ? setPickerOpen(true) : goToLogin())}
+              className="text-[10px] font-semibold text-muted-foreground underline underline-offset-2"
+            >
+              {t('nOptions', { count: variants!.length })}
+            </button>
+          )}
+        </div>
       </div>
+
+      {pickerOpen && multiVariant && (
+        <VariantPickerSheet
+          productId={product.id}
+          productName={product.name}
+          productUnitType={product.unitType}
+          variants={variants!}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
     </article>
   );
 }

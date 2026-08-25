@@ -87,14 +87,13 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           seeAllLabel={tc('seeAll')}
         >
           {categories.length > 0 ? (
-            <ul className="grid grid-cols-2 gap-3">
+            <ul className="grid grid-cols-4 gap-3">
               {collages.map((collage) => (
                 <li key={collage.categorySlug}>
                   <CategoryCollageTile
                     slug={collage.categorySlug}
                     name={collage.categoryName}
                     images={collage.images}
-                    moreCount={collage.moreCount}
                   />
                 </li>
               ))}

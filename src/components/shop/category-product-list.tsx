@@ -6,8 +6,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { vegetableTypeLabel, VEGETABLE_TYPES } from '@/lib/catalog/vegetable-types';
 import type { AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
-import type { ProductCardData } from './product-card';
-import { ProductRow, type ProductRowVariant } from './product-row';
+import { ProductCard, type ProductCardData } from './product-card';
+import type { ProductRowVariant } from './product-row';
 
 export interface CategoryProduct extends ProductCardData {
   vegetableType: string | null;
@@ -40,7 +40,9 @@ const HEADER_OFFSET_PX = 68;
 // Each sub-type section previews this many products before "See all" —
 // a category page is an overview of every sub-type, not the place to
 // scroll through all 9 fruit-vegetable products at once.
-const GROUP_PREVIEW_COUNT = 2;
+// 4, not 2: a 2-column grid makes a 2-item preview exactly one row, which
+// read as stingier than the old list's 2-row preview did.
+const GROUP_PREVIEW_COUNT = 4;
 
 /**
  * The reference's list-row category screen: an in-page search that filters
@@ -336,9 +338,9 @@ export function CategoryProductList({
                       </button>
                     )}
                   </h2>
-                  <div className="divide-y divide-border px-4">
+                  <div className="grid grid-cols-2 gap-3 px-4 pt-3 pb-3">
                     {visibleProducts.map((product) => (
-                      <ProductRow key={product.id} product={product} />
+                      <ProductCard key={product.id} product={product} variants={product.variants} />
                     ))}
                   </div>
                 </section>
@@ -352,9 +354,9 @@ export function CategoryProductList({
                 >
                   {t('other')}
                 </h2>
-                <div className="divide-y divide-border px-4">
+                <div className="grid grid-cols-2 gap-3 px-4 pt-3 pb-3">
                   {rest.map((product) => (
-                    <ProductRow key={product.id} product={product} />
+                    <ProductCard key={product.id} product={product} variants={product.variants} />
                   ))}
                 </div>
               </section>
@@ -362,10 +364,10 @@ export function CategoryProductList({
           </div>
         </div>
       ) : (
-        <div className="bg-card px-4 pb-2">
-          <div className="divide-y divide-border">
+        <div className="bg-card px-4 pt-3 pb-3">
+          <div className="grid grid-cols-2 gap-3">
             {rest.map((product) => (
-              <ProductRow key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} variants={product.variants} />
             ))}
           </div>
         </div>
