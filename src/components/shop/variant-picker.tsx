@@ -82,46 +82,70 @@ export function VariantPicker({
 
   return (
     <>
-      <div className="mt-3 flex items-baseline gap-2">
-        <span className="text-2xl font-bold">{formatPaise(price)}</span>
-        {mrp > price && (
-          <>
-            <span className="text-sm text-muted-foreground line-through">
-              {formatPaise(mrp, { hidePaise: true })}
-            </span>
-            <span className="rounded bg-accent px-1.5 py-0.5 text-[11px] font-bold text-accent-foreground">
-              {Math.round((1 - Number(price) / Number(mrp)) * 100)}%
-            </span>
-          </>
-        )}
-      </div>
+      {variants.length <= 1 && (
+        <div className="mt-3 flex items-baseline gap-2">
+          <span className="text-2xl font-bold">{formatPaise(price)}</span>
+          {mrp > price && (
+            <>
+              <span className="text-sm text-muted-foreground line-through">
+                {formatPaise(mrp, { hidePaise: true })}
+              </span>
+              <span className="rounded bg-accent px-1.5 py-0.5 text-[11px] font-bold text-accent-foreground">
+                {Math.round((1 - Number(price) / Number(mrp)) * 100)}%
+              </span>
+            </>
+          )}
+        </div>
+      )}
 
+      {/* Blinkit-matched (session 2026-08-25): a 2-column grid of unit
+          cards, each carrying its own discount badge and price, rather
+          than a row of plain weight pills — the price is what actually
+          changes between variants, so it belongs on the card itself. */}
       {variants.length > 1 && (
-        <fieldset className="mt-5">
+        <fieldset className="mt-4">
           <legend className="text-sm font-semibold">{t('selectVariant')}</legend>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {variants.map((variant) => (
-              <button
-                key={variant.id}
-                type="button"
-                onClick={() => setSelectedId(variant.id)}
-                aria-pressed={variant.id === selectedId}
-                disabled={variant.stockQty === 0}
-                className={cn(
-                  'min-h-11 rounded-[var(--radius)] border-2 px-4 text-sm transition-colors disabled:opacity-40',
-                  variant.id === selectedId
-                    ? 'border-primary bg-primary font-bold text-primary-foreground shadow-sm'
-                    : 'border-border bg-card text-muted-foreground',
-                )}
-              >
-                <span className="block">
-                  {formatQuantity(variant.quantity, variant.unit as QuantityUnit)}
-                </span>
-                <span className="block text-[11px]">
-                  {formatPaise(paise(variant.pricePaise), { hidePaise: true })}
-                </span>
-              </button>
-            ))}
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            {variants.map((variant) => {
+              const variantPrice = paise(variant.pricePaise);
+              const variantMrp = paise(variant.mrpPaise);
+              const variantHasDiscount = variantMrp > variantPrice;
+              return (
+                <button
+                  key={variant.id}
+                  type="button"
+                  onClick={() => setSelectedId(variant.id)}
+                  aria-pressed={variant.id === selectedId}
+                  disabled={variant.stockQty === 0}
+                  className={cn(
+                    'relative overflow-hidden rounded-[var(--radius)] border-2 p-2.5 text-left transition-colors disabled:opacity-40',
+                    variant.id === selectedId
+                      ? 'border-primary bg-tint-green'
+                      : 'border-border bg-card',
+                  )}
+                >
+                  {variantHasDiscount && (
+                    <span className="absolute top-0 left-0 rounded-br-[var(--radius)] bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+                      {Math.round((1 - Number(variantPrice) / Number(variantMrp)) * 100)}%{' '}
+                      {t('off')}
+                    </span>
+                  )}
+                  <span className="mt-3.5 block text-sm font-semibold">
+                    {formatQuantity(variant.quantity, variant.unit as QuantityUnit)}
+                  </span>
+                  <span className="mt-0.5 flex items-baseline gap-1">
+                    <span className="text-sm font-bold">
+                      {formatPaise(variantPrice, { hidePaise: true })}
+                    </span>
+                    {variantHasDiscount && (
+                      <span className="text-[11px] text-muted-foreground line-through">
+                        {formatPaise(variantMrp, { hidePaise: true })}
+                      </span>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </fieldset>
       )}
@@ -164,17 +188,33 @@ export function VariantPicker({
         </div>
       )}
 
-      {/* Sticky above the bottom nav, so ADD stays reachable however long the
-          page gets. */}
+      {/* Sticky above the bottom nav, Blinkit-matched (session 2026-08-25):
+          weight + price sit on the left, the add control on the right —
+          not a single full-width button — so the price stays visible next
+          to whichever action is available. */}
       <div
-        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card px-4 py-3"
+        className="fixed inset-x-0 z-30 mx-auto flex max-w-[480px] items-center justify-between gap-3 border-t border-border bg-card px-4 py-3"
         style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
       >
+        <div className="min-w-0">
+          <p className="truncate text-xs text-muted-foreground">
+            {formatQuantity(selected.quantity, selected.unit as QuantityUnit)}
+          </p>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-lg font-bold">{formatPaise(price, { hidePaise: true })}</span>
+            {mrp > price && (
+              <span className="text-xs text-muted-foreground line-through">
+                {formatPaise(mrp, { hidePaise: true })}
+              </span>
+            )}
+          </div>
+        </div>
+
         {!inStock ? (
           <button
             type="button"
             disabled
-            className="h-11 w-full rounded-[var(--radius)] border border-border text-sm font-semibold text-muted-foreground"
+            className="h-11 shrink-0 rounded-[var(--radius)] border border-border px-6 text-sm font-semibold text-muted-foreground"
           >
             {t('outOfStock')}
           </button>
@@ -182,7 +222,7 @@ export function VariantPicker({
           <button
             type="button"
             onClick={handleAdd}
-            className="h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+            className="h-11 shrink-0 rounded-[var(--radius)] bg-primary px-6 text-sm font-bold text-primary-foreground"
           >
             {isLoggedIn ? t('addToCart') : ta('loginRequiredCart')}
           </button>
@@ -194,7 +234,7 @@ export function VariantPicker({
             disabled={cart.isMutating}
             max={selected.stockQty}
             label={productName}
-            className="h-11"
+            className="h-11 shrink-0"
           />
         )}
       </div>
