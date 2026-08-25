@@ -192,14 +192,18 @@ export function ProductCard({
               type="button"
               onClick={handleAdd}
               aria-label={`${t('add')} ${product.name}`}
-              className="flex min-w-[64px] flex-col items-center justify-center gap-0 rounded-[calc(var(--radius)-4px)] border border-primary bg-card px-3 py-1 text-[13px] font-semibold text-primary"
+              // Blinkit-matched (session 2026-08-25): 66x32px, a crisp 6px
+              // radius (not this app's usual pill-ish 12px) and a barely-
+              // tinted background — exact values read off Blinkit's own
+              // live button, not eyeballed, since the rounder/whiter
+              // version read as noticeably bigger even at the same font size.
+              className="flex h-8 w-[66px] flex-col items-center justify-center gap-0 rounded-[6px] border border-primary bg-[#f7fff9] py-0.5 text-[13px] font-semibold text-primary"
             >
               {t('add')}
-              {/* Blinkit-matched (session 2026-08-25): "N options" sits
-                  inside the same bordered button as a second line, not as
-                  a separate underlined link below it. */}
+              {/* "N options" sits inside the same bordered button as a
+                  second line, not as a separate underlined link below it. */}
               {multiVariant && (
-                <span className="text-[9px] leading-tight font-semibold text-muted-foreground">
+                <span className="text-[9px] leading-none font-semibold text-muted-foreground">
                   {t('nOptions', { count: variants!.length })}
                 </span>
               )}
