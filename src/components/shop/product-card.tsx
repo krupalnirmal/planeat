@@ -143,16 +143,16 @@ export function ProductCard({
             sells speed, so it sits above the name rather than being buried
             once at the top of the page. */}
         {product.inStock && (
-          <p className="mb-0.5 flex items-center gap-0.5 text-[10px] font-bold text-muted-foreground">
+          <p className="mb-0.5 flex items-center gap-0.5 text-[9px] font-bold text-muted-foreground">
             <Clock className="size-3" aria-hidden />
             {t('etaMinutes', { minutes: etaMinutes })}
           </p>
         )}
 
-        <h3 className="line-clamp-2 text-[13px] leading-tight font-medium">{product.name}</h3>
+        <h3 className="line-clamp-2 text-[13px] leading-tight font-semibold">{product.name}</h3>
 
         {activeVariant && (
-          <p className="mt-0.5 text-[11px] text-muted-foreground">
+          <p className="mt-0.5 text-[12px] font-medium text-muted-foreground">
             {formatQuantity(activeVariant.quantity, activeVariant.unit as QuantityUnit)}
           </p>
         )}
@@ -164,11 +164,11 @@ export function ProductCard({
       <div className="mt-1.5 flex items-end justify-between gap-2">
         <div className="min-w-0">
           <div className="flex items-baseline gap-1">
-            <span className="text-[15px] font-bold">
+            <span className="text-[12px] font-semibold">
               {formatPaise(price, { hidePaise: true })}
             </span>
             {hasDiscount && (
-              <span className="text-[11px] text-muted-foreground line-through">
+              <span className="text-[12px] text-muted-foreground line-through">
                 {formatPaise(mrp, { hidePaise: true })}
               </span>
             )}
@@ -192,14 +192,14 @@ export function ProductCard({
               type="button"
               onClick={handleAdd}
               aria-label={`${t('add')} ${product.name}`}
-              className="flex min-w-[64px] flex-col items-center justify-center gap-0 rounded-[calc(var(--radius)-4px)] border border-primary bg-card px-3 py-1 text-xs font-bold text-primary"
+              className="flex min-w-[64px] flex-col items-center justify-center gap-0 rounded-[calc(var(--radius)-4px)] border border-primary bg-card px-3 py-1 text-[13px] font-semibold text-primary"
             >
               {t('add')}
               {/* Blinkit-matched (session 2026-08-25): "N options" sits
                   inside the same bordered button as a second line, not as
                   a separate underlined link below it. */}
               {multiVariant && (
-                <span className="text-[9px] leading-tight font-medium text-muted-foreground">
+                <span className="text-[9px] leading-tight font-semibold text-muted-foreground">
                   {t('nOptions', { count: variants!.length })}
                 </span>
               )}

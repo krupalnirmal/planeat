@@ -31,3 +31,26 @@ export function vegetableTypeLabel(type: VegetableType, locale: AppLocale): stri
   if (locale === 'hi') return type.labelHi;
   return type.labelEn;
 }
+
+// Grocery's own sub-grouping (session 2026-08-25, Blinkit-matched sidebar
+// rail extended beyond Vegetables). Reuses the same `vegetableType` column
+// and shape — it is just a generic "sub-group id" per product, not
+// vegetable-specific despite the field's name.
+//
+// Fruits, Dairy, Bakery & Biscuits and Ice Cream are deliberately left
+// without a rail: at 6, 4, 3 and 2 products respectively, splitting them
+// further would put one item in most groups, which reads as broken rather
+// than organised — a rail earns its keep only once a category has real
+// breadth (Blinkit itself does not sub-group its own thin categories
+// either). Add a `groceryType` per product and a new entry to
+// `CATEGORY_SUBGROUPS` below once the catalogue grows enough there.
+export const GROCERY_TYPES: VegetableType[] = [
+  { id: 'grains', emoji: '🌾', labelEn: 'Grains & Flour', labelMr: 'पीठ व धान्य', labelHi: 'आटा और अनाज' },
+  { id: 'pulses', emoji: '🫘', labelEn: 'Pulses & Staples', labelMr: 'डाळी व इतर', labelHi: 'दाल और अन्य' },
+  { id: 'pantry', emoji: '🫗', labelEn: 'Oil & Beverages', labelMr: 'तेल व पेय', labelHi: 'तेल और पेय' },
+];
+
+export const CATEGORY_SUBGROUPS: Record<string, VegetableType[]> = {
+  vegetables: VEGETABLE_TYPES,
+  grocery: GROCERY_TYPES,
+};

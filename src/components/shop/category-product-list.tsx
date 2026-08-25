@@ -3,7 +3,7 @@
 import { Filter, Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { vegetableTypeLabel, VEGETABLE_TYPES } from '@/lib/catalog/vegetable-types';
+import { CATEGORY_SUBGROUPS, vegetableTypeLabel } from '@/lib/catalog/vegetable-types';
 import type { AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import { ProductCard, type ProductCardData } from './product-card';
@@ -104,16 +104,20 @@ export function CategoryProductList({
     return copy;
   }, [filtered, sort]);
 
-  // Grouping is a separate, earlier client request (vegetables only) — kept
-  // for the default view, but a search collapses to one flat, easy-to-scan
-  // list rather than making someone hunt across sub-groups for a match.
+  // Grouping applies to any category with a real sub-group breadth (see
+  // CATEGORY_SUBGROUPS) — kept for the default view, but a search collapses
+  // to one flat, easy-to-scan list rather than making someone hunt across
+  // sub-groups for a match.
   const searching = query.trim().length > 0;
+  const subgroupTypes = CATEGORY_SUBGROUPS[slug] ?? null;
   const groups =
-    !searching && slug === 'vegetables'
-      ? VEGETABLE_TYPES.map((type) => ({
-          type,
-          products: sorted.filter((p) => p.vegetableType === type.id),
-        })).filter((group) => group.products.length > 0)
+    !searching && subgroupTypes
+      ? subgroupTypes
+          .map((type) => ({
+            type,
+            products: sorted.filter((p) => p.vegetableType === type.id),
+          }))
+          .filter((group) => group.products.length > 0)
       : null;
   const rest = groups ? sorted.filter((p) => !p.vegetableType) : sorted;
 
@@ -242,6 +246,11 @@ export function CategoryProductList({
           >
             {groups.map(({ type, products: groupProducts }) => {
               const active = activeTypeId === type.id;
+              // Blinkit-matched (session 2026-08-25): a real product photo,
+              // not an emoji glyph — the same rounded-square treatment as
+              // the home category tiles. Our own catalogue photo, never
+              // Blinkit's own (see product-image sourcing note elsewhere).
+              const thumbUrl = groupProducts[0]?.imageUrl ?? null;
               return (
                 <button
                   key={type.id}
@@ -255,17 +264,22 @@ export function CategoryProductList({
                 >
                   <span
                     className={cn(
-                      'grid size-10 shrink-0 place-items-center rounded-full text-lg',
+                      'grid size-10 shrink-0 place-items-center overflow-hidden rounded-[calc(var(--radius)-6px)]',
                       active ? 'bg-card shadow-sm' : 'bg-background',
                     )}
                     aria-hidden
                   >
-                    {type.emoji}
+                    {thumbUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={thumbUrl} alt="" className="size-full object-cover" />
+                    ) : (
+                      <span className="text-lg">{type.emoji}</span>
+                    )}
                   </span>
                   <span
                     className={cn(
-                      'text-[10.5px] leading-tight',
-                      active ? 'font-bold text-primary-dark' : 'font-medium text-muted-foreground',
+                      'text-[11px] leading-tight',
+                      active ? 'font-bold text-primary-dark' : 'font-normal text-muted-foreground',
                     )}
                   >
                     {vegetableTypeLabel(type, locale)}
@@ -305,10 +319,19 @@ export function CategoryProductList({
                     style={{ top: HEADER_OFFSET_PX }}
                   >
                     <span
-                      className="grid size-7 shrink-0 place-items-center rounded-full bg-card text-base shadow-sm"
+                      className="grid size-7 shrink-0 place-items-center overflow-hidden rounded-[calc(var(--radius)-8px)] bg-card shadow-sm"
                       aria-hidden
                     >
-                      {type.emoji}
+                      {groupProducts[0]?.imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={groupProducts[0].imageUrl}
+                          alt=""
+                          className="size-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-base">{type.emoji}</span>
+                      )}
                     </span>
                     <span className="flex-1 text-[15px] font-black text-primary-dark">
                       {vegetableTypeLabel(type, locale)}
