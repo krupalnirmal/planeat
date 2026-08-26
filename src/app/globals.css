@@ -128,12 +128,12 @@
   --brand-tint-green: #e8f5ea;
   --brand-tint-yellow: #fdf1de;
 
-  /* Category page content-pane background (session 2026-08-26) — colour-
-     matched by sampling the client's reference screenshot directly (not
-     eyeballed): a paler, more yellow-leaning green than --brand-tint-green,
-     which stays reserved for the smaller accent uses (icon circles, badges)
-     it was already doing. */
-  --brand-tint-lime: #f1f9e1;
+  /* Category page content-pane background (session 2026-08-26) — the
+     client's own exact hex from their reference, not sampled/eyeballed.
+     Paler and more yellow-leaning than --brand-tint-green, which stays
+     reserved for the smaller accent uses (icon circles, badges) it was
+     already doing. */
+  --brand-tint-lime: #f1fadd;
 
   /* A faint wash of the brand's status-bar yellow (--accent, #FFD400) —
      for a header/footer band that echoes it without shouting. Lightened
