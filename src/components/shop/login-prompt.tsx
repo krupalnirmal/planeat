@@ -32,13 +32,17 @@ export function LoginPrompt({
   return (
     <main className="pb-2">
       <div className="relative overflow-hidden bg-tint-green px-4 py-5">
-        <div className="flex items-center gap-3">
+        {/* pr-24/28 keeps the title/subtitle column clear of the round photo
+            below — without it a subtitle longer than "स्मार्ट लिस्ट"'s own ran
+            straight under the photo and read as cut off mid-word rather than
+            wrapping or eliding. */}
+        <div className="flex items-center gap-3 pr-28 sm:pr-32">
           <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-card text-primary shadow-sm">
             <BandIcon className="size-5" aria-hidden />
           </span>
           <div className="min-w-0">
             <h1 className="text-lg font-black text-primary-dark">{title}</h1>
-            <p className="text-xs leading-snug text-muted-foreground">{bandSubtitle}</p>
+            <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">{bandSubtitle}</p>
           </div>
         </div>
 
