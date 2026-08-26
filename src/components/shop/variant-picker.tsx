@@ -90,8 +90,8 @@ export function VariantPicker({
               <span className="text-sm text-muted-foreground line-through">
                 {formatPaise(mrp, { hidePaise: true })}
               </span>
-              <span className="rounded bg-accent px-1.5 py-0.5 text-[11px] font-bold text-accent-foreground">
-                {Math.round((1 - Number(price) / Number(mrp)) * 100)}%
+              <span className="rounded bg-primary px-1.5 py-0.5 text-[11px] font-bold text-primary-foreground">
+                {Math.round((1 - Number(price) / Number(mrp)) * 100)}% {t('off')}
               </span>
             </>
           )}
