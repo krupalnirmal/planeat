@@ -139,6 +139,8 @@
     "nutrition": "पोषण",
     "similar": "ऐसे ही उत्पाद",
     "lowStock": "सिर्फ़ {count} बचे",
+    "wishlistAdd": "{name} को विशलिस्ट में जोड़ें",
+    "wishlistRemove": "{name} को विशलिस्ट से हटाएँ",
     "notFound": "यह उत्पाद नहीं मिला",
     "selectQuantity": "मात्रा चुनें",
     "decreaseQuantity": "मात्रा घटाएँ",

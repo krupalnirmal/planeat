@@ -139,6 +139,8 @@
     "nutrition": "पोषणमूल्ये",
     "similar": "अशीच उत्पादने",
     "lowStock": "फक्त {count} शिल्लक",
+    "wishlistAdd": "{name} विशलिस्टमध्ये टाका",
+    "wishlistRemove": "{name} विशलिस्टमधून काढा",
     "notFound": "हे उत्पादन सापडले नाही",
     "selectQuantity": "प्रमाण निवडा",
     "decreaseQuantity": "प्रमाण कमी करा",

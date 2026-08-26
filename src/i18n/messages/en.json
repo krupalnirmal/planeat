@@ -139,6 +139,8 @@
     "nutrition": "Nutrition",
     "similar": "Similar products",
     "lowStock": "Only {count} left",
+    "wishlistAdd": "Add {name} to wishlist",
+    "wishlistRemove": "Remove {name} from wishlist",
     "notFound": "We couldn't find that product",
     "selectQuantity": "Select Quantity",
     "decreaseQuantity": "Decrease quantity",

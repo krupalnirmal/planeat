@@ -253,37 +253,37 @@ export function CategoryProductList({
         </div>
       ) : groups ? (
         <div className="flex items-start gap-0 bg-card">
-          {/* Left rail — sticks right under the page's own sticky header. */}
+          {/* Left rail — sticks right under the page's own sticky header.
+              Restyled (session 2026-08-26) to the client's reference: round
+              photo tiles and a bold label for the active item, no left-edge
+              colour bar or per-group count. */}
           <nav
             aria-label={categoryName}
             className="sticky w-[76px] shrink-0 self-start overflow-y-auto"
             style={{ top: HEADER_OFFSET_PX, maxHeight: `calc(100dvh - ${HEADER_OFFSET_PX}px)` }}
           >
-            {/* Blinkit's rail always leads with a non-photo "All" tab,
-                active by default — a plain icon glyph, not a catalogue
-                photo, since it doesn't represent any one sub-group. */}
+            {/* The rail always leads with a non-photo "All" tab, active by
+                default — a plain icon glyph, not a catalogue photo, since it
+                doesn't represent any one sub-group. */}
             <button
               type="button"
               onClick={jumpToTop}
               aria-current={activeTypeId === ALL_ID}
-              className={cn(
-                'flex w-full flex-col items-center gap-1 border-l-4 px-1.5 py-3 text-center',
-                activeTypeId === ALL_ID ? 'border-primary bg-tint-green' : 'border-transparent',
-              )}
+              className="flex w-full flex-col items-center gap-1 px-1.5 py-3 text-center"
             >
               <span
                 className={cn(
-                  'grid size-10 shrink-0 place-items-center rounded-[calc(var(--radius)-6px)]',
-                  activeTypeId === ALL_ID ? 'bg-card text-primary shadow-sm' : 'bg-background text-muted-foreground',
+                  'grid size-14 shrink-0 place-items-center rounded-full',
+                  activeTypeId === ALL_ID ? 'bg-tint-green text-primary' : 'bg-background text-muted-foreground',
                 )}
                 aria-hidden
               >
-                <LayoutGrid className="size-4.5" aria-hidden />
+                <LayoutGrid className="size-5" aria-hidden />
               </span>
               <span
                 className={cn(
                   'text-[11px] leading-tight',
-                  activeTypeId === ALL_ID ? 'font-bold text-primary-dark' : 'font-normal text-muted-foreground',
+                  activeTypeId === ALL_ID ? 'font-bold text-foreground' : 'font-medium text-foreground',
                 )}
               >
                 {t('all')}
@@ -293,11 +293,8 @@ export function CategoryProductList({
             {groups.map(({ type, products: groupProducts }) => {
               const active = activeTypeId === type.id;
               // Blinkit-matched (session 2026-08-25): a real photo, not an
-              // emoji glyph — the same rounded-square treatment as the home
-              // category tiles, inset with a little padding rather than
-              // bled to the edge, matching Blinkit's own slightly-framed
-              // look. A curated client photo (SUBGROUP_TILE_IMAGES) wins
-              // over whichever product happens to be first in the group.
+              // emoji glyph. A curated client photo (SUBGROUP_TILE_IMAGES)
+              // wins over whichever product happens to be first in the group.
               const thumbUrl =
                 SUBGROUP_TILE_IMAGES[type.id] ?? groupProducts[0]?.imageUrl ?? null;
               return (
@@ -306,21 +303,18 @@ export function CategoryProductList({
                   type="button"
                   onClick={() => jumpTo(type.id)}
                   aria-current={active}
-                  className={cn(
-                    'flex w-full flex-col items-center gap-1 border-l-4 px-1.5 py-3 text-center',
-                    active ? 'border-primary bg-tint-green' : 'border-transparent',
-                  )}
+                  className="flex w-full flex-col items-center gap-1 px-1.5 py-3 text-center"
                 >
                   <span
                     className={cn(
-                      'grid size-10 shrink-0 place-items-center overflow-hidden rounded-[calc(var(--radius)-6px)] p-1',
-                      active ? 'bg-card shadow-sm' : 'bg-background',
+                      'grid size-14 shrink-0 place-items-center overflow-hidden rounded-full p-1',
+                      active ? 'bg-tint-green' : 'bg-background',
                     )}
                     aria-hidden
                   >
                     {thumbUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={thumbUrl} alt="" className="size-full rounded-[4px] object-cover" />
+                      <img src={thumbUrl} alt="" className="size-full rounded-full object-cover" />
                     ) : (
                       <span className="text-lg">{type.emoji}</span>
                     )}
@@ -328,12 +322,11 @@ export function CategoryProductList({
                   <span
                     className={cn(
                       'text-[11px] leading-tight',
-                      active ? 'font-bold text-primary-dark' : 'font-normal text-muted-foreground',
+                      active ? 'font-bold text-foreground' : 'font-medium text-foreground',
                     )}
                   >
                     {vegetableTypeLabel(type, locale)}
                   </span>
-                  <span className="text-[9px] text-muted-foreground">{groupProducts.length}</span>
                 </button>
               );
             })}
