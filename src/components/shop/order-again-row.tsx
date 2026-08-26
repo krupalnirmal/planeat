@@ -41,9 +41,10 @@ export function OrderAgainRow() {
   if (products.length === 0) return null;
 
   return (
-    // A white slab like every other home section, so it sits in the same
-    // stack rather than floating on the page colour.
-    <section aria-labelledby="order-again-heading" className="bg-card px-4 py-4">
+    // No card of its own (session 2026-08-26) — sits directly on the home
+    // page's own tint like every other section now, the product cards
+    // inside it carrying the white background.
+    <section aria-labelledby="order-again-heading" className="px-4 py-4">
       <div className="mb-3 flex items-baseline justify-between">
         <h2
           id="order-again-heading"

@@ -57,13 +57,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <>
       <AppHeader />
 
-      {/* Stacked slabs: white panels separated by a thin strip of page
-          colour (`space-y-2`), so the screen reads as one document rather
-          than a scatter of floating cards.
-          bg-tint-lime (session 2026-08-26, client feedback): the same tint
-          the category pages use behind their own white cards, so home
-          reads as the same app rather than a different, plainer screen. */}
-      <main className="space-y-2 bg-tint-lime pb-2">
+      {/* bg-tint-lime (session 2026-08-26, client feedback): the same tint
+          the category pages use behind their own white cards — the first
+          pass only showed it in the thin space-y-2 gaps between white
+          section slabs, which read as barely-there next to how prominent
+          the tint is on a category page, so the sections themselves drop
+          their own white background too and let it show through properly;
+          the individual pieces inside (category tiles, product cards)
+          still carry their own white/card backgrounds for contrast. */}
+      <main className="bg-tint-lime pb-2">
         {/* Client feedback (session 2026-08-26): the promo banner belongs
             right under the search bar, not buried below categories and Top
             Picks — the first thing under the fold, same as it was before
@@ -72,7 +74,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             (h-auto keeps it undistorted), so the only way to give it more
             on-screen presence without cropping or stretching it is to let
             it use the full viewport width instead of sitting inset. */}
-        <div className="bg-card pt-3 pb-4">
+        <div className="pt-3 pb-4">
           {banners.length > 0 ? (
             <BannerCarousel banners={banners} />
           ) : (
@@ -149,11 +151,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </HomeSection>
         )}
 
-        <div className="bg-card px-4 py-4">
+        <div className="px-4 py-4">
           <BenefitsRow />
         </div>
 
-        <div className="bg-card px-4 py-4">
+        <div className="px-4 py-4">
           <FastDeliveryBanner />
         </div>
       </main>

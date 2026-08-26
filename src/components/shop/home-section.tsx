@@ -3,16 +3,15 @@ import type { ReactNode } from 'react';
 import { Link } from '@/i18n/navigation';
 
 /**
- * One full-bleed white panel on the home screen.
+ * One section of the home screen.
  *
- * The quick-commerce reference stacks its home screen as SLABS: each section
- * is a white band running edge to edge, separated by a thin strip of the
- * page colour showing through. That is what makes the page read as one
- * continuous document instead of a scatter of floating cards — the problem
- * the client flagged ("everything feels separate, the background feels
- * empty").
+ * No longer a white slab of its own (session 2026-08-26, client feedback:
+ * home should carry the same tint the category pages already do behind
+ * their white cards) — the page-level bg-tint-lime shows straight through,
+ * and the individual pieces inside each section (category tiles, product
+ * cards) are what carry their own white/card backgrounds now.
  *
- * The header lives inside the panel, not above it, so the title visibly
+ * The header lives inside the section, not above it, so the title visibly
  * belongs to the content under it.
  */
 export function HomeSection({
@@ -31,7 +30,7 @@ export function HomeSection({
   children: ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="bg-card px-4 py-4">
+    <section aria-labelledby={id} className="px-4 py-4">
       <div className="mb-3 flex items-baseline justify-between gap-3">
         <h2 id={id} className="flex items-center gap-1.5 text-[17px] font-bold">
           {icon}
