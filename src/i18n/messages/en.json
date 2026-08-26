@@ -123,7 +123,14 @@
     "sortPriceAsc": "Price: Low to High",
     "sortPriceDesc": "Price: High to Low",
     "sortNameAsc": "Name: A to Z",
-    "vegetablesBannerAlt": "Promotional banner: fresh vegetables delivered daily, in 30 minutes"
+    "banner": {
+      "vegetables": { "headline": "Fresh picks at the best prices", "sub": "Wholesome vegetables, delivered fast" },
+      "fruits": { "headline": "Fresh picks at the best prices", "sub": "Wholesome fruits, delivered fast" },
+      "dairy": { "headline": "Farm-fresh, every morning", "sub": "Milk, curd, paneer & ghee, delivered fast" },
+      "bakery-biscuits": { "headline": "Freshly baked, always", "sub": "Bread, pav & biscuits, delivered fast" },
+      "ice-cream": { "headline": "Cool treats, delivered fast", "sub": "Your favourite scoops, in minutes" },
+      "grocery": { "headline": "Everyday essentials, sorted", "sub": "Grains, oil & more, delivered fast" }
+    }
   },
   "product": {
     "add": "ADD",

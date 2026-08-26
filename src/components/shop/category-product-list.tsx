@@ -15,11 +15,10 @@ export interface CategoryProduct extends ProductCardData {
   variants: ProductRowVariant[];
 }
 
-// Client-supplied (public/banners/category_banner.png) — its copy ("Fresh
-// vegetables, delivered daily") only makes sense on this one category, so
-// it isn't a generic per-category banner slot.
-const VEGETABLES_BANNER_URL =
-  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1786779984/planeat/banners/category-banner.jpg';
+// Categories with copy in the `categories.banner.*` messages — a category
+// slug added later without a translation just gets no hero rather than a
+// raw missing-message string.
+const BANNER_SLUGS = new Set(['vegetables', 'fruits', 'dairy', 'bakery-biscuits', 'ice-cream', 'grocery']);
 
 type SortOption = 'default' | 'priceAsc' | 'priceDesc' | 'nameAsc';
 
@@ -110,6 +109,14 @@ export function CategoryProductList({
     });
     return copy;
   }, [filtered, sort]);
+
+  // A small real-photo cluster for the hero banner below — the catalogue's
+  // own images, not stock art, same reasoning as the home banners' produce
+  // circles (scripts/generate-banners.mjs).
+  const bannerPhotos = useMemo(
+    () => [...new Set(products.map((p) => p.imageUrl).filter((url): url is string => !!url))].slice(0, 3),
+    [products],
+  );
 
   // Grouping applies to any category with a real sub-group breadth (see
   // CATEGORY_SUBGROUPS) — kept for the default view, but a search collapses
@@ -244,6 +251,38 @@ export function CategoryProductList({
           )}
         </div>
       </div>
+
+      {/* Hero banner (session 2026-08-26, client's reference): a headline
+          and a small cluster of the category's own product photos, sitting
+          directly on the page tint rather than a separate card — no fake
+          per-category creative to design or keep in sync, since it's built
+          from whatever's already in the catalogue. Sits above the grid,
+          matching the reference; a search collapses it along with the
+          sub-group rail, same reasoning as `groups` below. */}
+      {!searching && sorted.length > 0 && BANNER_SLUGS.has(slug) && (
+        <div className="flex items-center gap-3 bg-tint-green px-4 pt-1 pb-4">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-[19px] leading-tight font-black text-foreground">
+              {t(`banner.${slug}.headline`)}
+            </h2>
+            <p className="mt-1 text-[13px] text-muted-foreground">{t(`banner.${slug}.sub`)}</p>
+          </div>
+          {bannerPhotos.length > 0 && (
+            <div className="flex shrink-0 -space-x-3" aria-hidden>
+              {bannerPhotos.map((url, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={url}
+                  src={url}
+                  alt=""
+                  className="size-16 rounded-full border-2 border-card object-cover shadow-md"
+                  style={{ transform: `rotate(${(i - 1) * 8}deg)`, zIndex: bannerPhotos.length - i }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {sorted.length === 0 ? (
         <div className="bg-tint-green px-4 pb-4">
@@ -423,23 +462,6 @@ export function CategoryProductList({
             {rest.map((product) => (
               <ProductCard key={product.id} product={product} variants={product.variants} />
             ))}
-          </div>
-        </div>
-      )}
-
-      {/* Blinkit-matched (session 2026-08-25): products lead the fold, the
-          way Blinkit's own category page does — no banner above the grid.
-          The client's own promo creative still runs, just after the
-          products it advertises rather than blocking them. */}
-      {slug === 'vegetables' && !searching && sorted.length > 0 && (
-        <div className="bg-tint-green px-4 pb-3">
-          <div className="overflow-hidden rounded-[var(--radius)] shadow-sm">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={VEGETABLES_BANNER_URL}
-              alt={t('vegetablesBannerAlt')}
-              className="block h-auto w-full"
-            />
           </div>
         </div>
       )}
