@@ -64,8 +64,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         {/* Client feedback (session 2026-08-26): the promo banner belongs
             right under the search bar, not buried below categories and Top
             Picks — the first thing under the fold, same as it was before
-            the Blinkit-matched reorder in an earlier session. */}
-        <div className="bg-card px-4 pt-3 pb-4">
+            the Blinkit-matched reorder in an earlier session.
+            Full-bleed, no side padding: the banner is a fixed 2:1 creative
+            (h-auto keeps it undistorted), so the only way to give it more
+            on-screen presence without cropping or stretching it is to let
+            it use the full viewport width instead of sitting inset. */}
+        <div className="bg-card pt-3 pb-4">
           {banners.length > 0 ? (
             <BannerCarousel banners={banners} />
           ) : (
