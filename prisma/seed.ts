@@ -478,9 +478,8 @@ const CATEGORIES: CategorySeed[] = [
       // Dry Fruits real breadth rather than a rail with one item under it.
       // Prices are placeholders in the same style as the rest of this seed
       // file (DECISIONS.md already carries this caveat for the catalogue
-      // generally) — the owner should confirm before launch. None of these
-      // have a photo yet (no entry in cloudinary-map.json), same gap as a
-      // few existing grocery SKUs.
+      // generally) — the owner should confirm before launch. Photos fetched
+      // by `scripts/fetch-product-images.mjs` (session 2026-08-26).
       {
         sku: 'FRT-ORANGE',
         en: 'Orange',

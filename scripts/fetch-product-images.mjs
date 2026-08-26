@@ -86,7 +86,37 @@ const SEARCHES = {
   'GRC-OIL-1L': 'sunflower cooking oil bottle',
   'GRC-SUGAR-1KG': 'white sugar crystals',
   'GRC-TEA-250': 'black tea leaves dried',
+
+  // Fruits sub-group rail (session 2026-08-26) — Citrus/Seasonal/Exotic/Dry
+  // Fruits SKUs added alongside the sidebar grouping. Search terms lean on
+  // "isolated white background" / "studio" since these render in a rail of
+  // tiles where a consistent look matters more than for the full-bleed
+  // vegetable photos above.
+  'FRT-ORANGE': 'orange fruit whole citrus',
+  'FRT-MANGO': 'mango fruit',
+  'FRT-WATERMELON': 'watermelon fruit slice red',
+  'FRT-JAMUN': 'Syzygium cumini jamun java plum fruit',
+  'FRT-KIWI': 'kiwifruit whole and sliced',
+  'FRT-DRAGONFRUIT': 'pitaya hylocereus fruit',
+  'FRT-AVOCADO': 'avocado halved pit',
+  'FRT-BLUEBERRY': 'blueberries basket harvest',
+  'FRT-ALMOND': 'almonds shelled nuts',
+  'FRT-CASHEW': 'cashew nuts bowl',
+  'FRT-WALNUT': 'walnuts shelled nuts',
+  'FRT-RAISINS': 'raisins dried grapes',
 };
+
+/**
+ * SKUs whose photos are resized with white letterboxing (`contain` + flatten)
+ * instead of the cropped `cover` fit used everywhere else, so the new Fruits
+ * rail (session 2026-08-26) reads as one consistent set of tiles rather than
+ * a mix of whatever background each source photo happened to have.
+ */
+const WHITE_BG_SKUS = new Set([
+  'FRT-ORANGE', 'FRT-MANGO', 'FRT-WATERMELON', 'FRT-JAMUN', 'FRT-KIWI',
+  'FRT-DRAGONFRUIT', 'FRT-AVOCADO', 'FRT-BLUEBERRY', 'FRT-ALMOND',
+  'FRT-CASHEW', 'FRT-WALNUT', 'FRT-RAISINS',
+]);
 
 /** Re-fetch only these SKUs when given on the command line; otherwise all. */
 const ONLY = new Set(process.argv.slice(2));
@@ -121,6 +151,10 @@ const REJECT_IF_TITLE_CONTAINS = {
   'GRC-TOORDAL-1KG': ['dosa', 'uttapam', 'curry', 'dish', 'pudding'],
   'GRC-ATTA-5KG': ['great wall', 'atta kim', 'mountain', 'landscape'],
   'VEG-CUCUMBER': ['curly', 'thailand', 'indonesian', 'dressing', 'goddess', 'dip', 'platter'],
+  'FRT-MANGO': ['asmussen', 'portrait', 'comedian', 'people', 'illustration', 'market', 'display', 'basket', 'stall', 'shark', 'tree', 'branch', 'unripe'],
+  'FRT-AVOCADO': ['asmussen', 'portrait', 'comedian', 'people', 'illustration'],
+  'FRT-WATERMELON': ['pumpkin', 'squash', 'wounded', 'art', 'sculpture'],
+  'FRT-CASHEW': ['brazil nut', 'shell halves', 'coconut'],
 };
 
 function isRejected(sku, title) {
@@ -216,12 +250,17 @@ async function main() {
 
       const buffer = Buffer.from(await imageRes.arrayBuffer());
 
-      // Square, centre-cropped: the product grid is a square tile, and letting
-      // the browser squash a 4:3 photo into it looks broken on a phone.
-      await sharp(buffer)
-        .resize(WIDTH, WIDTH, { fit: 'cover', position: 'centre' })
-        .jpeg({ quality: 82 })
-        .toFile(path.join(OUT_DIR, `${sku}.jpg`));
+      // Square: cropped to fill for most SKUs (a squashed 4:3 photo looks
+      // broken on a phone), but letterboxed onto white for WHITE_BG_SKUS so
+      // that rail reads as one consistent set regardless of each source
+      // photo's own background.
+      const pipeline = sharp(buffer);
+      if (WHITE_BG_SKUS.has(sku)) {
+        pipeline.resize(WIDTH, WIDTH, { fit: 'contain', background: '#ffffff' }).flatten({ background: '#ffffff' });
+      } else {
+        pipeline.resize(WIDTH, WIDTH, { fit: 'cover', position: 'centre' });
+      }
+      await pipeline.jpeg({ quality: 82 }).toFile(path.join(OUT_DIR, `${sku}.jpg`));
 
       attributions.push({
         sku,

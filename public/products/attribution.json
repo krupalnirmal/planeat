@@ -56,12 +56,28 @@
     "source": "https://commons.wikimedia.org/wiki/File:Panir_Paneer_Indian_cheese_fresh.jpg"
   },
   {
+    "sku": "FRT-ALMOND",
+    "term": "almonds shelled nuts",
+    "title": "Go nuts for them (6712993049).jpg",
+    "artist": "Keith Williamson from Bigastro, Spain",
+    "licence": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Go_nuts_for_them_(6712993049).jpg"
+  },
+  {
     "sku": "FRT-APPLE",
     "term": "apple fruit red whole",
     "title": "Liat Portal for Foodie Disorder - Red Apple (Whole Fruit).jpg",
     "artist": "HaJunkiyada",
     "licence": "CC BY-SA 4.0",
     "source": "https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Red_Apple_(Whole_Fruit).jpg"
+  },
+  {
+    "sku": "FRT-AVOCADO",
+    "term": "avocado halved pit",
+    "title": "Halved avocado without pit.jpg",
+    "artist": "MichalPL",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Halved_avocado_without_pit.jpg"
   },
   {
     "sku": "FRT-BANANA",
@@ -72,6 +88,46 @@
     "source": "https://commons.wikimedia.org/wiki/File:DFC_1274_Two_vendors_chat_behind_a_stall_piled_high_with_ripe_bananas_at_a_local_market.jpg"
   },
   {
+    "sku": "FRT-BLUEBERRY",
+    "term": "blueberries basket harvest",
+    "title": "Cesta de arándanos.jpg",
+    "artist": "diluvi.com Anna i Adria",
+    "licence": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Cesta_de_ar%C3%A1ndanos.jpg"
+  },
+  {
+    "sku": "FRT-CASHEW",
+    "term": "cashew nuts bowl",
+    "title": "Cashews2.JPG",
+    "artist": "Vicki Nunn",
+    "licence": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Cashews2.JPG"
+  },
+  {
+    "sku": "FRT-DRAGONFRUIT",
+    "term": "pitaya hylocereus fruit",
+    "title": "Pitaya P1190424.jpg",
+    "artist": "David Monniaux",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Pitaya_P1190424.jpg"
+  },
+  {
+    "sku": "FRT-JAMUN",
+    "term": "Syzygium cumini jamun java plum fruit",
+    "title": "India Goa Jambul Fruit.jpg",
+    "artist": "No machine-readable author provided. Fredericknoronha assumed (based on copyright claims).",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:India_Goa_Jambul_Fruit.jpg"
+  },
+  {
+    "sku": "FRT-KIWI",
+    "term": "kiwifruit whole and sliced",
+    "title": "Kiwi.jpg",
+    "artist": "Renee Comet (Photographer)",
+    "licence": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Kiwi.jpg"
+  },
+  {
     "sku": "FRT-LEMON",
     "term": "lemon citrus fruit yellow",
     "title": "Lemon.jpg",
@@ -80,12 +136,28 @@
     "source": "https://commons.wikimedia.org/wiki/File:Lemon.jpg"
   },
   {
+    "sku": "FRT-MANGO",
+    "term": "mango on white (picked by exact title, search kept surfacing a tree/comedian photo)",
+    "title": "Mango on white.jpg",
+    "artist": "Rhododendrites",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Mango_on_white.jpg"
+  },
+  {
     "sku": "FRT-MOSAMBI",
     "term": "sweet lime mosambi citrus fruit",
     "title": "Sweet limes of Salem.jpg",
     "artist": "Thamizhpparithi Maari",
     "licence": "CC BY-SA 4.0",
     "source": "https://commons.wikimedia.org/wiki/File:Sweet_limes_of_Salem.jpg"
+  },
+  {
+    "sku": "FRT-ORANGE",
+    "term": "orange fruit isolated white background",
+    "title": "Orange Fruit Close-up.jpg",
+    "artist": "freestock.ca",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Orange_Fruit_Close-up.jpg"
   },
   {
     "sku": "FRT-PAPAYA",
@@ -102,6 +174,30 @@
     "artist": "Jebulon",
     "licence": "CC0",
     "source": "https://commons.wikimedia.org/wiki/File:Punica_granatum_fruit_Grenade.jpg"
+  },
+  {
+    "sku": "FRT-RAISINS",
+    "term": "raisins dried grapes",
+    "title": "Raisins 01.jpg",
+    "artist": "Paweł Kuźniar (Jojo_1, Jojo)",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Raisins_01.jpg"
+  },
+  {
+    "sku": "FRT-WALNUT",
+    "term": "walnuts shelled nuts",
+    "title": "Walnuts no shell.jpg",
+    "artist": "Miansari66",
+    "licence": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Walnuts_no_shell.jpg"
+  },
+  {
+    "sku": "FRT-WATERMELON",
+    "term": "watermelon fruit slice red",
+    "title": "Red watermelon (Citrullus lanatus var. lanatus) in Thailand.jpg",
+    "artist": "Susan Slater",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Red_watermelon_(Citrullus_lanatus_var._lanatus)_in_Thailand.jpg"
   },
   {
     "sku": "GRC-ATTA-5KG",
