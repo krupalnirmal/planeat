@@ -75,6 +75,11 @@ const SEARCHES = {
   'DRY-CURD-400': 'yogurt bowl',
   'DRY-PANEER-200': 'paneer',
   'DRY-GHEE-500': 'clarified butter ghee',
+  'DRY-BUTTERMILK-500': 'buttermilk glass',
+  'DRY-YOGURT-100': 'strawberry yogurt bowl',
+  'DRY-CHEESESLICE-200': 'cheddar cheese sliced',
+  'DRY-CHEESECUBE-200': 'cheese cube organic plate',
+  'DRY-BUTTER-100': 'butter block',
   'BKY-BREAD-400': 'sliced white bread loaf',
   'BKY-PAV-6': 'pav bread buns indian',
   'BKY-MARIE-250': 'tea biscuits plate',
@@ -155,6 +160,8 @@ const REJECT_IF_TITLE_CONTAINS = {
   'FRT-AVOCADO': ['asmussen', 'portrait', 'comedian', 'people', 'illustration'],
   'FRT-WATERMELON': ['pumpkin', 'squash', 'wounded', 'art', 'sculpture'],
   'FRT-CASHEW': ['brazil nut', 'shell halves', 'coconut'],
+  'DRY-BUTTERMILK-500': ['making', 'churn', 'butter-'],
+  'DRY-CHEESESLICE-200': ['fondue', 'omelette', 'pizza', 'burger', 'market', 'apple pie', 'triscuit', 'crispbread', 'sauerkraut', 'sausage', 'chops', 'herring', 'toast'],
 };
 
 function isRejected(sku, title) {

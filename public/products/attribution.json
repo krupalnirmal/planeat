@@ -24,6 +24,38 @@
     "source": "https://commons.wikimedia.org/wiki/File:Vada_pav_01.jpg"
   },
   {
+    "sku": "DRY-BUTTER-100",
+    "term": "butter block",
+    "title": "Butter block.JPG",
+    "artist": "Meanos",
+    "licence": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Butter_block.JPG"
+  },
+  {
+    "sku": "DRY-BUTTERMILK-500",
+    "term": "buttermilk glass (picked by exact title — the search-ranked result was a near-empty glass with a keyboard in frame)",
+    "title": "Buttermilk-(right)-and-Milk-(left).jpg",
+    "artist": "Ukko-wc",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Buttermilk-(right)-and-Milk-(left).jpg"
+  },
+  {
+    "sku": "DRY-CHEESECUBE-200",
+    "term": "cheese cube organic plate",
+    "title": "A Cube of Yellow Organic Cheese on the plate.jpg",
+    "artist": "Peachyeung316",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:A_Cube_of_Yellow_Organic_Cheese_on_the_plate.jpg"
+  },
+  {
+    "sku": "DRY-CHEESESLICE-200",
+    "term": "cheddar cheese sliced",
+    "title": "Somerset-Cheddar.jpg",
+    "artist": "J.P.Lon",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Somerset-Cheddar.jpg"
+  },
+  {
     "sku": "DRY-CURD-400",
     "term": "yogurt bowl",
     "title": "Yoghurt in bowl.jpg",
@@ -54,6 +86,14 @@
     "artist": "Sonja Pauen - Stanhopea",
     "licence": "CC BY 2.0 de",
     "source": "https://commons.wikimedia.org/wiki/File:Panir_Paneer_Indian_cheese_fresh.jpg"
+  },
+  {
+    "sku": "DRY-YOGURT-100",
+    "term": "strawberry yogurt bowl",
+    "title": "Yogurt fruit bowl.jpg",
+    "artist": "Jumbocombo0811",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Yogurt_fruit_bowl.jpg"
   },
   {
     "sku": "FRT-ALMOND",
