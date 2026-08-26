@@ -49,6 +49,7 @@
      card and the welcome banner, warm cream behind the Fruits card. */
   --color-tint-green: var(--brand-tint-green);
   --color-tint-yellow: var(--brand-tint-yellow);
+  --color-tint-lime: var(--brand-tint-lime);
   --color-accent-faint: var(--accent-faint);
 
   --font-sans: var(--font-app);
@@ -127,6 +128,13 @@
   --brand-tint-green: #e8f5ea;
   --brand-tint-yellow: #fdf1de;
 
+  /* Category page content-pane background (session 2026-08-26) — colour-
+     matched by sampling the client's reference screenshot directly (not
+     eyeballed): a paler, more yellow-leaning green than --brand-tint-green,
+     which stays reserved for the smaller accent uses (icon circles, badges)
+     it was already doing. */
+  --brand-tint-lime: #f1f9e1;
+
   /* A faint wash of the brand's status-bar yellow (--accent, #FFD400) —
      for a header/footer band that echoes it without shouting. Lightened
      further per client feedback — even the "faint" version was still
@@ -160,6 +168,7 @@
 
   --brand-green-dark: #0b3d1f;
   --brand-tint-green: #10331f;
+  --brand-tint-lime: #1c2812;
   --brand-tint-yellow: #332a12;
   --accent-faint: #3d3212;
 }

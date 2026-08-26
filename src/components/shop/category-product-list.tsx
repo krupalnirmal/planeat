@@ -187,7 +187,7 @@ export function CategoryProductList({
 
   return (
     <>
-      <div className="flex items-center gap-2 bg-tint-green px-4 pt-3 pb-2">
+      <div className="flex items-center gap-2 bg-tint-lime px-4 pt-3 pb-2">
         <div className="input-3d flex h-11 flex-1 items-center gap-2 rounded-[var(--radius)] bg-background px-3">
           <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
           <input
@@ -260,7 +260,7 @@ export function CategoryProductList({
           matching the reference; a search collapses it along with the
           sub-group rail, same reasoning as `groups` below. */}
       {!searching && sorted.length > 0 && BANNER_SLUGS.has(slug) && (
-        <div className="flex items-center gap-3 bg-tint-green px-4 pt-1 pb-4">
+        <div className="flex items-center gap-3 bg-tint-lime px-4 pt-1 pb-4">
           <div className="min-w-0 flex-1">
             <h2 className="text-[19px] leading-tight font-black text-foreground">
               {t(`banner.${slug}.headline`)}
@@ -285,7 +285,7 @@ export function CategoryProductList({
       )}
 
       {sorted.length === 0 ? (
-        <div className="bg-tint-green px-4 pb-4">
+        <div className="bg-tint-lime px-4 pb-4">
           <p className="rounded-[var(--radius)] border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
             {t('empty')}
           </p>
@@ -377,7 +377,7 @@ export function CategoryProductList({
               the white cards read as cards instead of blending into the
               page — the rail stays white so it still reads as its own
               column. */}
-          <div className="min-w-0 flex-1 bg-tint-green">
+          <div className="min-w-0 flex-1 bg-tint-lime">
             {groups.map(({ type, products: groupProducts }) => {
               const expanded = expandedTypes.has(type.id);
               const visibleProducts = expanded
@@ -457,7 +457,7 @@ export function CategoryProductList({
           </div>
         </div>
       ) : (
-        <div className="bg-tint-green px-4 pt-3 pb-3">
+        <div className="bg-tint-lime px-4 pt-3 pb-3">
           <div className="grid grid-cols-2 gap-3">
             {rest.map((product) => (
               <ProductCard key={product.id} product={product} variants={product.variants} />
