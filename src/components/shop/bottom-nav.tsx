@@ -2,6 +2,7 @@
 
 import { Home, Mic, Salad, User, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useSyncExternalStore } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
@@ -25,14 +26,63 @@ const TABS = [
   { href: '/profile', icon: User, key: 'profile' },
 ] as const;
 
+// Blinkit-style scroll behaviour (session 2026-08-26): visible only at the
+// very top of the page, hidden the instant the customer scrolls down, back
+// the moment they scroll back to the top — position-based, not direction-
+// based, so a partial scroll-up while still mid-page leaves it hidden.
+//
+// `useSyncExternalStore`, not an effect + setState: this is exactly what it
+// exists for (subscribing to a value React doesn't own), and it sidesteps
+// both the extra render an effect-driven setState would cause on mount and
+// any server/client mismatch (SSR has no scroll position; a fresh load is
+// at the top anyway, so `true` is the right guess).
+const AT_TOP_THRESHOLD_PX = 4;
+
+function subscribeScrollTop(onStoreChange: () => void): () => void {
+  let ticking = false;
+
+  function handleScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      onStoreChange();
+    });
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  return () => window.removeEventListener('scroll', handleScroll);
+}
+
+function getIsAtTop(): boolean {
+  return window.scrollY <= AT_TOP_THRESHOLD_PX;
+}
+
+function getServerIsAtTop(): boolean {
+  return true;
+}
+
+function useIsAtTop(): boolean {
+  return useSyncExternalStore(subscribeScrollTop, getIsAtTop, getServerIsAtTop);
+}
+
 export function BottomNav() {
   const t = useTranslations('nav');
   const pathname = usePathname();
+  const atTop = useIsAtTop();
 
   return (
     <nav
       aria-label={t('home')}
-      className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] border-t border-border bg-accent-faint"
+      // Kept in the DOM and always laid out — only transform/opacity move,
+      // so nothing that positions itself off this nav's height (CartBar,
+      // the various sticky action bars via --bottom-nav-height) has to
+      // know or care whether it's currently showing.
+      inert={!atTop}
+      className={cn(
+        'fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] border-t border-border bg-accent-faint transition-[transform,opacity] duration-300 ease-out',
+        atTop ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-full opacity-0',
+      )}
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <ul className="grid grid-cols-5 gap-1 px-1.5 py-2">
