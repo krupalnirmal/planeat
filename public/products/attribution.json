@@ -73,11 +73,11 @@
   },
   {
     "sku": "DRY-MILK-500",
-    "term": "person pouring milk glass",
-    "title": "A person is pouring white milk into a glass cup.jpg",
-    "artist": "Shixart1985",
-    "licence": "CC BY 2.0",
-    "source": "https://commons.wikimedia.org/wiki/File:A_person_is_pouring_white_milk_into_a_glass_cup.jpg"
+    "term": "glass of milk on table (replaced session 2026-08-26 — the old photo showed milk being poured into a mug that already had coffee in it, reading as a coffee product, not milk)",
+    "title": "Glass of milk on table.jpg",
+    "artist": "PotatoCow25",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Glass_of_milk_on_table.jpg"
   },
   {
     "sku": "DRY-PANEER-200",
@@ -121,11 +121,11 @@
   },
   {
     "sku": "FRT-BANANA",
-    "term": "bunch of bananas yellow ripe fruit",
-    "title": "DFC 1274 Two vendors chat behind a stall piled high with ripe bananas at a local market.jpg",
-    "artist": "PattayaPatrol",
-    "licence": "CC BY-SA 4.0",
-    "source": "https://commons.wikimedia.org/wiki/File:DFC_1274_Two_vendors_chat_behind_a_stall_piled_high_with_ripe_bananas_at_a_local_market.jpg"
+    "term": "bunch of bananas white background (replaced session 2026-08-26 — the old photo showed two market vendors chatting behind a stall, not a clean product shot)",
+    "title": "Banana bunch.jpeg",
+    "artist": "NW Indian Language Institute",
+    "licence": "CC BY 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Banana_bunch.jpeg"
   },
   {
     "sku": "FRT-BLUEBERRY",

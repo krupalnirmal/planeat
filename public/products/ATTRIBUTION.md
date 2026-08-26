@@ -16,13 +16,13 @@ panel. Licences are recorded here because several require credit.
 | `DRY-CHEESESLICE-200` | [Somerset-Cheddar.jpg](https://commons.wikimedia.org/wiki/File:Somerset-Cheddar.jpg) | J.P.Lon | CC BY-SA 3.0 |
 | `DRY-CURD-400` | [Yoghurt in bowl.jpg](https://commons.wikimedia.org/wiki/File:Yoghurt_in_bowl.jpg) | Kris Miller from Issaquah | CC BY 2.0 |
 | `DRY-GHEE-500` | [Butterschmalz-3.jpg](https://commons.wikimedia.org/wiki/File:Butterschmalz-3.jpg) | Rainer Z ... | CC BY-SA 3.0 |
-| `DRY-MILK-500` | [A person is pouring white milk into a glass cup.jpg](https://commons.wikimedia.org/wiki/File:A_person_is_pouring_white_milk_into_a_glass_cup.jpg) | Shixart1985 | CC BY 2.0 |
+| `DRY-MILK-500` | [Glass of milk on table.jpg](https://commons.wikimedia.org/wiki/File:Glass_of_milk_on_table.jpg) | PotatoCow25 | CC BY-SA 4.0 |
 | `DRY-PANEER-200` | [Panir Paneer Indian cheese fresh.jpg](https://commons.wikimedia.org/wiki/File:Panir_Paneer_Indian_cheese_fresh.jpg) | Sonja Pauen - Stanhopea | CC BY 2.0 de |
 | `DRY-YOGURT-100` | [Yogurt fruit bowl.jpg](https://commons.wikimedia.org/wiki/File:Yogurt_fruit_bowl.jpg) | Jumbocombo0811 | CC BY-SA 4.0 |
 | `FRT-ALMOND` | [Go nuts for them (6712993049).jpg](https://commons.wikimedia.org/wiki/File:Go_nuts_for_them_(6712993049).jpg) | Keith Williamson from Bigastro, Spain | CC BY 2.0 |
 | `FRT-APPLE` | [Liat Portal for Foodie Disorder - Red Apple (Whole Fruit).jpg](https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Red_Apple_(Whole_Fruit).jpg) | HaJunkiyada | CC BY-SA 4.0 |
 | `FRT-AVOCADO` | [Halved avocado without pit.jpg](https://commons.wikimedia.org/wiki/File:Halved_avocado_without_pit.jpg) | MichalPL | CC BY-SA 4.0 |
-| `FRT-BANANA` | [DFC 1274 Two vendors chat behind a stall piled high with ripe bananas at a local market.jpg](https://commons.wikimedia.org/wiki/File:DFC_1274_Two_vendors_chat_behind_a_stall_piled_high_with_ripe_bananas_at_a_local_market.jpg) | PattayaPatrol | CC BY-SA 4.0 |
+| `FRT-BANANA` | [Banana bunch.jpeg](https://commons.wikimedia.org/wiki/File:Banana_bunch.jpeg) | NW Indian Language Institute | CC BY 3.0 |
 | `FRT-BLUEBERRY` | [Cesta de arándanos.jpg](https://commons.wikimedia.org/wiki/File:Cesta_de_ar%C3%A1ndanos.jpg) | diluvi.com Anna i Adria | CC BY 2.0 |
 | `FRT-CASHEW` | [Cashews2.JPG](https://commons.wikimedia.org/wiki/File:Cashews2.JPG) | Vicki Nunn | Public domain |
 | `FRT-DRAGONFRUIT` | [Pitaya P1190424.jpg](https://commons.wikimedia.org/wiki/File:Pitaya_P1190424.jpg) | David Monniaux | CC BY-SA 3.0 |
