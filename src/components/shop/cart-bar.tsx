@@ -91,7 +91,11 @@ export function CartBar() {
   return (
     <div
       ref={barRef}
-      className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-3"
+      // Narrower side inset than the edge-to-edge Blinkit original (session
+      // 2026-08-26, client feedback: the full-width bar read as too big) —
+      // still one stacked unit with the free-delivery nudge above it, just
+      // a compact floating pill instead of a bar spanning the screen.
+      className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-8"
       style={{
         bottom: `calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 0.5rem)`,
       }}
