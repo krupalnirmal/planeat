@@ -256,7 +256,7 @@ export function CategoryProductList({
           {/* Left rail — sticks right under the page's own sticky header. */}
           <nav
             aria-label={categoryName}
-            className="sticky w-[76px] shrink-0 self-start overflow-y-auto border-r border-border"
+            className="sticky w-[76px] shrink-0 self-start overflow-y-auto"
             style={{ top: HEADER_OFFSET_PX, maxHeight: `calc(100dvh - ${HEADER_OFFSET_PX}px)` }}
           >
             {/* Blinkit's rail always leads with a non-photo "All" tab,
