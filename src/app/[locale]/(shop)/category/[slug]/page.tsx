@@ -1,9 +1,8 @@
-import { ChevronLeft } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
+import { CategoryHeader } from '@/components/shop/category-header';
 import { CategoryProductList, type CategoryProduct } from '@/components/shop/category-product-list';
-import { HeaderCartLink } from '@/components/shop/header-cart-link';
 import { getCategoryProducts } from '@/lib/catalog/queries';
 import type { AppLocale } from '@/i18n/routing';
 
@@ -23,7 +22,6 @@ export default async function CategoryPage({
   const { page: pageParam } = await searchParams;
   setRequestLocale(locale);
 
-  const t = await getTranslations('categories');
   const tc = await getTranslations('common');
 
   const page = Math.max(1, Number(pageParam ?? '1') || 1);
@@ -60,20 +58,7 @@ export default async function CategoryPage({
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-accent-faint px-3 py-3">
-        <Link
-          href="/"
-          aria-label={tc('back')}
-          className="grid size-11 shrink-0 place-items-center rounded-full"
-        >
-          <ChevronLeft className="size-5" aria-hidden />
-        </Link>
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate text-base font-bold">{result.category.name}</h1>
-          <p className="text-xs text-muted-foreground">{t('productCount', { count: result.total })}</p>
-        </div>
-        <HeaderCartLink />
-      </header>
+      <CategoryHeader />
 
       {/* Stacked white slabs on the page colour, same as home — a group
           heading sitting directly on the background is what made these read

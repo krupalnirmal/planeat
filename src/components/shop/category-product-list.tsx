@@ -1,6 +1,6 @@
 'use client';
 
-import { Filter, LayoutGrid, Search, X } from 'lucide-react';
+import { ChevronDown, LayoutGrid, Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { SUBGROUP_TILE_IMAGES } from '@/lib/catalog/subgroup-tile-images';
@@ -21,6 +21,7 @@ export interface CategoryProduct extends ProductCardData {
 const BANNER_SLUGS = new Set(['vegetables', 'fruits', 'dairy', 'bakery-biscuits', 'ice-cream', 'grocery']);
 
 type SortOption = 'default' | 'priceAsc' | 'priceDesc' | 'nameAsc';
+type PillId = 'filters' | 'sort' | 'type' | 'price';
 
 const SORT_OPTIONS: Array<{
   value: SortOption;
@@ -51,6 +52,61 @@ const GROUP_PREVIEW_COUNT = 4;
 const ALL_ID = '__all__';
 
 /**
+ * One of the toolbar's pill triggers (session 2026-08-26, client's
+ * reference: Filters / Sort / Type / Price, not a text search field). Just
+ * the button — the pills row scrolls horizontally (`overflow-x-auto`),
+ * and a dropdown panel positioned `absolute` *inside* a scrolling
+ * container gets its bottom half clipped (setting `overflow-x` forces the
+ * other axis to compute as `auto` too, per spec, no matter what
+ * `overflow-y` says). The open pill's panel is rendered by the parent
+ * instead, outside the scrolling row — see `openPill` below.
+ */
+function FilterPillButton({
+  label,
+  isOpen,
+  onToggle,
+}: {
+  label: string;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={isOpen}
+      className="flex h-10 shrink-0 items-center gap-1 rounded-full border border-border bg-card px-3.5 text-[13px] font-semibold whitespace-nowrap"
+    >
+      {label}
+      <ChevronDown className={cn('size-3.5 transition-transform', isOpen && 'rotate-180')} aria-hidden />
+    </button>
+  );
+}
+
+function FilterPillOption({
+  label,
+  active,
+  onSelect,
+}: {
+  label: string;
+  active: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={cn(
+        'block w-full px-3 py-2.5 text-left text-sm whitespace-nowrap',
+        active ? 'font-bold text-primary' : 'text-foreground',
+      )}
+    >
+      {label}
+    </button>
+  );
+}
+
+/**
  * The reference's list-row category screen: an in-page search that filters
  * the products already on the page (a category comfortably fits on one
  * load, per the pagination above), plus a real sort menu standing in for
@@ -78,8 +134,10 @@ export function CategoryProductList({
   const tc = useTranslations('common');
 
   const [query, setQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
   const [sort, setSort] = useState<SortOption>('default');
-  const [sortOpen, setSortOpen] = useState(false);
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [openPill, setOpenPill] = useState<PillId | null>(null);
   const [activeTypeId, setActiveTypeId] = useState<string | null>(null);
   const [expandedTypes, setExpandedTypes] = useState<Set<string>>(() => new Set());
 
@@ -96,8 +154,12 @@ export function CategoryProductList({
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
-    return term ? products.filter((p) => p.name.toLowerCase().includes(term)) : products;
-  }, [products, query]);
+    return products.filter((p) => {
+      if (term && !p.name.toLowerCase().includes(term)) return false;
+      if (inStockOnly && !p.inStock) return false;
+      return true;
+    });
+  }, [products, query, inStockOnly]);
 
   const sorted = useMemo(() => {
     if (sort === 'default') return filtered;
@@ -172,6 +234,11 @@ export function CategoryProductList({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groups?.map((g) => g.type.id).join(',')]);
 
+  function closeSearch() {
+    setSearchOpen(false);
+    setQuery('');
+  }
+
   function jumpTo(typeId: string) {
     setActiveTypeId(typeId);
     sectionRefs.current[typeId]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -187,69 +254,151 @@ export function CategoryProductList({
 
   return (
     <>
-      <div className="flex items-center gap-2 bg-tint-lime px-4 pt-3 pb-2">
-        <div className="input-3d flex h-11 flex-1 items-center gap-2 rounded-[var(--radius)] bg-background px-3">
-          <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={t('searchPlaceholder', { category: categoryName })}
-            aria-label={t('searchPlaceholder', { category: categoryName })}
-            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => setQuery('')}
-              aria-label={tc('close')}
-              className="grid size-6 shrink-0 place-items-center text-muted-foreground"
-            >
-              <X className="size-3.5" aria-hidden />
-            </button>
-          )}
-        </div>
+      <h1 className="bg-tint-lime px-4 pt-3 text-xl leading-tight font-black text-foreground">
+        {categoryName}
+      </h1>
 
-        <div className="relative shrink-0">
+      <div className="relative bg-tint-lime px-4 pt-2 pb-2">
+        <div className="flex items-center gap-2">
+          {/* Search collapses to an icon by default (session 2026-08-26,
+              client's reference: the toolbar is pills, not a text field) —
+              tapping it swaps the pill row for the same search input this
+              page always had, rather than losing in-page search entirely. */}
           <button
             type="button"
-            onClick={() => setSortOpen((open) => !open)}
-            aria-expanded={sortOpen}
-            className="flex h-11 items-center gap-1.5 rounded-[var(--radius)] border border-border px-3 text-sm font-semibold"
+            onClick={() => {
+              setOpenPill(null);
+              if (searchOpen) closeSearch();
+              else setSearchOpen(true);
+            }}
+            aria-expanded={searchOpen}
+            aria-label={t('search')}
+            className="grid size-10 shrink-0 place-items-center rounded-full border border-border bg-card"
           >
-            <Filter className="size-4" aria-hidden />
-            {t('filter')}
+            <Search className="size-4 text-muted-foreground" aria-hidden />
           </button>
 
-          {sortOpen && (
-            <>
+          {searchOpen ? (
+            <div className="input-3d flex h-10 flex-1 items-center gap-2 rounded-[var(--radius)] bg-background px-3">
+              <input
+                type="search"
+                autoFocus
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={t('searchPlaceholder', { category: categoryName })}
+                aria-label={t('searchPlaceholder', { category: categoryName })}
+                className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              />
               <button
                 type="button"
+                onClick={closeSearch}
                 aria-label={tc('close')}
-                onClick={() => setSortOpen(false)}
-                className="fixed inset-0 z-10 cursor-default"
+                className="grid size-6 shrink-0 place-items-center text-muted-foreground"
+              >
+                <X className="size-3.5" aria-hidden />
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-1 gap-2 overflow-x-auto">
+              <FilterPillButton
+                label={t('pillFilters')}
+                isOpen={openPill === 'filters'}
+                onToggle={() => setOpenPill((p) => (p === 'filters' ? null : 'filters'))}
               />
-              <div className="absolute top-full right-0 z-20 mt-1 w-48 overflow-hidden rounded-[var(--radius)] border border-border bg-card py-1 shadow-lg">
-                {SORT_OPTIONS.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => {
-                      setSort(option.value);
-                      setSortOpen(false);
-                    }}
-                    className={cn(
-                      'block w-full px-3 py-2.5 text-left text-sm',
-                      sort === option.value ? 'font-bold text-primary' : 'text-foreground',
-                    )}
-                  >
-                    {t(option.labelKey)}
-                  </button>
-                ))}
-              </div>
-            </>
+              <FilterPillButton
+                label={t('pillSort')}
+                isOpen={openPill === 'sort'}
+                onToggle={() => setOpenPill((p) => (p === 'sort' ? null : 'sort'))}
+              />
+              {subgroupTypes && (
+                <FilterPillButton
+                  label={t('pillType')}
+                  isOpen={openPill === 'type'}
+                  onToggle={() => setOpenPill((p) => (p === 'type' ? null : 'type'))}
+                />
+              )}
+              <FilterPillButton
+                label={t('pillPrice')}
+                isOpen={openPill === 'price'}
+                onToggle={() => setOpenPill((p) => (p === 'price' ? null : 'price'))}
+              />
+            </div>
           )}
         </div>
+
+        {/* The open pill's panel, rendered here rather than inside the
+            scrolling pills row above — see FilterPillButton's comment. */}
+        {openPill && (
+          <>
+            <button
+              type="button"
+              aria-label={tc('close')}
+              onClick={() => setOpenPill(null)}
+              className="fixed inset-0 z-10 cursor-default"
+            />
+            <div className="absolute top-full left-4 z-20 mt-1 max-h-64 min-w-40 overflow-y-auto rounded-[var(--radius)] border border-border bg-card py-1 shadow-lg">
+              {openPill === 'filters' &&
+                [
+                  { value: false, label: t('all') },
+                  { value: true, label: t('inStockOnly') },
+                ].map((option) => (
+                  <FilterPillOption
+                    key={String(option.value)}
+                    label={option.label}
+                    active={inStockOnly === option.value}
+                    onSelect={() => {
+                      setInStockOnly(option.value);
+                      setOpenPill(null);
+                    }}
+                  />
+                ))}
+
+              {openPill === 'sort' &&
+                SORT_OPTIONS.map((option) => (
+                  <FilterPillOption
+                    key={option.value}
+                    label={t(option.labelKey)}
+                    active={sort === option.value}
+                    onSelect={() => {
+                      setSort(option.value);
+                      setOpenPill(null);
+                    }}
+                  />
+                ))}
+
+              {openPill === 'type' &&
+                subgroupTypes?.map((type) => (
+                  <FilterPillOption
+                    key={type.id}
+                    label={vegetableTypeLabel(type, locale)}
+                    active={activeTypeId === type.id}
+                    onSelect={() => {
+                      jumpTo(type.id);
+                      setOpenPill(null);
+                    }}
+                  />
+                ))}
+
+              {openPill === 'price' &&
+                (
+                  [
+                    { value: 'priceAsc', label: t('priceLowToHigh') },
+                    { value: 'priceDesc', label: t('priceHighToLow') },
+                  ] as const
+                ).map((option) => (
+                  <FilterPillOption
+                    key={option.value}
+                    label={option.label}
+                    active={sort === option.value}
+                    onSelect={() => {
+                      setSort(option.value);
+                      setOpenPill(null);
+                    }}
+                  />
+                ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Hero banner (session 2026-08-26, client's reference): a headline
@@ -308,7 +457,10 @@ export function CategoryProductList({
               type="button"
               onClick={jumpToTop}
               aria-current={activeTypeId === ALL_ID}
-              className="flex w-full flex-col items-center gap-1 px-1.5 py-3 text-center"
+              className={cn(
+                'flex w-full flex-col items-center gap-1 border-r-4 px-1.5 py-3 text-center',
+                activeTypeId === ALL_ID ? 'border-primary' : 'border-transparent',
+              )}
             >
               <span
                 className={cn(
@@ -342,7 +494,10 @@ export function CategoryProductList({
                   type="button"
                   onClick={() => jumpTo(type.id)}
                   aria-current={active}
-                  className="flex w-full flex-col items-center gap-1 px-1.5 py-3 text-center"
+                  className={cn(
+                    'flex w-full flex-col items-center gap-1 border-r-4 px-1.5 py-3 text-center',
+                    active ? 'border-primary' : 'border-transparent',
+                  )}
                 >
                   <span
                     className={cn(
