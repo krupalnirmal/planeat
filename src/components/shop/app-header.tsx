@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, Leaf, MapPin, ShoppingCart, Wallet } from 'lucide-react';
+import { ChevronDown, Leaf, MapPin, ShoppingCart, UserRound, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { SearchBar } from '@/components/shop/search-bar';
@@ -48,7 +48,10 @@ export function AppHeader() {
     ? `${defaultAddress.label} · ${defaultAddress.line1}`
     : (rememberedArea ?? t('selectAddress'));
 
-  const initial = user?.name?.trim().charAt(0) || 'आ';
+  // A hardcoded Marathi letter here would show on the Hindi/English locales
+  // too — a generic person icon (same fallback profile-screen.tsx already
+  // uses) reads correctly everywhere instead.
+  const initial = user?.name?.trim().charAt(0);
 
   return (
     // White, so the header and the banner panel beneath it read as one block
@@ -100,7 +103,7 @@ export function AppHeader() {
             aria-label={tp('title')}
             className="grid size-11 place-items-center rounded-full bg-primary-dark text-sm font-semibold text-white"
           >
-            {initial}
+            {initial || <UserRound className="size-5" aria-hidden />}
           </Link>
         </div>
       </div>
