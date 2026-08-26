@@ -59,13 +59,25 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {/* Stacked slabs: white panels separated by a thin strip of page
           colour (`space-y-2`), so the screen reads as one document rather
-          than a scatter of floating cards.
-          Blinkit-matched (session 2026-08-25): the category grid is the
-          FIRST thing under the search bar, exactly like Blinkit's own
-          fold — the promo banner and the trust strip (built earlier from
-          the client's own reference) still exist, just lower, after
-          shopping itself has been offered. */}
+          than a scatter of floating cards. */}
       <main className="space-y-2 pb-2">
+        {/* Client feedback (session 2026-08-26): the promo banner belongs
+            right under the search bar, not buried below categories and Top
+            Picks — the first thing under the fold, same as it was before
+            the Blinkit-matched reorder in an earlier session. */}
+        <div className="bg-card px-4 pt-3 pb-4">
+          {banners.length > 0 ? (
+            <BannerCarousel banners={banners} />
+          ) : (
+            <HeroBanner
+              headline={t('heroHeadline')}
+              subtitle={t('heroSubtitle')}
+              badge={t('deliveryIn', { minutes: 30 })}
+              images={heroImages}
+            />
+          )}
+        </div>
+
         <HomeSection
           id="categories-heading"
           title={t('categories')}
@@ -130,18 +142,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </HomeSection>
         )}
 
-        <div className="bg-card px-4 pt-1 pb-4">
-          {banners.length > 0 ? (
-            <BannerCarousel banners={banners} />
-          ) : (
-            <HeroBanner
-              headline={t('heroHeadline')}
-              subtitle={t('heroSubtitle')}
-              badge={t('deliveryIn', { minutes: 30 })}
-              images={heroImages}
-            />
-          )}
-
+        <div className="bg-card px-4 py-4">
           <BenefitsRow />
         </div>
 
@@ -235,9 +236,9 @@ async function BenefitsRow() {
   ] as const;
 
   return (
-    // Sits inside the banner's white panel, so it needs no card of its own —
-    // just a rule separating it from the banner above.
-    <div className="mt-4 grid grid-cols-4 divide-x divide-border border-t border-border pt-4">
+    // In its own white panel now (session 2026-08-26 — the banner above it
+    // moved up to sit right under the search bar), so no top rule needed.
+    <div className="grid grid-cols-4 divide-x divide-border">
       {items.map(({ icon: Icon, titleKey, bodyKey }) => (
         <div key={titleKey} className="flex flex-col items-center gap-1.5 px-1 text-center">
           <span className="grid size-9 place-items-center rounded-full bg-tint-green text-primary">
