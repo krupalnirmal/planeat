@@ -70,11 +70,11 @@ export function ProfileScreen() {
   ] as const;
 
   const laterRows = [
-    { key: 'healthProfile', icon: HeartPulse, phase: 4 },
-    { key: 'notifications', icon: Bell, phase: 9 },
-    { key: 'medicalDisclaimer', icon: Stethoscope, phase: 10 },
-    { key: 'terms', icon: FileText, phase: 10 },
-    { key: 'privacy', icon: ShieldCheck, phase: 10 },
+    { key: 'healthProfile', icon: HeartPulse },
+    { key: 'notifications', icon: Bell },
+    { key: 'medicalDisclaimer', icon: Stethoscope },
+    { key: 'terms', icon: FileText },
+    { key: 'privacy', icon: ShieldCheck },
   ] as const;
 
   return (
@@ -122,7 +122,7 @@ export function ProfileScreen() {
           </li>
         ))}
 
-        {laterRows.map(({ key, icon: Icon, phase }) => (
+        {laterRows.map(({ key, icon: Icon }) => (
           <li key={key}>
             <button
               type="button"
@@ -131,7 +131,7 @@ export function ProfileScreen() {
             >
               <Icon className="size-5 shrink-0 text-primary" aria-hidden />
               <span className="flex-1 text-sm font-medium">{t(key)}</span>
-              <span className="text-[10px] text-muted-foreground">P{phase}</span>
+              <span className="text-[10px] text-muted-foreground">{tc('comingSoon')}</span>
             </button>
           </li>
         ))}
