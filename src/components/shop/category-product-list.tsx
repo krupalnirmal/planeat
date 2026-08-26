@@ -180,7 +180,7 @@ export function CategoryProductList({
 
   return (
     <>
-      <div className="flex items-center gap-2 bg-card px-4 pt-3 pb-2">
+      <div className="flex items-center gap-2 bg-tint-green px-4 pt-3 pb-2">
         <div className="input-3d flex h-11 flex-1 items-center gap-2 rounded-[var(--radius)] bg-background px-3">
           <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
           <input
@@ -246,20 +246,20 @@ export function CategoryProductList({
       </div>
 
       {sorted.length === 0 ? (
-        <div className="bg-card px-4 pb-4">
+        <div className="bg-tint-green px-4 pb-4">
           <p className="rounded-[var(--radius)] border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
             {t('empty')}
           </p>
         </div>
       ) : groups ? (
-        <div className="flex items-start gap-0 bg-card">
+        <div className="flex items-start gap-0">
           {/* Left rail — sticks right under the page's own sticky header.
               Restyled (session 2026-08-26) to the client's reference: round
               photo tiles and a bold label for the active item, no left-edge
               colour bar or per-group count. */}
           <nav
             aria-label={categoryName}
-            className="sticky w-[76px] shrink-0 self-start overflow-y-auto"
+            className="sticky w-[76px] shrink-0 self-start overflow-y-auto bg-card"
             style={{ top: HEADER_OFFSET_PX, maxHeight: `calc(100dvh - ${HEADER_OFFSET_PX}px)` }}
           >
             {/* The rail always leads with a non-photo "All" tab, active by
@@ -333,8 +333,12 @@ export function CategoryProductList({
           </nav>
 
           {/* Right pane — the actual scrolling list; the rail above just
-              rides along with the page's normal scroll via `sticky`. */}
-          <div className="min-w-0 flex-1">
+              rides along with the page's normal scroll via `sticky`. The
+              tint (session 2026-08-26, client's reference) is what makes
+              the white cards read as cards instead of blending into the
+              page — the rail stays white so it still reads as its own
+              column. */}
+          <div className="min-w-0 flex-1 bg-tint-green">
             {groups.map(({ type, products: groupProducts }) => {
               const expanded = expandedTypes.has(type.id);
               const visibleProducts = expanded
@@ -414,7 +418,7 @@ export function CategoryProductList({
           </div>
         </div>
       ) : (
-        <div className="bg-card px-4 pt-3 pb-3">
+        <div className="bg-tint-green px-4 pt-3 pb-3">
           <div className="grid grid-cols-2 gap-3">
             {rest.map((product) => (
               <ProductCard key={product.id} product={product} variants={product.variants} />
@@ -428,7 +432,7 @@ export function CategoryProductList({
           The client's own promo creative still runs, just after the
           products it advertises rather than blocking them. */}
       {slug === 'vegetables' && !searching && sorted.length > 0 && (
-        <div className="bg-card px-4 pb-3">
+        <div className="bg-tint-green px-4 pb-3">
           <div className="overflow-hidden rounded-[var(--radius)] shadow-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
