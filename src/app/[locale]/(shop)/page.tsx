@@ -59,8 +59,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {/* Stacked slabs: white panels separated by a thin strip of page
           colour (`space-y-2`), so the screen reads as one document rather
-          than a scatter of floating cards. */}
-      <main className="space-y-2 pb-2">
+          than a scatter of floating cards.
+          bg-tint-lime (session 2026-08-26, client feedback): the same tint
+          the category pages use behind their own white cards, so home
+          reads as the same app rather than a different, plainer screen. */}
+      <main className="space-y-2 bg-tint-lime pb-2">
         {/* Client feedback (session 2026-08-26): the promo banner belongs
             right under the search bar, not buried below categories and Top
             Picks — the first thing under the fold, same as it was before
