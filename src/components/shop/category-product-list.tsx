@@ -313,7 +313,7 @@ export function CategoryProductList({
               <span
                 className={cn(
                   'grid size-14 shrink-0 place-items-center rounded-full',
-                  activeTypeId === ALL_ID ? 'bg-tint-green text-primary' : 'bg-background text-muted-foreground',
+                  activeTypeId === ALL_ID ? 'bg-tint-lime text-primary' : 'bg-background text-muted-foreground',
                 )}
                 aria-hidden
               >
@@ -347,7 +347,7 @@ export function CategoryProductList({
                   <span
                     className={cn(
                       'grid size-14 shrink-0 place-items-center overflow-hidden rounded-full p-1',
-                      active ? 'bg-tint-green' : 'bg-background',
+                      active ? 'bg-tint-lime' : 'bg-background',
                     )}
                     aria-hidden
                   >
@@ -400,7 +400,7 @@ export function CategoryProductList({
                       heading — an unmistakable "you're in a new sub-category
                       now" signal, not just bold text sitting in the list. */}
                   <h2
-                    className="sticky z-10 flex items-center gap-2 border-b border-border bg-tint-green px-4 py-2.5"
+                    className="sticky z-10 flex items-center gap-2 border-b border-border bg-tint-lime px-4 py-2.5"
                     style={{ top: HEADER_OFFSET_PX }}
                   >
                     <span
@@ -442,7 +442,7 @@ export function CategoryProductList({
             {rest.length > 0 && (
               <section className="pb-2">
                 <h2
-                  className="sticky z-10 border-b border-border bg-tint-green px-4 py-2.5 text-[15px] font-black text-primary-dark"
+                  className="sticky z-10 border-b border-border bg-tint-lime px-4 py-2.5 text-[15px] font-black text-primary-dark"
                   style={{ top: HEADER_OFFSET_PX }}
                 >
                   {t('other')}
