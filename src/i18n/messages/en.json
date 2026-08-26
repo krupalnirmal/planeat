@@ -184,6 +184,8 @@
   },
   "address": {
     "title": "My addresses",
+    "loginBandSubtitle": "Save addresses for faster checkout",
+    "loginDescription": "Log in to save your home, work and other addresses so checkout is just a tap away.",
     "add": "Add a new address",
     "edit": "Edit address",
     "label": "Address name",
@@ -258,6 +260,8 @@
   },
   "orders": {
     "title": "My orders",
+    "loginBandSubtitle": "Track and reorder your past purchases",
+    "loginDescription": "Log in to see your order history, track deliveries, and reorder your favourites in one tap.",
     "empty": "No orders yet",
     "orderNumber": "Order {number}",
     "placedOn": "on {date}",

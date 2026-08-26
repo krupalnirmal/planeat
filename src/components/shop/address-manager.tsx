@@ -5,7 +5,8 @@ import { Check, LocateFixed, MapPin, Plus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
-import { CenteredState, PageHeader } from '@/components/shop/page-header';
+import { LoginPrompt } from '@/components/shop/login-prompt';
+import { PageHeader } from '@/components/shop/page-header';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
@@ -35,8 +36,6 @@ const LABEL_KEYS = ['labelHome', 'labelWork', 'labelOther'] as const;
 export function AddressManager() {
   const t = useTranslations('address');
   const tc = useTranslations('common');
-  const te = useTranslations('errors');
-  const router = useRouter();
   const queryClient = useQueryClient();
   const { isLoggedIn, isLoading } = useSession();
 
@@ -79,20 +78,13 @@ export function AddressManager() {
     return (
       <>
         <PageHeader title={t('title')} backHref="/profile" backLabel={tc('back')} />
-        <main className="pb-2">
-          <div className="bg-card">
-            <CenteredState>
-              <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
-              <button
-                type="button"
-                onClick={() => router.push('/login?next=/addresses')}
-                className="mt-4 h-11 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-              >
-                {tc('next')}
-              </button>
-            </CenteredState>
-          </div>
-        </main>
+        <LoginPrompt
+          icon={MapPin}
+          title={t('title')}
+          bandSubtitle={t('loginBandSubtitle')}
+          description={t('loginDescription')}
+          loginHref="/login?next=/addresses"
+        />
       </>
     );
   }

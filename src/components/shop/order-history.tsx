@@ -4,7 +4,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ImageIcon, Package, RotateCcw } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { Link, useRouter } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
+import { LoginPrompt } from '@/components/shop/login-prompt';
 import { OrderStatusBadge, type OrderStatusValue } from '@/components/shop/order-status-badge';
 import { CenteredState, PageHeader } from '@/components/shop/page-header';
 import { CART_QUERY_KEY } from '@/hooks/use-cart';
@@ -31,7 +32,6 @@ export function OrderHistory() {
   const te = useTranslations('errors');
   const format = useFormatter();
   const locale = useLocale();
-  const router = useRouter();
   const queryClient = useQueryClient();
   const { isLoggedIn, isLoading: sessionLoading } = useSession();
 
@@ -74,20 +74,13 @@ export function OrderHistory() {
     return (
       <>
         <PageHeader title={t('title')} backHref="/profile" backLabel={tc('back')} />
-        <main className="pb-2">
-          <div className="bg-card">
-            <CenteredState>
-              <p className="text-sm text-muted-foreground">{te('unauthorized')}</p>
-              <button
-                type="button"
-                onClick={() => router.push('/login?next=/orders')}
-                className="mt-4 h-11 w-full max-w-xs rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-              >
-                {tc('next')}
-              </button>
-            </CenteredState>
-          </div>
-        </main>
+        <LoginPrompt
+          icon={Package}
+          title={t('title')}
+          bandSubtitle={t('loginBandSubtitle')}
+          description={t('loginDescription')}
+          loginHref="/login?next=/orders"
+        />
       </>
     );
   }
