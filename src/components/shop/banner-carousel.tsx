@@ -63,10 +63,8 @@ export function BannerCarousel({ banners }: { banners: CarouselBanner[] }) {
     slideRefs.current[index]?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
   }
 
-  // The 44px dot row carries its own breathing room, so the wrapper needs
-  // less bottom margin than the plain-banner fallback does.
   return (
-    <div className="mb-3">
+    <div className="mb-1">
       <ul
         ref={trackRef}
         className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -91,7 +89,12 @@ export function BannerCarousel({ banners }: { banners: CarouselBanner[] }) {
       </ul>
 
       {banners.length > 1 && (
-        <div className="flex items-center justify-center gap-1">
+        // `h-5` + the buttons' `-my-3`: the dots keep their full 44px tap
+        // target (R10), but stop RESERVING 44px of page height for it. The
+        // row was taller than these short, wide banner creatives are, which
+        // read as a large empty gap under the banner rather than as
+        // pagination.
+        <div className="flex h-5 items-center justify-center gap-1 overflow-visible">
           {banners.map((banner, index) => (
             // The BUTTON is the 44px tap target R10 requires (enforced
             // globally in `globals.css`); the visible dot is the small span
@@ -103,7 +106,7 @@ export function BannerCarousel({ banners }: { banners: CarouselBanner[] }) {
               aria-label={banner.title}
               aria-current={index === active}
               onClick={() => goTo(index)}
-              className="grid place-items-center px-1.5"
+              className="-my-3 grid place-items-center px-1.5"
             >
               <span
                 aria-hidden
