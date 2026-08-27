@@ -66,9 +66,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         {/* Client feedback (session 2026-08-26): the promo banner belongs
             right under the search bar, not buried below categories and Top
             Picks.
-            Inset with side padding and rounded, matching the reference —
-            it reads as a card on the page, not a full-bleed strip. */}
-        <div className="px-4 pt-2">
+            Full-bleed (session 2026-08-27, client feedback: no white
+            margin at the sides). These creatives are ~4.4:1, so the only
+            way to make them taller without cropping their own artwork —
+            the logo on the left, the "Order Now" chip on the right — is to
+            let them use the full viewport width. */}
+        <div className="pt-2">
           {banners.length > 0 ? (
             <BannerCarousel banners={banners} />
           ) : (
