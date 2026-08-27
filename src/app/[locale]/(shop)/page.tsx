@@ -1,4 +1,4 @@
-import { Bike, ChevronRight, Heart, Leaf, Sprout, Truck } from 'lucide-react';
+import { Bike, ChevronRight, Clock, Leaf, PackageCheck, ShieldCheck, ShoppingBag } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { AppHeader } from '@/components/shop/app-header';
@@ -238,10 +238,10 @@ async function BenefitsRow() {
   const t = await getTranslations('home');
 
   const items = [
-    { icon: Sprout, titleKey: 'benefitsFreshTitle', bodyKey: 'benefitsFreshBody' },
-    { icon: Truck, titleKey: 'benefitsDeliveryTitle', bodyKey: 'benefitsDeliveryBody' },
-    { icon: Leaf, titleKey: 'benefitsFarmTitle', bodyKey: 'benefitsFarmBody' },
-    { icon: Heart, titleKey: 'benefitsHealthyTitle', bodyKey: 'benefitsHealthyBody' },
+    { icon: ShoppingBag, titleKey: 'benefitsFreshTitle', bodyKey: 'benefitsFreshBody' },
+    { icon: ShieldCheck, titleKey: 'benefitsDeliveryTitle', bodyKey: 'benefitsDeliveryBody' },
+    { icon: Clock, titleKey: 'benefitsFarmTitle', bodyKey: 'benefitsFarmBody' },
+    { icon: PackageCheck, titleKey: 'benefitsHealthyTitle', bodyKey: 'benefitsHealthyBody' },
   ] as const;
 
   return (
