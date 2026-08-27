@@ -50,6 +50,7 @@
   --color-tint-green: var(--brand-tint-green);
   --color-tint-yellow: var(--brand-tint-yellow);
   --color-tint-lime: var(--brand-tint-lime);
+  --color-page-grey: var(--brand-page-grey);
   --color-accent-faint: var(--accent-faint);
 
   --font-sans: var(--font-app);
@@ -135,6 +136,12 @@
      already doing. */
   --brand-tint-lime: #f1fadd;
 
+  /* Home page background (session 2026-08-27) — sampled straight out of
+     the client's reference screenshot: a near-white neutral grey, NOT a
+     green tint. The white cards sitting on it are what carry the
+     structure; the background's only job is to separate them. */
+  --brand-page-grey: #fafafa;
+
   /* A faint wash of the brand's status-bar yellow (--accent, #FFD400) —
      for a header/footer band that echoes it without shouting. Lightened
      further per client feedback — even the "faint" version was still
@@ -169,6 +176,7 @@
   --brand-green-dark: #0b3d1f;
   --brand-tint-green: #10331f;
   --brand-tint-lime: #1c2812;
+  --brand-page-grey: #0f0f0f;
   --brand-tint-yellow: #332a12;
   --accent-faint: #3d3212;
 }

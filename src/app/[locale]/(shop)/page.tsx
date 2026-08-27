@@ -57,24 +57,18 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <>
       <AppHeader />
 
-      {/* bg-tint-lime (session 2026-08-26, client feedback): the same tint
-          the category pages use behind their own white cards — the first
-          pass only showed it in the thin space-y-2 gaps between white
-          section slabs, which read as barely-there next to how prominent
-          the tint is on a category page, so the sections themselves drop
-          their own white background too and let it show through properly;
-          the individual pieces inside (category tiles, product cards)
-          still carry their own white/card backgrounds for contrast. */}
-      <main className="bg-tint-lime pb-2">
+      {/* bg-page-grey (session 2026-08-27): #fafafa, sampled straight out
+          of the client's reference screenshot. An earlier session put the
+          category pages' green tint here instead; the reference has no
+          green background at all — near-white, with the white cards on top
+          carrying the structure. */}
+      <main className="bg-page-grey pb-2">
         {/* Client feedback (session 2026-08-26): the promo banner belongs
             right under the search bar, not buried below categories and Top
-            Picks — the first thing under the fold, same as it was before
-            the Blinkit-matched reorder in an earlier session.
-            Full-bleed, no side padding: the banner is a fixed 2:1 creative
-            (h-auto keeps it undistorted), so the only way to give it more
-            on-screen presence without cropping or stretching it is to let
-            it use the full viewport width instead of sitting inset. */}
-        <div className="pt-3 pb-4">
+            Picks.
+            Inset with side padding and rounded, matching the reference —
+            it reads as a card on the page, not a full-bleed strip. */}
+        <div className="px-4 pt-3 pb-4">
           {banners.length > 0 ? (
             <BannerCarousel banners={banners} />
           ) : (
@@ -92,6 +86,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           title={t('categories')}
           seeAllHref="/categories"
           seeAllLabel={tc('seeAll')}
+          card
         >
           {categories.length > 0 ? (
             <ul className="grid grid-cols-4 gap-3">
@@ -151,11 +146,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </HomeSection>
         )}
 
-        <div className="px-4 py-4">
-          <BenefitsRow />
+        {/* Both sit in their own white rounded card on the page grey,
+            matching the reference's benefits strip. */}
+        <div className="px-4 py-2">
+          <div className="rounded-[var(--radius)] bg-card p-3 shadow-sm">
+            <BenefitsRow />
+          </div>
         </div>
 
-        <div className="px-4 py-4">
+        <div className="px-4 py-2">
           <FastDeliveryBanner />
         </div>
       </main>
