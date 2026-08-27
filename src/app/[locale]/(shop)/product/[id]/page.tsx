@@ -48,8 +48,13 @@ export default async function ProductPage({
         <h1 className="truncate text-base font-bold">{product.name}</h1>
       </header>
 
-      {/* Stacked white slabs on the page colour, same as home. */}
-      <main className="space-y-2 pb-2">
+      {/* Stacked white slabs on the page colour, same as home.
+          `pb-24` reserves room for VariantPicker's own fixed add-to-cart
+          bar (71px tall). That reservation used to be a `h-16` spacer
+          inside VariantPicker itself, which sits mid-page — so it punched
+          a 64px hole under the price instead of protecting the last
+          section, the thing it was there for. */}
+      <main className="space-y-2 pb-24">
         <div className="bg-card px-4 pt-2 pb-4">
           {/* The photo is a product shot, not a hero image: a full-width
               square ran ~390px tall on a phone and pushed the price and the

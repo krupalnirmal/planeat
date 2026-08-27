@@ -239,8 +239,6 @@ export function VariantPicker({
         )}
       </div>
 
-      {/* Reserves room so the sticky bar never covers the last section. */}
-      <div aria-hidden className="h-16" />
     </>
   );
 }
