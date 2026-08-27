@@ -125,10 +125,7 @@ export function BannerCarousel({ banners }: { banners: CarouselBanner[] }) {
 
 function ImageBanner({ imageUrl, title }: { imageUrl: string; title: string }) {
   return (
-    // No radius or shadow: the banner runs edge to edge now, and a rounded
-    // corner against the screen edge reads as a rendering glitch rather
-    // than as a card.
-    <div className="overflow-hidden bg-tint-green">
+    <div className="overflow-hidden rounded-[var(--radius)] bg-tint-green shadow-sm">
       {/* `h-auto`, not `object-cover`: a finished marketing creative with a
           logo and copy baked into the pixels gets shown whole, at its own
           aspect ratio, never cropped to fill a fixed box. */}

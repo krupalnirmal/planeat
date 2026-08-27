@@ -63,17 +63,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           green background at all — near-white, with the white cards on top
           carrying the structure. */}
       <main className="bg-page-grey pb-2">
-        {/* Client feedback (session 2026-08-26): the promo banner belongs
-            right under the search bar, not buried below categories and Top
-            Picks.
-            Full-bleed (session 2026-08-27, client feedback: no white
-            margin at the sides). These creatives are ~4.4:1, so the only
-            way to make them taller without cropping their own artwork —
-            the logo on the left, the "Order Now" chip on the right — is to
-            let them use the full viewport width. */}
-        <div className="pt-2">
+        {/* The promo banner sits right under the search bar.
+            One banner, not a carousel (session 2026-08-27, client's
+            reference shows a single static hero) — `slice(0, 1)` rather
+            than deleting the others, so the remaining creatives stay
+            seeded and switching back is a one-line change. BannerCarousel
+            already skips its dots and auto-advance at length 1.
+            Inset with the same px-4 gutter as every other section, and
+            rounded, matching the reference. */}
+        <div className="px-4 pt-2">
           {banners.length > 0 ? (
-            <BannerCarousel banners={banners} />
+            <BannerCarousel banners={banners.slice(0, 1)} />
           ) : (
             <HeroBanner
               headline={t('heroHeadline')}

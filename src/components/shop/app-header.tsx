@@ -109,22 +109,28 @@ export function AppHeader() {
         </div>
       </div>
 
-      <div className="mt-3 flex items-center gap-2">
+      {/* The address and the delivery promise share one bordered card, as
+          in the client's reference — the address stacked as a quiet label
+          over a bold value, the promise as a tinted pill on the right. */}
+      <div className="mt-3 flex items-center gap-2 rounded-[var(--radius)] border border-border bg-card px-3 py-2">
         <Link
           href={user ? '/addresses' : '/serviceability'}
-          className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
+          className="flex min-w-0 flex-1 items-center gap-2 text-left"
         >
           <MapPin className="size-4 shrink-0 text-primary" aria-hidden />
-          <span className="text-[13px] text-muted-foreground">{t('deliverTo')}</span>
-          <span className="truncate text-[13px] font-bold">{addressLine}</span>
-          <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+          <span className="min-w-0">
+            <span className="block text-[11px] leading-tight text-muted-foreground">
+              {t('deliverTo')}
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="truncate text-[13px] leading-tight font-bold">{addressLine}</span>
+              <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+            </span>
+          </span>
         </Link>
 
-        {/* The per-card delivery promise, surfaced once here too so it
-            reads next to the address instead of only on individual
-            products (client's reference). */}
-        <span className="flex shrink-0 items-center gap-1 rounded-full bg-tint-green px-2.5 py-1.5 text-[11px] font-bold text-primary-dark">
-          <Zap className="size-3.5 fill-primary-dark" aria-hidden />
+        <span className="flex shrink-0 items-center gap-1 rounded-[calc(var(--radius)-6px)] bg-tint-green px-2.5 py-1.5 text-[11px] leading-tight font-bold text-primary-dark">
+          <Zap className="size-3.5 shrink-0 fill-primary-dark" aria-hidden />
           {t('deliveryIn', { minutes: 30 })}
         </span>
       </div>
