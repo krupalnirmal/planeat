@@ -20,6 +20,14 @@ export interface CategoryProduct extends ProductCardData {
 // raw missing-message string.
 const BANNER_SLUGS = new Set(['vegetables', 'fruits', 'dairy', 'bakery-biscuits', 'ice-cream', 'grocery']);
 
+/**
+ * Hides the category hero on every category page (client asked for it off
+ * for now, session 2026-08-27). Flip to `true` to bring it back — the
+ * banner, its copy in `categories.banner.*` and its animations are all
+ * still here, so this is the only line that needs changing.
+ */
+const SHOW_CATEGORY_HERO = false;
+
 type SortOption = 'default' | 'priceAsc' | 'priceDesc' | 'nameAsc';
 type PillId = 'filters' | 'sort' | 'type' | 'price';
 
@@ -412,7 +420,7 @@ export function CategoryProductList({
           from whatever's already in the catalogue. Sits above the grid,
           matching the reference; a search collapses it along with the
           sub-group rail, same reasoning as `groups` below. */}
-      {!searching && sorted.length > 0 && BANNER_SLUGS.has(slug) && (
+      {SHOW_CATEGORY_HERO && !searching && sorted.length > 0 && BANNER_SLUGS.has(slug) && (
         <div className="bg-tint-lime px-4 pt-1 pb-4">
           <div className="animate-in fade-in slide-in-from-bottom-2 relative overflow-hidden rounded-[var(--radius)] bg-gradient-to-br from-[#eaf7d4] via-[#f2fadf] to-[#fdf6e6] px-4 py-5 shadow-sm duration-500">
             {/* Two soft colour pools behind everything, so the gradient
