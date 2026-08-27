@@ -124,7 +124,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 four narrow cards side by side that scroll sideways, which
                 keeps "Top Picks" one glanceable row instead of a block that
                 pushes everything below it off the screen. */}
-            <ul className="-mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {/* `scroll-px-4` matters: without it scroll-snap aligns the
+                first card to the scrollport's own edge, silently scrolling
+                past the `px-4` padding, so the rail started flush at x=0
+                while every other section on the page starts at 16px. */}
+            <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {bestsellers.map((product) => (
                 <li key={product.id} className="w-[42vw] max-w-[168px] shrink-0 snap-start">
                   <ProductCard
