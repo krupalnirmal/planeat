@@ -42,7 +42,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  * against `scripts/contact-sheet.mjs` rather than trusting the first result.
  */
 const SEARCHES = {
-  'VEG-ONION': 'red onion bulb vegetable',
+  'VEG-ONION': 'three whole red onions',
   'VEG-TOMATO': 'organic tomatoes ripe',
   'VEG-POTATO': 'potato tuber vegetable',
   'VEG-BRINJAL': 'aubergine vegetable',

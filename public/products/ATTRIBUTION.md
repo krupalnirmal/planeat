@@ -62,7 +62,7 @@ panel. Licences are recorded here because several require credit.
 | `VEG-GINGER` | [Liat Portal for Foodie Disorder - Fresh Ginger Root.jpg](https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Fresh_Ginger_Root.jpg) | HaJunkiyada | CC BY-SA 4.0 |
 | `VEG-GREENCHILLI` | [കാന്താരി മുളക്൧.jpg](https://commons.wikimedia.org/wiki/File:%E0%B4%95%E0%B4%BE%E0%B4%A8%E0%B5%8D%E0%B4%A4%E0%B4%BE%E0%B4%B0%E0%B4%BF_%E0%B4%AE%E0%B5%81%E0%B4%B3%E0%B4%95%E0%B5%8D%E0%B5%A7.jpg) | Fotokannan | CC BY-SA 3.0 |
 | `VEG-OKRA` | [Bucket of raw okra pods.jpg](https://commons.wikimedia.org/wiki/File:Bucket_of_raw_okra_pods.jpg) | Bill Tarpenning | Public domain |
-| `VEG-ONION` | [Textura de cebolla.JPG](https://commons.wikimedia.org/wiki/File:Textura_de_cebolla.JPG) | Yolandagagliardi | CC BY-SA 3.0 |
+| `VEG-ONION` | [Three whole red onions.jpg](https://commons.wikimedia.org/wiki/File:Three_whole_red_onions.jpg) | Anja | CC BY-SA 4.0 |
 | `VEG-POTATO` | [Potato and cross section.jpg](https://commons.wikimedia.org/wiki/File:Potato_and_cross_section.jpg) | Unknown | GFDL 1.2 |
 | `VEG-PUMPKIN` | [Cucurbita 2011 G1.jpg](https://commons.wikimedia.org/wiki/File:Cucurbita_2011_G1.jpg) | George Chernilevsky | Public domain |
 | `VEG-RIDGEGOURD` | [Luffa acutangula1.jpg](https://commons.wikimedia.org/wiki/File:Luffa_acutangula1.jpg) | No machine-readable author provided. Hans B.~commonswiki assumed (based on copyright claims). | Public domain |
