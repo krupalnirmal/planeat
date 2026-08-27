@@ -225,6 +225,27 @@
     @apply mx-auto w-full max-w-[480px] min-h-dvh bg-background;
   }
 
+  /* Category hero (session 2026-08-27): a slow bob for the produce cutout
+     and the leaves drifting behind it. Long, low-amplitude and eased, so
+     it reads as "alive" in peripheral vision rather than as something
+     demanding attention while the customer is trying to shop. */
+  .animate-hero-float {
+    animation: hero-float 6s ease-in-out infinite;
+  }
+
+  .animate-hero-drift {
+    animation: hero-drift 9s ease-in-out infinite;
+  }
+
+  /* Vestibular safety: anyone who has asked their OS for less motion gets
+     the finished layout with nothing moving. */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-hero-float,
+    .animate-hero-drift {
+      animation: none;
+    }
+  }
+
   .app-scroll {
     /* Reserves space for the floating cart bar too, not just the bottom
        nav — without it the bar (and its free-delivery nudge, when shown)
@@ -253,5 +274,30 @@
       inset 0 1px 3px 0 rgb(0 0 0 / 0.07),
       inset 0 1px 0 0 rgb(255 255 255 / 0.7),
       0 0 0 3px var(--brand-tint-green);
+  }
+}
+
+/* Category hero motion — see `.animate-hero-float` / `.animate-hero-drift`
+   in the components layer above. Declared outside @layer so the keyframes
+   are never stripped when the layer is reordered. */
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(-1.2deg);
+  }
+}
+
+@keyframes hero-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(6px, -9px) rotate(14deg);
+    opacity: 0.85;
   }
 }

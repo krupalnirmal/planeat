@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, LayoutGrid, Search, X } from 'lucide-react';
+import { ChevronDown, LayoutGrid, Leaf, Search, X, Zap } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { SUBGROUP_TILE_IMAGES } from '@/lib/catalog/subgroup-tile-images';
@@ -132,6 +132,10 @@ export function CategoryProductList({
 }) {
   const t = useTranslations('categories');
   const tc = useTranslations('common');
+  // The delivery promise lives under `home`, where the header already uses
+  // it — repeating the string under `categories` would be two copies of
+  // one fact to keep in sync across three locales.
+  const th = useTranslations('home');
 
   const [query, setQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
@@ -409,27 +413,72 @@ export function CategoryProductList({
           matching the reference; a search collapses it along with the
           sub-group rail, same reasoning as `groups` below. */}
       {!searching && sorted.length > 0 && BANNER_SLUGS.has(slug) && (
-        <div className="flex items-center gap-3 bg-tint-lime px-4 pt-1 pb-4">
-          <div className="min-w-0 flex-1">
-            <h2 className="text-[19px] leading-tight font-black text-foreground">
-              {t(`banner.${slug}.headline`)}
-            </h2>
-            <p className="mt-1 text-[13px] text-muted-foreground">{t(`banner.${slug}.sub`)}</p>
-          </div>
-          {bannerPhotos.length > 0 && (
-            <div className="flex shrink-0 -space-x-3" aria-hidden>
-              {bannerPhotos.map((url, i) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  key={url}
-                  src={url}
-                  alt=""
-                  className="size-16 rounded-full border-2 border-card object-cover shadow-md"
-                  style={{ transform: `rotate(${(i - 1) * 8}deg)`, zIndex: bannerPhotos.length - i }}
-                />
-              ))}
+        <div className="bg-tint-lime px-4 pt-1 pb-4">
+          <div className="animate-in fade-in slide-in-from-bottom-2 relative overflow-hidden rounded-[var(--radius)] bg-gradient-to-br from-[#eaf7d4] via-[#f2fadf] to-[#fdf6e6] px-4 py-5 shadow-sm duration-500">
+            {/* Two soft colour pools behind everything, so the gradient
+                reads as depth rather than as a flat two-tone fill. */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -top-10 -left-8 size-36 rounded-full bg-primary/15 blur-3xl"
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -right-6 -bottom-12 size-32 rounded-full bg-accent/20 blur-3xl"
+            />
+
+            {/* Leaves drifting behind the copy. Decorative only — aria-hidden,
+                and stilled entirely under prefers-reduced-motion. */}
+            {[
+              { cls: 'top-2 left-[52%] size-4', delay: '0s' },
+              { cls: 'top-9 left-[70%] size-3', delay: '1.6s' },
+              { cls: 'bottom-3 left-[60%] size-3.5', delay: '3.1s' },
+            ].map((leaf) => (
+              <Leaf
+                key={leaf.cls}
+                aria-hidden
+                style={{ animationDelay: leaf.delay }}
+                className={cn(
+                  'animate-hero-drift pointer-events-none absolute text-primary/40',
+                  leaf.cls,
+                )}
+              />
+            ))}
+
+            <div className="relative flex items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <h2 className="text-[19px] leading-tight font-black text-primary-dark drop-shadow-sm">
+                  {t(`banner.${slug}.headline`)}
+                </h2>
+                <p className="mt-1 text-[13px] leading-snug font-medium text-foreground/70">
+                  {t(`banner.${slug}.sub`)}
+                </p>
+                <span className="mt-2.5 inline-flex items-center gap-1 rounded-full bg-primary-dark px-2.5 py-1 text-[11px] font-bold text-white">
+                  <Zap className="size-3 fill-white" aria-hidden />
+                  {th('deliveryIn', { minutes: 30 })}
+                </span>
+              </div>
+
+              {/* The catalogue's own photos, overlapped and gently bobbing on
+                  a stagger so they don't move as one block. */}
+              {bannerPhotos.length > 0 && (
+                <div className="flex shrink-0 -space-x-4" aria-hidden>
+                  {bannerPhotos.map((url, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={url}
+                      src={url}
+                      alt=""
+                      className="animate-hero-float size-[68px] rounded-full border-[3px] border-white/90 object-cover shadow-lg"
+                      style={{
+                        animationDelay: `${i * 0.8}s`,
+                        zIndex: bannerPhotos.length - i,
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       )}
 
