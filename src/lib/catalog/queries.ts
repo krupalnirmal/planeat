@@ -209,7 +209,16 @@ export async function getHomePayload(locale: Locale): Promise<HomePayload> {
     }),
 
     db.product.findMany({
-      where: { isActive: true, variants: { some: { isActive: true, stockQty: { gt: 0 } } } },
+      where: {
+        isActive: true,
+        // A product in a switched-off category must not surface here: Top
+        // Picks was still showing Grocery and Ice Cream items after those
+        // categories were taken off the storefront (session 2026-08-27),
+        // and tapping one opened a product page for a category the
+        // customer cannot otherwise reach.
+        category: { isActive: true },
+        variants: { some: { isActive: true, stockQty: { gt: 0 } } },
+      },
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
       take: 12,
       select: productCardSelect,

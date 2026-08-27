@@ -47,15 +47,15 @@ export function BannerCarousel({ banners }: { banners: CarouselBanner[] }) {
     return () => observer.disconnect();
   }, [banners.length]);
 
-  // Auto-advance every 4.5s. Paused implicitly whenever the tab is not
-  // visible (setInterval throttles in background tabs) — nothing fancier is
-  // needed for a home-screen promo strip.
+  // Auto-advance every 5s (client-specified, session 2026-08-27). Paused
+  // implicitly whenever the tab is not visible (setInterval throttles in
+  // background tabs) — nothing fancier is needed for a promo strip.
   useEffect(() => {
     if (banners.length <= 1) return;
     const timer = setInterval(() => {
       const next = (active + 1) % banners.length;
       slideRefs.current[next]?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
-    }, 4500);
+    }, 5000);
     return () => clearInterval(timer);
   }, [active, banners.length]);
 

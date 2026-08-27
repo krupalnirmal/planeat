@@ -22,13 +22,31 @@ const cloudinaryMap: Record<string, string> = (() => {
 
 const url = (slug: string, localFile: string) => cloudinaryMap[slug] ?? localFile;
 
+// Three client-supplied creatives (session 2026-08-27), replacing the
+// single banner_3 that ran before. The home carousel rotates them; the
+// titles below are the alt text, so they describe each creative's own
+// headline rather than repeating one generic line three times.
 const BANNERS = [
   {
-    imageUrl: url('banner_3', '/banners/banner_3.jpg'),
+    imageUrl: url('banner-1', '/banners/banner-1.jpg'),
+    titleMr: 'ताजं खा, निरोगी राहा — निवडक ताजेपणा, तुमच्यासाठी',
+    titleHi: 'ताज़ा खाएँ, स्वस्थ रहें — चुनी हुई ताज़गी, आपके लिए',
+    titleEn: 'Eat Fresh, Live Fresh — handpicked freshness, just for you',
+    sortOrder: 0,
+  },
+  {
+    imageUrl: url('banner-2', '/banners/banner-2.jpg'),
+    titleMr: 'चांगलं अन्न, चांगला मूड — रोजच्या गरजा, दारापर्यंत',
+    titleHi: 'अच्छा खाना, अच्छा मूड — रोज़ की ज़रूरतें, आपके दरवाज़े तक',
+    titleEn: 'Good Food. Good Mood. — daily essentials, at your doorstep',
+    sortOrder: 1,
+  },
+  {
+    imageUrl: url('banner-3', '/banners/banner-3.jpg'),
     titleMr: 'ताज्या भाज्या, ताजं आरोग्य!',
     titleHi: 'ताज़ी सब्ज़ियां, ताज़ी सेहत!',
     titleEn: 'Fresh vegetables, fresh health!',
-    sortOrder: 0,
+    sortOrder: 2,
   },
 ];
 
