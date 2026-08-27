@@ -30,7 +30,7 @@ export function HomeSection({
   children: ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="px-4 py-3">
+    <section aria-labelledby={id} className="px-4 py-2">
       <div className={cn(card && 'rounded-[var(--radius)] bg-card p-3 shadow-sm')}>
         <div className="mb-3 flex items-baseline justify-between gap-3">
           <h2 id={id} className="flex items-center gap-1.5 text-[17px] font-bold">

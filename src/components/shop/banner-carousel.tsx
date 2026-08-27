@@ -64,7 +64,7 @@ export function BannerCarousel({ banners }: { banners: CarouselBanner[] }) {
   }
 
   return (
-    <div className="mb-1">
+    <div>
       <ul
         ref={trackRef}
         className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -94,7 +94,7 @@ export function BannerCarousel({ banners }: { banners: CarouselBanner[] }) {
         // row was taller than these short, wide banner creatives are, which
         // read as a large empty gap under the banner rather than as
         // pagination.
-        <div className="flex h-5 items-center justify-center gap-1 overflow-visible">
+        <div className="mt-1 flex h-4 items-center justify-center gap-1 overflow-visible">
           {banners.map((banner, index) => (
             // The BUTTON is the 44px tap target R10 requires (enforced
             // globally in `globals.css`); the visible dot is the small span

@@ -68,7 +68,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             Picks.
             Inset with side padding and rounded, matching the reference —
             it reads as a card on the page, not a full-bleed strip. */}
-        <div className="px-4 pt-2 pb-1">
+        <div className="px-4 pt-2">
           {banners.length > 0 ? (
             <BannerCarousel banners={banners} />
           ) : (
