@@ -14,16 +14,26 @@ import cloudinaryMap from './category-tile-cloudinary-map.json';
  */
 const map = cloudinaryMap as Record<string, string>;
 
-function imagesFor(prefix: string): string[] {
-  return Object.keys(map)
+/**
+ * Returns `undefined`, not `[]`, when a prefix has no curated photos —
+ * callers reach for the category's own product photos with `??`, which an
+ * empty array would sail straight past, leaving the tile blank.
+ */
+function imagesFor(prefix: string): string[] | undefined {
+  const images = Object.keys(map)
     .filter((key) => key.startsWith(`${prefix}-`))
     .sort()
     .map((key) => map[key]);
+  return images.length > 0 ? images : undefined;
 }
 
-export const CATEGORY_TILE_IMAGES: Record<string, string[]> = {
+export const CATEGORY_TILE_IMAGES: Record<string, string[] | undefined> = {
   vegetables: imagesFor('vegetables'),
   fruits: imagesFor('fruits'),
   dairy: imagesFor('dairy'),
-  grocery: imagesFor('grocery'),
+  // No curated set for Bakery & Biscuits — it falls back to its own
+  // product photos. Grocery's curated set is left in the JSON but no
+  // longer wired up: the category is switched off in the storefront
+  // (session 2026-08-27, client asked for Bakery in its place).
+  'bakery-biscuits': imagesFor('bakery'),
 };

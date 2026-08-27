@@ -68,6 +68,14 @@ interface CategorySeed {
   hi: string;
   sortOrder: number;
   mealPlanEligible: boolean;
+  /**
+   * Whether the category is live in the storefront. Defaults to true.
+   * Seeded explicitly (session 2026-08-27) rather than left to whatever the
+   * database happened to hold — bakery and ice-cream had been switched off
+   * in the demo database at some point, so they 404'd and were missing from
+   * home, and re-running the seed never put them back.
+   */
+  isActive?: boolean;
   products: ProductSeed[];
 }
 
@@ -785,6 +793,10 @@ const CATEGORIES: CategorySeed[] = [
     hi: 'आइसक्रीम',
     sortOrder: 5,
     mealPlanEligible: false,
+    // Off in the demo database already and not part of the client's
+    // four-tile home grid — left off rather than silently switched on by
+    // the new explicit isActive default.
+    isActive: false,
     products: [
       {
         sku: 'ICE-VANILLA-700',
@@ -815,6 +827,11 @@ const CATEGORIES: CategorySeed[] = [
     hi: 'किराना',
     sortOrder: 6,
     mealPlanEligible: true,
+    // Client asked for Grocery off the storefront (session 2026-08-27) and
+    // Bakery on in its place. Deactivated rather than deleted: the products
+    // and their order history stay intact, and flipping this back is a
+    // one-line change (the admin panel toggles the same flag).
+    isActive: false,
     products: [
       {
         // Placeholder prices, same as the rest of this seed file — the
@@ -1022,12 +1039,14 @@ async function seedCatalogue(): Promise<void> {
         nameMr: category.mr,
         nameHi: category.hi,
         sortOrder: category.sortOrder,
+        isActive: category.isActive ?? true,
       },
       update: {
         nameEn: category.en,
         nameMr: category.mr,
         nameHi: category.hi,
         sortOrder: category.sortOrder,
+        isActive: category.isActive ?? true,
       },
     });
 
