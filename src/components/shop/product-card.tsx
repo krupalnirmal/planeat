@@ -227,7 +227,7 @@ export function ProductCard({
           overlapping the photo, and no eta/stock line the reference
           doesn't show either. `mt-auto` pins this row to the bottom even
           when the name above it is a single short line. */}
-      <div className="mt-auto flex items-end justify-between gap-2 px-2.5 pt-2 pb-2.5">
+      <div className="mt-auto flex items-end justify-between gap-1.5 px-2.5 pt-2 pb-2.5">
         <div className="min-w-0">
           <div className="flex items-baseline gap-1">
             <span className="text-[14px] font-bold">{formatPaise(price, { hidePaise: true })}</span>
@@ -252,11 +252,12 @@ export function ProductCard({
               type="button"
               onClick={handleAdd}
               aria-label={`${t('add')} ${product.name}`}
-              // Matches the client's mock exactly: white, a crisp green
-              // border (not the earlier tinted fill), generously padded
-              // rather than a fixed narrow width now that it isn't sharing
-              // a bar with a weight label anymore.
-              className="flex min-w-[64px] flex-col items-center justify-center gap-0 rounded-[10px] border-[1.5px] border-primary bg-card px-4 py-1.5 text-[13px] font-bold text-primary"
+              // Matches the client's mock: white, a crisp green border (not
+              // the earlier tinted fill). Sized down (session 2026-08-28)
+              // from a fixed 64px min-width — that crowded into the price on
+              // the narrower Top Picks card and any 3-digit price wrapped
+              // right up against it.
+              className="flex min-w-[46px] flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-2 py-1.5 text-[12px] font-bold text-primary"
             >
               {t('add')}
               {/* "N options" sits inside the same bordered button as a
