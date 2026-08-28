@@ -365,7 +365,7 @@ export function LoginFlow() {
             role="group"
             aria-label={t('otpLabel')}
             onPaste={handleOtpPaste}
-            className="flex justify-between gap-2"
+            className="flex justify-center gap-2.5"
           >
             {Array.from({ length: OTP_LENGTH }).map((_, index) => (
               <input
@@ -381,7 +381,7 @@ export function LoginFlow() {
                 onChange={(event) => setDigit(index, event.target.value)}
                 onKeyDown={(event) => handleOtpKeyDown(index, event)}
                 className={cn(
-                  'input-3d h-13 w-full max-w-13 rounded-2xl border-2 border-border/60 bg-card text-center text-xl font-bold outline-none focus:border-primary',
+                  'input-3d size-11 shrink-0 rounded-xl border-2 border-border/60 bg-card text-center text-lg font-bold outline-none focus:border-primary',
                   error && 'border-danger',
                 )}
               />
