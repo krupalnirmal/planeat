@@ -3,6 +3,7 @@ import { getStorageProvider } from '@/lib/services/storage';
 import type { Prisma } from '@/generated/prisma/client';
 import type { Locale, UnitType } from '@/generated/prisma/enums';
 import { CATEGORY_TILE_IMAGES } from './category-tile-images';
+import NON_WHITE_BG_SKUS from './non-white-bg-skus.json';
 import { pickName, scoreMatch, searchTerms } from './text';
 
 /**
@@ -218,6 +219,14 @@ export async function getHomePayload(locale: Locale): Promise<HomePayload> {
         // customer cannot otherwise reach.
         category: { isActive: true },
         variants: { some: { isActive: true, stockQty: { gt: 0 } } },
+        // Client request (session 2026-08-28): Top Picks is the shop's
+        // showcase rail, so it should only ever feature a studio-white
+        // photo — a product photographed on a wooden board or rustic
+        // backdrop still sells fine in its own category grid, just not
+        // here. The exclude-list is a static scan (border pixel
+        // whiteness), not computed per-request — see
+        // scripts/scan-white-bg-skus.mjs, re-run whenever a photo changes.
+        sku: { notIn: NON_WHITE_BG_SKUS },
       },
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
       take: 12,

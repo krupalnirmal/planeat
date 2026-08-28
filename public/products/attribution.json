@@ -72,14 +72,6 @@
     "source": "https://commons.wikimedia.org/wiki/File:Butterschmalz-3.jpg"
   },
   {
-    "sku": "DRY-MILK-500",
-    "term": "glass of milk on table (replaced session 2026-08-26 — the old photo showed milk being poured into a mug that already had coffee in it, reading as a coffee product, not milk)",
-    "title": "Glass of milk on table.jpg",
-    "artist": "PotatoCow25",
-    "licence": "CC BY-SA 4.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Glass_of_milk_on_table.jpg"
-  },
-  {
     "sku": "DRY-PANEER-200",
     "term": "paneer",
     "title": "Panir Paneer Indian cheese fresh.jpg",
@@ -166,14 +158,6 @@
     "artist": "Renee Comet (Photographer)",
     "licence": "Public domain",
     "source": "https://commons.wikimedia.org/wiki/File:Kiwi.jpg"
-  },
-  {
-    "sku": "FRT-LEMON",
-    "term": "lemon citrus fruit yellow",
-    "title": "Lemon.jpg",
-    "artist": "André Karwath aka Aka",
-    "licence": "CC BY-SA 2.5",
-    "source": "https://commons.wikimedia.org/wiki/File:Lemon.jpg"
   },
   {
     "sku": "FRT-MANGO",
@@ -304,54 +288,6 @@
     "source": "https://commons.wikimedia.org/wiki/File:Ice_Cream_Dessert.JPG"
   },
   {
-    "sku": "VEG-BEETROOT",
-    "term": "beetroot",
-    "title": "Beets produce-1.jpg",
-    "artist": "Quadell",
-    "licence": "CC BY-SA 3.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Beets_produce-1.jpg"
-  },
-  {
-    "sku": "VEG-BOTTLEGOURD",
-    "term": "bottle gourd",
-    "title": "Lagenaria siceraria Clavata Group1SHSU.jpg",
-    "artist": "Shu Suehiro",
-    "licence": "CC BY 3.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Lagenaria_siceraria_Clavata_Group1SHSU.jpg"
-  },
-  {
-    "sku": "VEG-BRINJAL",
-    "term": "aubergine vegetable",
-    "title": "Aubergine Rhodos.jpg",
-    "artist": "Karelj",
-    "licence": "Public domain",
-    "source": "https://commons.wikimedia.org/wiki/File:Aubergine_Rhodos.jpg"
-  },
-  {
-    "sku": "VEG-CABBAGE",
-    "term": "cabbage head green vegetable",
-    "title": "Savoy Cabbage wrinkles.jpg",
-    "artist": "Sheila Sund",
-    "licence": "CC BY 2.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Savoy_Cabbage_wrinkles.jpg"
-  },
-  {
-    "sku": "VEG-CAPSICUM",
-    "term": "bell pepper capsicum green",
-    "title": "Green Peppers KGs.jpg",
-    "artist": "JMK (JohnManuel)",
-    "licence": "CC BY 2.5",
-    "source": "https://commons.wikimedia.org/wiki/File:Green_Peppers_KGs.jpg"
-  },
-  {
-    "sku": "VEG-CARROT",
-    "term": "carrot orange root vegetable",
-    "title": "Carrots of many colors.jpg",
-    "artist": "Stephen Ausmus",
-    "licence": "Public domain",
-    "source": "https://commons.wikimedia.org/wiki/File:Carrots_of_many_colors.jpg"
-  },
-  {
     "sku": "VEG-CAULIFLOWER",
     "term": "cauliflower head white vegetable",
     "title": "Chou-fleur 02.jpg",
@@ -360,100 +296,12 @@
     "source": "https://commons.wikimedia.org/wiki/File:Chou-fleur_02.jpg"
   },
   {
-    "sku": "VEG-CLUSTERBEANS",
-    "term": "cluster beans guar cyamopsis pods",
-    "title": "Cluster bean cluster.jpg",
-    "artist": "Ton Rulkens",
-    "licence": "CC BY-SA 2.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Cluster_bean_cluster.jpg"
-  },
-  {
-    "sku": "VEG-CORIANDER",
-    "term": "Coriandrum sativum coriander leaves bunch fresh",
-    "title": "Bunches of coriander leaves.jpg",
-    "artist": "Kpsudeep",
-    "licence": "CC BY-SA 4.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Bunches_of_coriander_leaves.jpg"
-  },
-  {
-    "sku": "VEG-CUCUMBER",
-    "term": "cucumber white background (white-background pass, session 2026-08-27)",
-    "title": "Cucumber picture.jpg",
-    "artist": "Mgmoscatello",
-    "licence": "CC BY-SA 3.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Cucumber_picture.jpg"
-  },
-  {
-    "sku": "VEG-CURRYLEAVES",
-    "term": "curry leaves murraya koenigii",
-    "title": "Murraya koenigii leaves - curry leaves.jpg",
-    "artist": "Sonja Pauen - Stanhopea",
-    "licence": "CC BY 2.0 de",
-    "source": "https://commons.wikimedia.org/wiki/File:Murraya_koenigii_leaves_-_curry_leaves.jpg"
-  },
-  {
-    "sku": "VEG-FENUGREEK",
-    "term": "fenugreek leaves methi greens",
-    "title": "Methi leaves.jpg",
-    "artist": "Katyare",
-    "licence": "CC BY-SA 3.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Methi_leaves.jpg"
-  },
-  {
-    "sku": "VEG-FRESHPEANUT",
-    "term": "raw peanuts",
-    "title": "Raw peanuts.JPG",
-    "artist": "Sakurai Midori",
-    "licence": "CC BY 3.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Raw_peanuts.JPG"
-  },
-  {
     "sku": "VEG-GARLIC",
     "term": "garlic bulbs white background (white-background pass, session 2026-08-27)",
     "title": "Opened garlic bulb with garlic clove.jpg",
     "artist": "Dubravko Sorić SoraZG on Flickr",
     "licence": "CC BY 2.0",
     "source": "https://commons.wikimedia.org/wiki/File:Opened_garlic_bulb_with_garlic_clove.jpg"
-  },
-  {
-    "sku": "VEG-GINGER",
-    "term": "fresh ginger root farmers market",
-    "title": "Liat Portal for Foodie Disorder - Fresh Ginger Root.jpg",
-    "artist": "HaJunkiyada",
-    "licence": "CC BY-SA 4.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Fresh_Ginger_Root.jpg"
-  },
-  {
-    "sku": "VEG-GREENCHILLI",
-    "term": "green chillies Kerala",
-    "title": "കാന്താരി മുളക്൧.jpg",
-    "artist": "Fotokannan",
-    "licence": "CC BY-SA 3.0",
-    "source": "https://commons.wikimedia.org/wiki/File:%E0%B4%95%E0%B4%BE%E0%B4%A8%E0%B5%8D%E0%B4%A4%E0%B4%BE%E0%B4%B0%E0%B4%BF_%E0%B4%AE%E0%B5%81%E0%B4%B3%E0%B4%95%E0%B5%8D%E0%B5%A7.jpg"
-  },
-  {
-    "sku": "VEG-OKRA",
-    "term": "okra Abelmoschus esculentus pods raw",
-    "title": "Bucket of raw okra pods.jpg",
-    "artist": "Bill Tarpenning",
-    "licence": "Public domain",
-    "source": "https://commons.wikimedia.org/wiki/File:Bucket_of_raw_okra_pods.jpg"
-  },
-  {
-    "sku": "VEG-ONION",
-    "term": "onions white background (replaced session 2026-08-27 — the old photo was an extreme close-up of a cut onion's cross-section, reading as a texture study rather than a product for sale)",
-    "title": "Three whole red onions.jpg",
-    "artist": "Anja",
-    "licence": "CC BY-SA 4.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Three_whole_red_onions.jpg"
-  },
-  {
-    "sku": "VEG-POTATO",
-    "term": "potato tuber vegetable",
-    "title": "Potato and cross section.jpg",
-    "artist": "Unknown",
-    "licence": "GFDL 1.2",
-    "source": "https://commons.wikimedia.org/wiki/File:Potato_and_cross_section.jpg"
   },
   {
     "sku": "VEG-PUMPKIN",
@@ -470,21 +318,5 @@
     "artist": "No machine-readable author provided. Hans B.~commonswiki assumed (based on copyright claims).",
     "licence": "Public domain",
     "source": "https://commons.wikimedia.org/wiki/File:Luffa_acutangula1.jpg"
-  },
-  {
-    "sku": "VEG-SPINACH",
-    "term": "spinach leaves bunch green vegetable",
-    "title": "Fresh Spinach leaves.jpg",
-    "artist": "Charipearl",
-    "licence": "CC BY-SA 4.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Fresh_Spinach_leaves.jpg"
-  },
-  {
-    "sku": "VEG-TOMATO",
-    "term": "tomatoes white background (white-background pass, session 2026-08-27)",
-    "title": "Red tomatoes. img 03.jpg",
-    "artist": "Dmitry Makeev",
-    "licence": "CC BY-SA 4.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Red_tomatoes._img_03.jpg"
   }
 ]

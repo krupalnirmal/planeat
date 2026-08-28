@@ -1,4 +1,7 @@
 {
   "leafy": "https://res.cloudinary.com/kf9nvvpv/image/upload/v1787676481/planeat/subgroup-tiles/leafy.png",
-  "fruit": "https://res.cloudinary.com/kf9nvvpv/image/upload/v1787676482/planeat/subgroup-tiles/fruit.png"
+  "fruit": "https://res.cloudinary.com/kf9nvvpv/image/upload/v1787676482/planeat/subgroup-tiles/fruit.png",
+  "citrus": "https://res.cloudinary.com/kf9nvvpv/image/upload/v1787718507/planeat/products/frt-orange.jpg",
+  "exotic": "https://res.cloudinary.com/kf9nvvpv/image/upload/v1787830745/planeat/products/frt-dragonfruit.jpg",
+  "dryfruits": "https://res.cloudinary.com/kf9nvvpv/image/upload/v1787718509/planeat/products/frt-raisins.jpg"
 }
