@@ -116,10 +116,12 @@ export function CartScreen() {
   return (
     <>
       <PageHeader title={t('title')} backHref="/" backLabel={tc('back')} />
-      <main className="space-y-2 pb-2">
+      <main className="space-y-2 bg-background pb-2">
       {defaultAddress && (
-        <div className="flex items-center gap-2.5 bg-card px-4 py-3">
-          <MapPin className="size-4 shrink-0 text-primary" aria-hidden />
+        <div className="flex items-center gap-3 bg-card px-4 py-3.5">
+          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-tint-green">
+            <MapPin className="size-4 text-primary" aria-hidden />
+          </span>
           <div className="min-w-0 flex-1">
             <p className="text-xs text-muted-foreground">{t('deliverTo')}</p>
             <p className="truncate text-sm font-semibold">
@@ -137,7 +139,7 @@ export function CartScreen() {
       </p>
 
       {blocked && (
-        <p className="mb-4 flex items-start gap-2 rounded-[var(--radius)] bg-[#FDF3E3] px-3 py-2.5 text-xs text-warning">
+        <p className="mb-4 flex items-start gap-2 rounded-2xl bg-[#FDF3E3] px-3.5 py-3 text-xs text-warning">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
           {t('unavailableItems')}
         </p>
@@ -151,11 +153,11 @@ export function CartScreen() {
             <li
               key={line.id}
               className={cn(
-                'flex gap-3 rounded-[var(--radius)] border border-border/60 bg-background p-3',
+                'flex gap-3 rounded-2xl border border-border/50 bg-background p-3.5',
                 unavailable && 'opacity-70',
               )}
             >
-              <div className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-[calc(var(--radius)-6px)] bg-secondary">
+              <div className="grid size-[68px] shrink-0 place-items-center overflow-hidden rounded-xl bg-secondary">
                 {line.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={line.imageUrl} alt="" aria-hidden className="size-full object-cover" />
@@ -165,8 +167,8 @@ export function CartScreen() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="line-clamp-2 text-sm font-medium">{line.name}</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">
+                <p className="line-clamp-2 text-sm font-bold">{line.name}</p>
+                <p className="mt-0.5 text-xs font-medium text-muted-foreground">
                   {formatQuantity(line.unitQuantity, line.unit as QuantityUnit)} ·{' '}
                   {formatPaise(paise(line.unitPricePaise), { hidePaise: true })}
                 </p>
@@ -188,7 +190,7 @@ export function CartScreen() {
                     <button
                       type="button"
                       onClick={() => cart.remove(line.variantId)}
-                      className="flex h-11 items-center gap-1.5 rounded-[var(--radius)] border border-border px-3 text-xs font-medium"
+                      className="flex h-11 items-center gap-1.5 rounded-xl border border-border px-3 text-xs font-medium"
                     >
                       <Trash2 className="size-3.5" aria-hidden />
                       {tc('remove')}
@@ -228,7 +230,7 @@ export function CartScreen() {
           href="/checkout"
           aria-disabled={!quote.data?.canPlaceOrder}
           className={cn(
-            'flex h-11 items-center justify-between rounded-[var(--radius)] bg-primary px-4 text-sm font-bold text-primary-foreground',
+            'flex h-14 items-center justify-between rounded-2xl bg-primary px-5 text-[15px] font-bold text-primary-foreground shadow-sm',
             !quote.data?.canPlaceOrder && 'pointer-events-none opacity-50',
           )}
         >

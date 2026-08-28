@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Check, Leaf, MessageCircle, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Check, Leaf, MessageCircle, ShieldCheck, Smartphone } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -23,7 +23,11 @@ import { cn } from '@/lib/utils';
  */
 
 const OTP_LENGTH = 6;
-const FEATURE_KEYS = ['featureFreshHandpicked', 'featureNoPreservatives', 'featureOnTime'] as const;
+const FEATURES = [
+  { titleKey: 'featureFreshHandpicked', bodyKey: 'featureFreshHandpickedBody' },
+  { titleKey: 'featureNoPreservatives', bodyKey: 'featureNoPreservativesBody' },
+  { titleKey: 'featureOnTime', bodyKey: 'featureOnTimeBody' },
+] as const;
 
 interface SendResult {
   sent: boolean;
@@ -202,29 +206,34 @@ export function LoginFlow() {
 
   if (step === 'phone') {
     return (
-      <main className="flex min-h-dvh flex-col px-6 pt-6 pb-6">
-        <div className="relative flex items-center justify-center">
-          <div className="flex items-center gap-2">
-            <Leaf className="size-9 -rotate-12 text-primary" aria-hidden />
-            <p className="text-4xl font-black tracking-tight">
+      // bg-background, not the page's usual white-card-on-white — a premium
+      // onboarding screen (session 2026-08-28, client's reference) reads as
+      // one soft field rather than a stack of panels the way the shop
+      // screens deliberately do.
+      <main className="flex min-h-dvh flex-col bg-background px-6 pt-7 pb-6">
+        <div className="flex items-center justify-between gap-2">
+          {/* Left-aligned, not centred in the full row — on a narrow phone
+              a centred "Get Fresh" at this size runs directly under the
+              Skip pill's right-aligned position and the two collide. */}
+          <div className="flex min-w-0 items-center gap-2">
+            <Leaf className="size-9 shrink-0 -rotate-12 text-primary" aria-hidden />
+            <p className="truncate text-4xl font-black tracking-tight">
               <span className="text-primary-dark">Get</span>{' '}
               <span className="text-primary">Fresh</span>
             </p>
           </div>
 
           {/* B17 — the catalogue is public, so a customer who lands here by
-              accident must have a way back out that is not the OS back button.
-              Absolutely positioned so it doesn't pull the centred logo off
-              centre. */}
+              accident must have a way back out that is not the OS back button. */}
           <Link
             href="/"
-            className="absolute top-0 right-0 rounded-full bg-card px-4 py-2 text-[13px] font-bold shadow-sm"
+            className="shrink-0 rounded-full bg-card px-4 py-2 text-[13px] font-bold shadow-sm"
           >
             {t('skipLogin')}
           </Link>
         </div>
 
-        <h1 className="mt-3 text-center text-lg leading-tight font-bold whitespace-pre-line">
+        <h1 className="mt-4 text-center text-xl leading-snug font-bold whitespace-pre-line">
           {ta('tagline')}
         </h1>
 
@@ -233,28 +242,34 @@ export function LoginFlow() {
           src="/promo/veg-basket-hero.png"
           alt=""
           aria-hidden
-          className="mx-auto mt-6 w-full max-w-[260px]"
+          className="mx-auto mt-6 w-full max-w-[260px] drop-shadow-lg"
         />
 
-        <ul className="mt-6 flex flex-col items-center space-y-2.5">
-          {FEATURE_KEYS.map((key) => (
-            <li key={key} className="flex items-center gap-2.5 text-sm font-semibold">
-              <span className="grid size-5 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
-                <Check className="size-3.5" aria-hidden />
+        {/* Icon left, title + a short subtitle stacked to its right — a
+            proper feature list (client's reference) rather than a row of
+            single-line checkmarks. */}
+        <ul className="mt-7 flex flex-col gap-3.5">
+          {FEATURES.map(({ titleKey, bodyKey }) => (
+            <li key={titleKey} className="flex items-start gap-3">
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
+                <Check className="size-4.5" aria-hidden />
               </span>
-              {t(key)}
+              <span className="min-w-0 pt-0.5">
+                <span className="block text-sm font-bold">{t(titleKey)}</span>
+                <span className="block text-xs text-muted-foreground">{t(bodyKey)}</span>
+              </span>
             </li>
           ))}
         </ul>
 
         <form
-          className="mx-auto mt-6 w-full max-w-xs"
+          className="mt-7 w-full"
           onSubmit={(event) => {
             event.preventDefault();
             if (phoneValid && !busy) void sendCode('sms');
           }}
         >
-          <div className="input-3d flex h-12 items-center gap-3 rounded-[var(--radius)] border border-border/60 bg-card px-4 focus-within:border-foreground">
+          <div className="input-3d flex h-13 items-center gap-3 rounded-2xl border border-border/60 bg-card px-4 focus-within:border-primary">
             <span className="text-base font-bold">+91</span>
             <span aria-hidden className="h-6 w-px bg-border" />
             <input
@@ -276,7 +291,7 @@ export function LoginFlow() {
           <button
             type="submit"
             disabled={!phoneValid || busy}
-            className="mt-4 h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground transition-colors disabled:bg-muted-foreground/45 disabled:text-white"
+            className="mt-4 h-13 w-full rounded-2xl bg-primary text-[15px] font-bold text-primary-foreground shadow-sm transition-colors disabled:bg-muted-foreground/45 disabled:text-white disabled:shadow-none"
           >
             {busy ? t('sending') : t('sendOtp')}
           </button>
@@ -286,7 +301,7 @@ export function LoginFlow() {
             the viewport left a large dead gap under the button on anything
             taller than the shortest phones, with the top and bottom margins
             reading as mismatched. */}
-        <p className="mt-10 border-t border-border pt-4 text-center text-[11px] leading-relaxed text-muted-foreground">
+        <p className="mt-8 text-center text-[11px] leading-relaxed text-muted-foreground">
           {t('termsNote')}
         </p>
       </main>
@@ -295,7 +310,10 @@ export function LoginFlow() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-accent-faint px-3 py-3">
+      {/* White, not the cream PageHeader band — this flow has its own
+          header rather than the shared shop one, so restyling it doesn't
+          ripple into every other screen. */}
+      <header className="sticky top-0 z-30 flex items-center gap-2 bg-card px-3 py-3 shadow-sm">
         <button
           type="button"
           onClick={() => {
@@ -307,11 +325,22 @@ export function LoginFlow() {
         >
           <ArrowLeft className="size-5" aria-hidden />
         </button>
-        <h1 className="text-base font-bold">{t('otpTitle')}</h1>
+        <h1 className="flex-1 text-base font-bold">{t('otpTitle')}</h1>
+        <ShieldCheck className="size-5 shrink-0 text-primary" aria-hidden />
       </header>
 
-      <main className="px-5 py-6">
-        <p className="text-sm text-muted-foreground">
+      <main className="bg-background px-5 py-8">
+        {/* A minimal verification illustration (client's reference) built
+            from two stacked icon circles rather than a shipped SVG asset —
+            one more thing that never goes stale if the icon set changes. */}
+        <div className="relative mx-auto grid size-28 place-items-center rounded-full bg-tint-green">
+          <Smartphone className="size-11 text-primary" aria-hidden />
+          <span className="absolute right-0 bottom-0 grid size-9 place-items-center rounded-full border-4 border-background bg-primary text-primary-foreground">
+            <Check className="size-4.5" aria-hidden />
+          </span>
+        </div>
+
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           {t('otpSubtitle', { phone })}{' '}
           <button
             type="button"
@@ -352,7 +381,7 @@ export function LoginFlow() {
                 onChange={(event) => setDigit(index, event.target.value)}
                 onKeyDown={(event) => handleOtpKeyDown(index, event)}
                 className={cn(
-                  'input-3d h-12 w-full max-w-12 rounded-[var(--radius)] border border-border/60 bg-card text-center text-xl font-bold outline-none focus:border-primary',
+                  'input-3d h-13 w-full max-w-13 rounded-2xl border-2 border-border/60 bg-card text-center text-xl font-bold outline-none focus:border-primary',
                   error && 'border-danger',
                 )}
               />
@@ -389,7 +418,7 @@ export function LoginFlow() {
               like failure. WhatsApp, not a voice call: that is the channel
               this app actually has wired up end to end. */}
           {elapsed >= WHATSAPP_FALLBACK_SECONDS && (
-            <div className="mt-4 rounded-[var(--radius)] bg-tint-green p-3.5 text-center">
+            <div className="mt-4 rounded-2xl bg-tint-green p-3.5 text-center">
               <p className="text-xs font-medium text-muted-foreground">{t('otpFallbackBody')}</p>
               <button
                 type="button"
@@ -406,7 +435,7 @@ export function LoginFlow() {
           <button
             type="submit"
             disabled={code.length !== OTP_LENGTH || busy}
-            className="mt-6 h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+            className="mt-6 h-13 w-full rounded-2xl bg-primary text-[15px] font-bold text-primary-foreground shadow-sm disabled:opacity-50 disabled:shadow-none"
           >
             {busy ? t('verifying') : t('verify')}
           </button>
