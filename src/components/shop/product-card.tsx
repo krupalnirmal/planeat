@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, Heart, ImageIcon, Package } from 'lucide-react';
+import { Heart, ImageIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useState, useSyncExternalStore } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -14,13 +14,15 @@ import { QtyStepper } from './qty-stepper';
 import { VariantPickerSheet } from './variant-picker-sheet';
 
 /**
- * M2 product card, redesigned (session 2026-08-26) to match a reference the
- * client supplied: a full-bleed square photo, a heart toggle riding over its
- * top-right corner, and a weight/ADD bar that overlaps the photo's bottom
- * edge before the price, name and delivery line underneath.
+ * M2 product card, redesigned (session 2026-08-27) to match the client's
+ * full home-page mock exactly: a full-bleed square photo (discount badge
+ * top-left, wishlist heart top-right), then name, then weight, then a
+ * bottom row with price on the left and ADD on the right — no bar
+ * overlapping the photo's bottom edge, no eta-minutes/low-stock line, both
+ * of which the mock doesn't show.
  *
- * The reference also shows per-card image carousel dots and an "Imported"
- * badge — both skipped here since neither has data behind it yet (the
+ * The mock also shows per-card image carousel dots and an "Imported"
+ * badge — both skipped here since neither has data behind it (the
  * catalogue stores one photo per product, and no product carries a country
  * of origin). Wiring those up is a data-model change, not a restyle.
  *
@@ -107,13 +109,10 @@ function useWishlisted(productId: string) {
 export function ProductCard({
   product,
   variants,
-  etaMinutes = 30,
 }: {
   product: ProductCardData;
   /** The full weight lineup — only the category grid passes this. */
   variants?: ProductRowVariant[];
-  /** The instant-delivery promise shown on the card. Matches the header's. */
-  etaMinutes?: number;
 }) {
   const t = useTranslations('product');
   const router = useRouter();
@@ -210,12 +209,40 @@ export function ProductCard({
         />
       </button>
 
-      {/* Weight + add control ride up over the photo's bottom edge, as in
-          the reference — the card's one deliberately overlapping element. */}
-      <div className="relative z-10 mx-1.5 -mt-3 flex items-center justify-between gap-1 rounded-[calc(var(--radius)-4px)] bg-card px-1.5 py-1 shadow-sm">
-        <span className="min-w-0 truncate text-[10.5px] font-medium text-muted-foreground">
-          {activeVariant ? formatQuantity(activeVariant.quantity, activeVariant.unit as QuantityUnit) : ''}
-        </span>
+      <Link
+        href={`/product/${product.id}`}
+        className="flex flex-col px-2.5 pt-2"
+        aria-label={product.name}
+      >
+        <h3 className="line-clamp-2 text-[13px] leading-tight font-semibold">{product.name}</h3>
+        {activeVariant && (
+          <p className="mt-0.5 truncate text-[12px] text-muted-foreground">
+            {formatQuantity(activeVariant.quantity, activeVariant.unit as QuantityUnit)}
+          </p>
+        )}
+      </Link>
+
+      {/* Price (left) and the add control (right) share one row at the
+          card's bottom edge, exactly as the reference has it — not a bar
+          overlapping the photo, and no eta/stock line the reference
+          doesn't show either. `mt-auto` pins this row to the bottom even
+          when the name above it is a single short line. */}
+      <div className="mt-auto flex items-end justify-between gap-2 px-2.5 pt-2 pb-2.5">
+        <div className="min-w-0">
+          <div className="flex items-baseline gap-1">
+            <span className="text-[14px] font-bold">{formatPaise(price, { hidePaise: true })}</span>
+            {hasDiscount && (
+              <span className="text-[12px] text-muted-foreground line-through">
+                {formatPaise(mrp, { hidePaise: true })}
+              </span>
+            )}
+          </div>
+          {isLowStock && (
+            <p className="mt-0.5 text-[10px] font-medium text-warning">
+              {t('lowStock', { count: activeVariant.stockQty })}
+            </p>
+          )}
+        </div>
 
         <div className="flex shrink-0 flex-col items-end">
           {!product.inStock || !activeVariant ? (
@@ -225,11 +252,11 @@ export function ProductCard({
               type="button"
               onClick={handleAdd}
               aria-label={`${t('add')} ${product.name}`}
-              // A crisp 6px radius and barely-tinted background, in the
-              // spirit of the earlier Blinkit-matched button — narrowed to
-              // 58px (session 2026-08-26) so the weight label next to it in
-              // this bar has room to read as more than two letters.
-              className="flex h-8 w-[58px] shrink-0 flex-col items-center justify-center gap-0 rounded-[6px] border border-primary bg-[#f7fff9] py-0.5 text-[12px] font-semibold text-primary"
+              // Matches the client's mock exactly: white, a crisp green
+              // border (not the earlier tinted fill), generously padded
+              // rather than a fixed narrow width now that it isn't sharing
+              // a bar with a weight label anymore.
+              className="flex min-w-[64px] flex-col items-center justify-center gap-0 rounded-[10px] border-[1.5px] border-primary bg-card px-4 py-1.5 text-[13px] font-bold text-primary"
             >
               {t('add')}
               {/* "N options" sits inside the same bordered button as a
@@ -252,7 +279,7 @@ export function ProductCard({
                 disabled={cart.isMutating}
                 max={activeVariant.stockQty}
                 label={product.name}
-                className="animate-in zoom-in-95 fade-in h-8 duration-200"
+                className="animate-in zoom-in-95 fade-in duration-200"
               />
               {multiVariant && (
                 <button
@@ -267,41 +294,6 @@ export function ProductCard({
           )}
         </div>
       </div>
-
-      <Link
-        href={`/product/${product.id}`}
-        className="flex flex-1 flex-col px-2.5 pt-1.5 pb-2.5"
-        aria-label={product.name}
-      >
-        <div className="flex items-baseline gap-1">
-          <span className="text-[13px] font-bold">{formatPaise(price, { hidePaise: true })}</span>
-          {hasDiscount && (
-            <span className="text-[12px] text-muted-foreground line-through">
-              {formatPaise(mrp, { hidePaise: true })}
-            </span>
-          )}
-        </div>
-
-        <h3 className="mt-0.5 line-clamp-2 text-[13px] leading-tight font-semibold">{product.name}</h3>
-
-        {/* Delivery time and (when it's actually low) remaining stock share
-            one row, as in the reference — an icon-led pair of small facts
-            rather than two separate lines. */}
-        {product.inStock && (
-          <p className="mt-1 flex items-center gap-2 text-[10px] font-medium text-muted-foreground">
-            <span className="flex items-center gap-0.5">
-              <Clock className="size-3" aria-hidden />
-              {t('etaMinutes', { minutes: etaMinutes })}
-            </span>
-            {isLowStock && (
-              <span className="flex items-center gap-0.5 text-warning">
-                <Package className="size-3" aria-hidden />
-                {t('lowStock', { count: activeVariant.stockQty })}
-              </span>
-            )}
-          </p>
-        )}
-      </Link>
 
       {pickerOpen && multiVariant && (
         <VariantPickerSheet
