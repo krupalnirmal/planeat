@@ -104,14 +104,6 @@
     "source": "https://commons.wikimedia.org/wiki/File:Apple_With_White_Background.jpg"
   },
   {
-    "sku": "FRT-AVOCADO",
-    "term": "avocado halved pit",
-    "title": "Halved avocado without pit.jpg",
-    "artist": "MichalPL",
-    "licence": "CC BY-SA 4.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Halved_avocado_without_pit.jpg"
-  },
-  {
     "sku": "FRT-BANANA",
     "term": "bunch of bananas white background (replaced session 2026-08-26 — the old photo showed two market vendors chatting behind a stall, not a clean product shot)",
     "title": "Banana bunch.jpeg",
@@ -168,14 +160,6 @@
     "source": "https://commons.wikimedia.org/wiki/File:Mango_on_white.jpg"
   },
   {
-    "sku": "FRT-MOSAMBI",
-    "term": "sweet lime mosambi citrus fruit",
-    "title": "Sweet limes of Salem.jpg",
-    "artist": "Thamizhpparithi Maari",
-    "licence": "CC BY-SA 4.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Sweet_limes_of_Salem.jpg"
-  },
-  {
     "sku": "FRT-ORANGE",
     "term": "orange fruit isolated white background",
     "title": "Orange Fruit Close-up.jpg",
@@ -184,36 +168,12 @@
     "source": "https://commons.wikimedia.org/wiki/File:Orange_Fruit_Close-up.jpg"
   },
   {
-    "sku": "FRT-PAPAYA",
-    "term": "papaya fruit ripe",
-    "title": "Malabar papaya.jpg",
-    "artist": "Netha Hussain",
-    "licence": "CC BY-SA 3.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Malabar_papaya.jpg"
-  },
-  {
-    "sku": "FRT-POMEGRANATE",
-    "term": "pomegranate fruit arils",
-    "title": "Punica granatum fruit Grenade.jpg",
-    "artist": "Jebulon",
-    "licence": "CC0",
-    "source": "https://commons.wikimedia.org/wiki/File:Punica_granatum_fruit_Grenade.jpg"
-  },
-  {
     "sku": "FRT-RAISINS",
     "term": "raisins dried grapes",
     "title": "Raisins 01.jpg",
     "artist": "Paweł Kuźniar (Jojo_1, Jojo)",
     "licence": "CC BY-SA 3.0",
     "source": "https://commons.wikimedia.org/wiki/File:Raisins_01.jpg"
-  },
-  {
-    "sku": "FRT-WALNUT",
-    "term": "walnuts shelled nuts",
-    "title": "Walnuts no shell.jpg",
-    "artist": "Miansari66",
-    "licence": "Public domain",
-    "source": "https://commons.wikimedia.org/wiki/File:Walnuts_no_shell.jpg"
   },
   {
     "sku": "FRT-WATERMELON",

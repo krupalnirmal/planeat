@@ -2,11 +2,11 @@
 
 Every image in this folder comes from Wikimedia Commons, fetched by
 `scripts/fetch-product-images.mjs` or `scripts/fetch-white-bg-images.mjs`, EXCEPT the
-vegetable/milk photos the client supplied directly from their own product-photo
-set (session 2026-08-28) — those have no Commons attribution to record.
-They are demo catalogue assets: the shop owner replaces them with photos of
-their own stock from the admin panel. Licences are recorded here because
-several require credit.
+vegetable/milk/fruit photos the client supplied directly from their own
+product-photo set (session 2026-08-28/29) — those have no Commons attribution
+to record. They are demo catalogue assets: the shop owner replaces them with
+photos of their own stock from the admin panel. Licences are recorded here
+because several require credit.
 
 | SKU | Photo | Author | Licence |
 |---|---|---|---|
@@ -23,7 +23,6 @@ several require credit.
 | `DRY-YOGURT-100` | [Yogurt fruit bowl.jpg](https://commons.wikimedia.org/wiki/File:Yogurt_fruit_bowl.jpg) | Jumbocombo0811 | CC BY-SA 4.0 |
 | `FRT-ALMOND` | [Go nuts for them (6712993049).jpg](https://commons.wikimedia.org/wiki/File:Go_nuts_for_them_(6712993049).jpg) | Keith Williamson from Bigastro, Spain | CC BY 2.0 |
 | `FRT-APPLE` | [Apple With White Background.jpg](https://commons.wikimedia.org/wiki/File:Apple_With_White_Background.jpg) | Karl Thomas Moore | CC BY-SA 4.0 |
-| `FRT-AVOCADO` | [Halved avocado without pit.jpg](https://commons.wikimedia.org/wiki/File:Halved_avocado_without_pit.jpg) | MichalPL | CC BY-SA 4.0 |
 | `FRT-BANANA` | [Banana bunch.jpeg](https://commons.wikimedia.org/wiki/File:Banana_bunch.jpeg) | NW Indian Language Institute | CC BY 3.0 |
 | `FRT-BLUEBERRY` | [Cesta de arándanos.jpg](https://commons.wikimedia.org/wiki/File:Cesta_de_ar%C3%A1ndanos.jpg) | diluvi.com Anna i Adria | CC BY 2.0 |
 | `FRT-CASHEW` | [Cashews2.JPG](https://commons.wikimedia.org/wiki/File:Cashews2.JPG) | Vicki Nunn | Public domain |
@@ -31,12 +30,8 @@ several require credit.
 | `FRT-JAMUN` | [India Goa Jambul Fruit.jpg](https://commons.wikimedia.org/wiki/File:India_Goa_Jambul_Fruit.jpg) | No machine-readable author provided. Fredericknoronha assumed (based on copyright claims). | CC BY-SA 3.0 |
 | `FRT-KIWI` | [Kiwi.jpg](https://commons.wikimedia.org/wiki/File:Kiwi.jpg) | Renee Comet (Photographer) | Public domain |
 | `FRT-MANGO` | [Mango on white.jpg](https://commons.wikimedia.org/wiki/File:Mango_on_white.jpg) | Rhododendrites | CC BY-SA 4.0 |
-| `FRT-MOSAMBI` | [Sweet limes of Salem.jpg](https://commons.wikimedia.org/wiki/File:Sweet_limes_of_Salem.jpg) | Thamizhpparithi Maari | CC BY-SA 4.0 |
 | `FRT-ORANGE` | [Orange Fruit Close-up.jpg](https://commons.wikimedia.org/wiki/File:Orange_Fruit_Close-up.jpg) | freestock.ca | CC BY-SA 3.0 |
-| `FRT-PAPAYA` | [Malabar papaya.jpg](https://commons.wikimedia.org/wiki/File:Malabar_papaya.jpg) | Netha Hussain | CC BY-SA 3.0 |
-| `FRT-POMEGRANATE` | [Punica granatum fruit Grenade.jpg](https://commons.wikimedia.org/wiki/File:Punica_granatum_fruit_Grenade.jpg) | Jebulon | CC0 |
 | `FRT-RAISINS` | [Raisins 01.jpg](https://commons.wikimedia.org/wiki/File:Raisins_01.jpg) | Paweł Kuźniar (Jojo_1, Jojo) | CC BY-SA 3.0 |
-| `FRT-WALNUT` | [Walnuts no shell.jpg](https://commons.wikimedia.org/wiki/File:Walnuts_no_shell.jpg) | Miansari66 | Public domain |
 | `FRT-WATERMELON` | [Red watermelon (Citrullus lanatus var. lanatus) in Thailand.jpg](https://commons.wikimedia.org/wiki/File:Red_watermelon_(Citrullus_lanatus_var._lanatus)_in_Thailand.jpg) | Susan Slater | CC BY-SA 4.0 |
 | `GRC-ATTA-5KG` | [Atta Chakki.jpg](https://commons.wikimedia.org/wiki/File:Atta_Chakki.jpg) | Bames24 | CC BY-SA 3.0 |
 | `GRC-OIL-1L` | [Bottle 1 liter Sunflower refined oil.jpg](https://commons.wikimedia.org/wiki/File:Bottle_1_liter_Sunflower_refined_oil.jpg) | Exgsp Gmbh LLC BOTTLE 1 liter Sunflower refined oil | CC BY-SA 4.0 |
