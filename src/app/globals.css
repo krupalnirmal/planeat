@@ -275,6 +275,19 @@
       inset 0 1px 0 0 rgb(255 255 255 / 0.7),
       0 0 0 3px var(--brand-tint-green);
   }
+
+  /* The raised counterpart to `.input-3d`'s pressed-in field: a card
+     lifting slightly off the page rather than a flat outlined box. A
+     soft ambient shadow plus a crisp close one for a bit of definition,
+     and a faint inset top highlight so the card itself reads as a
+     bevelled surface, not just a shadow floating under a flat rectangle.
+     Used on every product card across the app (session 2026-08-29). */
+  .card-3d {
+    box-shadow:
+      0 1px 2px 0 rgb(0 0 0 / 0.04),
+      0 6px 14px -6px rgb(0 0 0 / 0.12),
+      inset 0 1px 0 0 rgb(255 255 255 / 0.8);
+  }
 }
 
 /* Category hero motion — see `.animate-hero-float` / `.animate-hero-drift`

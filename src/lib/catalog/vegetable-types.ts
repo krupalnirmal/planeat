@@ -37,12 +37,12 @@ export function vegetableTypeLabel(type: VegetableType, locale: AppLocale): stri
 // and shape — it is just a generic "sub-group id" per product, not
 // vegetable-specific despite the field's name.
 //
-// Bakery & Biscuits and Ice Cream are still deliberately left without a
-// rail: at 3 and 2 products respectively, splitting them further would put
-// one item in most groups, which reads as broken rather than organised — a
-// rail earns its keep only once a category has real breadth (Blinkit itself
-// does not sub-group its own thin categories either). Dairy crossed that
-// line in session 2026-08-26 (see DAIRY_TYPES below).
+// Ice Cream is still deliberately left without a rail: at 2 products,
+// splitting it further would put one item in most groups, which reads as
+// broken rather than organised — a rail earns its keep only once a category
+// has real breadth (Blinkit itself does not sub-group its own thin
+// categories either). Dairy crossed that line in session 2026-08-26, Bakery
+// & Biscuits in session 2026-08-29 (see DAIRY_TYPES / BAKERY_TYPES below).
 export const GROCERY_TYPES: VegetableType[] = [
   { id: 'grains', emoji: '🌾', labelEn: 'Grains & Flour', labelMr: 'पीठ व धान्य', labelHi: 'आटा और अनाज' },
   { id: 'pulses', emoji: '🫘', labelEn: 'Pulses & Staples', labelMr: 'डाळी व इतर', labelHi: 'दाल और अन्य' },
@@ -73,9 +73,21 @@ export const FRUIT_TYPES: VegetableType[] = [
   { id: 'dryfruits', emoji: '🌰', labelEn: 'Dry Fruits', labelMr: 'सुका मेवा', labelHi: 'सूखे मेवे' },
 ];
 
+// Bakery & Biscuits' own sub-grouping (session 2026-08-29) — the category
+// only had 3 products (one bread, one pav, one biscuit), so a second bread,
+// a burger bun, two more biscuits, a rusk and a cake were added to the seed
+// alongside this so every group has more than one item, same reasoning as
+// DAIRY_TYPES and FRUIT_TYPES above.
+export const BAKERY_TYPES: VegetableType[] = [
+  { id: 'bread', emoji: '🍞', labelEn: 'Bread & Buns', labelMr: 'ब्रेड व बन', labelHi: 'ब्रेड और बन' },
+  { id: 'biscuits', emoji: '🍪', labelEn: 'Biscuits & Cookies', labelMr: 'बिस्किटे व कुकीज', labelHi: 'बिस्कुट और कुकीज़' },
+  { id: 'cakes', emoji: '🍰', labelEn: 'Cakes & Rusk', labelMr: 'केक व रस्क', labelHi: 'केक और रस्क' },
+];
+
 export const CATEGORY_SUBGROUPS: Record<string, VegetableType[]> = {
   vegetables: VEGETABLE_TYPES,
   fruits: FRUIT_TYPES,
   grocery: GROCERY_TYPES,
   dairy: DAIRY_TYPES,
+  'bakery-biscuits': BAKERY_TYPES,
 };

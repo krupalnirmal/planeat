@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
 import { useCart } from '@/hooks/use-cart';
+import { useIsAtTop } from '@/hooks/use-is-at-top';
 import { formatPaise, paise } from '@/lib/money';
 
 /**
@@ -49,6 +50,7 @@ export function CartBar() {
   const t = useTranslations('cart');
   const pathname = usePathname();
   const cart = useCart();
+  const atTop = useIsAtTop();
   const barRef = useRef<HTMLDivElement>(null);
 
   const visible =
@@ -95,15 +97,22 @@ export function CartBar() {
       // 2026-08-26, client feedback: the full-width bar read as too big) —
       // still one stacked unit with the free-delivery nudge above it, just
       // a compact floating pill instead of a bar spanning the screen.
-      className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-14"
+      className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-14 transition-[bottom] duration-300 ease-out"
       style={{
-        bottom: `calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 0.5rem)`,
+        // The nav (BottomNav) stays laid out even while scroll-hidden — it
+        // only translates off-screen — so reserving its height here
+        // unconditionally left this bar floating above a strip of empty
+        // page with nothing under it whenever the nav was hidden (session
+        // 2026-08-30). Drop to just the safe-area gap in that state.
+        bottom: atTop
+          ? `calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 0.5rem)`
+          : `calc(env(safe-area-inset-bottom, 0px) + 0.5rem)`,
       }}
     >
       {forFreeDelivery > 0n && (
         // Sits directly on top of the bar and tucks behind it, so the two
         // read as one stacked unit rather than two floating cards.
-        <p className="-mb-3 flex items-center gap-1.5 rounded-t-[var(--radius)] bg-tint-green px-3 pt-2 pb-4 text-[11px] font-medium">
+        <p className="-mb-3 flex items-center gap-1.5 rounded-t-[var(--radius)] bg-tint-green px-3 pt-1.5 pb-3 text-[10.5px] font-medium">
           <Truck className="size-3.5 shrink-0 text-primary" aria-hidden />
           {t('freeDeliveryNudge', {
             amount: formatPaise(forFreeDelivery, { hidePaise: true }),
@@ -111,28 +120,25 @@ export function CartBar() {
         </p>
       )}
 
-      {/* Blinkit-matched (session 2026-08-25): the bar's own box (52px
-          tall, 12px radius, no shadow, asymmetric padding) read off
-          Blinkit's live "View Cart" bar, and the same slide-up + fade-in
-          it plays the moment the bar first mounts — this component
-          renders nothing at all while the cart is empty (`visible` above),
-          so every appearance is a fresh mount the animation can play on. */}
+      {/* Blinkit-matched (session 2026-08-25), sized down further (session
+          2026-08-30, client feedback: read as too big) — 44px, the
+          accessibility touch-target floor, rather than the earlier 52px. */}
       <Link
         href="/cart"
-        className="animate-in slide-in-from-bottom-4 fade-in relative flex h-[52px] items-center justify-between gap-3 rounded-[12px] bg-primary py-2 pr-[18px] pl-3 text-primary-foreground duration-300"
+        className="animate-in slide-in-from-bottom-4 fade-in relative flex h-11 items-center justify-between gap-3 rounded-[12px] bg-primary py-1.5 pr-4 pl-3 text-primary-foreground duration-300"
       >
         <span className="flex items-center gap-2">
-          <ShoppingCart className="size-5 shrink-0" aria-hidden />
-          <span className="text-[12px] font-medium">{t('itemCount', { count: cart.itemCount })}</span>
+          <ShoppingCart className="size-4.5 shrink-0" aria-hidden />
+          <span className="text-[11px] font-medium">{t('itemCount', { count: cart.itemCount })}</span>
           {total > 0n && (
-            <span className="text-[12px] font-semibold">
+            <span className="text-[11px] font-semibold">
               {formatPaise(total, { hidePaise: true })}
             </span>
           )}
         </span>
 
         <span className="flex items-center gap-1">
-          <span className="text-[17px] font-normal">{t('viewCart')}</span>
+          <span className="text-[14px] font-normal">{t('viewCart')}</span>
           <ChevronRight className="size-4 shrink-0" aria-hidden />
         </span>
       </Link>

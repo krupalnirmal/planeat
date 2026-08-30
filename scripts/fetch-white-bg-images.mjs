@@ -96,6 +96,12 @@ const NOUNS = {
   'BKY-BREAD-400': 'sliced bread loaf',
   'BKY-PAV-6': 'bread rolls buns',
   'BKY-MARIE-250': 'biscuits cookies',
+  'BKY-BREAD-WHITE-400': 'white bread loaf sliced',
+  'BKY-BUN-BURGER-4': 'burger buns',
+  'BKY-CREAMBISCUIT-150': 'cream biscuits sandwich',
+  'BKY-GLUCOSE-200': 'glucose biscuits',
+  'BKY-RUSK-200': 'rusk toast bread',
+  'BKY-CAKE-300': 'butter cake slice',
 };
 
 /** Same trap as the relevance script: a plausible title that is the wrong thing. */

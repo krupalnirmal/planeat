@@ -266,7 +266,10 @@ export function CategoryProductList({
 
   return (
     <>
-      <h1 className="bg-tint-lime px-4 pt-3 text-xl leading-tight font-black text-foreground">
+      <h1
+        key={categoryName}
+        className="animate-in fade-in slide-in-from-top-1 bg-tint-lime px-4 pt-4 pb-3 text-xl leading-tight font-black text-foreground duration-300"
+      >
         {categoryName}
       </h1>
 

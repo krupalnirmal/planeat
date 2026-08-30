@@ -11,8 +11,14 @@ because several require credit.
 | SKU | Photo | Author | Licence |
 |---|---|---|---|
 | `BKY-BREAD-400` | [White bread 800.jpg](https://commons.wikimedia.org/wiki/File:White_bread_800.jpg) | User Sannse on en.wikipedia | CC BY-SA 3.0 |
+| `BKY-BREAD-WHITE-400` | [White bread.jpg](https://commons.wikimedia.org/wiki/File:White_bread.jpg) | ElinorD | CC BY-SA 3.0 |
+| `BKY-BUN-BURGER-4` | [2020-03-25 14 40 50 A cheeseburger from Burger King in the Franklin Farm section of Oak Hill, Fairfax County, Virginia.jpg](https://commons.wikimedia.org/wiki/File:2020-03-25_14_40_50_A_cheeseburger_from_Burger_King_in_the_Franklin_Farm_section_of_Oak_Hill,_Fairfax_County,_Virginia.jpg) | Famartin | CC BY-SA 4.0 |
+| `BKY-CAKE-300` | [Butter cake slice.jpg](https://commons.wikimedia.org/wiki/File:Butter_cake_slice.jpg) | SKopp | CC BY-SA 3.0 |
+| `BKY-CREAMBISCUIT-150` | [Custard cream biscuit.jpg](https://commons.wikimedia.org/wiki/File:Custard_cream_biscuit.jpg) | No machine-readable author provided. Loganberry~commonswiki assumed (based on copyright claims). | Public domain |
+| `BKY-GLUCOSE-200` | [22012008-Petit beurre CL J Weber01-2.jpg](https://commons.wikimedia.org/wiki/File:22012008-Petit_beurre_CL_J_Weber01-2.jpg) | Jean Weber | CC BY 2.0 |
 | `BKY-MARIE-250` | [Rich tea.jpg](https://commons.wikimedia.org/wiki/File:Rich_tea.jpg) | Sean Whitton (User:Xyrael) | CC BY-SA 3.0 |
 | `BKY-PAV-6` | [Vada pav 01.jpg](https://commons.wikimedia.org/wiki/File:Vada_pav_01.jpg) | Marajozkee | CC BY-SA 4.0 |
+| `BKY-RUSK-200` | [Rusk from India.jpg](https://commons.wikimedia.org/wiki/File:Rusk_from_India.jpg) | Barthateslisa | CC BY-SA 4.0 |
 | `DRY-BUTTER-100` | [NCI butter.jpg](https://commons.wikimedia.org/wiki/File:NCI_butter.jpg) | Renee Comet (National Cancer Institute) | Public domain |
 | `DRY-BUTTERMILK-500` | [Buttermilk-(right)-and-Milk-(left).jpg](https://commons.wikimedia.org/wiki/File:Buttermilk-(right)-and-Milk-(left).jpg) | Ukko-wc | CC BY-SA 3.0 |
 | `DRY-CHEESECUBE-200` | [A Cube of Yellow Organic Cheese on the plate.jpg](https://commons.wikimedia.org/wiki/File:A_Cube_of_Yellow_Organic_Cheese_on_the_plate.jpg) | Peachyeung316 | CC BY-SA 4.0 |

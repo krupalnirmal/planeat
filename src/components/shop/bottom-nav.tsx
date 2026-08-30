@@ -2,8 +2,8 @@
 
 import { Home, Mic, Salad, User, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useSyncExternalStore } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
+import { useIsAtTop } from '@/hooks/use-is-at-top';
 import { cn } from '@/lib/utils';
 
 /**
@@ -30,41 +30,8 @@ const TABS = [
 // very top of the page, hidden the instant the customer scrolls down, back
 // the moment they scroll back to the top — position-based, not direction-
 // based, so a partial scroll-up while still mid-page leaves it hidden.
-//
-// `useSyncExternalStore`, not an effect + setState: this is exactly what it
-// exists for (subscribing to a value React doesn't own), and it sidesteps
-// both the extra render an effect-driven setState would cause on mount and
-// any server/client mismatch (SSR has no scroll position; a fresh load is
-// at the top anyway, so `true` is the right guess).
-const AT_TOP_THRESHOLD_PX = 4;
-
-function subscribeScrollTop(onStoreChange: () => void): () => void {
-  let ticking = false;
-
-  function handleScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      ticking = false;
-      onStoreChange();
-    });
-  }
-
-  window.addEventListener('scroll', handleScroll, { passive: true });
-  return () => window.removeEventListener('scroll', handleScroll);
-}
-
-function getIsAtTop(): boolean {
-  return window.scrollY <= AT_TOP_THRESHOLD_PX;
-}
-
-function getServerIsAtTop(): boolean {
-  return true;
-}
-
-function useIsAtTop(): boolean {
-  return useSyncExternalStore(subscribeScrollTop, getIsAtTop, getServerIsAtTop);
-}
+// `useIsAtTop` (src/hooks/use-is-at-top.ts) is shared with CartBar, which
+// needs the same signal to know when to drop down to the real screen edge.
 
 export function BottomNav() {
   const t = useTranslations('nav');

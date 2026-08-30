@@ -8,6 +8,46 @@
     "source": "https://commons.wikimedia.org/wiki/File:White_bread_800.jpg"
   },
   {
+    "sku": "BKY-BREAD-WHITE-400",
+    "term": "white bread loaf sliced",
+    "title": "White bread.jpg",
+    "artist": "ElinorD",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:White_bread.jpg"
+  },
+  {
+    "sku": "BKY-BUN-BURGER-4",
+    "term": "burger buns white background (white-background pass, session 2026-08-27)",
+    "title": "2020-03-25 14 40 50 A cheeseburger from Burger King in the Franklin Farm section of Oak Hill, Fairfax County, Virginia.jpg",
+    "artist": "Famartin",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2020-03-25_14_40_50_A_cheeseburger_from_Burger_King_in_the_Franklin_Farm_section_of_Oak_Hill,_Fairfax_County,_Virginia.jpg"
+  },
+  {
+    "sku": "BKY-CAKE-300",
+    "term": "butter cake slice",
+    "title": "Butter cake slice.jpg",
+    "artist": "SKopp",
+    "licence": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Butter_cake_slice.jpg"
+  },
+  {
+    "sku": "BKY-CREAMBISCUIT-150",
+    "term": "custard cream biscuit",
+    "title": "Custard cream biscuit.jpg",
+    "artist": "No machine-readable author provided. Loganberry~commonswiki assumed (based on copyright claims).",
+    "licence": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Custard_cream_biscuit.jpg"
+  },
+  {
+    "sku": "BKY-GLUCOSE-200",
+    "term": "petit beurre biscuit (plain glucose-style biscuit)",
+    "title": "22012008-Petit beurre CL J Weber01-2.jpg",
+    "artist": "Jean Weber",
+    "licence": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:22012008-Petit_beurre_CL_J_Weber01-2.jpg"
+  },
+  {
     "sku": "BKY-MARIE-250",
     "term": "tea biscuits plate",
     "title": "Rich tea.jpg",
@@ -22,6 +62,14 @@
     "artist": "Marajozkee",
     "licence": "CC BY-SA 4.0",
     "source": "https://commons.wikimedia.org/wiki/File:Vada_pav_01.jpg"
+  },
+  {
+    "sku": "BKY-RUSK-200",
+    "term": "rusk toast",
+    "title": "Rusk from India.jpg",
+    "artist": "Barthateslisa",
+    "licence": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Rusk_from_India.jpg"
   },
   {
     "sku": "DRY-BUTTER-100",

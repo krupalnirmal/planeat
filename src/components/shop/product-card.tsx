@@ -158,9 +158,11 @@ export function ProductCard({
   }
 
   return (
-    // A hairline border, not a shadow: these cards sit on white section
-    // panels now, and a white-on-white shadow reads as nothing at all.
-    <article className="relative flex h-full flex-col overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+    // Raised, not flat: `.card-3d` (session 2026-08-29) gives the card a
+    // soft lift off the page instead of relying on a hairline border alone
+    // — the border stays too, just faint, since the shadow alone reads as
+    // nothing on the lightest backgrounds.
+    <article className="card-3d relative flex h-full flex-col overflow-hidden rounded-[var(--radius)] border border-border/50 bg-card">
       <Link href={`/product/${product.id}`} aria-label={product.name} tabIndex={-1}>
         <div
           className={cn(
@@ -214,7 +216,15 @@ export function ProductCard({
         className="flex flex-col px-2.5 pt-2"
         aria-label={product.name}
       >
-        <h3 className="line-clamp-2 text-[13px] leading-tight font-semibold">{product.name}</h3>
+        {/* `min-h` reserves 2 lines' worth of space regardless of the
+            actual name length (session 2026-08-29) — without it, a
+            one-line name next to a two-line sibling in the same grid row
+            left this card's own content visibly shorter than the row's
+            stretched height, and `mt-auto` below absorbed the difference
+            as a large dead gap above the price row. */}
+        <h3 className="line-clamp-2 min-h-[2.2em] text-[13px] leading-tight font-semibold">
+          {product.name}
+        </h3>
         {activeVariant && (
           <p className="mt-0.5 truncate text-[12px] text-muted-foreground">
             {formatQuantity(activeVariant.quantity, activeVariant.unit as QuantityUnit)}
@@ -227,7 +237,7 @@ export function ProductCard({
           overlapping the photo, and no eta/stock line the reference
           doesn't show either. `mt-auto` pins this row to the bottom even
           when the name above it is a single short line. */}
-      <div className="mt-auto flex items-end justify-between gap-1.5 px-2.5 pt-2 pb-2.5">
+      <div className="mt-auto flex items-end justify-between gap-1.5 px-2.5 pt-1.5 pb-2">
         <div className="min-w-0">
           <div className="flex items-baseline gap-1">
             <span className="text-[14px] font-bold">{formatPaise(price, { hidePaise: true })}</span>
@@ -253,17 +263,17 @@ export function ProductCard({
               onClick={handleAdd}
               aria-label={`${t('add')} ${product.name}`}
               // Matches the client's mock: white, a crisp green border (not
-              // the earlier tinted fill). Sized down (session 2026-08-28)
-              // from a fixed 64px min-width — that crowded into the price on
-              // the narrower Top Picks card and any 3-digit price wrapped
-              // right up against it.
-              className="flex min-w-[46px] flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-2 py-1.5 text-[12px] font-bold text-primary"
+              // the earlier tinted fill). Sized down (session 2026-08-28,
+              // trimmed further 2026-08-29) from a fixed 64px min-width —
+              // that crowded into the price on the narrower Top Picks card
+              // and any 3-digit price wrapped right up against it.
+              className="flex min-w-[44px] flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-1.5 py-1 text-[12px] font-bold text-primary"
             >
               {t('add')}
               {/* "N options" sits inside the same bordered button as a
                   second line, not as a separate underlined link below it. */}
               {multiVariant && (
-                <span className="text-[9px] leading-none font-semibold text-muted-foreground">
+                <span className="text-[8px] leading-none font-semibold text-muted-foreground">
                   {t('nOptions', { count: variants!.length })}
                 </span>
               )}
