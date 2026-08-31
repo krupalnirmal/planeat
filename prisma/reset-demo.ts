@@ -48,7 +48,6 @@ async function main(): Promise<void> {
     ['orders', () => db.order.deleteMany({})],
     ['subscription_exceptions', () => db.subscriptionException.deleteMany({})],
     ['subscriptions', () => db.subscription.deleteMany({})],
-    ['meal_plan_swap_requests', () => db.mealPlanSwapRequest.deleteMany({})],
     ['meal_plan_items', () => db.mealPlanItem.deleteMany({})],
     ['meal_plan_days', () => db.mealPlanDay.deleteMany({})],
     ['meal_plans', () => db.mealPlan.deleteMany({})],

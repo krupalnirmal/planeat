@@ -156,27 +156,3 @@ export async function buildCandidates(input: CandidateFilterInput): Promise<Cand
 
   return { candidates, excluded };
 }
-
-/**
- * The minimum a week needs: 14 slots, and no vegetable more than twice, so
- * seven distinct products is the floor. Below that, no valid plan exists and
- * the caller must say so rather than generate a broken one.
- */
-export const MINIMUM_CANDIDATES = 7;
-
-/**
- * PART 6.3 rule 5 — "compress the catalogue payload".
- *
- * The model receives `{id, name, tags}` and nothing else. Prices, stock and
- * SKUs are not its business and every token of them is paid for on a free tier
- * that is measured in tokens per minute.
- */
-export function compressForPrompt(
-  candidates: readonly CandidateProduct[],
-): Array<{ id: string; name: string; tags: string[] }> {
-  return candidates.map((candidate) => ({
-    id: candidate.id,
-    name: candidate.nameEn,
-    tags: candidate.tags.filter((tag) => !tag.startsWith('allergen:')).slice(0, 6),
-  }));
-}

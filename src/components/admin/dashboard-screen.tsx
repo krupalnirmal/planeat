@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, CheckCircle2, Loader2, RefreshCw, Stethoscope } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Loader2, RefreshCw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -129,22 +129,6 @@ export function AdminDashboard() {
         </button>
       </section>
 
-      {/* ── B8: "shows the unreviewed count prominently". */}
-      {data.unreviewedFlaggedPlans > 0 && (
-        <Link
-          href="/admin/meal-plans?unreviewedOnly=true"
-          className="mb-4 flex items-center gap-3 rounded-[var(--radius)] border border-warning/50 bg-[#FDF3E3] px-4 py-3"
-        >
-          <Stethoscope className="size-5 shrink-0 text-warning" aria-hidden />
-          <div>
-            <p className="text-sm font-bold text-[#8A5A2B]">
-              {data.unreviewedFlaggedPlans} · {t('flaggedPlans')}
-            </p>
-            <p className="mt-0.5 text-xs text-[#8A5A2B]/85">{t('flaggedHint')}</p>
-          </div>
-        </Link>
-      )}
-
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Stat label={t('todayOrders')} value={String(data.todayOrders)} />
         <Stat
@@ -161,7 +145,6 @@ export function AdminDashboard() {
         <Stat label={t('activeSubscriptions')} value={String(data.activeSubscriptions)} />
         <Stat label={t('pausedSubscriptions')} value={String(data.pausedSubscriptions)} />
         <Stat label={t('expiringSoon')} value={String(data.expiringWithin2Days)} />
-        <Stat label={t('pendingSwaps')} value={String(data.pendingSwapRequests)} />
 
         <Stat
           label={t('lowStock')}

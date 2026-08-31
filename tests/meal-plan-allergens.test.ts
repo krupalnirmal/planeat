@@ -5,16 +5,18 @@ import {
   isJainExcluded,
   isVeganExcluded,
 } from '@/lib/meal-plan/allergens';
-import { assessSafety, detectRedFlags, hasValidConsent } from '@/lib/meal-plan/safety';
 
 /**
- * PART 6.4 — the medical safety layer. This is the file to read first if you
- * are changing anything in `src/lib/meal-plan/`.
+ * S4 — the allergen hard block. Still exercised in production by
+ * `src/lib/subscription/substitute.ts` (an out-of-stock item on an active
+ * subscription is never substituted with something the customer is
+ * allergic to) even though the AI meal-plan generator that originally used
+ * this module was removed (session 2026-08-30).
  *
- * PART 12 acceptance criteria covered here:
- *   - "A peanut-allergy profile never produces a plan containing peanuts"
- *     (the filtering half; the 20-generation half is in meal-plan-pipeline)
- *   - "A pregnancy flag sets flaggedForReview"
+ * Split out of the old `meal-plan-safety.test.ts`, which also covered
+ * `safety.ts` (health-profile red-flag routing / consent) — that module was
+ * deleted along with the rest of the AI generation pipeline, so those tests
+ * went with it.
  */
 
 const PEANUT = {
@@ -149,103 +151,5 @@ describe('dietary exclusions', () => {
   it('excludes dairy for a vegan diet', () => {
     expect(isVeganExcluded(PANEER)).toBe(true);
     expect(isVeganExcluded(SPINACH)).toBe(false);
-  });
-});
-
-describe('S3 — red-flag routing', () => {
-  const base = {
-    age: 35,
-    medicalConditions: [] as string[],
-    medications: null,
-    notes: null,
-    goal: 'GENERAL_HEALTH',
-  };
-
-  it('does not flag an ordinary profile', () => {
-    expect(assessSafety(base).flaggedForReview).toBe(false);
-  });
-
-  it('flags a pregnancy condition', () => {
-    // PART 12 — "A pregnancy flag sets flaggedForReview."
-    const result = assessSafety({ ...base, medicalConditions: ['PREGNANCY'] });
-    expect(result.flaggedForReview).toBe(true);
-    expect(result.flags.map((flag) => flag.code)).toContain('PREGNANCY');
-  });
-
-  it('flags pregnancy mentioned only in free text, in Marathi', () => {
-    const result = assessSafety({ ...base, notes: 'मी गर्भवती आहे' });
-    expect(result.flags.map((flag) => flag.code)).toContain('PREGNANCY');
-  });
-
-  it('flags both ends of the age range', () => {
-    expect(detectRedFlags({ ...base, age: 17 })[0]?.code).toBe('AGE_UNDER_18');
-    expect(detectRedFlags({ ...base, age: 76 })[0]?.code).toBe('AGE_OVER_75');
-  });
-
-  it('does not flag the boundary ages themselves', () => {
-    expect(assessSafety({ ...base, age: 18 }).flaggedForReview).toBe(false);
-    expect(assessSafety({ ...base, age: 75 }).flaggedForReview).toBe(false);
-  });
-
-  it('flags kidney disease — potassium restriction is dangerous to get wrong', () => {
-    expect(
-      assessSafety({ ...base, medicalConditions: ['KIDNEY_DISEASE'] }).flaggedForReview,
-    ).toBe(true);
-  });
-
-  it('flags dialysis mentioned in notes without the condition ticked', () => {
-    const result = assessSafety({ ...base, notes: 'on dialysis twice a week' });
-    expect(result.flags.map((flag) => flag.code)).toContain('KIDNEY_DISEASE');
-  });
-
-  it('flags insulin found in the medications field', () => {
-    const result = assessSafety({ ...base, medications: 'Insulin 10 units at night' });
-    expect(result.flags.map((flag) => flag.code)).toContain('INSULIN_USE');
-  });
-
-  it('flags type 1 diabetes but not type 2', () => {
-    expect(
-      assessSafety({ ...base, medicalConditions: ['DIABETES_TYPE_1'] }).flaggedForReview,
-    ).toBe(true);
-    expect(
-      assessSafety({ ...base, medicalConditions: ['DIABETES_TYPE_2'] }).flaggedForReview,
-    ).toBe(false);
-  });
-
-  it('flags a stated goal of rapid weight loss', () => {
-    const result = assessSafety({ ...base, notes: 'want to lose weight fast before the wedding' });
-    expect(result.flags.map((flag) => flag.code)).toContain('RAPID_WEIGHT_LOSS');
-  });
-
-  it('flags recent surgery from Marathi free text', () => {
-    const result = assessSafety({ ...base, notes: 'नुकतीच ऑपरेशन झाले आहे' });
-    expect(result.flags.map((flag) => flag.code)).toContain('RECENT_SURGERY');
-  });
-
-  it('records every distinct flag without duplicating one', () => {
-    const result = assessSafety({
-      ...base,
-      age: 80,
-      medicalConditions: ['PREGNANCY', 'KIDNEY_DISEASE'],
-      notes: 'pregnant and on dialysis',
-    });
-    const codes = result.flags.map((flag) => flag.code);
-    expect(new Set(codes).size).toBe(codes.length);
-    expect(codes).toContain('AGE_OVER_75');
-    expect(codes).toContain('PREGNANCY');
-    expect(codes).toContain('KIDNEY_DISEASE');
-  });
-
-  it('produces a reason string for the admin queue', () => {
-    const result = assessSafety({ ...base, medicalConditions: ['PREGNANCY'] });
-    expect(result.flagReason).toContain('PREGNANCY');
-  });
-});
-
-describe('S2 — consent', () => {
-  it('requires both a timestamp and a version', () => {
-    expect(hasValidConsent({ consentGivenAt: new Date(), consentVersion: '2026-08-v1' })).toBe(true);
-    expect(hasValidConsent({ consentGivenAt: null, consentVersion: '2026-08-v1' })).toBe(false);
-    expect(hasValidConsent({ consentGivenAt: new Date(), consentVersion: null })).toBe(false);
   });
 });

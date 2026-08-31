@@ -1,9 +1,8 @@
 import { z } from 'zod';
-import { parseQuery, route } from '@/lib/api/handler';
+import { parseJson, parseQuery, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
 import { requireUser } from '@/lib/auth/session';
-import { db } from '@/lib/db';
-import { getCurrentMealPlan } from '@/lib/meal-plan/queries';
+import { getCustomerPlan, getPlanColumns, saveCustomerPlan } from '@/lib/meal-plan/queries';
 import { localeSchema } from '@/lib/validators/common';
 
 export const dynamic = 'force-dynamic';
@@ -13,28 +12,45 @@ const querySchema = z.object({ locale: localeSchema.default('mr') });
 /**
  * GET /api/meal-plan/current
  *
- * Returns null rather than 404 when there is no plan yet — "you have not made
- * one" is a normal state for most customers, and the meal-plan tab renders it
- * as the starting call to action.
+ * Returns the 4 pickable category columns alongside whatever the customer
+ * has already saved (or `plan: null` for "you haven't built one yet") —
+ * one round trip for the whole builder screen, no health-profile/consent
+ * gating any more (session 2026-08-30, the manual picker has no profile).
  */
 export const GET = route(async (request: Request) => {
   const session = await requireUser();
   const { locale } = parseQuery(request, querySchema);
 
-  const [plan, profile] = await Promise.all([
-    getCurrentMealPlan(session.userId, locale),
-    db.healthProfile.findUnique({
-      where: { userId: session.userId },
-      select: { consentGivenAt: true, updatedAt: true },
-    }),
+  const [plan, columns] = await Promise.all([
+    getCustomerPlan(session.userId, locale),
+    getPlanColumns(locale),
   ]);
 
-  return ok({
-    plan,
-    hasProfile: profile !== null,
-    hasConsent: Boolean(profile?.consentGivenAt),
-    /** B5 — a profile edited after the plan was built means it is stale. */
-    profileChangedSincePlan:
-      plan !== null && profile !== null ? profile.updatedAt > plan.createdAt : false,
-  });
+  return ok({ plan, columns });
+});
+
+const saveSchema = z.object({
+  days: z
+    .array(
+      z.object({
+        dayOfWeek: z.number().int().min(1).max(7),
+        variantIds: z.array(z.string()),
+      }),
+    )
+    .length(7),
+});
+
+/**
+ * PUT /api/meal-plan/current
+ *
+ * Replaces the customer's whole week in one go — the builder screen always
+ * submits all 7 days, picked or not, so a day the customer cleared out
+ * really does end up empty rather than keeping its last save.
+ */
+export const PUT = route(async (request: Request) => {
+  const session = await requireUser();
+  const { days } = await parseJson(request, saveSchema);
+
+  const plan = await saveCustomerPlan(session.userId, days);
+  return ok({ plan });
 });

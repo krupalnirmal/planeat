@@ -136,12 +136,30 @@
     "priceHighToLow": "High to Low",
     "search": "Search",
     "banner": {
-      "vegetables": { "headline": "Fresh picks at the best prices", "sub": "Wholesome vegetables, delivered fast" },
-      "fruits": { "headline": "Fresh picks at the best prices", "sub": "Wholesome fruits, delivered fast" },
-      "dairy": { "headline": "Farm-fresh, every morning", "sub": "Milk, curd, paneer & ghee, delivered fast" },
-      "bakery-biscuits": { "headline": "Freshly baked, always", "sub": "Bread, pav & biscuits, delivered fast" },
-      "ice-cream": { "headline": "Cool treats, delivered fast", "sub": "Your favourite scoops, in minutes" },
-      "grocery": { "headline": "Everyday essentials, sorted", "sub": "Grains, oil & more, delivered fast" }
+      "vegetables": {
+        "headline": "Fresh picks at the best prices",
+        "sub": "Wholesome vegetables, delivered fast"
+      },
+      "fruits": {
+        "headline": "Fresh picks at the best prices",
+        "sub": "Wholesome fruits, delivered fast"
+      },
+      "dairy": {
+        "headline": "Farm-fresh, every morning",
+        "sub": "Milk, curd, paneer & ghee, delivered fast"
+      },
+      "bakery-biscuits": {
+        "headline": "Freshly baked, always",
+        "sub": "Bread, pav & biscuits, delivered fast"
+      },
+      "ice-cream": {
+        "headline": "Cool treats, delivered fast",
+        "sub": "Your favourite scoops, in minutes"
+      },
+      "grocery": {
+        "headline": "Everyday essentials, sorted",
+        "sub": "Grains, oil & more, delivered fast"
+      }
     }
   },
   "product": {
@@ -360,26 +378,7 @@
   },
   "mealPlan": {
     "title": "My Meal Plan",
-    "subtitle": "A free weekly vegetable plan for the whole family",
-    "start": "Start a plan",
-    "startHint": "A common seasonal base plan, free for every family — pick your daily options and get fresh vegetables delivered home.",
-    "morning": "Morning",
-    "evening": "Evening",
-    "swap": "Swap",
-    "approve": "Approve plan",
-    "regenerate": "Regenerate",
-    "regenerating": "Building a new plan…",
-    "generating": "Building your plan…",
-    "generatingHint": "This can take up to a minute",
-    "generateFailed": "We couldn't build a plan. Please try again.",
-    "notEnoughVeg": "There aren't enough suitable vegetables in stock for a full week. Try easing one of your preferences.",
-    "editProfile": "Edit details",
-    "profileChanged": "You've changed your details. Build a new plan?",
-    "estimatedDaily": "Estimated daily cost",
-    "priceVaries": "Vegetable prices vary daily with market rates, so the amount will move a little.",
-    "planVersion": "Version {version}",
-    "ruleBasedNote": "This plan was built from our standard rules.",
-    "approveComingSoon": "Approving starts your daily deliveries",
+    "subtitle": "Build your own weekly vegetable, fruit, dairy and bakery plan",
     "days": {
       "1": "Monday",
       "2": "Tuesday",
@@ -398,69 +397,16 @@
       "6": "Sat",
       "7": "Sun"
     },
-    "loginDescription": "Log in to build a personalised weekly meal plan and get it delivered on your schedule.",
-    "terms": {
-      "title": "Make My Meal Plan — Terms & Conditions",
-      "section1Heading": "About the Base Plan",
-      "section1Body": "'Make My Meal Plan' is a general base plan for the whole family. It is prepared from our own research — not under the personal guidance of a specific dietitian — built around seasonally available vegetables, essential fruits, and the general physical needs of family members.",
-      "section2Heading": "Freedom of Daily Choice",
-      "section2Body": "This plan offers a variety of options for each day. You can build your final meal plan by choosing from among them, according to your preference. Following this plan regularly makes it possible to get the season’s full range of nutritious vegetables and fruits.",
-      "section3Heading": "Completely Free",
-      "section3Body": "'Make My Meal Plan' is a base plan that is completely free for every family. Under this plan, we deliver fresh vegetables to your home every day.",
-      "section4Heading": "Expert Guidance",
-      "section4Body": "For families who want a perfectly personalised family meal plan with the advice of a nutritionist and dietitian, that facility is also available. Our expert team will prepare it for you, either by visiting your home or at a suitable time. Applicable charges for this will need to be agreed to by the user.",
-      "checkboxLabel": "I accept all the above terms and conditions, and I am voluntarily using 'Make My Meal Plan'.",
-      "continueButton": "I Agree & Continue"
-    },
-    "basePlan": {
-      "categoryBreakfast": "Breakfast",
-      "categoryFruits": "Fruits",
-      "categoryDairy": "Dairy Products",
-      "categoryOther": "Other Items",
-      "categoryVegetables": "Vegetables",
-      "multiSelectHint": "you can pick more than one",
-      "builderTitle": "Build Your Weekly Plan",
-      "builderHint": "Tap to select what you want for each day. This is your family’s common base plan.",
-      "confirmButton": "Confirm My Plan",
-      "finalPlanTitle": "Your Family Meal Plan",
-      "congratsMessage": "Congratulations — you’ve created your family’s best meal plan!",
-      "congratsSubtext": "Press OK to start getting fresh vegetables delivered to your home, every day, as per this plan.",
-      "okButton": "OK, Get Started",
-      "editPlan": "Edit plan"
-    },
-    "planType": {
-      "title": "Choose plan type",
-      "personalTitle": "Personal Plan",
-      "personalDescription": "A personal meal plan for just one person",
-      "familyTitle": "Family Plan",
-      "familyDescription": "A meal plan for the whole family"
-    },
-    "family": {
-      "countTitle": "How many family members?",
-      "countHint": "Choose how many people are in your household",
-      "memberTitle": "Member details",
-      "memberProgress": "Member {current} of {total}",
-      "memberName": "Name",
-      "memberNamePlaceholder": "e.g. Sunita Pawar",
-      "memberAge": "Age",
-      "memberAgeUnit": "years",
-      "memberAllergies": "Any allergies?",
-      "memberAllergiesPlaceholder": "Type here",
-      "memberAllergiesAdd": "Add",
-      "memberDislikes": "Which vegetables to avoid?",
-      "preferencesTitle": "Family preferences",
-      "spicePreference": "Spice level",
-      "spiceLOW": "Low",
-      "spiceMEDIUM": "Medium",
-      "spiceHIGH": "High",
-      "dietaryPreference": "Diet type",
-      "dietVEG": "Vegetarian",
-      "dietVEGAN": "Fully vegetarian (no dairy)",
-      "dietJAIN": "Jain",
-      "dietEGGETARIAN": "Eggetarian",
-      "breakfastStyle": "Preferred breakfast style",
-      "breakfastStylePlaceholder": "e.g. poha, upma",
-      "finish": "Create plan"
+    "loginDescription": "Log in to build your own weekly plan and pick real products for each day.",
+    "builder": {
+      "dayColumn": "Day",
+      "hint": "Tap a product to pick a weight for that day. Tap it again to change or remove it.",
+      "saveButton": "Save my plan",
+      "saving": "Saving…",
+      "saved": "Plan saved!",
+      "remove": "Remove",
+      "summaryTitle": "Your weekly plan",
+      "summaryEmpty": "Pick items above to see them here."
     }
   },
   "subscription": {
@@ -508,28 +454,6 @@
       "SKIPPED_UNPAID": "Skipped — wallet was short",
       "OUTSIDE_PERIOD": "Outside your plan"
     }
-  },
-  "swap": {
-    "title": "Swap this vegetable",
-    "replacing": "Instead of {name}",
-    "why": "Why swap it?",
-    "reasonDONT_LIKE": "Don't like it",
-    "reasonALLERGIC": "It doesn't agree with me",
-    "reasonNOT_AVAILABLE": "Wasn't available",
-    "reasonTOO_EXPENSIVE": "Too expensive",
-    "reasonOTHER": "Something else",
-    "reasonText": "Tell us briefly",
-    "findAlternatives": "Show alternatives",
-    "finding": "Finding alternatives…",
-    "chooseOne": "Pick one of these",
-    "apply": "Use this one",
-    "applying": "Swapping…",
-    "applied": "Swapped",
-    "limitReached": "You've used all your swaps this week ({used} of {limit})",
-    "noAlternatives": "There aren't enough alternatives in stock right now",
-    "failed": "We couldn't swap that. Please try again.",
-    "learnNote": "This vegetable won't appear in future plans",
-    "swapsLeft": "{count} swaps left this week"
   },
   "approval": {
     "title": "Start your plan",
@@ -726,9 +650,7 @@
       "orders": "Orders",
       "inventory": "Inventory",
       "catalogue": "Catalogue",
-      "mealPlans": "Meal plans",
       "customers": "Customers",
-      "swaps": "Swap log",
       "waitlist": "Waitlist",
       "deliveryPartners": "Delivery partners",
       "settings": "Settings",
@@ -744,9 +666,6 @@
       "activeSubscriptions": "Active plans",
       "pausedSubscriptions": "Paused",
       "expiringSoon": "Ending within 2 days",
-      "flaggedPlans": "Plans needing a doctor's opinion",
-      "flaggedHint": "Nobody has looked at these yet",
-      "pendingSwaps": "Pending swaps",
       "openIssues": "Open complaints",
       "lowStock": "Low stock",
       "outOfStock": "Out of stock",
@@ -847,20 +766,6 @@
       "aliasAdded": "Alias added",
       "aliasHint": "Add the words customers actually say — the Smart List learns them immediately"
     },
-    "mealPlans": {
-      "title": "Meal plans",
-      "customer": "Customer",
-      "version": "Version",
-      "flagged": "Doctor's opinion",
-      "flagReason": "Reason",
-      "reviewed": "Reviewed",
-      "notReviewed": "Not reviewed",
-      "markReviewed": "Mark as reviewed",
-      "reviewNote": "Note",
-      "unreviewedOnly": "Unreviewed only",
-      "generatedBy": "Generated by",
-      "reviewedDone": "Recorded"
-    },
     "customers": {
       "title": "Customers",
       "search": "Search by name or phone",
@@ -904,12 +809,6 @@
       "pincode": "PIN code",
       "count": "People",
       "latest": "Latest signup"
-    },
-    "swaps": {
-      "title": "Swap log",
-      "hint": "A log only — every swap has already been applied",
-      "reason": "Reason",
-      "chosen": "Chosen"
     },
     "common": {
       "loading": "Loading…",

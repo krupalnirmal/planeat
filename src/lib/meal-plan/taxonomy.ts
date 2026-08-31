@@ -1,67 +1,14 @@
 /**
- * The vocabulary the health profile is built from (M5).
+ * The allergen/dietary-exclusion vocabulary `allergens.ts` matches against.
  *
- * Deliberately import-free so the wizard (a client component) and the safety
- * layer (server-only) share exactly one definition. A second copy in the UI is
- * how a condition ends up selectable but never checked for red flags.
- *
- * Every code here is stored in the database. Renaming one is a migration, not
- * an edit — old profiles carry the old code.
+ * Trimmed (session 2026-08-30) to just what's still used: the health-profile
+ * intake wizard that used to read the rest of this file (medical conditions,
+ * activity levels, consent versioning) was removed along with the AI meal
+ * plan generator. `allergens.ts` itself survives — it backs
+ * `src/lib/subscription/substitute.ts`'s out-of-stock substitution on active
+ * subscriptions, which must never substitute in something the customer is
+ * allergic to.
  */
-
-// ─────────────────────────────────────────────────────────────
-// Medical conditions
-// ─────────────────────────────────────────────────────────────
-
-/**
- * M5 step 3 lists the everyday conditions. S3 additionally requires pregnancy,
- * breastfeeding, kidney disease, cancer treatment, type 1 diabetes, recent
- * surgery and eating-disorder indicators to be detectable — a red flag that
- * cannot be selected can never be raised, so they are part of the same list.
- */
-export const MEDICAL_CONDITIONS = [
-  'DIABETES_TYPE_2',
-  'DIABETES_TYPE_1',
-  'HYPERTENSION',
-  'THYROID',
-  'PCOS',
-  'CHOLESTEROL',
-  'ANAEMIA',
-  'ACIDITY',
-  'JOINT_PAIN',
-  'KIDNEY_DISEASE',
-  'PREGNANCY',
-  'BREASTFEEDING',
-  'CANCER_TREATMENT',
-  'RECENT_SURGERY',
-  'EATING_DISORDER',
-  'NONE',
-] as const;
-
-export type MedicalCondition = (typeof MEDICAL_CONDITIONS)[number];
-
-/**
- * S3 — any of these sets `flaggedForReview`.
- *
- * Kidney disease is on the list because potassium restriction is genuinely
- * dangerous to get wrong, and a great many vegetables are high in potassium.
- */
-export const RED_FLAG_CONDITIONS: ReadonlySet<MedicalCondition> = new Set([
-  'DIABETES_TYPE_1',
-  'KIDNEY_DISEASE',
-  'PREGNANCY',
-  'BREASTFEEDING',
-  'CANCER_TREATMENT',
-  'RECENT_SURGERY',
-  'EATING_DISORDER',
-]);
-
-/** Conditions whose selection is exclusive — "none" cannot sit with others. */
-export const EXCLUSIVE_CONDITIONS: ReadonlySet<MedicalCondition> = new Set(['NONE']);
-
-// ─────────────────────────────────────────────────────────────
-// Allergens
-// ─────────────────────────────────────────────────────────────
 
 /**
  * S4 — a declared allergen is a HARD constraint, enforced in code.
@@ -154,36 +101,9 @@ export const ALLERGENS: readonly AllergenDefinition[] = [
   },
 ] as const;
 
-export const ALLERGEN_CODES = ALLERGENS.map((allergen) => allergen.code);
-
 export function allergenByCode(code: string): AllergenDefinition | undefined {
   return ALLERGENS.find((allergen) => allergen.code === code);
 }
-
-// ─────────────────────────────────────────────────────────────
-// Activity, diet and goals
-// ─────────────────────────────────────────────────────────────
-
-export const ACTIVITY_LEVELS = [
-  'SEDENTARY',
-  'LIGHT',
-  'MODERATE',
-  'ACTIVE',
-  'VERY_ACTIVE',
-] as const;
-export type ActivityLevelCode = (typeof ACTIVITY_LEVELS)[number];
-
-export const DIETARY_PREFERENCES = ['VEG', 'VEGAN', 'JAIN', 'EGGETARIAN'] as const;
-export type DietaryPreferenceCode = (typeof DIETARY_PREFERENCES)[number];
-
-export const HEALTH_GOALS = [
-  'WEIGHT_LOSS',
-  'WEIGHT_GAIN',
-  'MAINTENANCE',
-  'GENERAL_HEALTH',
-  'MANAGE_CONDITION',
-] as const;
-export type HealthGoalCode = (typeof HEALTH_GOALS)[number];
 
 /**
  * Jain cooking excludes root vegetables. This is a dietary constraint, not an
@@ -208,14 +128,3 @@ export const JAIN_EXCLUDED_TERMS = [
   'मुळा',
   'आले',
 ] as const;
-
-// ─────────────────────────────────────────────────────────────
-// Consent (S2, S6)
-// ─────────────────────────────────────────────────────────────
-
-/**
- * The disclaimer text the customer agreed to is versioned. If the wording ever
- * changes, existing consents remain attached to the version they actually
- * saw — which is the only thing that makes a consent record meaningful.
- */
-export const CONSENT_VERSION = '2026-08-v1';

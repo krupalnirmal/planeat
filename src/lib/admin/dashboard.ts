@@ -4,17 +4,13 @@ import { getCronHealth, type CronHealth } from '@/lib/subscription/daily-jobs';
 import { istDateKeyOf } from '@/lib/subscription/schedule';
 
 /**
- * M9 dashboard — "Today's orders, revenue, active subscriptions, pending
- * swaps, low stock, unreviewed flagged plans, cron health."
+ * M9 dashboard — "Today's orders, revenue, active subscriptions, low stock,
+ * cron health."
  *
  * Ordered by what the owner needs to act on, not by what is easy to count.
- * Two of these are alarms rather than statistics:
- *
- *   - B8 — "Admin dashboard shows the unreviewed count prominently." A
- *     flagged plan is a customer whose profile said something a doctor should
- *     see. It sits at the top for that reason.
- *   - M6 — cron health. A silent generation failure means nobody gets
- *     vegetables, and the owner finds out from phone calls at 07:00.
+ * Cron health is the one alarm rather than a statistic (M6) — a silent
+ * generation failure means nobody gets vegetables, and the owner finds out
+ * from phone calls at 07:00.
  */
 
 export interface DashboardMetrics {
@@ -29,9 +25,6 @@ export interface DashboardMetrics {
   pausedSubscriptions: number;
   expiringWithin2Days: number;
 
-  /** B8 — the number that must be impossible to miss. */
-  unreviewedFlaggedPlans: number;
-  pendingSwapRequests: number;
   openOrderIssues: number;
 
   lowStockCount: number;
@@ -60,8 +53,6 @@ export async function getDashboardMetrics(now: Date = new Date()): Promise<Dashb
     activeSubscriptions,
     pausedSubscriptions,
     expiringWithin2Days,
-    unreviewedFlaggedPlans,
-    pendingSwapRequests,
     openOrderIssues,
     lowStockVariants,
     outOfStockCount,
@@ -88,10 +79,6 @@ export async function getDashboardMetrics(now: Date = new Date()): Promise<Dashb
       where: { status: 'ACTIVE', endDate: { gte: scheduledDate, lte: twoDaysOut } },
     }),
 
-    // B8 — flagged and nobody has looked at it yet.
-    db.mealPlan.count({ where: { flaggedForReview: true, reviewedAt: null } }),
-
-    db.mealPlanSwapRequest.count({ where: { status: 'SUGGESTED' } }),
     db.orderIssue.count({ where: { status: 'OPEN' } }),
 
     // Prisma cannot compare two columns in a `where`, so low stock is filtered
@@ -122,8 +109,6 @@ export async function getDashboardMetrics(now: Date = new Date()): Promise<Dashb
     activeSubscriptions,
     pausedSubscriptions,
     expiringWithin2Days,
-    unreviewedFlaggedPlans,
-    pendingSwapRequests,
     openOrderIssues,
     lowStockCount: lowStockVariants.filter(
       (variant) => variant.stockQty <= variant.lowStockThreshold,

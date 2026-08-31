@@ -116,37 +116,6 @@ enum PlanType {
   FAMILY
 }
 
-/// "Make My Meal Plan" draft staging — mirrors the doc's own status list.
-enum MealPlanDraftStatus {
-  DRAFT
-  PROFILE_COMPLETED
-  GENERATING
-  GENERATED
-  SELECTING
-  FINAL_PREVIEW
-  APPROVED
-  REGENERATED
-  FAILED
-}
-
-/// The 5 fixed day/category slots a draft is generated into. Which
-/// categories are deliverable (become real MealPlanItem rows) is a business
-/// decision, not a schema one — see MealPlanDraft's finalize step.
-enum PlanCategory {
-  BREAKFAST
-  FRUITS
-  DAIRY
-  OTHER
-  VEGETABLES
-}
-
-/// Fixed per category in code (Breakfast/Fruits/Dairy/Other = SINGLE,
-/// Vegetables = MULTIPLE) — never AI-decided, same discipline as B4 quantity.
-enum SelectionType {
-  SINGLE
-  MULTIPLE
-}
-
 enum MealPlanStatus {
   DRAFT
   PENDING_CUSTOMER
@@ -158,26 +127,14 @@ enum MealPlanStatus {
 enum MealPlanGeneratedBy {
   AI
   ADMIN
+  /// The manual weekly picker (session 2026-08-30) — the customer built
+  /// this plan directly, nothing generated or suggested it.
+  CUSTOMER
 }
 
 enum MealSlot {
   MORNING
   EVENING
-}
-
-enum SwapReasonCode {
-  DONT_LIKE
-  ALLERGIC
-  NOT_AVAILABLE
-  TOO_EXPENSIVE
-  OTHER
-}
-
-enum SwapStatus {
-  PENDING
-  SUGGESTED
-  APPLIED
-  CANCELLED
 }
 
 enum SubscriptionStatus {
@@ -306,14 +263,12 @@ model User {
   addresses          Address[]
   healthProfile      HealthProfile?
   mealPlans          MealPlan[]
-  mealPlanDrafts     MealPlanDraft[]
   subscriptions      Subscription[]
   cart               Cart?
   orders             Order[]
   walletTransactions WalletTransaction[]
   payments           Payment[]
   smartLists         SmartList[]
-  swapRequests       MealPlanSwapRequest[]
   notifications      Notification[]
   pushTokens         PushToken[]
   deliveryPartner    DeliveryPartner?
@@ -468,11 +423,10 @@ model Product {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  category             Category              @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  variants             ProductVariant[]
-  aliases              ProductAlias[]
-  mealPlanItems        MealPlanItem[]
-  mealPlanDraftOptions MealPlanDraftOption[]
+  category      Category         @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variants      ProductVariant[]
+  aliases       ProductAlias[]
+  mealPlanItems MealPlanItem[]
 
   @@index([categoryId])
   @@index([isActive, isMealPlanEligible])
@@ -495,11 +449,10 @@ model ProductVariant {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  product              Product               @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  cartItems            CartItem[]
-  orderItems           OrderItem[]
-  mealPlanItems        MealPlanItem[]
-  mealPlanDraftOptions MealPlanDraftOption[]
+  product       Product        @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+  mealPlanItems MealPlanItem[]
 
   @@index([productId])
   @@index([isActive])
@@ -704,7 +657,6 @@ model HealthProfile {
   user          User                     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   accessLogs    HealthProfileAccessLog[]
   familyMembers FamilyMember[]
-  drafts        MealPlanDraft[]
 
   @@index([userId])
   @@map("health_profiles")
@@ -757,7 +709,10 @@ model MealPlan {
   id               String              @id
   userId           String
   version          Int                 @default(1)
-  profileSnapshot  Json
+  /// Required for an AI-generated plan (the health-profile state it was
+  /// generated against); null for a customer-built manual plan (session
+  /// 2026-08-30) — there's no profile to snapshot.
+  profileSnapshot  Json?
   status           MealPlanStatus      @default(DRAFT)
   generatedBy      MealPlanGeneratedBy @default(AI)
   aiProvider       String?             @db.VarChar(40)
@@ -808,10 +763,9 @@ model MealPlanItem {
   rationale     String?  @db.Text
   sortOrder     Int      @default(0)
 
-  day          MealPlanDay           @relation(fields: [mealPlanDayId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  product      Product               @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  variant      ProductVariant?       @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  swapRequests MealPlanSwapRequest[]
+  day     MealPlanDay     @relation(fields: [mealPlanDayId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  product Product         @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   /// Relaxed from a single [mealPlanDayId, slot] uniqueness (which allowed
   /// exactly one item per slot) so a day can carry several vegetables in
@@ -825,120 +779,6 @@ model MealPlanItem {
   @@index([productId])
   @@index([variantId])
   @@map("meal_plan_items")
-}
-
-model MealPlanSwapRequest {
-  id              String         @id
-  mealPlanItemId  String
-  userId          String
-  reasonCode      SwapReasonCode
-  reasonText      String?        @db.VarChar(255)
-  status          SwapStatus     @default(PENDING)
-  aiSuggestions   Json?
-  chosenProductId String?
-  createdAt       DateTime       @default(now())
-  resolvedAt      DateTime?
-
-  mealPlanItem MealPlanItem @relation(fields: [mealPlanItemId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user         User         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@index([mealPlanItemId])
-  @@index([userId])
-  @@index([chosenProductId])
-  @@index([status])
-  @@index([createdAt])
-  @@map("meal_plan_swap_requests")
-}
-
-// ─────────────────────────────────────────────────────────────
-// "Make My Meal Plan" draft staging
-//
-// Sits BEFORE MealPlan/MealPlanDay/MealPlanItem: the AI proposes 2-3
-// candidate options per day/category here, the customer selects and sets
-// quantities in place on MealPlanDraftOption, and only `finalize` resolves
-// the selections into real MealPlanItem rows. MealPlan itself stays the
-// single, unchanged source of truth for what's actually delivered/
-// subscribed — this hierarchy is scaffolding around it, not a replacement.
-// ─────────────────────────────────────────────────────────────
-
-model MealPlanDraft {
-  id                 String              @id
-  userId             String
-  healthProfileId    String
-  planType           PlanType
-  durationDays       Int
-  status             MealPlanDraftStatus @default(DRAFT)
-  aiProvider         String?             @db.VarChar(40)
-  aiModel            String?             @db.VarChar(80)
-  promptVersion      String?             @db.VarChar(20)
-  flaggedForReview   Boolean             @default(false)
-  flagReason         String?             @db.Text
-  /// Set once `finalize` has resolved this draft into a real MealPlan.
-  resolvedMealPlanId String?
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-
-  user          User               @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  healthProfile HealthProfile      @relation(fields: [healthProfileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  days          MealPlanDraftDay[]
-
-  @@index([userId])
-  @@index([healthProfileId])
-  @@map("meal_plan_drafts")
-}
-
-model MealPlanDraftDay {
-  id        String @id
-  draftId   String
-  dayNumber Int
-
-  draft      MealPlanDraft           @relation(fields: [draftId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  categories MealPlanDraftCategory[]
-
-  @@unique([draftId, dayNumber])
-  @@index([draftId])
-  @@map("meal_plan_draft_days")
-}
-
-model MealPlanDraftCategory {
-  id            String        @id
-  draftDayId    String
-  category      PlanCategory
-  /// Fixed per category in code at generation time, not chosen by the AI.
-  selectionType SelectionType
-
-  day     MealPlanDraftDay      @relation(fields: [draftDayId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  options MealPlanDraftOption[]
-
-  @@unique([draftDayId, category])
-  @@index([draftDayId])
-  @@map("meal_plan_draft_categories")
-}
-
-model MealPlanDraftOption {
-  id                String    @id
-  categoryId        String
-  /// Always a real, already-fetched candidate — the AI returns only ids
-  /// from the list it was given (same discipline as MealPlanItem/generate.ts),
-  /// never a freestanding name.
-  productId         String
-  variantId         String?
-  suggestedQuantity Int?
-  quantityUnit      UnitType?
-  /// Live selection state — toggled by PATCH .../select, cleared for
-  /// siblings in the same category when selectionType is SINGLE.
-  selected          Boolean   @default(false)
-  chosenQuantity    Int?
-  sortOrder         Int       @default(0)
-
-  category MealPlanDraftCategory @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  product  Product               @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  variant  ProductVariant?       @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@index([categoryId])
-  @@index([productId])
-  @@index([variantId])
-  @@map("meal_plan_draft_options")
 }
 
 // ─────────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 import { ApiError, clientIp, parseJson, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
 import { requireSuperAdmin } from '@/lib/admin/guard';
-import { getHealthProfileAsAdmin } from '@/lib/meal-plan/queries';
+import { getHealthProfileAsAdmin } from '@/lib/health-profile/queries';
 import { healthProfileAccessSchema } from '@/lib/validators/admin';
 
 export const dynamic = 'force-dynamic';
