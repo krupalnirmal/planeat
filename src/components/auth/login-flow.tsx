@@ -330,121 +330,129 @@ export function LoginFlow() {
       </header>
 
       <main className="bg-background px-5 py-8">
-        {/* A minimal verification illustration (client's reference) built
-            from two stacked icon circles rather than a shipped SVG asset —
-            one more thing that never goes stale if the icon set changes. */}
-        <div className="relative mx-auto grid size-28 place-items-center rounded-full bg-tint-green">
-          <Smartphone className="size-11 text-primary" aria-hidden />
-          <span className="absolute right-0 bottom-0 grid size-9 place-items-center rounded-full border-4 border-background bg-primary text-primary-foreground">
-            <Check className="size-4.5" aria-hidden />
-          </span>
-        </div>
-
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          {t('otpSubtitle', { phone })}{' '}
-          <button
-            type="button"
-            onClick={() => {
-              setStep('phone');
-              setError(null);
-            }}
-            className="font-bold text-primary"
-          >
-            {t('otpChangeLink')}
-          </button>
-        </p>
-
-        <form
-          className="mt-6"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (code.length === OTP_LENGTH && !busy) void verify(code);
-          }}
-        >
-          <div
-            role="group"
-            aria-label={t('otpLabel')}
-            onPaste={handleOtpPaste}
-            className="flex justify-center gap-2.5"
-          >
-            {Array.from({ length: OTP_LENGTH }).map((_, index) => (
-              <input
-                key={index}
-                ref={(el) => {
-                  otpRefs.current[index] = el;
-                }}
-                type="text"
-                inputMode="numeric"
-                autoComplete={index === 0 ? 'one-time-code' : 'off'}
-                aria-label={t('otpDigitAria', { position: index + 1 })}
-                value={code[index] ?? ''}
-                onChange={(event) => setDigit(index, event.target.value)}
-                onKeyDown={(event) => handleOtpKeyDown(index, event)}
-                className={cn(
-                  'input-3d size-11 shrink-0 rounded-xl border-2 border-border/60 bg-card text-center text-lg font-bold outline-none focus:border-primary',
-                  error && 'border-danger',
-                )}
-              />
-            ))}
+        {/* Everything below used to sit loose, straight on the page
+            background (client's feedback, session 2026-09-01: "looks too
+            scattered") — one raised card groups the illustration, the OTP
+            boxes and everything around them into a single visual unit,
+            same `.card-3d` elevation language as the rest of the app's
+            cards rather than a plain bordered box. */}
+        <div className="card-3d rounded-2xl border border-border/50 bg-card px-5 py-8">
+          {/* A minimal verification illustration (client's reference) built
+              from two stacked icon circles rather than a shipped SVG asset —
+              one more thing that never goes stale if the icon set changes. */}
+          <div className="relative mx-auto grid size-28 place-items-center rounded-full bg-tint-green">
+            <Smartphone className="size-11 text-primary" aria-hidden />
+            <span className="absolute right-0 bottom-0 grid size-9 place-items-center rounded-full border-4 border-card bg-primary text-primary-foreground">
+              <Check className="size-4.5" aria-hidden />
+            </span>
           </div>
 
-          {devCode && (
-            <p className="mt-2 rounded-[var(--radius)] bg-secondary px-3 py-2 text-center text-xs text-muted-foreground">
-              {t('devOtpHint', { code: devCode })}
-            </p>
-          )}
-
-          {error && <p className="mt-2 text-sm text-danger">{error}</p>}
-
-          <div className="mt-3 text-center">
-            {secondsLeft > 0 ? (
-              <p className="text-sm font-semibold text-muted-foreground">
-                {t('resendIn', { time: formatCountdown(secondsLeft) })}
-              </p>
-            ) : (
-              <button
-                type="button"
-                onClick={() => void sendCode('sms')}
-                disabled={busy}
-                className="text-sm font-bold text-primary"
-              >
-                {t('resend')}
-              </button>
-            )}
-          </div>
-
-          {/* B16 — SMS delivery in this segment is unreliable, so an
-              alternate channel is offered as soon as waiting starts to feel
-              like failure. WhatsApp, not a voice call: that is the channel
-              this app actually has wired up end to end. */}
-          {elapsed >= WHATSAPP_FALLBACK_SECONDS && (
-            <div className="mt-4 rounded-2xl bg-tint-green p-3.5 text-center">
-              <p className="text-xs font-medium text-muted-foreground">{t('otpFallbackBody')}</p>
-              <button
-                type="button"
-                onClick={() => void sendCode('whatsapp')}
-                disabled={busy}
-                className="mt-2.5 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-card text-sm font-bold shadow-sm"
-              >
-                <MessageCircle className="size-4 text-primary" aria-hidden />
-                {t('resendWhatsapp')}
-              </button>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={code.length !== OTP_LENGTH || busy}
-            className="mt-6 h-13 w-full rounded-2xl bg-primary text-[15px] font-bold text-primary-foreground shadow-sm disabled:opacity-50 disabled:shadow-none"
-          >
-            {busy ? t('verifying') : t('verify')}
-          </button>
-
-          <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-[11px] font-semibold text-muted-foreground">
-            <ShieldCheck className="size-3.5 text-primary" aria-hidden />
-            {t('otpSecuredFooter')}
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            {t('otpSubtitle', { phone })}{' '}
+            <button
+              type="button"
+              onClick={() => {
+                setStep('phone');
+                setError(null);
+              }}
+              className="font-bold text-primary"
+            >
+              {t('otpChangeLink')}
+            </button>
           </p>
-        </form>
+
+          <form
+            className="mt-6"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (code.length === OTP_LENGTH && !busy) void verify(code);
+            }}
+          >
+            <div
+              role="group"
+              aria-label={t('otpLabel')}
+              onPaste={handleOtpPaste}
+              className="flex justify-center gap-2.5"
+            >
+              {Array.from({ length: OTP_LENGTH }).map((_, index) => (
+                <input
+                  key={index}
+                  ref={(el) => {
+                    otpRefs.current[index] = el;
+                  }}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete={index === 0 ? 'one-time-code' : 'off'}
+                  aria-label={t('otpDigitAria', { position: index + 1 })}
+                  value={code[index] ?? ''}
+                  onChange={(event) => setDigit(index, event.target.value)}
+                  onKeyDown={(event) => handleOtpKeyDown(index, event)}
+                  className={cn(
+                    'input-3d size-11 shrink-0 rounded-xl border-2 border-border/60 bg-card text-center text-lg font-bold outline-none focus:border-primary',
+                    error && 'border-danger',
+                  )}
+                />
+              ))}
+            </div>
+
+            {devCode && (
+              <p className="mt-2 rounded-[var(--radius)] bg-secondary px-3 py-2 text-center text-xs text-muted-foreground">
+                {t('devOtpHint', { code: devCode })}
+              </p>
+            )}
+
+            {error && <p className="mt-2 text-sm text-danger">{error}</p>}
+
+            <div className="mt-3 text-center">
+              {secondsLeft > 0 ? (
+                <p className="text-sm font-semibold text-muted-foreground">
+                  {t('resendIn', { time: formatCountdown(secondsLeft) })}
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => void sendCode('sms')}
+                  disabled={busy}
+                  className="text-sm font-bold text-primary"
+                >
+                  {t('resend')}
+                </button>
+              )}
+            </div>
+
+            {/* B16 — SMS delivery in this segment is unreliable, so an
+                alternate channel is offered as soon as waiting starts to feel
+                like failure. WhatsApp, not a voice call: that is the channel
+                this app actually has wired up end to end. */}
+            {elapsed >= WHATSAPP_FALLBACK_SECONDS && (
+              <div className="mt-4 rounded-2xl bg-tint-green p-3.5 text-center">
+                <p className="text-xs font-medium text-muted-foreground">{t('otpFallbackBody')}</p>
+                <button
+                  type="button"
+                  onClick={() => void sendCode('whatsapp')}
+                  disabled={busy}
+                  className="mt-2.5 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-card text-sm font-bold shadow-sm"
+                >
+                  <MessageCircle className="size-4 text-primary" aria-hidden />
+                  {t('resendWhatsapp')}
+                </button>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={code.length !== OTP_LENGTH || busy}
+              className="mt-6 h-13 w-full rounded-2xl bg-primary text-[15px] font-bold text-primary-foreground shadow-sm disabled:opacity-50 disabled:shadow-none"
+            >
+              {busy ? t('verifying') : t('verify')}
+            </button>
+
+            <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-[11px] font-semibold text-muted-foreground">
+              <ShieldCheck className="size-3.5 text-primary" aria-hidden />
+              {t('otpSecuredFooter')}
+            </p>
+          </form>
+        </div>
       </main>
     </>
   );
