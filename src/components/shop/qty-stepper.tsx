@@ -42,8 +42,16 @@ export function QtyStepper({
   return (
     <div
       className={cn(
-        'flex items-center justify-between rounded-[var(--radius)] bg-primary text-primary-foreground',
-        sm ? 'h-8' : 'h-11',
+        'flex items-center rounded-[var(--radius)] bg-primary text-primary-foreground',
+        // `sm` is intentionally sized to content (`w-fit`), not stretched —
+        // the previous attempt passed `w-full` from the caller, which made
+        // this stretch to fill the card's remaining space instead of
+        // shrinking to its own content, so it kept crowding the price no
+        // matter how small the buttons got. The default size keeps no
+        // width of its own, same as before this change — every existing
+        // caller (cart-screen, variant-picker, variant-picker-sheet)
+        // already sets its own explicit width via `className`.
+        sm ? 'h-7 w-fit gap-0.5' : 'h-11 justify-between',
         className,
       )}
     >
@@ -53,13 +61,13 @@ export function QtyStepper({
         disabled={disabled}
         aria-label={`${t('remove')}${label ? ` — ${label}` : ''}`}
         className={cn(
-          'grid place-items-center rounded-l-[var(--radius)] disabled:opacity-50',
+          'grid shrink-0 place-items-center rounded-l-[var(--radius)] disabled:opacity-50',
           // `min-h-0` is load-bearing: the app's global rule (R10,
           // globals.css) sets `min-height: 44px` on every <button>, and
           // `min-height` always wins over a smaller `height` regardless of
           // Tailwind's layer order — that's a different-property clash, not
           // a same-property cascade the layer order can resolve.
-          sm ? 'h-8 w-8 min-h-0' : 'h-11 w-11',
+          sm ? 'h-7 w-7 min-h-0' : 'h-11 w-11',
         )}
       >
         <Minus className={sm ? 'size-3' : 'size-4'} aria-hidden />
@@ -67,7 +75,10 @@ export function QtyStepper({
 
       <span
         aria-live="polite"
-        className={cn('min-w-6 text-center font-bold tabular-nums', sm ? 'text-xs' : 'text-sm')}
+        className={cn(
+          'shrink-0 text-center font-bold tabular-nums',
+          sm ? 'w-4 text-[11px]' : 'min-w-6 text-sm',
+        )}
       >
         {quantity}
       </span>
@@ -78,8 +89,8 @@ export function QtyStepper({
         disabled={disabled || atMax}
         aria-label={`${t('add')}${label ? ` — ${label}` : ''}`}
         className={cn(
-          'grid place-items-center rounded-r-[var(--radius)] disabled:opacity-50',
-          sm ? 'h-8 w-8 min-h-0' : 'h-11 w-11',
+          'grid shrink-0 place-items-center rounded-r-[var(--radius)] disabled:opacity-50',
+          sm ? 'h-7 w-7 min-h-0' : 'h-11 w-11',
         )}
       >
         <Plus className={sm ? 'size-3' : 'size-4'} aria-hidden />

@@ -291,7 +291,7 @@ export function ProductCard({
                 max={activeVariant.stockQty}
                 label={product.name}
                 size="sm"
-                className="animate-in zoom-in-95 fade-in w-full max-w-[104px] duration-200"
+                className="animate-in zoom-in-95 fade-in duration-200"
               />
               {multiVariant && (
                 <button
