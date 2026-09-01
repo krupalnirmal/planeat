@@ -147,7 +147,7 @@ export function PlanTable({
                 </td>
                 {columns.map((col) => (
                   <td key={col.slug} className="border border-border bg-background p-1.5 align-top">
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1.5">
                       {col.products.map((product) => {
                         const variantId = selections[dayOfWeek]?.[product.id];
                         const activeVariant = variantLabelOf(product, variantId);
@@ -156,8 +156,17 @@ export function PlanTable({
                             key={product.id}
                             type="button"
                             onClick={() => setPicker({ dayOfWeek, product })}
+                            // Overrides this app's global 44px button
+                            // touch-target rule (R10, src/app/globals.css) —
+                            // that rule targets primary actions, but a day ×
+                            // category cell can hold 20+ of these, and
+                            // wrapping every one of them to 44px tall would
+                            // make a single cell taller than the screen.
+                            // 28px still clears WCAG's own 24px floor;
+                            // `gap-1.5` (up from `gap-1`) adds a bit of
+                            // spacing back to offset the smaller target.
                             className={cn(
-                              'rounded-full border px-2.5 py-1 text-[11px] whitespace-nowrap',
+                              'min-h-0 h-7 rounded-full border px-2.5 py-1 text-[11px] whitespace-nowrap',
                               activeVariant
                                 ? 'border-primary bg-primary text-primary-foreground font-semibold'
                                 : 'border-border bg-card text-foreground',
