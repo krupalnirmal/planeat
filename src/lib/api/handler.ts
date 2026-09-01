@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { ZodError, type ZodType } from 'zod';
+import { ensureFreshSession } from '@/lib/auth/session';
 import { ERROR_CODES, type ErrorCode, fail, internal, validationFailed } from './response';
 
 /**
@@ -44,12 +45,20 @@ export class ApiError extends Error {
 /**
  * Wraps a route handler so every failure leaves as `{ success, data, error }`
  * rather than as an unhandled 500 with a stack trace in the body.
+ *
+ * Also silently renews an expired access token from the refresh token
+ * before the handler runs (`ensureFreshSession`, src/lib/auth/session.ts) —
+ * every route goes through here, so this is the one place that fixes "page
+ * reload after 15 minutes looks like a logout" for the whole app at once,
+ * without every route needing to catch-and-retry on a 401 itself (which
+ * would also double-read a POST body that `parseJson` already consumed).
  */
 export function route<Args extends unknown[]>(
   handler: (...args: Args) => Promise<NextResponse>,
 ): (...args: Args) => Promise<NextResponse> {
   return async (...args: Args) => {
     try {
+      await ensureFreshSession();
       return await handler(...args);
     } catch (error) {
       if (error instanceof ApiError) {

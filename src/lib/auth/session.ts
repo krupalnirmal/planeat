@@ -130,6 +130,34 @@ export async function endSession(): Promise<void> {
   jar.delete(REFRESH_COOKIE);
 }
 
+/**
+ * Silently renews the access token from the refresh token when the access
+ * token is missing or has expired, so a page reload (or any request) after
+ * the 15-minute access-token TTL doesn't look like a logout to the customer
+ * — the refresh token is valid for 30 days and was sitting right there,
+ * just never used for anything. Called once per request from `route()`
+ * (src/lib/api/handler.ts), before the handler runs, so `getSession()` /
+ * `requireUser()` inside the handler see an already-fresh cookie and
+ * nothing downstream needs to change.
+ *
+ * Cheap for the common cases: a guest (no refresh-token cookie) or a still-
+ * valid access token both return after a single JWT check, no DB round
+ * trip. Only "access token expired, refresh token valid" pays for
+ * `rotateSession()`'s DB read/writes — exactly the case this exists for.
+ * Never throws: a failed refresh just leaves the request as unauthenticated,
+ * same as before this existed.
+ */
+export async function ensureFreshSession(): Promise<void> {
+  try {
+    const jar = await cookies();
+    const accessToken = jar.get(ACCESS_COOKIE)?.value;
+    if (accessToken && (await verifyAccessToken(accessToken))) return;
+    await rotateSession();
+  } catch {
+    // Best-effort — the request proceeds as unauthenticated if this fails.
+  }
+}
+
 /** Null for a guest. Guests may browse the whole catalogue (B17). */
 export async function getSession(): Promise<AccessClaims | null> {
   const jar = await cookies();
