@@ -51,7 +51,7 @@ export function QtyStepper({
         // width of its own, same as before this change — every existing
         // caller (cart-screen, variant-picker, variant-picker-sheet)
         // already sets its own explicit width via `className`.
-        sm ? 'h-7 w-fit gap-0.5' : 'h-11 justify-between',
+        sm ? 'h-7 w-fit' : 'h-11 justify-between',
         className,
       )}
     >
@@ -77,7 +77,11 @@ export function QtyStepper({
         aria-live="polite"
         className={cn(
           'shrink-0 text-center font-bold tabular-nums',
-          sm ? 'w-4 text-[11px]' : 'min-w-6 text-sm',
+          // No fixed width here for `sm` (was `w-4`, a flat 16px regardless
+          // of the digit) — just enough side padding to keep the number
+          // off the buttons' rounded corners, so a 1-digit quantity doesn't
+          // carry the same reserved width as a would-be 2-digit one.
+          sm ? 'px-0.5 text-[11px]' : 'min-w-6 text-sm',
         )}
       >
         {quantity}
