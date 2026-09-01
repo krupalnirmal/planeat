@@ -36,8 +36,8 @@ export interface ProductCardView {
       label), regardless of which one `name` above picked for aria-labels
       and other non-visual uses. */
   nameEn: string;
-  /** The locale's own name alongside `nameEn`, or `null` for the English
-      locale itself — "Onion (Onion)" adds nothing. */
+  /** Always the Marathi name alongside `nameEn` — fixed "English (Marathi)"
+      regardless of the UI's own current locale (see `localNameOf`). */
   localName: string | null;
   categorySlug: string;
   imageUrl: string | null;
@@ -144,11 +144,16 @@ function toVariantView(variant: ProductWithVariants['variants'][number]): Produc
   };
 }
 
-/** The locale's own name for the bilingual card label, or `null` for English. */
-function localNameOf(names: LocalisedNames, locale: Locale): string | null {
-  if (locale === 'mr') return names.nameMr;
-  if (locale === 'hi') return names.nameHi;
-  return null;
+/**
+ * The bilingual card label's bracketed half — always Marathi (session
+ * 2026-09-01, client's correction: this is fixed as "English (Marathi)"
+ * regardless of which locale the UI itself is currently showing, not
+ * "English (whatever locale is active)" — the customer base is Marathi-
+ * speaking Nashik, and the locale switcher is a dev/admin convenience, not
+ * a signal that the bracket should follow it.
+ */
+function localNameOf(names: LocalisedNames): string | null {
+  return names.nameMr;
 }
 
 export function toProductCard(product: ProductWithVariants, locale: Locale): ProductCardView {
@@ -158,7 +163,7 @@ export function toProductCard(product: ProductWithVariants, locale: Locale): Pro
     slug: product.sku.toLowerCase(),
     name: pickName(product, locale),
     nameEn: product.nameEn,
-    localName: localNameOf(product, locale),
+    localName: localNameOf(product),
     categorySlug: product.category.slug,
     imageUrl: firstImageUrl(product.imageUrls),
     unitType: product.unitType,

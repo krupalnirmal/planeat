@@ -47,7 +47,7 @@ export interface ProductCardData {
       (session 2026-09-01). Optional so any caller that hasn't been updated
       to pass it still falls back to `name` instead of rendering blank. */
   nameEn?: string;
-  /** The locale's own name, or `null`/undefined for the English locale. */
+  /** Always the Marathi name, regardless of the UI's own current locale. */
   localName?: string | null;
   imageUrl: string | null;
   unitType: string;
