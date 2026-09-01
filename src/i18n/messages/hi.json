@@ -270,7 +270,6 @@
     "payWalletBalance": "बैलेंस {amount}",
     "payWalletShort": "वॉलेट में पर्याप्त बैलेंस नहीं",
     "payOnline": "ऑनलाइन (UPI / कार्ड)",
-    "payOnlineSoon": "अगले चरण में शुरू होगा",
     "payCod": "डिलीवरी पर नकद",
     "codUnavailableCap": "{amount} से ऊपर नकद नहीं चलेगा",
     "codUnavailablePlan": "आहार प्लान के ऑर्डर पर नकद नहीं चलता",
@@ -278,7 +277,8 @@
     "notesPlaceholder": "जैसे दूसरी मंज़िल, घंटी बजाएँ",
     "placeOrder": "ऑर्डर दें",
     "placing": "ऑर्डर दे रहे हैं…",
-    "notServiceable": "इस पते पर हम नहीं पहुँच सकते"
+    "notServiceable": "इस पते पर हम नहीं पहुँच सकते",
+    "payOnlineHint": "UPI, कार्ड या नेटबैंकिंग"
   },
   "orders": {
     "title": "मेरे ऑर्डर",

@@ -543,6 +543,7 @@ model Order {
   statusHistory OrderStatusHistory[]
   assignment    DeliveryAssignment?
   issues        OrderIssue[]
+  payments      Payment[]
 
   // R5: the daily cron must be idempotent for a given subscription + date.
   @@unique([subscriptionId, scheduledDate])
@@ -862,6 +863,11 @@ model WalletTransaction {
 model Payment {
   id                String        @id
   userId            String
+  /// Set for an order-checkout payment (session 2026-09-01), null for a
+  /// wallet top-up — the one thing handlePaymentWebhook branches on to
+  /// decide whether "payment.captured" should mark an Order paid or credit
+  /// the wallet.
+  orderId           String?
   gateway           String        @db.VarChar(40)
   gatewayOrderId    String?       @db.VarChar(120)
   gatewayPaymentId  String?       @unique @db.VarChar(120)
@@ -872,11 +878,13 @@ model Payment {
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user  User   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([userId])
   @@index([status, createdAt])
   @@index([gatewayOrderId])
+  @@index([orderId])
   @@map("payments")
 }
 

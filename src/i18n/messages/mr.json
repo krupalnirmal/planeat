@@ -270,7 +270,6 @@
     "payWalletBalance": "शिल्लक {amount}",
     "payWalletShort": "वॉलेटमध्ये पुरेशी शिल्लक नाही",
     "payOnline": "ऑनलाइन (UPI / कार्ड)",
-    "payOnlineSoon": "पुढच्या टप्प्यात सुरू होईल",
     "payCod": "डिलिव्हरीच्या वेळी रोख",
     "codUnavailableCap": "{amount} पेक्षा जास्त रकमेला रोख चालणार नाही",
     "codUnavailablePlan": "आहार प्लॅनच्या ऑर्डरला रोख चालत नाही",
@@ -278,7 +277,8 @@
     "notesPlaceholder": "उदा. दुसऱ्या मजल्यावर, घंटी वाजवा",
     "placeOrder": "ऑर्डर द्या",
     "placing": "ऑर्डर देत आहोत…",
-    "notServiceable": "या पत्त्यावर आम्ही पोहोचू शकत नाही"
+    "notServiceable": "या पत्त्यावर आम्ही पोहोचू शकत नाही",
+    "payOnlineHint": "UPI, कार्ड किंवा नेटबँकिंग"
   },
   "orders": {
     "title": "माझ्या ऑर्डर",

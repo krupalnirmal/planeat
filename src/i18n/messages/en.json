@@ -270,7 +270,6 @@
     "payWalletBalance": "Balance {amount}",
     "payWalletShort": "Not enough balance in your wallet",
     "payOnline": "Online (UPI / card)",
-    "payOnlineSoon": "Arrives in the next phase",
     "payCod": "Cash on delivery",
     "codUnavailableCap": "Cash is not available above {amount}",
     "codUnavailablePlan": "Cash is not available on meal-plan orders",
@@ -278,7 +277,8 @@
     "notesPlaceholder": "e.g. second floor, please ring the bell",
     "placeOrder": "Place order",
     "placing": "Placing your order…",
-    "notServiceable": "We can't deliver to this address"
+    "notServiceable": "We can't deliver to this address",
+    "payOnlineHint": "UPI, cards or netbanking"
   },
   "orders": {
     "title": "My orders",
