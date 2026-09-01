@@ -153,11 +153,11 @@ export function CartScreen() {
             <li
               key={line.id}
               className={cn(
-                'flex gap-3 rounded-2xl border border-border/50 bg-background p-3.5',
+                'card-3d flex gap-2.5 rounded-2xl border border-border/50 bg-background p-2.5',
                 unavailable && 'opacity-70',
               )}
             >
-              <div className="grid size-[68px] shrink-0 place-items-center overflow-hidden rounded-xl bg-secondary">
+              <div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-secondary">
                 {line.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={line.imageUrl} alt="" aria-hidden className="size-full object-cover" />
@@ -167,8 +167,22 @@ export function CartScreen() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="line-clamp-2 text-sm font-bold">{line.name}</p>
-                <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                {/* Name + line total share one row (session 2026-09-01,
+                    client's reference) — the total used to sit alone in the
+                    control row below, which cost this card a whole extra
+                    row of height for one number. */}
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="line-clamp-2 min-w-0 text-sm font-bold">
+                    {line.nameEn}
+                    {line.localName && (
+                      <span className="font-normal text-muted-foreground"> ({line.localName})</span>
+                    )}
+                  </p>
+                  <span className="shrink-0 text-sm font-bold">
+                    {formatPaise(paise(line.linePaise), { hidePaise: true })}
+                  </span>
+                </div>
+                <p className="text-xs font-medium text-muted-foreground">
                   {formatQuantity(line.unitQuantity, line.unit as QuantityUnit)} ·{' '}
                   {formatPaise(paise(line.unitPricePaise), { hidePaise: true })}
                 </p>
@@ -181,11 +195,7 @@ export function CartScreen() {
                   </p>
                 )}
 
-                <div className="mt-2 flex items-center justify-between gap-3">
-                  <span className="text-sm font-bold">
-                    {formatPaise(paise(line.linePaise), { hidePaise: true })}
-                  </span>
-
+                <div className="mt-1.5 flex justify-end">
                   {unavailable ? (
                     <button
                       type="button"
@@ -203,7 +213,7 @@ export function CartScreen() {
                       disabled={cart.isMutating}
                       max={line.availableQty}
                       label={line.name}
-                      className="w-28"
+                      size="sm"
                     />
                   )}
                 </div>

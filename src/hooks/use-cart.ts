@@ -24,6 +24,8 @@ export interface CartLineView {
   productId: string;
   variantId: string;
   name: string;
+  nameEn: string;
+  localName: string | null;
   imageUrl: string | null;
   variantLabel: string;
   quantity: number;
@@ -103,6 +105,8 @@ export function useCart() {
             productId: line.productId,
             variantId: line.variantId,
             name: '',
+            nameEn: '',
+            localName: null,
             imageUrl: null,
             variantLabel: '',
             quantity: line.quantity,

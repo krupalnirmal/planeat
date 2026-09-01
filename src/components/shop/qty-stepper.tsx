@@ -9,12 +9,14 @@ import { cn } from '@/lib/utils';
  *
  * R10 — both buttons clear 44×44px by default. On a 390px screen with a
  * thumb on a moving bus, a 32px minus button is a mis-tap, and a mis-tap
- * here silently changes what the customer is charged. `size="sm"` is the
- * one deliberate exception (session 2026-09-01): the narrow product-card
- * rails (Order Again, Top Picks) are ~132-168px wide, and a 44px-per-button
- * stepper left almost no room for the price beside it, squeezing the MRP
- * strikethrough down to a sliver. 32px still clears WCAG's own 24px floor —
- * this app's 44px is its own stricter convention, not a hard requirement.
+ * here silently changes what the customer is charged. `size="sm"` trades
+ * that margin for a more compact control (still above WCAG's own 24px
+ * floor — this app's 44px is its own stricter convention, not a hard
+ * requirement), used on the narrow product-card rails (Order Again, Top
+ * Picks, session 2026-09-01 — a 44px-per-button stepper there left almost
+ * no room for the price beside it) and on the cart screen's line items
+ * (also session 2026-09-01, client's request to make that card more
+ * compact generally).
  */
 export function QtyStepper({
   quantity,

@@ -23,6 +23,10 @@ export interface CartLineView {
   productId: string;
   variantId: string;
   name: string;
+  /** English name, shown together with `localName` as "English (Marathi)"
+      (session 2026-09-01), same bilingual format as the product cards. */
+  nameEn: string;
+  localName: string | null;
   imageUrl: string | null;
   variantLabel: string;
   quantity: number;
@@ -92,6 +96,8 @@ function toLine(row: CartLineRow, locale: Locale): CartLineView {
     productId: row.productId,
     variantId: row.variantId,
     name: pickName(variant.product, locale),
+    nameEn: variant.product.nameEn,
+    localName: variant.product.nameMr,
     imageUrl: firstImage(variant.product.imageUrls),
     variantLabel: variant.label,
     quantity: row.quantity,
