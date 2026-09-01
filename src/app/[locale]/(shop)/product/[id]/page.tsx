@@ -75,7 +75,17 @@ export default async function ProductPage({
           </div>
 
           <p className="mt-4 text-xs text-muted-foreground">{product.categoryName}</p>
-          <h2 className="mt-0.5 text-lg leading-snug font-bold">{product.name}</h2>
+          {/* "English (Marathi)" — same bilingual format as the product
+              cards (session 2026-09-01). The sticky header above stays
+              plain (`product.name`, single-locale) — it's a narrow,
+              truncated bar, and the bracketed name is more likely to get
+              cut off there than to add anything. */}
+          <h2 className="mt-0.5 text-lg leading-snug font-bold">
+            {product.nameEn}
+            {product.localName && (
+              <span className="font-normal text-muted-foreground"> ({product.localName})</span>
+            )}
+          </h2>
 
           <VariantPicker
             productId={product.id}
