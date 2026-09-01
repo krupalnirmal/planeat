@@ -64,7 +64,7 @@ export function OrderAgainRow() {
           lands flush against the screen edge. */}
       <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {products.map((product) => (
-          <li key={product.id} className="w-[42vw] max-w-[168px] shrink-0 snap-start">
+          <li key={product.id} className="w-[30vw] max-w-[132px] shrink-0 snap-start">
             <ProductCard product={product} />
           </li>
         ))}
