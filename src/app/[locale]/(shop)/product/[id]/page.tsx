@@ -128,6 +128,8 @@ export default async function ProductPage({
                     product={{
                       id: item.id,
                       name: item.name,
+                      nameEn: item.nameEn,
+                      localName: item.localName,
                       imageUrl: item.imageUrl,
                       unitType: item.unitType,
                       inStock: item.inStock,

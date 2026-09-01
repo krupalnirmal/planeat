@@ -43,6 +43,12 @@ import { VariantPickerSheet } from './variant-picker-sheet';
 export interface ProductCardData {
   id: string;
   name: string;
+  /** English name — shown together with `localName` as "English (local)"
+      (session 2026-09-01). Optional so any caller that hasn't been updated
+      to pass it still falls back to `name` instead of rendering blank. */
+  nameEn?: string;
+  /** The locale's own name, or `null`/undefined for the English locale. */
+  localName?: string | null;
   imageUrl: string | null;
   unitType: string;
   inStock: boolean;
@@ -213,20 +219,33 @@ export function ProductCard({
 
       <Link
         href={`/product/${product.id}`}
-        className="flex flex-col px-2.5 pt-2"
+        // `min-h` on the wrapper, not the heading (session 2026-09-01) —
+        // reserving 2 lines' worth of space on the `<h3>` itself (session
+        // 2026-08-29, to keep a short one-line name from leaving this
+        // card's own content shorter than a two-line sibling in the same
+        // grid row) pushed the quantity line down to sit under the
+        // RESERVED box instead of right under the actual text, opening a
+        // visible gap between name and quantity whenever the name was
+        // short. Reserving the space here instead still absorbs that same
+        // row-height slack, but as space below the quantity line — where
+        // `mt-auto` on the price row already expects to find it — rather
+        // than wedged between two lines that belong together.
+        className="flex min-h-[3.4em] flex-col px-2.5 pt-2"
         aria-label={product.name}
       >
-        {/* `min-h` reserves 2 lines' worth of space regardless of the
-            actual name length (session 2026-08-29) — without it, a
-            one-line name next to a two-line sibling in the same grid row
-            left this card's own content visibly shorter than the row's
-            stretched height, and `mt-auto` below absorbed the difference
-            as a large dead gap above the price row. */}
-        <h3 className="line-clamp-2 min-h-[2.2em] text-[13px] leading-tight font-semibold">
-          {product.name}
+        {/* "English (local)" — client's reference (session 2026-09-01):
+            the English name first, the locale's own name alongside it in
+            brackets, "Asian-format". `nameEn`/`localName` are optional on
+            `ProductCardData` — a caller that hasn't been updated yet still
+            gets the single already-localised `name` it always had. */}
+        <h3 className="line-clamp-2 text-[13px] leading-tight font-semibold">
+          {product.nameEn ?? product.name}
+          {product.localName && (
+            <span className="font-normal text-muted-foreground"> ({product.localName})</span>
+          )}
         </h3>
         {activeVariant && (
-          <p className="mt-0.5 truncate text-[12px] text-muted-foreground">
+          <p className="truncate text-[12px] text-muted-foreground">
             {formatQuantity(activeVariant.quantity, activeVariant.unit as QuantityUnit)}
           </p>
         )}

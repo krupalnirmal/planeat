@@ -4,7 +4,7 @@ import type { Prisma } from '@/generated/prisma/client';
 import type { Locale, UnitType } from '@/generated/prisma/enums';
 import { CATEGORY_TILE_IMAGES } from './category-tile-images';
 import NON_WHITE_BG_SKUS from './non-white-bg-skus.json';
-import { pickName, scoreMatch, searchTerms } from './text';
+import { pickName, scoreMatch, searchTerms, type LocalisedNames } from './text';
 
 /**
  * Catalogue reads (M2).
@@ -31,6 +31,14 @@ export interface ProductCardView {
   id: string;
   slug: string;
   name: string;
+  /** Always the English name — the card shows "English (local)" together
+      (session 2026-09-01, client's reference: an "Asian-format" bilingual
+      label), regardless of which one `name` above picked for aria-labels
+      and other non-visual uses. */
+  nameEn: string;
+  /** The locale's own name alongside `nameEn`, or `null` for the English
+      locale itself — "Onion (Onion)" adds nothing. */
+  localName: string | null;
   categorySlug: string;
   imageUrl: string | null;
   unitType: UnitType;
@@ -136,12 +144,21 @@ function toVariantView(variant: ProductWithVariants['variants'][number]): Produc
   };
 }
 
+/** The locale's own name for the bilingual card label, or `null` for English. */
+function localNameOf(names: LocalisedNames, locale: Locale): string | null {
+  if (locale === 'mr') return names.nameMr;
+  if (locale === 'hi') return names.nameHi;
+  return null;
+}
+
 export function toProductCard(product: ProductWithVariants, locale: Locale): ProductCardView {
   const variant = product.variants[0] ?? null;
   return {
     id: product.id,
     slug: product.sku.toLowerCase(),
     name: pickName(product, locale),
+    nameEn: product.nameEn,
+    localName: localNameOf(product, locale),
     categorySlug: product.category.slug,
     imageUrl: firstImageUrl(product.imageUrls),
     unitType: product.unitType,
