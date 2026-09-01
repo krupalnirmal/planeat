@@ -169,18 +169,18 @@ export function ProductCard({
     // — the border stays too, just faint, since the shadow alone reads as
     // nothing on the lightest backgrounds.
     //
-    // `self-start`, not `h-full` (session 2026-09-01): every grid/flex row
-    // this card sits in defaults to stretching every item to the row's
-    // tallest sibling, and `h-full` + `mt-auto` on the price row below used
-    // to absorb that slack by pushing the price down — which reads fine
-    // when the gap is small, but became a large, repeatedly-flagged dead
-    // zone once bilingual names (session 2026-09-01, "English (local)")
-    // widened how much a 1-line vs. 2-line name could differ between
-    // siblings. `self-start` opts this card out of the stretch entirely, so
-    // it is exactly as tall as its own content — a row's cards can now sit
-    // at very slightly different heights, which is far less noticeable
-    // than a chunk of empty space inside one of them.
-    <article className="card-3d relative flex h-fit w-full flex-col self-start overflow-hidden rounded-[var(--radius)] border border-border/50 bg-card">
+    // `h-full` (reverted from `self-start`/`h-fit`, session 2026-09-01):
+    // opting out of the row's height-stretch made cards in the same row sit
+    // at different heights, which the client flagged as worse than the
+    // dead-space gap it was meant to fix — a stepper sitting flush against
+    // a visibly shorter neighbour's bottom edge reads as broken in a way a
+    // few extra px of empty space inside a card does not. Every card in a
+    // row must be the same height; the min-height reservation on the name
+    // block below (`min-h-[3.4em]` on the Link) is what actually keeps the
+    // gap small now, by making 1-line and 2-line bilingual names occupy the
+    // same space to begin with — so there's little slack left for
+    // `mt-auto` on the price row to absorb, with or without the stretch.
+    <article className="card-3d relative flex h-full flex-col overflow-hidden rounded-[var(--radius)] border border-border/50 bg-card">
       <Link href={`/product/${product.id}`} aria-label={product.name} tabIndex={-1}>
         <div
           className={cn(
