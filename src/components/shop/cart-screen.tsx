@@ -153,11 +153,15 @@ export function CartScreen() {
             <li
               key={line.id}
               className={cn(
-                'card-3d flex gap-2.5 rounded-2xl border border-border/50 bg-background p-2.5',
+                // Less rounded than the earlier rounded-2xl (client's
+                // request, session 2026-09-01: "square cha thev", not the
+                // very rounded pill-like look) — the same --radius token
+                // the rest of the app's cards use.
+                'card-3d flex gap-2.5 rounded-[var(--radius)] border border-border/50 bg-background p-2.5',
                 unavailable && 'opacity-70',
               )}
             >
-              <div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-secondary">
+              <div className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] bg-secondary">
                 {line.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={line.imageUrl} alt="" aria-hidden className="size-full object-cover" />
