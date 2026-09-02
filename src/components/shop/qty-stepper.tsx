@@ -70,7 +70,7 @@ export function QtyStepper({
         disabled={disabled}
         aria-label={`${t('remove')}${label ? ` — ${label}` : ''}`}
         className={cn(
-          'grid shrink-0 place-items-center rounded-l-[var(--radius)] disabled:opacity-50',
+          'grid shrink-0 place-items-center rounded-l-[var(--radius)] transition-transform active:scale-90 disabled:opacity-50 disabled:active:scale-100',
           // `min-h-0` is load-bearing: the app's global rule (R10,
           // globals.css) sets `min-height: 44px` on every <button>, and
           // `min-height` always wins over a smaller `height` regardless of
@@ -82,10 +82,16 @@ export function QtyStepper({
         <Minus className={sm ? 'size-3' : 'size-4'} aria-hidden />
       </button>
 
+      {/* `key={quantity}` remounts this span on every change, which is what
+          replays the `animate-in` pop — a value change alone doesn't retrigger
+          a CSS animation on an element that never left the DOM (client
+          feedback, session 2026-09-02: the count changing should feel like
+          something actually happened, not just silently update). */}
       <span
+        key={quantity}
         aria-live="polite"
         className={cn(
-          'shrink-0 text-center font-bold tabular-nums',
+          'animate-in zoom-in-50 shrink-0 text-center font-bold tabular-nums duration-200',
           // No fixed width here for `sm` (was `w-4`, a flat 16px regardless
           // of the digit) — just enough side padding to keep the number
           // off the buttons' rounded corners, so a 1-digit quantity doesn't
@@ -102,7 +108,7 @@ export function QtyStepper({
         disabled={disabled || atMax}
         aria-label={`${t('add')}${label ? ` — ${label}` : ''}`}
         className={cn(
-          'grid shrink-0 place-items-center rounded-r-[var(--radius)] disabled:opacity-50',
+          'grid shrink-0 place-items-center rounded-r-[var(--radius)] transition-transform active:scale-90 disabled:opacity-50 disabled:active:scale-100',
           sm ? 'h-7 w-7 min-h-0' : 'h-11 w-11',
         )}
       >

@@ -298,7 +298,7 @@ export function ProductCard({
               // trimmed further 2026-08-29) from a fixed 64px min-width —
               // that crowded into the price on the narrower Top Picks card
               // and any 3-digit price wrapped right up against it.
-              className="flex min-w-[44px] flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-1.5 py-1 text-[12px] font-bold text-primary"
+              className="flex min-w-[44px] flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-1.5 py-1 text-[12px] font-bold text-primary transition-transform active:scale-90"
             >
               {t('add')}
               {/* "N options" sits inside the same bordered button as a

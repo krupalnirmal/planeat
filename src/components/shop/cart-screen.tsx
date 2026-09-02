@@ -159,7 +159,10 @@ export function CartScreen() {
           <span className="grid size-12 place-items-center rounded-full bg-card shadow-sm">
             <ShoppingCart className="size-5" aria-hidden />
           </span>
-          <span className="absolute -top-1 -right-1 grid size-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+          <span
+            key={cart.itemCount}
+            className="animate-in zoom-in absolute -top-1 -right-1 grid size-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground duration-200"
+          >
             {cart.itemCount}
           </span>
         </div>

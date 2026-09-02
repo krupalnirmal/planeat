@@ -127,7 +127,11 @@ export function CartBar() {
         href="/cart"
         className="animate-in slide-in-from-bottom-4 fade-in relative flex h-11 items-center justify-between gap-3 rounded-[12px] bg-primary py-1.5 pr-4 pl-3 text-primary-foreground duration-300"
       >
-        <span className="flex items-center gap-2">
+        {/* `key` remounts this group on every count change, replaying the pop
+            — the one floating element visible from anywhere in the catalogue,
+            so it's the right place to confirm "that tap landed" (client
+            feedback, session 2026-09-02). */}
+        <span key={cart.itemCount} className="animate-in zoom-in-75 flex items-center gap-2 duration-200">
           <ShoppingCart className="size-4.5 shrink-0" aria-hidden />
           <span className="text-[11px] font-medium">{t('itemCount', { count: cart.itemCount })}</span>
           {total > 0n && (
