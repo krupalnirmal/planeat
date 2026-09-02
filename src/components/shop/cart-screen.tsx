@@ -133,15 +133,20 @@ export function CartScreen() {
     <main className="min-h-dvh space-y-4 bg-accent-faint px-4 pt-4 pb-2">
       {/* Header — back arrow, big bold title + leaf-bulleted subtitle, a
           faded decorative leaf behind a white badged cart icon. */}
-      <header className="relative flex items-start justify-between gap-3 overflow-hidden">
+      <header className="relative flex items-start justify-between gap-3">
+        {/* No overflow-hidden here — the image is 106x106 and taller than
+            this header's own flex content, so clipping it squashed it into
+            a small box instead of letting it spread naturally behind the
+            cart icon (client screenshot, session 2026-09-02). z-0 keeps it
+            behind the title and icon, which sit at z-10. */}
         {/* eslint-disable-next-line @next/next/no-img-element -- small static decorative asset, not worth next/image's setup */}
         <img
           src="/decor/leaf.png"
           alt=""
           aria-hidden
-          className="pointer-events-none absolute -top-3 -right-4 size-28 object-contain"
+          className="pointer-events-none absolute top-0 right-8 z-0 size-20 object-contain"
         />
-        <div className="relative flex min-w-0 items-start gap-1">
+        <div className="relative z-10 flex min-w-0 items-start gap-1">
           <Link
             href="/"
             aria-label={tc('back')}
@@ -162,7 +167,7 @@ export function CartScreen() {
 
         {/* Decorative, not a link — this screen already is the cart, so
             there is nowhere for it to navigate to. */}
-        <div aria-hidden className="relative mt-1 shrink-0">
+        <div aria-hidden className="relative z-10 mt-1 shrink-0">
           <span className="grid size-12 place-items-center rounded-full bg-card shadow-sm">
             <ShoppingCart className="size-5" aria-hidden />
           </span>
