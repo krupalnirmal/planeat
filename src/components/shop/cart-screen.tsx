@@ -1,7 +1,15 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { AlertTriangle, ImageIcon, MapPin, ShoppingCart, Trash2 } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowRight,
+  ChevronLeft,
+  ImageIcon,
+  Leaf,
+  ShoppingCart,
+  Trash2,
+} from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { BillSummary, type BillView } from '@/components/shop/bill-summary';
@@ -20,6 +28,14 @@ import { cn } from '@/lib/utils';
  * The bill comes from `/api/checkout/quote` rather than being added up here.
  * B10's fee rules live in one place on the server; a second copy in the browser
  * is a second place for them to be wrong.
+ *
+ * Redesigned (session 2026-09-02) to the client's own mockup: a warm cream
+ * page, a custom header with a decorative leaf illustration and a badged
+ * cart icon, heavily rounded white item cards, a light-green "handpicked"
+ * banner, and a dashed-border dark-green total bar with a bag illustration.
+ * Only the happy-path (cart has items) state gets this treatment — the
+ * loading/empty/logged-out states below keep the plain shared PageHeader,
+ * since the reference itself only ever shows a cart with items in it.
  */
 
 interface QuoteResponse {
@@ -114,13 +130,52 @@ export function CartScreen() {
   const blocked = (quote.data?.unavailableLines.length ?? 0) > 0;
 
   return (
-    <>
-      <PageHeader title={t('title')} backHref="/" backLabel={tc('back')} />
-      <main className="space-y-2 bg-background pb-2">
+    <main className="min-h-dvh space-y-4 bg-accent-faint px-4 pt-4 pb-2">
+      {/* Header — back arrow, big bold title + leaf-bulleted subtitle, a
+          faded decorative leaf behind a white badged cart icon. */}
+      <header className="relative flex items-start justify-between gap-3 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element -- small static decorative asset, not worth next/image's setup */}
+        <img
+          src="/decor/leaf.png"
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute -top-3 -right-4 size-28 object-contain"
+        />
+        <div className="relative flex min-w-0 items-start gap-1">
+          <Link
+            href="/"
+            aria-label={tc('back')}
+            className="mt-1 grid size-9 shrink-0 place-items-center rounded-full"
+          >
+            <ChevronLeft className="size-5" aria-hidden />
+          </Link>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-black">{t('title')}</h1>
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Leaf className="size-4 shrink-0 text-primary" aria-hidden />
+              <span className="truncate">
+                {t('itemCount', { count: cart.itemCount })} · {t('tagline')}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        {/* Decorative, not a link — this screen already is the cart, so
+            there is nowhere for it to navigate to. */}
+        <div aria-hidden className="relative mt-1 shrink-0">
+          <span className="grid size-12 place-items-center rounded-full bg-card shadow-sm">
+            <ShoppingCart className="size-5" aria-hidden />
+          </span>
+          <span className="absolute -top-1 -right-1 grid size-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+            {cart.itemCount}
+          </span>
+        </div>
+      </header>
+
       {defaultAddress && (
-        <div className="flex items-center gap-3 bg-card px-4 py-3.5">
+        <div className="card-3d flex items-center gap-3 rounded-[var(--radius-2xl)] bg-card px-4 py-3">
           <span className="grid size-9 shrink-0 place-items-center rounded-full bg-tint-green">
-            <MapPin className="size-4 text-primary" aria-hidden />
+            <Leaf className="size-4 text-primary" aria-hidden />
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-xs text-muted-foreground">{t('deliverTo')}</p>
@@ -133,13 +188,9 @@ export function CartScreen() {
           </Link>
         </div>
       )}
-      <div className="bg-card px-4 py-4">
-      <p className="mb-4 text-sm text-muted-foreground">
-        {t('itemCount', { count: cart.itemCount })}
-      </p>
 
       {blocked && (
-        <p className="mb-4 flex items-start gap-2 rounded-2xl bg-[#FDF3E3] px-3.5 py-3 text-xs text-warning">
+        <p className="flex items-start gap-2 rounded-[var(--radius-2xl)] bg-[#FDF3E3] px-3.5 py-3 text-xs text-warning">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
           {t('unavailableItems')}
         </p>
@@ -153,15 +204,11 @@ export function CartScreen() {
             <li
               key={line.id}
               className={cn(
-                // Less rounded than the earlier rounded-2xl (client's
-                // request, session 2026-09-01: "square cha thev", not the
-                // very rounded pill-like look) — the same --radius token
-                // the rest of the app's cards use.
-                'card-3d flex gap-2.5 rounded-[var(--radius)] border border-border/50 bg-background p-2.5',
+                'card-3d flex gap-3 rounded-[var(--radius-2xl)] bg-card p-3',
                 unavailable && 'opacity-70',
               )}
             >
-              <div className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] bg-secondary">
+              <div className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-xl)] bg-secondary">
                 {line.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={line.imageUrl} alt="" aria-hidden className="size-full object-cover" />
@@ -171,10 +218,6 @@ export function CartScreen() {
               </div>
 
               <div className="min-w-0 flex-1">
-                {/* Name + line total share one row (session 2026-09-01,
-                    client's reference) — the total used to sit alone in the
-                    control row below, which cost this card a whole extra
-                    row of height for one number. */}
                 <div className="flex items-baseline justify-between gap-2">
                   <p className="line-clamp-2 min-w-0 text-sm font-bold">
                     {line.nameEn}
@@ -182,11 +225,12 @@ export function CartScreen() {
                       <span className="font-normal text-muted-foreground"> ({line.localName})</span>
                     )}
                   </p>
-                  <span className="shrink-0 text-sm font-bold">
+                  <span className="shrink-0 text-base font-bold">
                     {formatPaise(paise(line.linePaise), { hidePaise: true })}
                   </span>
                 </div>
-                <p className="text-xs font-medium text-muted-foreground">
+                <p className="mt-0.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                  <Leaf className="size-3.5 shrink-0 text-primary" aria-hidden />
                   {formatQuantity(line.unitQuantity, line.unit as QuantityUnit)} ·{' '}
                   {formatPaise(paise(line.unitPricePaise), { hidePaise: true })}
                 </p>
@@ -218,6 +262,7 @@ export function CartScreen() {
                       max={line.availableQty}
                       label={line.name}
                       size="sm"
+                      tone="tint"
                     />
                   )}
                 </div>
@@ -227,34 +272,45 @@ export function CartScreen() {
         })}
       </ul>
 
-      {quote.data && (
-        <div className="mt-5">
-          <BillSummary bill={quote.data.bill} savedPaise={savedPaise} />
-        </div>
-      )}
-      </div>
+      <p className="flex items-center justify-center gap-2 rounded-full bg-tint-green px-4 py-2.5 text-center text-xs font-bold text-primary-dark">
+        <Leaf className="size-4 shrink-0" aria-hidden />
+        {t('handpickedBanner')}
+      </p>
+
+      {quote.data && <BillSummary bill={quote.data.bill} savedPaise={savedPaise} />}
 
       {/* Sticky above the bottom nav so the total and the next step are always
-          on screen, however long the cart gets. */}
+          on screen, however long the cart gets. Dashed border + bag
+          illustration per the client's reference. */}
       <div
-        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card px-4 py-3"
-        style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-4"
+        style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 0.75rem)' }}
       >
-        <Link
-          href="/checkout"
-          aria-disabled={!quote.data?.canPlaceOrder}
-          className={cn(
-            'flex h-14 items-center justify-between rounded-2xl bg-primary px-5 text-[15px] font-bold text-primary-foreground shadow-sm',
-            !quote.data?.canPlaceOrder && 'pointer-events-none opacity-50',
-          )}
-        >
-          <span>{quote.data ? formatPaise(paise(quote.data.bill.totalPaise)) : '—'}</span>
-          <span>{t('proceed')}</span>
-        </Link>
+        <div className="flex items-center gap-3 rounded-[var(--radius-2xl)] border-2 border-dashed border-primary-foreground/30 bg-primary-dark px-4 py-3 shadow-lg">
+          {/* eslint-disable-next-line @next/next/no-img-element -- small static decorative asset, not worth next/image's setup */}
+          <img src="/decor/cart-bag.png" alt="" aria-hidden className="size-10 shrink-0 object-contain" />
+          <div className="min-w-0 flex-1">
+            <p className="text-lg leading-tight font-black text-primary-foreground">
+              {quote.data ? formatPaise(paise(quote.data.bill.totalPaise)) : '—'}
+            </p>
+            <p className="text-xs text-primary-foreground/80">{t('totalAmount')}</p>
+          </div>
+          <span aria-hidden className="h-8 w-px shrink-0 bg-primary-foreground/25" />
+          <Link
+            href="/checkout"
+            aria-disabled={!quote.data?.canPlaceOrder}
+            className={cn(
+              'flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-card px-5 text-sm font-bold text-primary-dark',
+              !quote.data?.canPlaceOrder && 'pointer-events-none opacity-50',
+            )}
+          >
+            {t('proceed')}
+            <ArrowRight className="size-4" aria-hidden />
+          </Link>
+        </div>
       </div>
 
-      <div aria-hidden className="h-16" />
-      </main>
-    </>
+      <div aria-hidden className="h-24" />
+    </main>
   );
 }

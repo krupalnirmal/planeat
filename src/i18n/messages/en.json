@@ -231,7 +231,10 @@
     "locationDenied": "Location permission denied. Enter the PIN code manually."
   },
   "cart": {
-    "title": "Cart",
+    "title": "My Cart",
+    "tagline": "Fresh & Healthy",
+    "handpickedBanner": "Fresh vegetables, handpicked for you!",
+    "totalAmount": "Total Amount",
     "empty": "Your cart is empty",
     "emptyHint": "Browse the vegetables and add what you like",
     "startShopping": "Start shopping",

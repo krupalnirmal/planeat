@@ -27,6 +27,7 @@ export function QtyStepper({
   className,
   label,
   size = 'default',
+  tone = 'solid',
 }: {
   quantity: number;
   onIncrement: () => void;
@@ -36,6 +37,11 @@ export function QtyStepper({
   className?: string;
   label?: string;
   size?: 'default' | 'sm';
+  /** `tint` is the light-green-pill/dark-green-icon treatment (cart screen,
+      session 2026-09-02, client's reference) — a prop rather than a passed
+      className because it overrides the same `bg-*`/`text-*` utilities the
+      base style sets, which a plain className merge can't reliably win. */
+  tone?: 'solid' | 'tint';
 }) {
   const t = useTranslations('common');
   const atMax = max !== undefined && quantity >= max;
@@ -44,7 +50,8 @@ export function QtyStepper({
   return (
     <div
       className={cn(
-        'flex items-center rounded-[var(--radius)] bg-primary text-primary-foreground',
+        'flex items-center rounded-[var(--radius)]',
+        tone === 'tint' ? 'bg-tint-green text-primary' : 'bg-primary text-primary-foreground',
         // `sm` is intentionally sized to content (`w-fit`), not stretched —
         // the previous attempt passed `w-full` from the caller, which made
         // this stretch to fill the card's remaining space instead of
