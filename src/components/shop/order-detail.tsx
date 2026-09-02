@@ -172,18 +172,8 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
   return (
     <main className="min-h-dvh space-y-3 bg-accent-faint px-4 pt-4 pb-4">
-      {/* Header — same decorative leaf + z-layering approach as the cart
-          screen (session 2026-09-02): no overflow-hidden, title/badge above
-          the leaf via z-10. */}
-      <header className="relative flex items-start justify-between gap-3">
-        {/* eslint-disable-next-line @next/next/no-img-element -- small static decorative asset, not worth next/image's setup */}
-        <img
-          src="/decor/leaf.png"
-          alt=""
-          aria-hidden
-          className="pointer-events-none absolute top-0 right-0 z-0 size-20 object-contain"
-        />
-        <div className="relative z-10 flex min-w-0 items-start gap-1">
+      <header className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-1">
           <Link
             href="/orders"
             aria-label={tc('back')}
@@ -210,7 +200,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
         <span
           className={cn(
-            'relative z-10 flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold',
+            'flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold',
             HEADER_BADGE_TONE[order.status],
           )}
         >
@@ -391,18 +381,11 @@ export function OrderDetail({ orderId }: { orderId: string }) {
           </div>
         </dl>
 
-        <div className="relative mt-4 flex items-center gap-2.5 overflow-hidden rounded-[var(--radius-xl)] bg-tint-green px-4 py-3">
-          {/* eslint-disable-next-line @next/next/no-img-element -- small static decorative asset, not worth next/image's setup */}
-          <img
-            src="/decor/leaf.png"
-            alt=""
-            aria-hidden
-            className="pointer-events-none absolute -right-2 -bottom-4 size-16 object-contain"
-          />
-          <span className="relative grid size-8 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
+        <div className="mt-4 flex items-center gap-2.5 rounded-[var(--radius-xl)] bg-tint-green px-4 py-3">
+          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
             <ShieldCheck className="size-4" aria-hidden />
           </span>
-          <div className="relative min-w-0">
+          <div className="min-w-0">
             <p className="text-sm font-bold text-primary-dark">{t('securePayment')}</p>
             <p className="text-xs text-primary-dark/70">{t('securePaymentHint')}</p>
           </div>
