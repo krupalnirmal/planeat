@@ -269,8 +269,8 @@ function VariantPicker({
   const tc = useTranslations('common');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
-      <div className="w-full max-w-[480px] rounded-t-[calc(var(--radius)*1.6)] bg-background p-4 pb-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-[300px] rounded-[calc(var(--radius)*1.6)] bg-background p-4">
         <div className="mb-3 flex items-center justify-between gap-2">
           <h2 className="min-w-0 flex-1 truncate text-sm font-bold">{product.name}</h2>
           <button
