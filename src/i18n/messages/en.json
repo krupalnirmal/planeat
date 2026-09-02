@@ -305,6 +305,17 @@
     "deliveryOtpHint": "Read this code out when the delivery partner arrives",
     "deliveryOtpWithRider": "Read this code out to {rider} when they arrive",
     "notFound": "We couldn't find that order",
+    "timelineCompleted": "Completed",
+    "timelinePending": "Pending",
+    "viewOnMap": "View on map",
+    "securePayment": "Secure Payment",
+    "securePaymentHint": "Your payment is safe with us",
+    "stepDesc": {
+      "CONFIRMED": "We've received your order",
+      "PACKED": "Your items are being packed",
+      "OUT_FOR_DELIVERY": "Order is on the way to you",
+      "DELIVERED": "Enjoy your fresh veggies!"
+    },
     "status": {
       "PLACED": "Placed",
       "CONFIRMED": "Confirmed",

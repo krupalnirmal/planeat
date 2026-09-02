@@ -305,6 +305,17 @@
     "deliveryOtpHint": "डिलिव्हरी बॉय आल्यावर हा कोड त्याला सांगा",
     "deliveryOtpWithRider": "{rider} आल्यावर हा कोड त्याला सांगा",
     "notFound": "ही ऑर्डर सापडली नाही",
+    "timelineCompleted": "पूर्ण",
+    "timelinePending": "प्रलंबित",
+    "viewOnMap": "नकाशावर पहा",
+    "securePayment": "सुरक्षित पेमेंट",
+    "securePaymentHint": "तुमचे पेमेंट आमच्याकडे सुरक्षित आहे",
+    "stepDesc": {
+      "CONFIRMED": "आम्हाला तुमची ऑर्डर मिळाली आहे",
+      "PACKED": "तुमचे सामान पॅक केले जात आहे",
+      "OUT_FOR_DELIVERY": "ऑर्डर तुमच्याकडे येत आहे",
+      "DELIVERED": "तुमच्या ताज्या भाज्यांचा आनंद घ्या!"
+    },
     "status": {
       "PLACED": "ऑर्डर नोंदवली",
       "CONFIRMED": "स्वीकारली",
