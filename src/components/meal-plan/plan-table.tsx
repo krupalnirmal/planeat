@@ -1,9 +1,8 @@
 'use client';
 
-import { X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
 /**
@@ -286,9 +285,7 @@ function VariantPicker({
                 )}
               >
                 <span className="text-sm font-semibold">{variant.label}</span>
-                <span className="text-sm font-bold">
-                  {formatPaise(paise(variant.pricePaise), { hidePaise: true })}
-                </span>
+                {active && <Check className="size-5 text-primary" aria-hidden />}
               </button>
             );
           })}
