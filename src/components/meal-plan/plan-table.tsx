@@ -123,15 +123,19 @@ export function PlanTable({
     <div key={planKey}>
       <div className="-mx-4 overflow-x-auto px-4">
         <table className="w-full min-w-[720px] border-collapse text-sm">
+          {/* Header row sticks vertically (client feedback: scrolling down loses
+              track of which category — Vegetables/Fruits/etc — a cell is under),
+              the day column sticks horizontally; the corner cell needs both, so
+              it gets the highest z-index of the three sticky layers. */}
           <thead>
             <tr>
-              <th className="sticky left-0 z-10 w-20 border border-border bg-card p-2 text-xs font-bold">
+              <th className="sticky top-0 left-0 z-30 w-20 border border-border bg-card p-2 text-xs font-bold">
                 {t('builder.dayColumn')}
               </th>
               {columns.map((col) => (
                 <th
                   key={col.slug}
-                  className="border border-border bg-secondary p-2 text-center text-xs font-bold"
+                  className="sticky top-0 z-20 border border-border bg-secondary p-2 text-center text-xs font-bold"
                 >
                   {col.name}
                 </th>
@@ -258,20 +262,20 @@ function VariantPicker({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
-      <div className="w-full max-w-[480px] rounded-t-[calc(var(--radius)*1.6)] bg-background p-5 pb-8">
-        <div className="mb-4 flex items-center justify-between gap-2">
-          <h2 className="min-w-0 flex-1 truncate text-base font-bold">{product.name}</h2>
+      <div className="w-full max-w-[480px] rounded-t-[calc(var(--radius)*1.6)] bg-background p-4 pb-5">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <h2 className="min-w-0 flex-1 truncate text-sm font-bold">{product.name}</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label={tc('close')}
-            className="grid size-11 shrink-0 place-items-center rounded-full"
+            className="grid size-9 shrink-0 place-items-center rounded-full"
           >
-            <X className="size-5" aria-hidden />
+            <X className="size-4" aria-hidden />
           </button>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {product.variants.map((variant) => {
             const active = variant.id === activeVariantId;
             return (
@@ -280,12 +284,12 @@ function VariantPicker({
                 type="button"
                 onClick={() => onSelect(variant.id)}
                 className={cn(
-                  'flex w-full items-center justify-between gap-3 rounded-[var(--radius)] border px-3.5 py-3 text-left',
+                  'flex w-full items-center justify-between gap-3 rounded-[var(--radius)] border px-3.5 py-2.5 text-left',
                   active ? 'border-primary bg-tint-green' : 'border-border',
                 )}
               >
                 <span className="text-sm font-semibold">{variant.label}</span>
-                {active && <Check className="size-5 text-primary" aria-hidden />}
+                {active && <Check className="size-4 text-primary" aria-hidden />}
               </button>
             );
           })}
@@ -295,7 +299,7 @@ function VariantPicker({
           <button
             type="button"
             onClick={onRemove}
-            className="mt-3 flex h-11 w-full items-center justify-center rounded-[var(--radius)] border border-danger/40 text-sm font-bold text-danger"
+            className="mt-2.5 flex h-10 w-full items-center justify-center rounded-[var(--radius)] border border-danger/40 text-sm font-bold text-danger"
           >
             {t('builder.remove')}
           </button>
