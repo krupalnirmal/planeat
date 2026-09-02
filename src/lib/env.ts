@@ -117,6 +117,10 @@ export const env = {
     pendingReconcileMinutes: num('PAYMENT_PENDING_RECONCILE_MINUTES', 15),
     minTopupPaise: BigInt(num('MIN_WALLET_TOPUP_PAISE', 10000)),
     topupPresetsPaise: bigints('WALLET_TOPUP_PRESETS_PAISE', [20000n, 50000n, 100000n, 200000n]),
+    // Explicit, temporary opt-out of the test-key production guard below —
+    // for a deployment (like a client demo) that is NODE_ENV=production but
+    // has no real customers yet. Never set this once real money is at stake.
+    allowTestKeysInProduction: str('ALLOW_RAZORPAY_TEST_KEYS_IN_PRODUCTION', '') === 'true',
   },
 
   push: {
@@ -187,8 +191,16 @@ export function assertProductionSafety(): void {
 
   const problems: string[] = [];
 
-  if (env.providers.payment === 'razorpay' && env.payment.razorpayKeyId.startsWith('rzp_test_')) {
-    problems.push('RAZORPAY_KEY_ID is a test key (rzp_test_) but NODE_ENV=production.');
+  if (
+    env.providers.payment === 'razorpay' &&
+    env.payment.razorpayKeyId.startsWith('rzp_test_') &&
+    !env.payment.allowTestKeysInProduction
+  ) {
+    problems.push(
+      'RAZORPAY_KEY_ID is a test key (rzp_test_) but NODE_ENV=production. ' +
+        'If this deployment genuinely has no real customers yet (e.g. a client demo), ' +
+        'set ALLOW_RAZORPAY_TEST_KEYS_IN_PRODUCTION=true — remove it again before going live.',
+    );
   }
   if (env.auth.jwtSecret.startsWith('dev-only-')) {
     problems.push('JWT_SECRET is unset in production.');
@@ -205,5 +217,15 @@ export function assertProductionSafety(): void {
 
   if (problems.length > 0) {
     throw new Error(`Refusing to boot in production:\n - ${problems.join('\n - ')}`);
+  }
+
+  if (env.providers.payment === 'razorpay' && env.payment.razorpayKeyId.startsWith('rzp_test_')) {
+    // The bypass above was used. Loud on purpose — this must not be the
+    // quiet, forgettable state a deployment ends up in once it has customers.
+    console.warn(
+      '[env] ALLOW_RAZORPAY_TEST_KEYS_IN_PRODUCTION is set — this production deployment ' +
+        'is running Razorpay TEST keys and will take no real money. Remove the flag and switch ' +
+        'to live keys before this deployment has real customers.',
+    );
   }
 }
