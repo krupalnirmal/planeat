@@ -121,7 +121,15 @@ export function PlanTable({
 
   return (
     <div key={planKey}>
-      <div className="-mx-4 overflow-x-auto px-4">
+      {/* `max-h` + `overflow-auto` (both axes) rather than plain `overflow-x-auto`:
+          per the CSS overflow spec, giving only one axis a non-`visible` value
+          silently forces the other axis to `auto` too, so this div was already
+          a scroll container on both axes — just one that never actually
+          scrolled vertically (unbounded height), which is why `sticky top-0`
+          below never had a real scrollport to stick within. Bounding the
+          height makes it a genuine scroll container so the sticky header and
+          sticky day column both work. */}
+      <div className="-mx-4 max-h-[70vh] overflow-auto px-4">
         <table className="w-full min-w-[720px] border-collapse text-sm">
           {/* Header row sticks vertically (client feedback: scrolling down loses
               track of which category — Vegetables/Fruits/etc — a cell is under),
