@@ -11,11 +11,15 @@ import { cn } from '@/lib/utils';
  *
  *   Home | Smart List | My Meal Plan | Wallet | Profile
  *
- * Matching the client's Planeat reference: the active tab gets a light-green
- * rounded-rect highlight behind the icon and label, both in green — a nav
- * tab you are already on is where you are, which the reference treats as
- * worth the same colour as an action, unlike the flat/near-black scheme this
- * replaced.
+ * Plain black-active/gray-inactive (session 2026-09-02, client's cart-page
+ * reference) — replaces the earlier green-highlight-pill treatment app-wide,
+ * an explicit reversal of that prior decision. No colour, no background
+ * pill: the active tab is just bold and black, everything else is muted.
+ *
+ * Home is the fallback active tab on any route that isn't one of the other
+ * four sections (cart, checkout, product pages, orders, login, …) — the
+ * reference shows Home highlighted on the cart screen even though "/cart"
+ * isn't itself one of the five tab routes.
  */
 
 const TABS = [
@@ -25,6 +29,8 @@ const TABS = [
   { href: '/wallet', icon: Wallet, key: 'wallet' },
   { href: '/profile', icon: User, key: 'profile' },
 ] as const;
+
+const NON_HOME_PREFIXES = ['/smart-list', '/meal-plan', '/wallet', '/profile'] as const;
 
 // Blinkit-style scroll behaviour (session 2026-08-26): visible only at the
 // very top of the page, hidden the instant the customer scrolls down, back
@@ -54,7 +60,10 @@ export function BottomNav() {
     >
       <ul className="grid grid-cols-5 gap-1 px-1.5 py-2">
         {TABS.map((tab) => {
-          const active = tab.href === '/' ? pathname === '/' : pathname.startsWith(tab.href);
+          const active =
+            tab.href === '/'
+              ? !NON_HOME_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+              : pathname.startsWith(tab.href);
           const Icon = tab.icon;
 
           return (
@@ -62,20 +71,17 @@ export function BottomNav() {
               <Link
                 href={tab.href}
                 aria-current={active ? 'page' : undefined}
-                className={cn(
-                  'flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-2xl py-1.5 transition-colors',
-                  active && 'bg-tint-green',
-                )}
+                className="flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-2xl py-1.5"
               >
                 <Icon
-                  className={cn(active ? 'text-primary' : 'text-muted-foreground', 'size-5')}
+                  className={cn(active ? 'text-foreground' : 'text-muted-foreground', 'size-5')}
                   strokeWidth={active ? 2.4 : 1.8}
                   aria-hidden
                 />
                 <span
                   className={cn(
                     'text-[10.5px] leading-none',
-                    active ? 'font-bold text-primary-dark' : 'text-muted-foreground',
+                    active ? 'font-bold text-foreground' : 'text-muted-foreground',
                   )}
                 >
                   {t(tab.key)}
