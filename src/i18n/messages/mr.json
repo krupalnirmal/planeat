@@ -923,6 +923,7 @@
     "installTitle": "रायडर अ‍ॅप या फोनवर इन्स्टॉल करा",
     "installAction": "इन्स्टॉल करा",
     "installIosHint": "Share → Add to Home Screen निवडा",
+    "installAndroidHint": "Chrome चे ⋮ मेनू → Install app निवडा",
     "installDismiss": "आत्ता नको",
     "summaryDelivered": "पोहोचवल्या",
     "summaryPending": "बाकी",

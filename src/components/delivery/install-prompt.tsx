@@ -1,6 +1,6 @@
 'use client';
 
-import { Download, Share, X } from 'lucide-react';
+import { Download, MoreVertical, Share, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 
@@ -101,24 +101,23 @@ export function InstallPrompt() {
   }
 
   if (state === 'hidden' || dismissed) return null;
-  // Android before Chrome has decided the app is installable: nothing to
-  // offer yet, and a dead button would be worse than no button.
-  if (state === 'android' && !deferred) return null;
 
   return (
     <div className="flex items-start gap-2 border-b border-border bg-tint-green px-4 py-2.5">
       <div className="min-w-0 flex-1">
         <p className="text-xs font-semibold">{t('installTitle')}</p>
-        {state === 'ios' ? (
-          <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
-            <Share className="size-3 shrink-0" aria-hidden />
-            {t('installIosHint')}
-          </p>
-        ) : (
+        {/* The one-tap path only exists when Chrome's `beforeinstallprompt`
+            was actually captured, and often it isn't — the event fires
+            early in page load, frequently before this component has
+            hydrated and attached its listener, and Chrome skips it
+            entirely once it thinks the origin is installed. Falling back
+            to the menu instructions rather than hiding the strip: a rider
+            who was shown nothing at all has no way to install, which is
+            exactly what happened on the first version of this. */}
+        {deferred ? (
           <button
             type="button"
             onClick={async () => {
-              if (!deferred) return;
               await deferred.prompt();
               const choice = await deferred.userChoice;
               setDeferred(null);
@@ -129,6 +128,20 @@ export function InstallPrompt() {
             <Download className="size-3.5" aria-hidden />
             {t('installAction')}
           </button>
+        ) : (
+          <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+            {state === 'ios' ? (
+              <>
+                <Share className="size-3 shrink-0" aria-hidden />
+                {t('installIosHint')}
+              </>
+            ) : (
+              <>
+                <MoreVertical className="size-3 shrink-0" aria-hidden />
+                {t('installAndroidHint')}
+              </>
+            )}
+          </p>
         )}
       </div>
       <button

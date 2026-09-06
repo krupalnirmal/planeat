@@ -923,6 +923,7 @@
     "installTitle": "Install the rider app on this phone",
     "installAction": "Install",
     "installIosHint": "Share → Add to Home Screen",
+    "installAndroidHint": "Chrome menu → Install app",
     "installDismiss": "Not now",
     "summaryDelivered": "Delivered",
     "summaryPending": "Pending",

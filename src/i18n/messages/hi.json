@@ -923,6 +923,7 @@
     "installTitle": "राइडर ऐप इस फ़ोन पर इंस्टॉल करें",
     "installAction": "इंस्टॉल करें",
     "installIosHint": "Share → Add to Home Screen चुनें",
+    "installAndroidHint": "Chrome के ⋮ मेनू → Install app चुनें",
     "installDismiss": "अभी नहीं",
     "summaryDelivered": "पहुँचाए",
     "summaryPending": "बाकी",
