@@ -672,7 +672,9 @@
       "deliveryPartners": "राइडर",
       "settings": "सेटिंग्स",
       "auditLog": "रिकॉर्ड बही",
-      "backToShop": "दुकान पर वापस"
+      "backToShop": "दुकान पर वापस",
+      "openMenu": "मेनू खोलें",
+      "closeMenu": "मेनू बंद करें"
     },
     "notifications": {
       "title": "सूचनाएं",

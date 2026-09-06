@@ -8,13 +8,16 @@ import {
   Home,
   LayoutDashboard,
   MapPinned,
+  Menu,
   Package,
   Settings,
   ShoppingBag,
   Users,
   Warehouse,
+  X,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
 import { NotificationBell } from '@/components/admin/notification-bell';
 import { cn } from '@/lib/utils';
@@ -44,10 +47,73 @@ const SECTIONS = [
   { href: '/admin/audit-log', key: 'auditLog', icon: FileClock },
 ] as const;
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+/** The vertical section list — shared by the desktop sidebar and the mobile
+    drawer, so the two never drift into different link sets or ordering.
+    `onNavigate` closes the drawer on mobile; the desktop sidebar just omits
+    it, since there's nothing there that needs closing. */
+function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const t = useTranslations('admin.nav');
+  const pathname = usePathname();
+
+  return (
+    <nav className="p-2">
+      <ul className="space-y-0.5">
+        {SECTIONS.map((section) => {
+          const active =
+            'exact' in section && section.exact
+              ? pathname === section.href
+              : pathname.startsWith(section.href);
+          const Icon = section.icon;
+
+          return (
+            <li key={section.key}>
+              <Link
+                href={section.href}
+                onClick={onNavigate}
+                aria-current={active ? 'page' : undefined}
+                className={cn(
+                  'flex min-h-11 items-center gap-2.5 rounded-[var(--radius)] px-3 text-sm transition-colors',
+                  active
+                    ? 'bg-primary/10 font-semibold text-primary'
+                    : 'text-muted-foreground hover:bg-secondary',
+                )}
+              >
+                <Icon className="size-4 shrink-0" aria-hidden />
+                {t(section.key)}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="mt-4 border-t border-border pt-2">
+        <Link
+          href="/"
+          onClick={onNavigate}
+          className="flex min-h-11 items-center gap-2.5 rounded-[var(--radius)] px-3 text-sm text-muted-foreground"
+        >
+          <Home className="size-4 shrink-0" aria-hidden />
+          {t('backToShop')}
+        </Link>
+      </div>
+    </nav>
+  );
+}
+
+export function AdminShell({ children }: { children: React.ReactNode }) {
   const tAdmin = useTranslations('admin');
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Belt-and-braces: `onNavigate` on each link already closes the drawer,
+  // but a browser back/forward tap doesn't fire that handler. Adjusted
+  // during render (React's own pattern for "reset state when a dependency
+  // changes") rather than in an effect, which would cost an extra render.
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
+    setMenuOpen(false);
+  }
 
   return (
     <div className="flex min-h-dvh bg-secondary">
@@ -63,79 +129,56 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <NotificationBell align="left" />
         </div>
 
-        <nav className="p-2">
-          <ul className="space-y-0.5">
-            {SECTIONS.map((section) => {
-              const active =
-                'exact' in section && section.exact
-                  ? pathname === section.href
-                  : pathname.startsWith(section.href);
-              const Icon = section.icon;
-
-              return (
-                <li key={section.key}>
-                  <Link
-                    href={section.href}
-                    aria-current={active ? 'page' : undefined}
-                    className={cn(
-                      'flex min-h-10 items-center gap-2.5 rounded-[var(--radius)] px-3 text-sm transition-colors',
-                      active
-                        ? 'bg-primary/10 font-semibold text-primary'
-                        : 'text-muted-foreground hover:bg-secondary',
-                    )}
-                  >
-                    <Icon className="size-4 shrink-0" aria-hidden />
-                    {t(section.key)}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-
-          <div className="mt-4 border-t border-border pt-2">
-            <Link
-              href="/"
-              className="flex min-h-10 items-center gap-2.5 rounded-[var(--radius)] px-3 text-sm text-muted-foreground"
-            >
-              <Home className="size-4 shrink-0" aria-hidden />
-              {t('backToShop')}
-            </Link>
-          </div>
-        </nav>
+        <NavList />
       </aside>
 
       <div className="min-w-0 flex-1">
-        {/* A horizontal nav on narrow screens, so the panel is still usable on
-            a phone when the owner is standing in the shop. */}
-        <nav className="flex items-center gap-2 border-b border-border bg-card px-3 py-2 lg:hidden print:hidden">
-          <ul className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
-            {SECTIONS.map((section) => {
-              const active =
-                'exact' in section && section.exact
-                  ? pathname === section.href
-                  : pathname.startsWith(section.href);
-              const Icon = section.icon;
-
-              return (
-                <li key={section.key}>
-                  <Link
-                    href={section.href}
-                    className={cn(
-                      'flex min-h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs whitespace-nowrap',
-                      active
-                        ? 'bg-primary text-primary-foreground font-semibold'
-                        : 'text-muted-foreground',
-                    )}
-                  >
-                    <Icon className="size-3.5" aria-hidden />
-                    {t(section.key)}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+        {/* The client's reference for "a normal mobile menu": a compact top
+            bar (hamburger, title, bell) with the same section list as the
+            desktop sidebar opening as a slide-over drawer — not the
+            horizontally-scrolling pill row this replaces, which read as a
+            broken/custom scrollbar rather than a recognisable nav. */}
+        <header className="flex h-14 items-center gap-1 border-b border-border bg-card px-2 lg:hidden print:hidden">
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            aria-label={tAdmin('nav.openMenu')}
+            aria-expanded={menuOpen}
+            className="grid size-10 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary"
+          >
+            <Menu className="size-5" aria-hidden />
+          </button>
+          <p className="min-w-0 flex-1 truncate text-sm font-bold">Get Fresh</p>
           <NotificationBell />
-        </nav>
+        </header>
+
+        {menuOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <button
+              type="button"
+              aria-label={tAdmin('nav.closeMenu')}
+              onClick={() => setMenuOpen(false)}
+              className="absolute inset-0 bg-black/40"
+            />
+            <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-card shadow-xl">
+              <div className="flex items-center justify-between border-b border-border px-5 py-4">
+                <div>
+                  <p className="text-sm font-bold">Get Fresh</p>
+                  <p className="text-xs text-muted-foreground">{tAdmin('title')}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen(false)}
+                  aria-label={tAdmin('nav.closeMenu')}
+                  className="grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary"
+                >
+                  <X className="size-4.5" aria-hidden />
+                </button>
+              </div>
+              <NavList onNavigate={() => setMenuOpen(false)} />
+            </div>
+          </div>
+        )}
 
         <main className="p-4 lg:p-6 print:p-0">{children}</main>
       </div>
