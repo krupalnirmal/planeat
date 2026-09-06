@@ -41,6 +41,9 @@ export interface ProductCardView {
   localName: string | null;
   categorySlug: string;
   imageUrl: string | null;
+  /** Every photo the admin uploaded, capped small — the card shows a
+      swipeable mini-gallery with dots when there's more than one (M9). */
+  images: string[];
   unitType: UnitType;
   isMealPlanEligible: boolean;
   vegetableType: string | null;
@@ -63,15 +66,27 @@ export interface CategoryView {
 }
 
 const CARD_IMAGE_WIDTH = 300;
+/** A grid card is small — 4 dots is already more than a shopper flips
+    through, and it keeps the payload light across a whole page of cards. */
+const MAX_CARD_IMAGES = 4;
 
-function firstImageUrl(imageUrls: unknown): string | null {
-  if (!Array.isArray(imageUrls) || imageUrls.length === 0) return null;
-  const first = imageUrls[0];
-  if (typeof first !== 'string' || first === '') return null;
+function resolveImageUrl(url: string): string {
   // M2 — images are served as f_auto,q_auto,w_300. Absolute URLs are already
   // final; a bare storage key still needs the provider's transformation.
-  if (first.startsWith('http') || first.startsWith('/')) return first;
-  return getStorageProvider().urlFor(first, { width: CARD_IMAGE_WIDTH, auto: true });
+  if (url.startsWith('http') || url.startsWith('/')) return url;
+  return getStorageProvider().urlFor(url, { width: CARD_IMAGE_WIDTH, auto: true });
+}
+
+function cardImages(imageUrls: unknown, limit = MAX_CARD_IMAGES): string[] {
+  if (!Array.isArray(imageUrls)) return [];
+  return imageUrls
+    .filter((url): url is string => typeof url === 'string' && url !== '')
+    .slice(0, limit)
+    .map(resolveImageUrl);
+}
+
+function firstImageUrl(imageUrls: unknown): string | null {
+  return cardImages(imageUrls, 1)[0] ?? null;
 }
 
 type ProductWithVariants = {
@@ -166,6 +181,7 @@ export function toProductCard(product: ProductWithVariants, locale: Locale): Pro
     localName: localNameOf(product),
     categorySlug: product.category.slug,
     imageUrl: firstImageUrl(product.imageUrls),
+    images: cardImages(product.imageUrls),
     unitType: product.unitType,
     isMealPlanEligible: product.isMealPlanEligible,
     vegetableType: product.vegetableType,

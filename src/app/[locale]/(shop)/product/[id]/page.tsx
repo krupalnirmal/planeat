@@ -131,6 +131,7 @@ export default async function ProductPage({
                       nameEn: item.nameEn,
                       localName: item.localName,
                       imageUrl: item.imageUrl,
+                      images: item.images,
                       unitType: item.unitType,
                       inStock: item.inStock,
                       variant: item.variant

@@ -41,6 +41,7 @@ export default async function CategoryPage({
     nameEn: product.nameEn,
     localName: product.localName,
     imageUrl: product.imageUrl,
+    images: product.images,
     unitType: product.unitType,
     inStock: product.inStock,
     vegetableType: product.vegetableType,

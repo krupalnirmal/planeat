@@ -2,7 +2,7 @@
 
 import { Heart, ImageIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useCallback, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useCart } from '@/hooks/use-cart';
 import { useSession } from '@/hooks/use-session';
@@ -22,9 +22,10 @@ import { VariantPickerSheet } from './variant-picker-sheet';
  * of which the mock doesn't show.
  *
  * The mock also shows per-card image carousel dots and an "Imported"
- * badge — both skipped here since neither has data behind it (the
- * catalogue stores one photo per product, and no product carries a country
- * of origin). Wiring those up is a data-model change, not a restyle.
+ * badge. The dots are now wired up (M9, session 2026-09-06 — the admin
+ * catalogue form can attach more than one photo per product) via
+ * `CardImage` below; "Imported" is still skipped since no product carries a
+ * country of origin.
  *
  * The heart is a real per-device toggle (localStorage, keyed by product id)
  * rather than a decoration with no effect — but it doesn't sync to an
@@ -50,6 +51,10 @@ export interface ProductCardData {
   /** Always the Marathi name, regardless of the UI's own current locale. */
   localName?: string | null;
   imageUrl: string | null;
+  /** Every photo the admin uploaded, most recent catalogue write first.
+      Optional and additive — a caller that hasn't been updated yet falls
+      back to the single `imageUrl` it always had (see `CardImage`). */
+  images?: string[];
   unitType: string;
   inStock: boolean;
   variant: {
@@ -110,6 +115,88 @@ function useWishlisted(productId: string) {
   );
   const toggle = useCallback(() => writeWishlisted(productId, !readWishlisted(productId)), [productId]);
   return [wishlisted, toggle] as const;
+}
+
+/**
+ * The card's photo. A single image (still the common case) renders exactly
+ * as it always did — no observer, no track, nothing extra mounted. More
+ * than one gets the client's reference dots: a swipeable strip with an
+ * IntersectionObserver tracking which slide is centred, the same mechanics
+ * as the home banner carousel and the product page's own gallery, just
+ * small enough to sit inside a grid card.
+ */
+function CardImage({ images, alt }: { images: string[]; alt: string }) {
+  const trackRef = useRef<HTMLUListElement>(null);
+  const slideRefs = useRef<Array<HTMLLIElement | null>>([]);
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || images.length <= 1) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.find((entry) => entry.isIntersecting);
+        if (!visible) return;
+        const index = slideRefs.current.findIndex((el) => el === visible.target);
+        if (index !== -1) setActive(index);
+      },
+      { root: track, threshold: 0.6 },
+    );
+
+    for (const slide of slideRefs.current) {
+      if (slide) observer.observe(slide);
+    }
+    return () => observer.disconnect();
+  }, [images.length]);
+
+  if (images.length === 0) {
+    return <ImageIcon className="size-8 text-muted-foreground/40" aria-hidden />;
+  }
+
+  if (images.length === 1) {
+    // Plain <img>: the storage port already returns a correctly sized,
+    // format-optimised URL (f_auto,q_auto,w_300), so routing it through
+    // next/image would re-optimise an already-optimised asset and add a
+    // Vercel-specific dependency (R11).
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={images[0]} alt={alt} loading="lazy" decoding="async" className="size-full object-cover" />;
+  }
+
+  return (
+    <>
+      <ul
+        ref={trackRef}
+        className="flex size-full snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {images.map((url, index) => (
+          <li
+            key={url}
+            ref={(el) => {
+              slideRefs.current[index] = el;
+            }}
+            className="w-full shrink-0 snap-center snap-always"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={url} alt={alt} loading="lazy" decoding="async" className="size-full object-cover" />
+          </li>
+        ))}
+      </ul>
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-1.5 flex items-center justify-center gap-1">
+        {images.map((url, index) => (
+          <span
+            key={url}
+            aria-hidden
+            className={cn(
+              'block h-1 rounded-full shadow-sm transition-all',
+              index === active ? 'w-3 bg-white' : 'w-1 bg-white/60',
+            )}
+          />
+        ))}
+      </div>
+    </>
+  );
 }
 
 export function ProductCard({
@@ -188,22 +275,10 @@ export function ProductCard({
             !product.inStock && 'opacity-45 grayscale',
           )}
         >
-          {product.imageUrl ? (
-            // Plain <img>: the storage port already returns a correctly sized,
-            // format-optimised URL (f_auto,q_auto,w_300), so routing it through
-            // next/image would re-optimise an already-optimised asset and add a
-            // Vercel-specific dependency (R11).
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              loading="lazy"
-              decoding="async"
-              className="size-full object-cover"
-            />
-          ) : (
-            <ImageIcon className="size-8 text-muted-foreground/40" aria-hidden />
-          )}
+          <CardImage
+            images={product.images?.length ? product.images : product.imageUrl ? [product.imageUrl] : []}
+            alt={product.name}
+          />
 
           {hasDiscount && product.inStock && (
             <span className="absolute top-1.5 left-1.5 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">

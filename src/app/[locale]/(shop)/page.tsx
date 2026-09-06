@@ -138,6 +138,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                       nameEn: product.nameEn,
                       localName: product.localName,
                       imageUrl: product.imageUrl,
+                      images: product.images,
                       unitType: product.unitType,
                       inStock: product.inStock,
                       variant: product.variant
