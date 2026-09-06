@@ -38,9 +38,6 @@ const saveSchema = z.object({
       }),
     )
     .length(7),
-  // "Daily Use Vegetables" (session 2026-09-06) — picked once, applied to
-  // every day. Optional so an older cached client tab doesn't 422 on save.
-  dailyEssentialVariantIds: z.array(z.string()).default([]),
 });
 
 /**
@@ -53,8 +50,8 @@ const saveSchema = z.object({
 export const PUT = route(async (request: Request) => {
   const session = await requireUser();
   const { locale } = parseQuery(request, querySchema);
-  const { days, dailyEssentialVariantIds } = await parseJson(request, saveSchema);
+  const { days } = await parseJson(request, saveSchema);
 
-  const plan = await saveCustomerPlan(session.userId, days, dailyEssentialVariantIds, locale);
+  const plan = await saveCustomerPlan(session.userId, days, locale);
   return ok({ plan });
 });

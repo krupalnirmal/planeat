@@ -8,14 +8,7 @@ import { LoginPrompt } from '@/components/shop/login-prompt';
 import { PageHeader } from '@/components/shop/page-header';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api, qs } from '@/lib/api/client';
-import {
-  type InitialPlanDay,
-  type PlanColumn,
-  type PlanItem,
-  type PlanProduct,
-  type SavePlanDay,
-  PlanTable,
-} from './plan-table';
+import { type InitialPlanDay, type PlanColumn, type PlanProduct, type SavePlanDay, PlanTable } from './plan-table';
 
 /**
  * The My Meal Plan tab (M5) — rebuilt (session 2026-08-30) as a manual
@@ -27,7 +20,7 @@ import {
  */
 
 interface PlanResponse {
-  plan: { id: string; days: InitialPlanDay[]; dailyEssentialItems: PlanItem[] } | null;
+  plan: { id: string; days: InitialPlanDay[] } | null;
   columns: PlanColumn[];
   dailyEssentials: PlanProduct[];
 }
@@ -49,11 +42,8 @@ export function MealPlanScreen() {
   });
 
   const save = useMutation({
-    mutationFn: ({ days, dailyEssentialVariantIds }: { days: SavePlanDay[]; dailyEssentialVariantIds: string[] }) =>
-      api.put<{ plan: PlanResponse['plan'] }>(`/api/meal-plan/current${qs({ locale })}`, {
-        days,
-        dailyEssentialVariantIds,
-      }),
+    mutationFn: (days: SavePlanDay[]) =>
+      api.put<{ plan: PlanResponse['plan'] }>(`/api/meal-plan/current${qs({ locale })}`, { days }),
     onSuccess: (data) => {
       queryClient.setQueryData<PlanResponse | undefined>(['meal-plan-current', locale], (prev) =>
         prev ? { ...prev, plan: data.plan } : prev,
@@ -117,8 +107,7 @@ export function MealPlanScreen() {
             columns={data?.columns ?? []}
             initialDays={data?.plan?.days}
             dailyEssentials={data?.dailyEssentials ?? []}
-            initialDailyEssentialItems={data?.plan?.dailyEssentialItems}
-            onSave={(days, dailyEssentialVariantIds) => save.mutate({ days, dailyEssentialVariantIds })}
+            onSave={(days) => save.mutate(days)}
             saving={save.isPending}
             saved={saved}
           />

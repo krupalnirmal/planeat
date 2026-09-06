@@ -60,8 +60,6 @@ export interface SavePlanDay {
 
 /** `{ [dayOfWeek]: { [productId]: variantId } }` — the whole table's edit state. */
 type Selections = Record<number, Record<string, string>>;
-/** `{ [productId]: variantId }` — no day dimension, since these apply to every day alike. */
-type EssentialSelections = Record<string, string>;
 
 const DAYS = [1, 2, 3, 4, 5, 6, 7] as const;
 
@@ -76,18 +74,6 @@ function buildInitialSelections(days: InitialPlanDay[] | undefined): Selections 
   return selections;
 }
 
-function buildInitialEssentialSelections(items: PlanItem[] | undefined): EssentialSelections {
-  const selections: EssentialSelections = {};
-  for (const item of items ?? []) selections[item.productId] = item.variantId;
-  return selections;
-}
-
-/** Either a day's cell or the day-agnostic "Daily Use Vegetables" row — the
-    one thing `pickVariant`/`removeVariant` branch on. */
-type PickerTarget =
-  | { kind: 'day'; dayOfWeek: number; product: PlanProduct }
-  | { kind: 'essential'; product: PlanProduct };
-
 function variantLabelOf(product: PlanProduct, variantId: string | undefined): PlanVariant | null {
   if (!variantId) return null;
   return product.variants.find((v) => v.id === variantId) ?? null;
@@ -97,59 +83,54 @@ export function PlanTable({
   columns,
   initialDays,
   dailyEssentials,
-  initialDailyEssentialItems,
   onSave,
   saving,
   saved,
 }: {
   columns: PlanColumn[];
   initialDays: InitialPlanDay[] | undefined;
-  /** "Daily Use Vegetables" — the pickable products for the always-visible
-      section. Empty until a real product exists for it (e.g. Sprouts, not
-      yet in the catalogue), in which case the section just doesn't render. */
+  /** "Daily Use Vegetables" — a curated subset of the Vegetables category,
+      pulled into its own column so the same product is never pickable in
+      two places at once. Picked per day exactly like every other column
+      (client feedback, session 2026-09-06 — an earlier version made this
+      one pick apply to all 7 days at once, which wasn't what was wanted).
+      Empty until a real product exists for it (e.g. a future "Sprouts"
+      column with nothing in the catalogue yet), in which case it just
+      doesn't render. */
   dailyEssentials: PlanProduct[];
-  initialDailyEssentialItems: PlanItem[] | undefined;
-  onSave: (days: SavePlanDay[], dailyEssentialVariantIds: string[]) => void;
+  onSave: (days: SavePlanDay[]) => void;
   saving: boolean;
   saved: boolean;
 }) {
   const t = useTranslations('mealPlan');
+  // The essentials column is just another column for edit-state purposes —
+  // folding it into the same list here means every render below (header,
+  // body cells, summary) needs exactly one code path, not two near-duplicates.
+  const allColumns: PlanColumn[] =
+    dailyEssentials.length > 0
+      ? [...columns, { slug: '__daily_essentials__', name: t('builder.dailyEssentialsTitle'), products: dailyEssentials }]
+      : columns;
   const [selections, setSelections] = useState<Selections>(() => buildInitialSelections(initialDays));
-  const [essentialSelections, setEssentialSelections] = useState<EssentialSelections>(() =>
-    buildInitialEssentialSelections(initialDailyEssentialItems),
-  );
-  const [picker, setPicker] = useState<PickerTarget | null>(null);
+  const [picker, setPicker] = useState<{ dayOfWeek: number; product: PlanProduct } | null>(null);
 
   function pickVariant(variantId: string) {
     if (!picker) return;
-    if (picker.kind === 'day') {
-      const { dayOfWeek, product } = picker;
-      setSelections((prev) => ({
-        ...prev,
-        [dayOfWeek]: { ...prev[dayOfWeek], [product.id]: variantId },
-      }));
-    } else {
-      setEssentialSelections((prev) => ({ ...prev, [picker.product.id]: variantId }));
-    }
+    const { dayOfWeek, product } = picker;
+    setSelections((prev) => ({
+      ...prev,
+      [dayOfWeek]: { ...prev[dayOfWeek], [product.id]: variantId },
+    }));
     setPicker(null);
   }
 
   function removeVariant() {
     if (!picker) return;
-    if (picker.kind === 'day') {
-      const { dayOfWeek, product } = picker;
-      setSelections((prev) => {
-        const day = { ...prev[dayOfWeek] };
-        delete day[product.id];
-        return { ...prev, [dayOfWeek]: day };
-      });
-    } else {
-      setEssentialSelections((prev) => {
-        const next = { ...prev };
-        delete next[picker.product.id];
-        return next;
-      });
-    }
+    const { dayOfWeek, product } = picker;
+    setSelections((prev) => {
+      const day = { ...prev[dayOfWeek] };
+      delete day[product.id];
+      return { ...prev, [dayOfWeek]: day };
+    });
     setPicker(null);
   }
 
@@ -159,20 +140,10 @@ export function PlanTable({
         dayOfWeek,
         variantIds: Object.values(selections[dayOfWeek] ?? {}),
       })),
-      Object.values(essentialSelections),
     );
   }
 
-  const activePickerVariantId =
-    picker?.kind === 'day'
-      ? selections[picker.dayOfWeek]?.[picker.product.id]
-      : picker
-        ? essentialSelections[picker.product.id]
-        : undefined;
-
-  const hasAnySelection =
-    DAYS.some((d) => Object.keys(selections[d] ?? {}).length > 0) ||
-    Object.keys(essentialSelections).length > 0;
+  const hasAnySelection = DAYS.some((d) => Object.keys(selections[d] ?? {}).length > 0);
 
   return (
     <div>
@@ -195,7 +166,7 @@ export function PlanTable({
               <th className="sticky top-0 left-0 z-30 w-20 border border-border bg-card p-2 text-xs font-bold">
                 {t('builder.dayColumn')}
               </th>
-              {columns.map((col) => (
+              {allColumns.map((col) => (
                 <th
                   key={col.slug}
                   className="sticky top-0 z-20 border border-border bg-secondary p-2 text-center text-xs font-bold"
@@ -203,18 +174,6 @@ export function PlanTable({
                   {col.name}
                 </th>
               ))}
-              {/* "Daily Use Vegetables" (session 2026-09-06) — a column like
-                  any other, except its cell renders the exact same chips
-                  (reading/writing the day-agnostic essentialSelections, not
-                  the day-keyed selections) on every row, so picking one
-                  updates all 7 at once. Omitted entirely if there's nothing
-                  to pick yet (e.g. a future "Sprouts" column with no real
-                  product behind it) rather than showing an empty column. */}
-              {dailyEssentials.length > 0 && (
-                <th className="sticky top-0 z-20 border border-border bg-secondary p-2 text-center text-xs font-bold">
-                  {t('builder.dailyEssentialsTitle')}
-                </th>
-              )}
             </tr>
           </thead>
           <tbody>
@@ -223,7 +182,7 @@ export function PlanTable({
                 <td className="sticky left-0 z-10 border border-border bg-card p-2 text-center text-xs font-bold">
                   {t(`days.${dayOfWeek}`)}
                 </td>
-                {columns.map((col) => (
+                {allColumns.map((col) => (
                   <td key={col.slug} className="border border-border bg-background p-1.5 align-top">
                     <div className="flex flex-wrap gap-1.5">
                       {col.products.map((product) => {
@@ -233,7 +192,7 @@ export function PlanTable({
                           <button
                             key={product.id}
                             type="button"
-                            onClick={() => setPicker({ kind: 'day', dayOfWeek, product })}
+                            onClick={() => setPicker({ dayOfWeek, product })}
                             // Overrides this app's global 44px button
                             // touch-target rule (R10, src/app/globals.css) —
                             // that rule targets primary actions, but a day ×
@@ -258,62 +217,22 @@ export function PlanTable({
                     </div>
                   </td>
                 ))}
-                {dailyEssentials.length > 0 && (
-                  <td className="border border-border bg-background p-1.5 align-top">
-                    <div className="flex flex-wrap gap-1.5">
-                      {dailyEssentials.map((product) => {
-                        const variantId = essentialSelections[product.id];
-                        const activeVariant = variantLabelOf(product, variantId);
-                        return (
-                          <button
-                            key={product.id}
-                            type="button"
-                            onClick={() => setPicker({ kind: 'essential', product })}
-                            className={cn(
-                              'min-h-0 h-7 rounded-full border px-2.5 py-1 text-[11px] whitespace-nowrap',
-                              activeVariant
-                                ? 'border-primary bg-primary text-primary-foreground font-semibold'
-                                : 'border-border bg-card text-foreground',
-                            )}
-                          >
-                            {product.name}
-                            {activeVariant ? ` (${activeVariant.label})` : ''}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </td>
-                )}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Live summary — pure derived render off the same state, no second
-          query. Daily essentials get their own line (they're identical
-          every day, so listing them under all 7 would just repeat them);
-          the per-day list below only covers the day × category grid. */}
+      {/* Live summary — pure derived render off the same `selections` state,
+          no second query. Only days with at least one pick show up. */}
       <section className="mt-5 rounded-[var(--radius)] border border-border/60 bg-background p-4">
         <h2 className="text-sm font-bold">{t('builder.summaryTitle')}</h2>
         {!hasAnySelection ? (
           <p className="mt-2 text-xs text-muted-foreground">{t('builder.summaryEmpty')}</p>
         ) : (
           <ul className="mt-2 space-y-1.5">
-            {Object.keys(essentialSelections).length > 0 && (
-              <li className="text-xs">
-                <span className="font-bold">{t('builder.dailyEssentialsTitle')}:</span>{' '}
-                {dailyEssentials
-                  .filter((p) => essentialSelections[p.id])
-                  .map((p) => {
-                    const v = variantLabelOf(p, essentialSelections[p.id]);
-                    return v ? `${p.name} (${v.label})` : p.name;
-                  })
-                  .join(', ')}
-              </li>
-            )}
             {DAYS.filter((d) => Object.keys(selections[d] ?? {}).length > 0).map((dayOfWeek) => {
-              const names = columns
+              const names = allColumns
                 .flatMap((col) => col.products)
                 .filter((p) => selections[dayOfWeek][p.id])
                 .map((p) => {
@@ -343,7 +262,7 @@ export function PlanTable({
       {picker && (
         <VariantPicker
           product={picker.product}
-          activeVariantId={activePickerVariantId}
+          activeVariantId={selections[picker.dayOfWeek]?.[picker.product.id]}
           onSelect={pickVariant}
           onRemove={removeVariant}
           onClose={() => setPicker(null)}
