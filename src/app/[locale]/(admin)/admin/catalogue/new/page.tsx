@@ -1,8 +1,8 @@
 import { setRequestLocale } from 'next-intl/server';
-import { AdminCatalogueScreen } from '@/components/admin/catalogue-screen';
+import { ProductFormScreen } from '@/components/admin/product-form-screen';
 
 /** M9 admin section. RBAC is enforced by the layout and by every API route. */
-export default async function AdminSectionPage({
+export default async function AdminNewProductPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
@@ -10,5 +10,5 @@ export default async function AdminSectionPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <AdminCatalogueScreen />;
+  return <ProductFormScreen />;
 }

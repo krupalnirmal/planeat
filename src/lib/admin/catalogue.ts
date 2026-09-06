@@ -285,6 +285,81 @@ export async function updateProduct(
   return { ok: true, productId };
 }
 
+export interface AdminProductDetail extends ProductInput {
+  id: string;
+  categorySlug: string;
+  variants: Array<{
+    id: string;
+    label: string;
+    quantity: number;
+    unit: UnitType;
+    mrpPaise: bigint;
+    pricePaise: bigint;
+    stockQty: number;
+    lowStockThreshold: number;
+    isDefault: boolean;
+    isActive: boolean;
+  }>;
+}
+
+/** Everything the edit form needs in one call — `listProducts` only carries
+    aggregate counts, not the actual editable fields or full variant rows. */
+export async function getProductDetail(productId: string): Promise<AdminProductDetail | null> {
+  const product = await db.product.findUnique({
+    where: { id: productId },
+    select: {
+      id: true,
+      sku: true,
+      nameEn: true,
+      nameMr: true,
+      nameHi: true,
+      categoryId: true,
+      unitType: true,
+      description: true,
+      tags: true,
+      isMealPlanEligible: true,
+      isActive: true,
+      sortOrder: true,
+      category: { select: { slug: true } },
+      variants: {
+        orderBy: [{ isDefault: 'desc' }, { quantity: 'asc' }],
+        select: {
+          id: true,
+          label: true,
+          quantity: true,
+          unit: true,
+          mrpPaise: true,
+          pricePaise: true,
+          stockQty: true,
+          lowStockThreshold: true,
+          isDefault: true,
+          isActive: true,
+        },
+      },
+    },
+  });
+  if (!product) return null;
+
+  return {
+    id: product.id,
+    sku: product.sku,
+    nameEn: product.nameEn,
+    nameMr: product.nameMr,
+    nameHi: product.nameHi,
+    categoryId: product.categoryId,
+    categorySlug: product.category.slug,
+    unitType: product.unitType,
+    description: product.description,
+    tags: Array.isArray(product.tags)
+      ? product.tags.filter((tag): tag is string => typeof tag === 'string')
+      : [],
+    isMealPlanEligible: product.isMealPlanEligible,
+    isActive: product.isActive,
+    sortOrder: product.sortOrder,
+    variants: product.variants,
+  };
+}
+
 export interface VariantInput {
   label: string;
   quantity: number;
@@ -346,6 +421,30 @@ export async function upsertVariant(
 // ─────────────────────────────────────────────────────────────
 // Categories
 // ─────────────────────────────────────────────────────────────
+
+export interface AdminCategoryRow {
+  id: string;
+  slug: string;
+  name: string;
+  isActive: boolean;
+}
+
+/** All categories, active or not — for the product form's dropdown. An
+    admin adding a product should see everything, unlike storefront
+    browsing, which only ever shows the active ones. */
+export async function listCategories(locale: Locale): Promise<AdminCategoryRow[]> {
+  const categories = await db.category.findMany({
+    orderBy: [{ sortOrder: 'asc' }, { nameEn: 'asc' }],
+    select: { id: true, slug: true, nameEn: true, nameMr: true, nameHi: true, isActive: true },
+  });
+
+  return categories.map((category) => ({
+    id: category.id,
+    slug: category.slug,
+    name: pickName(category, locale),
+    isActive: category.isActive,
+  }));
+}
 
 export interface CategoryInput {
   slug: string;

@@ -43,6 +43,7 @@ const flatEn = flatten(en);
 const SHARED_LATIN_KEYS = new Set([
   'language.en',
   'admin.catalogue.sku',
+  'admin.catalogue.mrp',
   'app.name',
   'home.benefitsFreshTitle',
 ]);

@@ -1,12 +1,24 @@
 import { ApiError, clientIp, parseJson, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
 import { requireStoreAdmin } from '@/lib/admin/guard';
-import { updateProduct, upsertVariant } from '@/lib/admin/catalogue';
+import { getProductDetail, updateProduct, upsertVariant } from '@/lib/admin/catalogue';
 import { productPatchSchema, variantSchema } from '@/lib/validators/admin';
 
 export const dynamic = 'force-dynamic';
 
 type Context = { params: Promise<{ id: string }> };
+
+/** GET /api/admin/products/:id — full detail for the edit form: every
+    editable field plus full variant rows (M9). */
+export const GET = route(async (_request: Request, context: Context) => {
+  await requireStoreAdmin();
+  const { id } = await context.params;
+
+  const product = await getProductDetail(id);
+  if (!product) throw ApiError.notFound('Product not found');
+
+  return ok({ product });
+});
 
 /** PATCH /api/admin/products/:id — edit a product (M9). */
 export const PATCH = route(async (request: Request, context: Context) => {

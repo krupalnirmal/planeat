@@ -1,19 +1,20 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useFormatter, useLocale, useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
 import { api, qs } from '@/lib/api/client';
-import { formatPaise, paise } from '@/lib/money';
 
 /**
- * The read-oriented admin sections: waitlist, swap log, audit log, customers
- * and catalogue.
+ * The read-oriented admin sections: waitlist, swap log, audit log, and
+ * customers.
  *
  * Grouped in one file because they share exactly one shape — a filtered table
- * over an admin endpoint — and five near-identical files would be five places
- * to fix the same layout bug.
+ * over an admin endpoint — and near-identical files would be several places
+ * to fix the same layout bug. Catalogue used to live here too (session
+ * 2026-09-06) but outgrew "read-oriented" once it got a create/edit form —
+ * see catalogue-screen.tsx and product-form-screen.tsx.
  */
 
 // ─────────────────────────────────────────────────────────────
@@ -209,96 +210,6 @@ export function AdminCustomersScreen() {
                     year: 'numeric',
                   })}
                 </td>
-              </tr>
-            ))}
-          </tbody>
-        </AdminTable>
-      )}
-    </>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────
-// M9 — catalogue
-// ─────────────────────────────────────────────────────────────
-
-export function AdminCatalogueScreen() {
-  const t = useTranslations('admin.catalogue');
-  const tc = useTranslations('admin.common');
-  const locale = useLocale();
-
-  const [query, setQuery] = useState('');
-
-  const products = useQuery({
-    queryKey: ['admin-products', query, locale],
-    queryFn: () =>
-      api.get<{
-        products: Array<{
-          id: string;
-          sku: string;
-          name: string;
-          categorySlug: string;
-          variantCount: number;
-          aliasCount: number;
-          isMealPlanEligible: boolean;
-          lowestPricePaise: string | null;
-          totalStock: number;
-        }>;
-      }>(`/api/admin/products${qs({ query: query || undefined, locale, perPage: 50 })}`),
-  });
-
-  const rows = products.data?.products ?? [];
-
-  return (
-    <>
-      <AdminPageHeader title={t('title')} subtitle={t('aliasHint')} />
-
-      <input
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        placeholder={tc('search')}
-        className="mb-3 h-10 w-full max-w-sm rounded-[var(--radius)] border border-border bg-card px-3 text-sm outline-none"
-      />
-
-      {products.isLoading ? (
-        <p className="text-sm text-muted-foreground">{tc('loading')}</p>
-      ) : rows.length === 0 ? (
-        <EmptyState label={tc('empty')} />
-      ) : (
-        <AdminTable>
-          <TableHead
-            labels={[
-              t('name'),
-              t('category'),
-              t('variants'),
-              t('aliases'),
-              t('mealPlanEligible'),
-              'Stock',
-            ]}
-            align={['left', 'left', 'right', 'right', 'left', 'right']}
-          />
-          <tbody>
-            {rows.map((product) => (
-              <tr key={product.id} className="border-b border-border last:border-0">
-                <td className="px-3 py-2.5">
-                  <span className="block font-medium">{product.name}</span>
-                  <span className="font-mono text-[11px] text-muted-foreground">
-                    {product.sku}
-                    {product.lowestPricePaise &&
-                      ` · ${formatPaise(paise(product.lowestPricePaise), { hidePaise: true })}`}
-                  </span>
-                </td>
-                <td className="px-3 py-2.5 text-xs text-muted-foreground">
-                  {product.categorySlug}
-                </td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{product.variantCount}</td>
-                {/* M4 — the alias count is the number that predicts Smart List
-                    accuracy for this product. */}
-                <td className="px-3 py-2.5 text-right tabular-nums">{product.aliasCount}</td>
-                <td className="px-3 py-2.5 text-xs">
-                  {product.isMealPlanEligible ? '✓' : '—'}
-                </td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{product.totalStock}</td>
               </tr>
             ))}
           </tbody>
