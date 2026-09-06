@@ -1,9 +1,9 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Loader2, Plus } from 'lucide-react';
+import { Loader2, Plus, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
 import { useRouter } from '@/i18n/navigation';
 import { ApiClientError, api } from '@/lib/api/client';
@@ -55,6 +55,7 @@ interface ProductDetail {
   unitType: UnitType;
   description: string | null;
   tags: string[];
+  imageUrls: string[];
   isMealPlanEligible: boolean;
   isActive: boolean;
   sortOrder: number;
@@ -70,6 +71,7 @@ interface ProductFields {
   unitType: UnitType;
   description: string;
   tagsText: string;
+  imageUrls: string[];
   isMealPlanEligible: boolean;
   isActive: boolean;
   sortOrder: string;
@@ -84,10 +86,13 @@ const BLANK_FIELDS: ProductFields = {
   unitType: 'G',
   description: '',
   tagsText: '',
+  imageUrls: [],
   isMealPlanEligible: false,
   isActive: true,
   sortOrder: '0',
 };
+
+const MAX_PRODUCT_IMAGES = 6;
 
 export function ProductFormScreen({ productId }: { productId?: string }) {
   const t = useTranslations('admin.catalogue');
@@ -128,6 +133,7 @@ export function ProductFormScreen({ productId }: { productId?: string }) {
         unitType: p.unitType,
         description: p.description ?? '',
         tagsText: p.tags.join(', '),
+        imageUrls: p.imageUrls,
         isMealPlanEligible: p.isMealPlanEligible,
         isActive: p.isActive,
         sortOrder: String(p.sortOrder),
@@ -186,6 +192,7 @@ function ProductFieldsForm({
           .split(',')
           .map((tag) => tag.trim())
           .filter(Boolean),
+        imageUrls: fields.imageUrls,
         isMealPlanEligible: fields.isMealPlanEligible,
         isActive: fields.isActive,
         sortOrder: Number(fields.sortOrder) || 0,
@@ -291,6 +298,11 @@ function ProductFieldsForm({
           </Field>
         </div>
 
+        <ImagesField
+          images={fields.imageUrls}
+          onChange={(imageUrls) => setFields((f) => ({ ...f, imageUrls }))}
+        />
+
         <Field label={t('description')} className="mt-3">
           <textarea
             value={fields.description}
@@ -339,6 +351,96 @@ function ProductFieldsForm({
         </button>
       </section>
     </>
+  );
+}
+
+function ImagesField({
+  images,
+  onChange,
+}: {
+  images: string[];
+  onChange: (images: string[]) => void;
+}) {
+  const t = useTranslations('admin.catalogue');
+  const tc = useTranslations('admin.common');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const upload = useMutation({
+    mutationFn: async (file: File) => {
+      const response = await fetch('/api/admin/uploads/photo?folder=products', {
+        method: 'POST',
+        headers: { 'content-type': file.type },
+        body: file,
+        credentials: 'same-origin',
+      });
+      const payload = await response.json();
+      if (!payload.success) {
+        throw new ApiClientError(payload.error.code, payload.error.message, response.status);
+      }
+      return (payload.data as { url: string }).url;
+    },
+    onSuccess: (url) => {
+      setError(null);
+      onChange([...images, url]);
+    },
+    onError: (err) => setError(err instanceof ApiClientError ? err.message : tc('failed')),
+  });
+
+  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (file) upload.mutate(file);
+  }
+
+  return (
+    <div className="mt-3">
+      <label className="mb-1 block text-xs font-medium text-muted-foreground">{t('images')}</label>
+
+      {error && <p className="mb-2 text-xs text-danger">{error}</p>}
+
+      <div className="flex flex-wrap gap-2">
+        {images.map((url, index) => (
+          <div key={url} className="group relative size-20 overflow-hidden rounded-[var(--radius)] border border-border">
+            {/* Cloudinary/local/mock URLs are all plain <img> src, not next/image's remote-pattern allowlist. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={url} alt="" className="size-full object-cover" />
+            <button
+              type="button"
+              onClick={() => onChange(images.filter((_, i) => i !== index))}
+              aria-label={t('removeImage')}
+              className="absolute top-0.5 right-0.5 flex size-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              <X className="size-3" aria-hidden />
+            </button>
+          </div>
+        ))}
+
+        {images.length < MAX_PRODUCT_IMAGES && (
+          <button
+            type="button"
+            disabled={upload.isPending}
+            onClick={() => fileInputRef.current?.click()}
+            className="flex size-20 flex-col items-center justify-center gap-1 rounded-[var(--radius)] border border-dashed border-border text-muted-foreground disabled:opacity-50"
+          >
+            {upload.isPending ? (
+              <Loader2 className="size-4 animate-spin" aria-hidden />
+            ) : (
+              <Plus className="size-4" aria-hidden />
+            )}
+            <span className="text-[10px]">{upload.isPending ? t('uploading') : t('addImage')}</span>
+          </button>
+        )}
+      </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+    </div>
   );
 }
 

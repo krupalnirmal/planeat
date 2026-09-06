@@ -88,6 +88,7 @@ export const productSchema = z.object({
   unitType: unitTypeSchema,
   description: z.string().trim().max(2000).nullable().optional(),
   tags: z.array(z.string().trim().max(40)).max(20).default([]),
+  imageUrls: z.array(z.string().trim().max(500)).max(6).default([]),
   isMealPlanEligible: z.boolean().default(false),
   isActive: z.boolean().default(true),
   sortOrder: z.coerce.number().int().min(0).max(10_000).optional(),

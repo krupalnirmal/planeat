@@ -120,6 +120,7 @@ export interface ProductInput {
   unitType: UnitType;
   description?: string | null;
   tags: string[];
+  imageUrls: string[];
   isMealPlanEligible: boolean;
   isActive: boolean;
   sortOrder?: number;
@@ -173,7 +174,7 @@ export async function createProduct(
         categoryId: input.categoryId,
         unitType: input.unitType,
         description: input.description ?? null,
-        imageUrls: [],
+        imageUrls: input.imageUrls,
         tags: input.tags,
         isMealPlanEligible: mealPlanEligible,
         isActive: input.isActive,
@@ -216,6 +217,7 @@ export async function updateProduct(
       unitType: true,
       description: true,
       tags: true,
+      imageUrls: true,
       isActive: true,
       isMealPlanEligible: true,
       sortOrder: true,
@@ -254,6 +256,7 @@ export async function updateProduct(
         ...(input.unitType !== undefined ? { unitType: input.unitType } : {}),
         ...(input.description !== undefined ? { description: input.description } : {}),
         ...(input.tags !== undefined ? { tags: input.tags } : {}),
+        ...(input.imageUrls !== undefined ? { imageUrls: input.imageUrls } : {}),
         ...(input.isActive !== undefined ? { isActive: input.isActive } : {}),
         ...(input.sortOrder !== undefined ? { sortOrder: input.sortOrder } : {}),
         isMealPlanEligible: mealPlanEligible,
@@ -262,6 +265,7 @@ export async function updateProduct(
           categoryId: existing.categoryId,
           unitType: existing.unitType,
           tags: [],
+          imageUrls: [],
           isMealPlanEligible: mealPlanEligible,
           isActive: true,
         }),
@@ -317,6 +321,7 @@ export async function getProductDetail(productId: string): Promise<AdminProductD
       unitType: true,
       description: true,
       tags: true,
+      imageUrls: true,
       isMealPlanEligible: true,
       isActive: true,
       sortOrder: true,
@@ -352,6 +357,9 @@ export async function getProductDetail(productId: string): Promise<AdminProductD
     description: product.description,
     tags: Array.isArray(product.tags)
       ? product.tags.filter((tag): tag is string => typeof tag === 'string')
+      : [],
+    imageUrls: Array.isArray(product.imageUrls)
+      ? product.imageUrls.filter((url): url is string => typeof url === 'string')
       : [],
     isMealPlanEligible: product.isMealPlanEligible,
     isActive: product.isActive,
