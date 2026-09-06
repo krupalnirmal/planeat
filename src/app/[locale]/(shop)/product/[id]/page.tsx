@@ -1,8 +1,9 @@
-import { ChevronLeft, ImageIcon } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { ProductCard } from '@/components/shop/product-card';
+import { ProductGallery } from '@/components/shop/product-gallery';
 import { VariantPicker } from '@/components/shop/variant-picker';
 import { getProductDetail } from '@/lib/catalog/queries';
 import type { AppLocale } from '@/i18n/routing';
@@ -59,20 +60,9 @@ export default async function ProductPage({
           {/* The photo is a product shot, not a hero image: a full-width
               square ran ~390px tall on a phone and pushed the price and the
               ADD button below the fold. Capped and centred, it stays the
-              first thing you see without being the only thing. */}
-          <div className="mx-auto grid aspect-square w-full max-w-[240px] place-items-center overflow-hidden rounded-[var(--radius)] bg-white">
-            {product.images[0] ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="size-full object-cover"
-                decoding="async"
-              />
-            ) : (
-              <ImageIcon className="size-16 text-muted-foreground/30" aria-hidden />
-            )}
-          </div>
+              first thing you see without being the only thing. Swipeable
+              when the admin uploaded more than one (M9). */}
+          <ProductGallery images={product.images} alt={product.name} />
 
           <p className="mt-4 text-xs text-muted-foreground">{product.categoryName}</p>
           {/* "English (Marathi)" — same bilingual format as the product
