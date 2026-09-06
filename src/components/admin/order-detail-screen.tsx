@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
+import { AdminPageHeader } from '@/components/admin/admin-shell';
 import { STATUS_TONE } from '@/components/admin/orders-screen';
 import { api } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
@@ -187,19 +187,28 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
 
         <section>
           <h2 className="mb-2 text-sm font-bold">{t('items')}</h2>
-          <AdminTable>
-            <tbody>
-              {order.items.map((item) => (
-                <tr key={item.id} className="border-b border-border last:border-0">
-                  <td className="px-3 py-2 text-sm">{item.name}</td>
-                  <td className="px-3 py-2 text-xs whitespace-nowrap text-muted-foreground">× {item.quantity}</td>
-                  <td className="px-3 py-2 text-right text-sm font-semibold">
-                    {formatPaise(paise(item.totalPaise), { hidePaise: true })}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </AdminTable>
+          {/* A plain flex-row list, not AdminTable: that component forces a
+              640px table min-width (right for a dense many-column table
+              like Orders/Inventory, wrong here) — on a phone, only the
+              "name" column stayed within the visible width and quantity +
+              price scrolled off-screen unnoticed. This wraps at any width
+              instead, matching the customer-facing order detail's own item
+              row (src/components/shop/order-detail.tsx). */}
+          <ul className="divide-y divide-border overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+            {order.items.map((item) => (
+              <li key={item.id} className="flex items-center gap-3 px-3 py-2.5">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm">{item.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.quantity} × {formatPaise(paise(item.unitPricePaise), { hidePaise: true })}
+                  </p>
+                </div>
+                <p className="shrink-0 text-sm font-semibold">
+                  {formatPaise(paise(item.totalPaise), { hidePaise: true })}
+                </p>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section className="rounded-[var(--radius)] border border-border bg-card p-4">
