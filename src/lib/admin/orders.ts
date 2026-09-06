@@ -2,8 +2,9 @@ import { db } from '@/lib/db';
 import { ID_PREFIX, newId } from '@/lib/ids';
 import { parseDateKey } from '@/lib/meal-plan/pricing';
 import { TEMPLATE, notifyEvent } from '@/lib/notifications/notify';
-import { canTransition } from '@/lib/orders/status';
-import type { OrderStatus, OrderType } from '@/generated/prisma/enums';
+import { type AddressSnapshot, parseAddress } from '@/lib/orders/queries';
+import { canTransition, nextStatuses as legalNextStatuses } from '@/lib/orders/status';
+import type { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from '@/generated/prisma/enums';
 import { audit } from './audit';
 
 /**
@@ -110,6 +111,138 @@ export async function listAdminOrders(
         pincode: typeof address.pincode === 'string' ? address.pincode : '',
       };
     }),
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
+// Detail
+// ─────────────────────────────────────────────────────────────
+
+export interface AdminOrderDetailView {
+  id: string;
+  orderNumber: string;
+  type: OrderType;
+  status: OrderStatus;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
+  address: AddressSnapshot;
+  subtotalPaise: bigint;
+  deliveryFeePaise: bigint;
+  discountPaise: bigint;
+  totalPaise: bigint;
+  notes: string | null;
+  placedAt: Date;
+  deliveredAt: Date | null;
+  cancelledAt: Date | null;
+  customerName: string;
+  customerPhone: string;
+  items: Array<{
+    id: string;
+    name: string;
+    quantity: number;
+    unitPricePaise: bigint;
+    totalPaise: bigint;
+  }>;
+  /** Never the delivery OTP — that stays customer-only (M10); staff have no
+      reason to see the code the customer reads out at the door. */
+  rider: { name: string; phone: string; status: string } | null;
+  history: Array<{
+    fromStatus: OrderStatus | null;
+    toStatus: OrderStatus;
+    reason: string | null;
+    changedByName: string | null;
+    createdAt: Date;
+  }>;
+  /** Drives which status-change buttons the detail page can show — the
+      frontend never re-derives the transition graph in `status.ts`. */
+  nextStatuses: OrderStatus[];
+}
+
+export async function getAdminOrderDetail(orderId: string): Promise<AdminOrderDetailView | null> {
+  const order = await db.order.findUnique({
+    where: { id: orderId },
+    select: {
+      id: true,
+      orderNumber: true,
+      type: true,
+      status: true,
+      paymentMethod: true,
+      paymentStatus: true,
+      addressSnapshot: true,
+      subtotalPaise: true,
+      deliveryFeePaise: true,
+      discountPaise: true,
+      totalPaise: true,
+      notes: true,
+      placedAt: true,
+      deliveredAt: true,
+      cancelledAt: true,
+      user: { select: { name: true, phone: true } },
+      items: {
+        select: { id: true, nameSnapshot: true, quantity: true, unitPricePaise: true, totalPaise: true },
+      },
+      assignment: {
+        select: { status: true, partner: { select: { user: { select: { name: true, phone: true } } } } },
+      },
+      statusHistory: {
+        orderBy: { createdAt: 'asc' },
+        select: { fromStatus: true, toStatus: true, reason: true, changedBy: true, createdAt: true },
+      },
+    },
+  });
+  if (!order) return null;
+
+  // `OrderStatusHistory.changedBy` is a bare userId, not a relation — a
+  // second lookup, not a join, to put a name on it for the admin timeline.
+  const changedByIds = [
+    ...new Set(order.statusHistory.map((h) => h.changedBy).filter((id): id is string => id !== null)),
+  ];
+  const actors =
+    changedByIds.length > 0
+      ? await db.user.findMany({ where: { id: { in: changedByIds } }, select: { id: true, name: true, phone: true } })
+      : [];
+  const actorNameById = new Map(actors.map((a) => [a.id, a.name ?? a.phone]));
+
+  return {
+    id: order.id,
+    orderNumber: order.orderNumber,
+    type: order.type,
+    status: order.status,
+    paymentMethod: order.paymentMethod,
+    paymentStatus: order.paymentStatus,
+    address: parseAddress(order.addressSnapshot),
+    subtotalPaise: order.subtotalPaise,
+    deliveryFeePaise: order.deliveryFeePaise,
+    discountPaise: order.discountPaise,
+    totalPaise: order.totalPaise,
+    notes: order.notes,
+    placedAt: order.placedAt,
+    deliveredAt: order.deliveredAt,
+    cancelledAt: order.cancelledAt,
+    customerName: order.user.name ?? order.user.phone,
+    customerPhone: order.user.phone,
+    items: order.items.map((item) => ({
+      id: item.id,
+      name: item.nameSnapshot,
+      quantity: item.quantity,
+      unitPricePaise: item.unitPricePaise,
+      totalPaise: item.totalPaise,
+    })),
+    rider: order.assignment
+      ? {
+          name: order.assignment.partner.user.name ?? order.assignment.partner.user.phone,
+          phone: order.assignment.partner.user.phone,
+          status: order.assignment.status,
+        }
+      : null,
+    history: order.statusHistory.map((h) => ({
+      fromStatus: h.fromStatus,
+      toStatus: h.toStatus,
+      reason: h.reason,
+      changedByName: h.changedBy ? (actorNameById.get(h.changedBy) ?? null) : null,
+      createdAt: h.createdAt,
+    })),
+    nextStatuses: [...legalNextStatuses(order.status)],
   };
 }
 

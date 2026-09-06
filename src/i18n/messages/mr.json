@@ -754,7 +754,36 @@
       "assigned": "{count} ऑर्डरना रायडर नेमला",
       "noSuggestions": "नेमायच्या ऑर्डर नाहीत",
       "filterAll": "सर्व",
-      "filterUnassigned": "रायडर नसलेल्या"
+      "filterUnassigned": "रायडर नसलेल्या",
+      "viewDetails": "तपशील पहा",
+      "items": "वस्तू",
+      "billSummary": "बिल",
+      "itemTotal": "वस्तूंची किंमत",
+      "deliveryFee": "डिलिव्हरी शुल्क",
+      "discount": "सूट",
+      "grandTotal": "एकूण",
+      "paymentMethod": "पेमेंट पद्धत",
+      "paymentStatus": "पेमेंट स्थिती",
+      "deliverTo": "पत्ता",
+      "notes": "टीप",
+      "riderTitle": "रायडर",
+      "noRiderAssigned": "अजून नेमलेला नाही",
+      "selectRider": "रायडर निवडा",
+      "assign": "नेमा",
+      "statusHistory": "स्थिती इतिहास",
+      "noHistory": "अजून काही बदल नाही",
+      "markAs": "{status} म्हणून मार्क करा",
+      "cancelOrder": "ऑर्डर रद्द करा",
+      "cancelConfirmTitle": "ही ऑर्डर रद्द करायची का?",
+      "cancelReasonLabel": "कारण (ऐच्छिक)",
+      "confirmCancel": "हो, रद्द करा",
+      "filterStatus": "स्थिती",
+      "filterType": "प्रकार",
+      "filterDate": "तारीख",
+      "typeLabel": {
+        "INSTANT": "त्वरित",
+        "MEAL_PLAN_DAILY": "आहार प्लॅन"
+      }
     },
     "inventory": {
       "title": "साठा",
@@ -834,7 +863,9 @@
       "search": "शोधा",
       "date": "तारीख",
       "actions": "क्रिया",
-      "noAccess": "तुम्हाला या पानाची परवानगी नाही"
+      "noAccess": "तुम्हाला या पानाची परवानगी नाही",
+      "back": "मागे",
+      "dismiss": "नको"
     }
   },
   "delivery": {

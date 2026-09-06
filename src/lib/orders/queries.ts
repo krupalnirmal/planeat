@@ -82,7 +82,7 @@ export interface OrderDetailView extends Omit<OrderSummaryView, 'previewItems'> 
   }>;
 }
 
-function parseAddress(snapshot: Prisma.JsonValue): AddressSnapshot {
+export function parseAddress(snapshot: Prisma.JsonValue): AddressSnapshot {
   const raw = (snapshot ?? {}) as Record<string, unknown>;
   const str = (key: string) => (typeof raw[key] === 'string' ? (raw[key] as string) : '');
   const nullable = (key: string) => (typeof raw[key] === 'string' ? (raw[key] as string) : null);

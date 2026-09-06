@@ -754,7 +754,36 @@
       "assigned": "{count} ऑर्डर को राइडर मिला",
       "noSuggestions": "तय करने को कुछ नहीं",
       "filterAll": "सभी",
-      "filterUnassigned": "बिना राइडर"
+      "filterUnassigned": "बिना राइडर",
+      "viewDetails": "विवरण देखें",
+      "items": "सामान",
+      "billSummary": "बिल",
+      "itemTotal": "सामान की कीमत",
+      "deliveryFee": "डिलीवरी शुल्क",
+      "discount": "छूट",
+      "grandTotal": "कुल",
+      "paymentMethod": "भुगतान का तरीका",
+      "paymentStatus": "भुगतान स्थिति",
+      "deliverTo": "पता",
+      "notes": "नोट",
+      "riderTitle": "राइडर",
+      "noRiderAssigned": "अभी तय नहीं हुआ",
+      "selectRider": "राइडर चुनें",
+      "assign": "तय करें",
+      "statusHistory": "स्थिति इतिहास",
+      "noHistory": "अभी कोई बदलाव नहीं",
+      "markAs": "{status} के रूप में चिह्नित करें",
+      "cancelOrder": "ऑर्डर रद्द करें",
+      "cancelConfirmTitle": "क्या यह ऑर्डर रद्द करें?",
+      "cancelReasonLabel": "कारण (वैकल्पिक)",
+      "confirmCancel": "हाँ, रद्द करें",
+      "filterStatus": "स्थिति",
+      "filterType": "प्रकार",
+      "filterDate": "तारीख़",
+      "typeLabel": {
+        "INSTANT": "तुरंत",
+        "MEAL_PLAN_DAILY": "मील प्लान"
+      }
     },
     "inventory": {
       "title": "स्टॉक",
@@ -834,7 +863,9 @@
       "search": "खोजें",
       "date": "तारीख़",
       "actions": "क्रियाएँ",
-      "noAccess": "आपको इस पेज की अनुमति नहीं है"
+      "noAccess": "आपको इस पेज की अनुमति नहीं है",
+      "back": "वापस",
+      "dismiss": "रहने दें"
     }
   },
   "delivery": {

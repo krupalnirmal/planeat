@@ -51,6 +51,12 @@ export async function cancelOrder(options: CancelOptions): Promise<CancelResult>
 
   if (!allowed) return { ok: false, reason: 'NOT_CANCELLABLE', status: order.status };
 
+  // Explicit timeout, not Prisma's 5000ms default: the stock-return loop is
+  // one round trip per item, plus the wallet credit, against a remote TiDB
+  // connection — enough real network latency to blow the default on a
+  // multi-item order (first actually exercised via the admin cancel path,
+  // session 2026-09-06 — P2028 "commit cannot be executed on an expired
+  // transaction"). Same fix already applied to saveCustomerPlan, same reason.
   return db.$transaction(async (tx) => {
     // Guarded update: if a rider marked it OUT_FOR_DELIVERY between the read
     // above and this write, zero rows change and we refuse rather than
@@ -118,5 +124,5 @@ export async function cancelOrder(options: CancelOptions): Promise<CancelResult>
       refundedPaise: order.totalPaise,
       alreadyRefunded: refund.alreadyRecorded,
     };
-  });
+  }, { timeout: 15_000 });
 }

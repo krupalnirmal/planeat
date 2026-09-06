@@ -2,6 +2,7 @@
 
 import {
   Bike,
+  ChevronLeft,
   ClipboardList,
   FileClock,
   Home,
@@ -137,21 +138,38 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Shared heading, so every admin screen looks like the same product. */
+/** Shared heading, so every admin screen looks like the same product.
+    `backHref` is optional — only detail pages (drilled into from a list,
+    e.g. an order) need it; every existing list-screen caller is unaffected. */
 export function AdminPageHeader({
   title,
   subtitle,
   action,
+  backHref,
+  backLabel,
 }: {
   title: string;
   subtitle?: string;
   action?: React.ReactNode;
+  backHref?: string;
+  backLabel?: string;
 }) {
   return (
     <header className="mb-5 flex flex-wrap items-start justify-between gap-3 print:mb-3">
-      <div className="min-w-0">
-        <h1 className="text-xl font-bold">{title}</h1>
-        {subtitle && <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>}
+      <div className="flex min-w-0 items-start gap-2">
+        {backHref && (
+          <Link
+            href={backHref}
+            aria-label={backLabel}
+            className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary print:hidden"
+          >
+            <ChevronLeft className="size-5" aria-hidden />
+          </Link>
+        )}
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold">{title}</h1>
+          {subtitle && <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>}
+        </div>
       </div>
       {action && <div className="flex shrink-0 items-center gap-2 print:hidden">{action}</div>}
     </header>

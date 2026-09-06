@@ -5,6 +5,7 @@ import { Bike, Loader2 } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
+import { Link } from '@/i18n/navigation';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -45,7 +46,7 @@ interface Suggestion {
   rationale: string;
 }
 
-const STATUS_TONE: Record<string, string> = {
+export const STATUS_TONE: Record<string, string> = {
   PLACED: 'bg-secondary text-muted-foreground',
   CONFIRMED: 'bg-primary/10 text-primary',
   PACKED: 'bg-primary/10 text-primary',
@@ -57,25 +58,46 @@ const STATUS_TONE: Record<string, string> = {
   PAYMENT_PENDING: 'bg-[#FDF3E3] text-warning',
 };
 
+const STATUS_OPTIONS = [
+  'PLACED',
+  'CONFIRMED',
+  'PACKED',
+  'OUT_FOR_DELIVERY',
+  'DELIVERED',
+  'CANCELLED',
+  'FAILED_DELIVERY',
+  'REFUNDED',
+  'PAYMENT_PENDING',
+] as const;
+
+const TYPE_OPTIONS = ['INSTANT', 'MEAL_PLAN_DAILY'] as const;
+
 export function AdminOrdersScreen() {
   const t = useTranslations('admin.orders');
   const tc = useTranslations('admin.common');
   const tStatus = useTranslations('orders.status');
+  const tType = useTranslations('admin.orders.typeLabel');
   const format = useFormatter();
   const queryClient = useQueryClient();
 
   const [unassignedOnly, setUnassignedOnly] = useState(false);
   const [query, setQuery] = useState('');
+  const [status, setStatus] = useState('');
+  const [type, setType] = useState('');
+  const [dateKey, setDateKey] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
   const orders = useQuery({
-    queryKey: ['admin-orders', unassignedOnly, query],
+    queryKey: ['admin-orders', unassignedOnly, query, status, type, dateKey],
     queryFn: () =>
       api.get<{ orders: OrderRow[] }>(
         `/api/admin/orders${qs({
           unassignedOnly: unassignedOnly ? 'true' : undefined,
           query: query || undefined,
+          status: status || undefined,
+          type: type || undefined,
+          date: dateKey || undefined,
           perPage: 50,
         })}`,
       ),
@@ -174,6 +196,39 @@ export function AdminOrdersScreen() {
           placeholder={tc('search')}
           className="h-10 min-w-48 flex-1 rounded-[var(--radius)] border border-border bg-card px-3 text-sm outline-none"
         />
+        <select
+          value={status}
+          onChange={(event) => setStatus(event.target.value)}
+          aria-label={t('filterStatus')}
+          className="h-10 rounded-[var(--radius)] border border-border bg-card px-2 text-xs outline-none"
+        >
+          <option value="">{t('filterStatus')}</option>
+          {STATUS_OPTIONS.map((value) => (
+            <option key={value} value={value}>
+              {tStatus(value)}
+            </option>
+          ))}
+        </select>
+        <select
+          value={type}
+          onChange={(event) => setType(event.target.value)}
+          aria-label={t('filterType')}
+          className="h-10 rounded-[var(--radius)] border border-border bg-card px-2 text-xs outline-none"
+        >
+          <option value="">{t('filterType')}</option>
+          {TYPE_OPTIONS.map((value) => (
+            <option key={value} value={value}>
+              {tType(value)}
+            </option>
+          ))}
+        </select>
+        <input
+          type="date"
+          value={dateKey}
+          onChange={(event) => setDateKey(event.target.value)}
+          aria-label={t('filterDate')}
+          className="h-10 rounded-[var(--radius)] border border-border bg-card px-2 text-xs outline-none"
+        />
         {(
           [
             [false, t('filterAll')],
@@ -216,8 +271,12 @@ export function AdminOrdersScreen() {
           </thead>
           <tbody>
             {orders.data?.orders.map((order) => (
-              <tr key={order.id} className="border-b border-border last:border-0">
-                <td className="px-3 py-2.5 font-mono text-xs">{order.orderNumber}</td>
+              <tr key={order.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
+                <td className="px-3 py-2.5 font-mono text-xs">
+                  <Link href={`/admin/orders/${order.id}`} className="text-primary hover:underline">
+                    {order.orderNumber}
+                  </Link>
+                </td>
                 <td className="px-3 py-2.5">
                   <span className="block font-medium">{order.customerName}</span>
                   <span className="text-xs text-muted-foreground">

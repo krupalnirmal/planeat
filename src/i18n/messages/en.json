@@ -754,7 +754,36 @@
       "assigned": "{count} orders assigned",
       "noSuggestions": "Nothing to assign",
       "filterAll": "All",
-      "filterUnassigned": "Unassigned"
+      "filterUnassigned": "Unassigned",
+      "viewDetails": "View details",
+      "items": "Items",
+      "billSummary": "Bill",
+      "itemTotal": "Item total",
+      "deliveryFee": "Delivery fee",
+      "discount": "Discount",
+      "grandTotal": "Total",
+      "paymentMethod": "Payment method",
+      "paymentStatus": "Payment status",
+      "deliverTo": "Deliver to",
+      "notes": "Notes",
+      "riderTitle": "Rider",
+      "noRiderAssigned": "Not assigned yet",
+      "selectRider": "Select a rider",
+      "assign": "Assign",
+      "statusHistory": "Status history",
+      "noHistory": "No changes yet",
+      "markAs": "Mark as {status}",
+      "cancelOrder": "Cancel order",
+      "cancelConfirmTitle": "Cancel this order?",
+      "cancelReasonLabel": "Reason (optional)",
+      "confirmCancel": "Yes, cancel",
+      "filterStatus": "Status",
+      "filterType": "Type",
+      "filterDate": "Date",
+      "typeLabel": {
+        "INSTANT": "Instant",
+        "MEAL_PLAN_DAILY": "Meal plan"
+      }
     },
     "inventory": {
       "title": "Inventory",
@@ -834,7 +863,9 @@
       "search": "Search",
       "date": "Date",
       "actions": "Actions",
-      "noAccess": "You don't have access to this page"
+      "noAccess": "You don't have access to this page",
+      "back": "Back",
+      "dismiss": "Never mind"
     }
   },
   "delivery": {
