@@ -530,7 +530,7 @@ function VariantsSection({ productId, variants }: { productId: string; variants:
 
       <div className="mt-4 rounded-[var(--radius)] border border-dashed border-border p-3">
         <p className="mb-2 text-xs font-semibold text-muted-foreground">{t('addVariant')}</p>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-4">
           <input
             value={newVariant.label}
             onChange={(e) => setNewVariant((v) => ({ ...v, label: e.target.value }))}

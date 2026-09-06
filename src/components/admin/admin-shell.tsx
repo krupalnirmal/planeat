@@ -176,7 +176,15 @@ export function AdminPageHeader({
           {subtitle && <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>}
         </div>
       </div>
-      {action && <div className="flex shrink-0 items-center gap-2 print:hidden">{action}</div>}
+      {/* `flex-wrap`: the outer header already wraps the action block as a
+          whole onto its own line, but the action's own children (e.g.
+          picklist-screen.tsx's date input + CSV link + print button) still
+          laid out in one unbreakable row with nothing to stop them
+          overflowing a phone's content width — this is what let that row
+          push the whole page into horizontal scroll on mobile. */}
+      {action && (
+        <div className="flex shrink-0 flex-wrap items-center gap-2 print:hidden">{action}</div>
+      )}
     </header>
   );
 }
