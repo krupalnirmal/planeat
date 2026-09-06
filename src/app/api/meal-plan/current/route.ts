@@ -21,12 +21,12 @@ export const GET = route(async (request: Request) => {
   const session = await requireUser();
   const { locale } = parseQuery(request, querySchema);
 
-  const [plan, columns] = await Promise.all([
+  const [plan, { columns, dailyEssentials }] = await Promise.all([
     getCustomerPlan(session.userId, locale),
     getPlanColumns(locale),
   ]);
 
-  return ok({ plan, columns });
+  return ok({ plan, columns, dailyEssentials });
 });
 
 const saveSchema = z.object({
@@ -38,6 +38,9 @@ const saveSchema = z.object({
       }),
     )
     .length(7),
+  // "Daily Use Vegetables" (session 2026-09-06) — picked once, applied to
+  // every day. Optional so an older cached client tab doesn't 422 on save.
+  dailyEssentialVariantIds: z.array(z.string()).default([]),
 });
 
 /**
@@ -49,8 +52,9 @@ const saveSchema = z.object({
  */
 export const PUT = route(async (request: Request) => {
   const session = await requireUser();
-  const { days } = await parseJson(request, saveSchema);
+  const { locale } = parseQuery(request, querySchema);
+  const { days, dailyEssentialVariantIds } = await parseJson(request, saveSchema);
 
-  const plan = await saveCustomerPlan(session.userId, days);
+  const plan = await saveCustomerPlan(session.userId, days, dailyEssentialVariantIds, locale);
   return ok({ plan });
 });

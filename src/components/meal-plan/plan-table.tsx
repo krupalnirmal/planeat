@@ -60,6 +60,8 @@ export interface SavePlanDay {
 
 /** `{ [dayOfWeek]: { [productId]: variantId } }` — the whole table's edit state. */
 type Selections = Record<number, Record<string, string>>;
+/** `{ [productId]: variantId }` — no day dimension, since these apply to every day alike. */
+type EssentialSelections = Record<string, string>;
 
 const DAYS = [1, 2, 3, 4, 5, 6, 7] as const;
 
@@ -74,6 +76,18 @@ function buildInitialSelections(days: InitialPlanDay[] | undefined): Selections 
   return selections;
 }
 
+function buildInitialEssentialSelections(items: PlanItem[] | undefined): EssentialSelections {
+  const selections: EssentialSelections = {};
+  for (const item of items ?? []) selections[item.productId] = item.variantId;
+  return selections;
+}
+
+/** Either a day's cell or the day-agnostic "Daily Use Vegetables" row — the
+    one thing `pickVariant`/`removeVariant` branch on. */
+type PickerTarget =
+  | { kind: 'day'; dayOfWeek: number; product: PlanProduct }
+  | { kind: 'essential'; product: PlanProduct };
+
 function variantLabelOf(product: PlanProduct, variantId: string | undefined): PlanVariant | null {
   if (!variantId) return null;
   return product.variants.find((v) => v.id === variantId) ?? null;
@@ -82,34 +96,60 @@ function variantLabelOf(product: PlanProduct, variantId: string | undefined): Pl
 export function PlanTable({
   columns,
   initialDays,
+  dailyEssentials,
+  initialDailyEssentialItems,
   onSave,
   saving,
   saved,
 }: {
   columns: PlanColumn[];
   initialDays: InitialPlanDay[] | undefined;
-  onSave: (days: SavePlanDay[]) => void;
+  /** "Daily Use Vegetables" — the pickable products for the always-visible
+      section. Empty until a real product exists for it (e.g. Sprouts, not
+      yet in the catalogue), in which case the section just doesn't render. */
+  dailyEssentials: PlanProduct[];
+  initialDailyEssentialItems: PlanItem[] | undefined;
+  onSave: (days: SavePlanDay[], dailyEssentialVariantIds: string[]) => void;
   saving: boolean;
   saved: boolean;
 }) {
   const t = useTranslations('mealPlan');
   const [selections, setSelections] = useState<Selections>(() => buildInitialSelections(initialDays));
-  const [picker, setPicker] = useState<{ dayOfWeek: number; product: PlanProduct } | null>(null);
+  const [essentialSelections, setEssentialSelections] = useState<EssentialSelections>(() =>
+    buildInitialEssentialSelections(initialDailyEssentialItems),
+  );
+  const [picker, setPicker] = useState<PickerTarget | null>(null);
 
-  function pickVariant(dayOfWeek: number, productId: string, variantId: string) {
-    setSelections((prev) => ({
-      ...prev,
-      [dayOfWeek]: { ...prev[dayOfWeek], [productId]: variantId },
-    }));
+  function pickVariant(variantId: string) {
+    if (!picker) return;
+    if (picker.kind === 'day') {
+      const { dayOfWeek, product } = picker;
+      setSelections((prev) => ({
+        ...prev,
+        [dayOfWeek]: { ...prev[dayOfWeek], [product.id]: variantId },
+      }));
+    } else {
+      setEssentialSelections((prev) => ({ ...prev, [picker.product.id]: variantId }));
+    }
     setPicker(null);
   }
 
-  function removeVariant(dayOfWeek: number, productId: string) {
-    setSelections((prev) => {
-      const day = { ...prev[dayOfWeek] };
-      delete day[productId];
-      return { ...prev, [dayOfWeek]: day };
-    });
+  function removeVariant() {
+    if (!picker) return;
+    if (picker.kind === 'day') {
+      const { dayOfWeek, product } = picker;
+      setSelections((prev) => {
+        const day = { ...prev[dayOfWeek] };
+        delete day[product.id];
+        return { ...prev, [dayOfWeek]: day };
+      });
+    } else {
+      setEssentialSelections((prev) => {
+        const next = { ...prev };
+        delete next[picker.product.id];
+        return next;
+      });
+    }
     setPicker(null);
   }
 
@@ -119,13 +159,58 @@ export function PlanTable({
         dayOfWeek,
         variantIds: Object.values(selections[dayOfWeek] ?? {}),
       })),
+      Object.values(essentialSelections),
     );
   }
 
-  const hasAnySelection = DAYS.some((d) => Object.keys(selections[d] ?? {}).length > 0);
+  const activePickerVariantId =
+    picker?.kind === 'day'
+      ? selections[picker.dayOfWeek]?.[picker.product.id]
+      : picker
+        ? essentialSelections[picker.product.id]
+        : undefined;
+
+  const hasAnySelection =
+    DAYS.some((d) => Object.keys(selections[d] ?? {}).length > 0) ||
+    Object.keys(essentialSelections).length > 0;
 
   return (
     <div>
+      {/* "Daily Use Vegetables" (session 2026-09-06) — picked once, applied
+          to every day, so it sits outside the day × category grid entirely
+          rather than as an eighth column or an extra row repeated 7 times.
+          Renders nothing if the section has no products yet (e.g. a
+          "Sprouts" section with no matching real product in the catalogue
+          yet) rather than showing an empty, confusing card. */}
+      {dailyEssentials.length > 0 && (
+        <section className="mb-4 rounded-[var(--radius)] border border-border/60 bg-background p-4">
+          <h2 className="text-sm font-bold">{t('builder.dailyEssentialsTitle')}</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">{t('builder.dailyEssentialsHint')}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {dailyEssentials.map((product) => {
+              const variantId = essentialSelections[product.id];
+              const activeVariant = variantLabelOf(product, variantId);
+              return (
+                <button
+                  key={product.id}
+                  type="button"
+                  onClick={() => setPicker({ kind: 'essential', product })}
+                  className={cn(
+                    'h-9 rounded-full border px-3.5 text-xs font-semibold whitespace-nowrap',
+                    activeVariant
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-card text-foreground',
+                  )}
+                >
+                  {product.name}
+                  {activeVariant ? ` (${activeVariant.label})` : ''}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* `max-h` + `overflow-auto` (both axes) rather than plain `overflow-x-auto`:
           per the CSS overflow spec, giving only one axis a non-`visible` value
           silently forces the other axis to `auto` too, so this div was already
@@ -171,7 +256,7 @@ export function PlanTable({
                           <button
                             key={product.id}
                             type="button"
-                            onClick={() => setPicker({ dayOfWeek, product })}
+                            onClick={() => setPicker({ kind: 'day', dayOfWeek, product })}
                             // Overrides this app's global 44px button
                             // touch-target rule (R10, src/app/globals.css) —
                             // that rule targets primary actions, but a day ×
@@ -202,14 +287,28 @@ export function PlanTable({
         </table>
       </div>
 
-      {/* Live summary — pure derived render off the same `selections` state,
-          no second query. Only days with at least one pick show up. */}
+      {/* Live summary — pure derived render off the same state, no second
+          query. Daily essentials get their own line (they're identical
+          every day, so listing them under all 7 would just repeat them);
+          the per-day list below only covers the day × category grid. */}
       <section className="mt-5 rounded-[var(--radius)] border border-border/60 bg-background p-4">
         <h2 className="text-sm font-bold">{t('builder.summaryTitle')}</h2>
         {!hasAnySelection ? (
           <p className="mt-2 text-xs text-muted-foreground">{t('builder.summaryEmpty')}</p>
         ) : (
           <ul className="mt-2 space-y-1.5">
+            {Object.keys(essentialSelections).length > 0 && (
+              <li className="text-xs">
+                <span className="font-bold">{t('builder.dailyEssentialsTitle')}:</span>{' '}
+                {dailyEssentials
+                  .filter((p) => essentialSelections[p.id])
+                  .map((p) => {
+                    const v = variantLabelOf(p, essentialSelections[p.id]);
+                    return v ? `${p.name} (${v.label})` : p.name;
+                  })
+                  .join(', ')}
+              </li>
+            )}
             {DAYS.filter((d) => Object.keys(selections[d] ?? {}).length > 0).map((dayOfWeek) => {
               const names = columns
                 .flatMap((col) => col.products)
@@ -241,9 +340,9 @@ export function PlanTable({
       {picker && (
         <VariantPicker
           product={picker.product}
-          activeVariantId={selections[picker.dayOfWeek]?.[picker.product.id]}
-          onSelect={(variantId) => pickVariant(picker.dayOfWeek, picker.product.id, variantId)}
-          onRemove={() => removeVariant(picker.dayOfWeek, picker.product.id)}
+          activeVariantId={activePickerVariantId}
+          onSelect={pickVariant}
+          onRemove={removeVariant}
           onClose={() => setPicker(null)}
         />
       )}

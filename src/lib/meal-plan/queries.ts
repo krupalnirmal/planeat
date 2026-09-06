@@ -2,7 +2,7 @@ import { db } from '@/lib/db';
 import { pickName } from '@/lib/catalog/text';
 import { ID_PREFIX, newId } from '@/lib/ids';
 import type { Locale } from '@/generated/prisma/enums';
-import { PLAN_CATEGORY_SLUGS, type PlanCategorySlug } from './plan-categories';
+import { DAILY_ESSENTIAL_VEGETABLE_SKUS, PLAN_CATEGORY_SLUGS, type PlanCategorySlug } from './plan-categories';
 
 /**
  * Reads and writes for the manual weekly plan picker (session 2026-08-30).
@@ -32,6 +32,19 @@ export interface PlanDayView {
 export interface CustomerPlanView {
   id: string;
   days: PlanDayView[];
+  /** The "Daily Use Vegetables" picks — same across all 7 days, so rather
+      than make the client dig one specific day's items out and filter them,
+      this is computed once here from whichever day happens to have them
+      (they're identical on every day the plan was saved with any). */
+  dailyEssentialItems: PlanItemView[];
+}
+
+async function dailyEssentialProductIds(): Promise<Set<string>> {
+  const products = await db.product.findMany({
+    where: { sku: { in: [...DAILY_ESSENTIAL_VEGETABLE_SKUS] } },
+    select: { id: true },
+  });
+  return new Set(products.map((p) => p.id));
 }
 
 const planSelect = {
@@ -53,14 +66,26 @@ const planSelect = {
   },
 } as const;
 
-/** The plan the customer is currently building/has built, if any. */
-export async function getCustomerPlan(userId: string, locale: Locale): Promise<CustomerPlanView | null> {
-  const plan = await db.mealPlan.findFirst({
-    where: { userId, generatedBy: 'CUSTOMER' },
-    orderBy: { version: 'desc' },
-    select: planSelect,
-  });
-  if (!plan) return null;
+type RawPlan = NonNullable<Awaited<ReturnType<typeof db.mealPlan.findFirst<{ select: typeof planSelect }>>>>;
+
+/** Shared by `getCustomerPlan` and `saveCustomerPlan` so there is exactly one
+    place that splits a plan's items into "per-day" vs "Daily Use Vegetables"
+    and resolves locale-appropriate names — `saveCustomerPlan` used to
+    hand-roll its own copy of this that skipped both. */
+function shapePlan(plan: RawPlan, locale: Locale, essentialIds: Set<string>): CustomerPlanView {
+  const allItems = plan.days.flatMap((day) =>
+    day.items
+      .filter((item): item is typeof item & { variantId: string; variant: NonNullable<typeof item.variant> } =>
+        item.variantId !== null && item.variant !== null,
+      )
+      .map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId,
+        name: pickName(item.product, locale),
+        variantLabel: item.variant.label,
+        pricePaise: item.variant.pricePaise,
+      })),
+  );
 
   return {
     id: plan.id,
@@ -68,7 +93,7 @@ export async function getCustomerPlan(userId: string, locale: Locale): Promise<C
       dayOfWeek: day.dayOfWeek,
       items: day.items
         .filter((item): item is typeof item & { variantId: string; variant: NonNullable<typeof item.variant> } =>
-          item.variantId !== null && item.variant !== null,
+          item.variantId !== null && item.variant !== null && !essentialIds.has(item.productId),
         )
         .map((item) => ({
           productId: item.productId,
@@ -78,7 +103,27 @@ export async function getCustomerPlan(userId: string, locale: Locale): Promise<C
           pricePaise: item.variant.pricePaise,
         })),
     })),
+    // De-duplicated by productId: identical on every day they were saved to,
+    // so this is just "whichever day had them first" rather than 7 copies.
+    dailyEssentialItems: Array.from(
+      new Map(allItems.filter((item) => essentialIds.has(item.productId)).map((item) => [item.productId, item])).values(),
+    ),
   };
+}
+
+/** The plan the customer is currently building/has built, if any. */
+export async function getCustomerPlan(userId: string, locale: Locale): Promise<CustomerPlanView | null> {
+  const [plan, essentialIds] = await Promise.all([
+    db.mealPlan.findFirst({
+      where: { userId, generatedBy: 'CUSTOMER' },
+      orderBy: { version: 'desc' },
+      select: planSelect,
+    }),
+    dailyEssentialProductIds(),
+  ]);
+  if (!plan) return null;
+
+  return shapePlan(plan, locale, essentialIds);
 }
 
 export interface SaveDayInput {
@@ -101,9 +146,24 @@ export interface SaveDayInput {
  * silently dropped rather than failing the whole save: the customer's other
  * picks that day should not be lost because one product went out of stock
  * between page-load and save.
+ *
+ * `dailyEssentialVariantIds` (session 2026-09-06) is merged into every
+ * day's variant list before validation/creation — "Daily Use Vegetables" is
+ * picked once but stored identically on all 7 days, same as any other item,
+ * so nothing downstream (the subscription cron, `getCustomerPlan`) needs to
+ * know this section exists at all.
  */
-export async function saveCustomerPlan(userId: string, inputDays: SaveDayInput[]): Promise<CustomerPlanView> {
-  const allVariantIds = [...new Set(inputDays.flatMap((day) => day.variantIds))];
+export async function saveCustomerPlan(
+  userId: string,
+  inputDays: SaveDayInput[],
+  dailyEssentialVariantIds: string[] = [],
+  locale: Locale = 'en',
+): Promise<CustomerPlanView> {
+  const mergedDays = inputDays.map((day) => ({
+    dayOfWeek: day.dayOfWeek,
+    variantIds: [...day.variantIds, ...dailyEssentialVariantIds],
+  }));
+  const allVariantIds = [...new Set(mergedDays.flatMap((day) => day.variantIds))];
 
   const validVariants = await db.productVariant.findMany({
     where: {
@@ -125,7 +185,7 @@ export async function saveCustomerPlan(userId: string, inputDays: SaveDayInput[]
   // instead of one round trip per row. Sequential per-row `create`s here
   // used to blow the interactive-transaction timeout against the remote
   // TiDB connection once a plan had picks on more than a couple of days.
-  const dayRecords = inputDays.map((day) => ({ id: newId(ID_PREFIX.mealPlanDay), dayOfWeek: day.dayOfWeek }));
+  const dayRecords = mergedDays.map((day) => ({ id: newId(ID_PREFIX.mealPlanDay), dayOfWeek: day.dayOfWeek }));
 
   const itemRecords: Array<{
     id: string;
@@ -138,7 +198,7 @@ export async function saveCustomerPlan(userId: string, inputDays: SaveDayInput[]
     sortOrder: number;
   }> = [];
 
-  inputDays.forEach((day, i) => {
+  mergedDays.forEach((day, i) => {
     let sortOrder = 0;
     for (const variantId of new Set(day.variantIds)) {
       const variant = validById.get(variantId);
@@ -190,23 +250,7 @@ export async function saveCustomerPlan(userId: string, inputDays: SaveDayInput[]
     { timeout: 15_000 },
   );
 
-  return {
-    id: plan.id,
-    days: plan.days.map((day) => ({
-      dayOfWeek: day.dayOfWeek,
-      items: day.items
-        .filter((item): item is typeof item & { variantId: string; variant: NonNullable<typeof item.variant> } =>
-          item.variantId !== null && item.variant !== null,
-        )
-        .map((item) => ({
-          productId: item.productId,
-          variantId: item.variantId,
-          name: item.product.nameEn,
-          variantLabel: item.variant.label,
-          pricePaise: item.variant.pricePaise,
-        })),
-    })),
-  };
+  return shapePlan(plan, locale, await dailyEssentialProductIds());
 }
 
 export interface PlanColumnProduct {
@@ -221,8 +265,17 @@ export interface PlanColumn {
   products: PlanColumnProduct[];
 }
 
-/** The 4 category columns and their pickable products, in display order. */
-export async function getPlanColumns(locale: Locale): Promise<PlanColumn[]> {
+export interface PlanColumnsView {
+  columns: PlanColumn[];
+  /** "Daily Use Vegetables" — pulled out of the Vegetables column entirely
+      (not duplicated), so the same product is never pickable in two places
+      at once. Empty if none of the curated SKUs currently exist/are active. */
+  dailyEssentials: PlanColumnProduct[];
+}
+
+/** The 4 category columns and their pickable products, in display order,
+    plus the always-visible "Daily Use Vegetables" set. */
+export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
   const categories = await db.category.findMany({
     where: { slug: { in: [...PLAN_CATEGORY_SLUGS] }, isActive: true },
     select: {
@@ -235,6 +288,7 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumn[]> {
         orderBy: [{ sortOrder: 'asc' }, { nameEn: 'asc' }],
         select: {
           id: true,
+          sku: true,
           nameEn: true,
           nameMr: true,
           nameHi: true,
@@ -249,19 +303,33 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumn[]> {
   });
 
   const bySlug = new Map(categories.map((c) => [c.slug, c]));
+  const essentialSkus: readonly string[] = DAILY_ESSENTIAL_VEGETABLE_SKUS;
+  const essentialsBySku = new Map<string, PlanColumnProduct>();
 
-  return PLAN_CATEGORY_SLUGS.map((slug) => {
+  const columns = PLAN_CATEGORY_SLUGS.map((slug) => {
     const category = bySlug.get(slug);
     if (!category) return { slug, name: slug, products: [] };
 
-    return {
-      slug,
-      name: pickName(category, locale),
-      products: category.products.map((product) => ({
+    const products = category.products
+      .filter((product) => {
+        if (slug !== 'vegetables' || !essentialSkus.includes(product.sku)) return true;
+        essentialsBySku.set(product.sku, { id: product.id, name: pickName(product, locale), variants: product.variants });
+        return false;
+      })
+      .map((product) => ({
         id: product.id,
         name: pickName(product, locale),
         variants: product.variants,
-      })),
-    };
+      }));
+
+    return { slug, name: pickName(category, locale), products };
   });
+
+  // Display order follows the curated list (session 2026-09-06's own
+  // ordering), not whatever order the query happened to return them in.
+  const dailyEssentials = essentialSkus
+    .map((sku) => essentialsBySku.get(sku))
+    .filter((product): product is PlanColumnProduct => product !== undefined);
+
+  return { columns, dailyEssentials };
 }

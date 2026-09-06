@@ -8,7 +8,14 @@ import { LoginPrompt } from '@/components/shop/login-prompt';
 import { PageHeader } from '@/components/shop/page-header';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api, qs } from '@/lib/api/client';
-import { type InitialPlanDay, type PlanColumn, type SavePlanDay, PlanTable } from './plan-table';
+import {
+  type InitialPlanDay,
+  type PlanColumn,
+  type PlanItem,
+  type PlanProduct,
+  type SavePlanDay,
+  PlanTable,
+} from './plan-table';
 
 /**
  * The My Meal Plan tab (M5) — rebuilt (session 2026-08-30) as a manual
@@ -20,8 +27,9 @@ import { type InitialPlanDay, type PlanColumn, type SavePlanDay, PlanTable } fro
  */
 
 interface PlanResponse {
-  plan: { id: string; days: InitialPlanDay[] } | null;
+  plan: { id: string; days: InitialPlanDay[]; dailyEssentialItems: PlanItem[] } | null;
   columns: PlanColumn[];
+  dailyEssentials: PlanProduct[];
 }
 
 export function MealPlanScreen() {
@@ -41,8 +49,11 @@ export function MealPlanScreen() {
   });
 
   const save = useMutation({
-    mutationFn: (days: SavePlanDay[]) =>
-      api.put<{ plan: PlanResponse['plan'] }>(`/api/meal-plan/current${qs({ locale })}`, { days }),
+    mutationFn: ({ days, dailyEssentialVariantIds }: { days: SavePlanDay[]; dailyEssentialVariantIds: string[] }) =>
+      api.put<{ plan: PlanResponse['plan'] }>(`/api/meal-plan/current${qs({ locale })}`, {
+        days,
+        dailyEssentialVariantIds,
+      }),
     onSuccess: (data) => {
       queryClient.setQueryData<PlanResponse | undefined>(['meal-plan-current', locale], (prev) =>
         prev ? { ...prev, plan: data.plan } : prev,
@@ -105,7 +116,9 @@ export function MealPlanScreen() {
             key={data?.plan?.id ?? 'new'}
             columns={data?.columns ?? []}
             initialDays={data?.plan?.days}
-            onSave={(days) => save.mutate(days)}
+            dailyEssentials={data?.dailyEssentials ?? []}
+            initialDailyEssentialItems={data?.plan?.dailyEssentialItems}
+            onSave={(days, dailyEssentialVariantIds) => save.mutate({ days, dailyEssentialVariantIds })}
             saving={save.isPending}
             saved={saved}
           />

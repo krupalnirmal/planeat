@@ -420,7 +420,9 @@
       "saved": "प्लान सेव हो गया!",
       "remove": "हटाएं",
       "summaryTitle": "आपका साप्ताहिक प्लान",
-      "summaryEmpty": "ऊपर से चीज़ें चुनें, यहां दिखेंगी।"
+      "summaryEmpty": "ऊपर से चीज़ें चुनें, यहां दिखेंगी।",
+      "dailyEssentialsTitle": "रोज़मर्रा की सब्ज़ियां",
+      "dailyEssentialsHint": "एक बार चुनें, पूरे हफ़्ते वही इस्तेमाल होंगी"
     }
   },
   "subscription": {

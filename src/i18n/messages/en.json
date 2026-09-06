@@ -420,7 +420,9 @@
       "saved": "Plan saved!",
       "remove": "Remove",
       "summaryTitle": "Your weekly plan",
-      "summaryEmpty": "Pick items above to see them here."
+      "summaryEmpty": "Pick items above to see them here.",
+      "dailyEssentialsTitle": "Daily Use Vegetables",
+      "dailyEssentialsHint": "Picked once, used every day of the week"
     }
   },
   "subscription": {

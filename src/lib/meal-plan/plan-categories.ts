@@ -13,3 +13,22 @@
  */
 export const PLAN_CATEGORY_SLUGS = ['vegetables', 'fruits', 'dairy', 'bakery-biscuits'] as const;
 export type PlanCategorySlug = (typeof PLAN_CATEGORY_SLUGS)[number];
+
+/**
+ * "Daily Use Vegetables" (session 2026-09-06, client's own list) — the
+ * handful of vegetables every household uses most days, picked once and
+ * applied to all 7 days rather than re-picked per day like the 4 columns
+ * above. Pulled out of the regular Vegetables column entirely (not just
+ * duplicated) so the same product never appears pickable in two places at
+ * once. Keyed by SKU rather than product id — stable across reseeds, and
+ * legible in a diff if the list ever changes.
+ */
+export const DAILY_ESSENTIAL_VEGETABLE_SKUS = [
+  'VEG-ONION',
+  'VEG-POTATO',
+  'VEG-TOMATO',
+  'VEG-CARROT',
+  'VEG-CABBAGE',
+  'VEG-OKRA', // Lady Finger / भेंडी
+  'VEG-BRINJAL',
+] as const;
