@@ -917,6 +917,9 @@
     "appTitle": "Get Fresh Delivery",
     "available": "Available",
     "logout": "Log out",
+    "enableAlerts": "Turn on new-order alerts",
+    "alertsEnabled": "New-order alerts are on",
+    "alertsBlocked": "Notifications blocked in browser settings",
     "summaryDelivered": "Delivered",
     "summaryPending": "Pending",
     "summaryFailed": "Failed",
@@ -1004,6 +1007,10 @@
     "orderPlacedAdmin": {
       "title": "New order",
       "body": "Order {orderNumber} — {amount}"
+    },
+    "orderAssignedRider": {
+      "title": "New delivery assigned",
+      "body": "Order {orderNumber} — {area}"
     }
   },
   "safety": {

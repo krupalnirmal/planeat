@@ -28,6 +28,7 @@ export const TEMPLATE = {
   subscriptionCancelled: 'subscription.cancelled',
   mealPlanReady: 'meal_plan.ready',
   orderPlacedAdmin: 'order.placed_admin',
+  orderAssignedRider: 'order.assigned_rider',
 } as const;
 
 export type TemplateKey = (typeof TEMPLATE)[keyof typeof TEMPLATE];
@@ -52,6 +53,7 @@ export const CHANNELS_BY_TEMPLATE: Record<TemplateKey, readonly NotificationChan
   [TEMPLATE.subscriptionExpiring]: ['IN_APP', 'WHATSAPP'],
   [TEMPLATE.subscriptionCancelled]: ['IN_APP'],
   [TEMPLATE.orderPlacedAdmin]: ['IN_APP', 'PUSH'],
+  [TEMPLATE.orderAssignedRider]: ['IN_APP', 'PUSH'],
 };
 
 export interface NotifyInput {
@@ -60,6 +62,13 @@ export interface NotifyInput {
   /** Everything the render step will need. Never a rendered string (R7). */
   payload: Record<string, unknown>;
   channel?: NotificationChannel;
+}
+
+/** What was actually written — `notify-now.ts` needs the ids to dispatch a
+    time-sensitive row immediately instead of leaving it for the cron. */
+export interface NotifiedRow {
+  id: string;
+  channel: NotificationChannel;
 }
 
 /**
@@ -71,12 +80,13 @@ export interface NotifyInput {
  * — so it is written already `SENT`. Every other channel starts `QUEUED` for
  * `send.ts` to pick up.
  */
-export async function notify(input: NotifyInput): Promise<void> {
+export async function notify(input: NotifyInput): Promise<NotifiedRow | null> {
   const channel = input.channel ?? 'IN_APP';
   try {
+    const id = newId(ID_PREFIX.notification);
     await db.notification.create({
       data: {
-        id: newId(ID_PREFIX.notification),
+        id,
         userId: input.userId,
         channel,
         templateKey: input.templateKey,
@@ -85,8 +95,10 @@ export async function notify(input: NotifyInput): Promise<void> {
         sentAt: channel === 'IN_APP' ? new Date() : null,
       },
     });
+    return { id, channel };
   } catch (error) {
     console.error('[notify] could not record notification', input.templateKey, error);
+    return null;
   }
 }
 
@@ -100,9 +112,12 @@ export async function notifyEvent(
   userId: string,
   templateKey: TemplateKey,
   payload: Record<string, unknown>,
-): Promise<void> {
+): Promise<NotifiedRow[]> {
   const channels = CHANNELS_BY_TEMPLATE[templateKey];
-  await Promise.all(channels.map((channel) => notify({ userId, templateKey, payload, channel })));
+  const rows = await Promise.all(
+    channels.map((channel) => notify({ userId, templateKey, payload, channel })),
+  );
+  return rows.filter((row): row is NotifiedRow => row !== null);
 }
 
 /**
@@ -114,13 +129,16 @@ export async function notifyEvent(
 export async function notifyAdmins(
   templateKey: TemplateKey,
   payload: Record<string, unknown>,
-): Promise<void> {
+): Promise<NotifiedRow[]> {
   const admins = await db.user.findMany({
     where: { role: { in: STORE_ROLES } },
     select: { id: true },
   });
 
-  await Promise.all(admins.map((admin) => notifyEvent(admin.id, templateKey, payload)));
+  const perAdmin = await Promise.all(
+    admins.map((admin) => notifyEvent(admin.id, templateKey, payload)),
+  );
+  return perAdmin.flat();
 }
 
 /** BigInt does not survive the Json column (R4). */

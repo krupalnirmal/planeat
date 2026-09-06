@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 import { ID_PREFIX, newId } from '@/lib/ids';
 import { parseDateKey } from '@/lib/meal-plan/pricing';
 import { TEMPLATE, notifyEvent } from '@/lib/notifications/notify';
+import { notifyEventNow } from '@/lib/notifications/notify-now';
 import { type AddressSnapshot, parseAddress } from '@/lib/orders/queries';
 import { canTransition, nextStatuses as legalNextStatuses } from '@/lib/orders/status';
 import type { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from '@/generated/prisma/enums';
@@ -444,9 +445,16 @@ export async function assignRider(
   const [order, partner] = await Promise.all([
     db.order.findUnique({
       where: { id: orderId },
-      select: { id: true, orderNumber: true, assignment: { select: { id: true } } },
+      select: {
+        id: true,
+        orderNumber: true,
+        addressSnapshot: true,
+        assignment: { select: { id: true } },
+      },
     }),
-    db.deliveryPartner.findUnique({ where: { id: partnerId }, select: { id: true } }),
+    // `userId`, not just `id`: notifications are addressed to the User row
+    // behind the partner, which is also where the push tokens hang.
+    db.deliveryPartner.findUnique({ where: { id: partnerId }, select: { id: true, userId: true } }),
   ]);
 
   if (!order) return { ok: false, reason: 'ORDER_NOT_FOUND' };
@@ -478,5 +486,23 @@ export async function assignRider(
     ip,
   });
 
+  // M8/M10 — the rider is told, rather than having to keep reopening the app
+  // to notice. Immediate rather than queued: the nightly cron would deliver
+  // this at ~03:30 IST. After the write, and `notifyEventNow` never throws,
+  // so a dead push provider cannot undo an assignment that already landed.
+  await notifyEventNow(partner.userId, TEMPLATE.orderAssignedRider, {
+    orderId,
+    orderNumber: order.orderNumber,
+    area: areaOf(order.addressSnapshot),
+  });
+
   return { ok: true, assignmentId };
+}
+
+/** "Nashik 422001" from the order's address snapshot — enough for a rider to
+    know roughly where before opening the notification. */
+function areaOf(addressSnapshot: unknown): string {
+  if (!addressSnapshot || typeof addressSnapshot !== 'object') return '';
+  const address = addressSnapshot as Record<string, unknown>;
+  return [address.city, address.pincode].filter((part) => typeof part === 'string').join(' ');
 }

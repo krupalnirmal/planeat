@@ -2,7 +2,8 @@ import { z } from 'zod';
 import { ApiError, parseJson, parseQuery, route } from '@/lib/api/handler';
 import { ERROR_CODES, fail, ok } from '@/lib/api/response';
 import { requireUser } from '@/lib/auth/session';
-import { TEMPLATE, notifyAdmins } from '@/lib/notifications/notify';
+import { TEMPLATE } from '@/lib/notifications/notify';
+import { notifyAdminsNow } from '@/lib/notifications/notify-now';
 import { placeOrder } from '@/lib/orders/create';
 import { listOrders } from '@/lib/orders/queries';
 import { localeSchema, paginate, paginationSchema } from '@/lib/validators/common';
@@ -57,9 +58,10 @@ export const POST = route(async (request: Request) => {
   if (result.ok) {
     // M8/M9 — every admin gets a heads-up on a genuinely new order. Gated on
     // !duplicate so a client retry (R5) never fires a second notification for
-    // the same order.
+    // the same order. Sent immediately rather than queued: the sender cron
+    // runs once a day, so a queued push would land at ~03:30 IST.
     if (!result.duplicate) {
-      await notifyAdmins(TEMPLATE.orderPlacedAdmin, {
+      await notifyAdminsNow(TEMPLATE.orderPlacedAdmin, {
         orderId: result.orderId,
         orderNumber: result.orderNumber,
         totalPaise: result.totalPaise.toString(),

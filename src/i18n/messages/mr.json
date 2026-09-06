@@ -917,6 +917,9 @@
     "appTitle": "Get Fresh डिलिव्हरी",
     "available": "उपलब्ध",
     "logout": "बाहेर पडा",
+    "enableAlerts": "नवीन ऑर्डरची सूचना सुरू करा",
+    "alertsEnabled": "नवीन ऑर्डरच्या सूचना सुरू आहेत",
+    "alertsBlocked": "ब्राउझर सेटिंग्जमध्ये सूचना बंद केल्या आहेत",
     "summaryDelivered": "पोहोचवल्या",
     "summaryPending": "बाकी",
     "summaryFailed": "अयशस्वी",
@@ -1004,6 +1007,10 @@
     "orderPlacedAdmin": {
       "title": "नवीन ऑर्डर",
       "body": "ऑर्डर {orderNumber} — {amount}"
+    },
+    "orderAssignedRider": {
+      "title": "नवीन डिलिव्हरी मिळाली",
+      "body": "ऑर्डर {orderNumber} — {area}"
     }
   },
   "safety": {

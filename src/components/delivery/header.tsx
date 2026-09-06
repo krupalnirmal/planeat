@@ -1,8 +1,9 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { LogOut } from 'lucide-react';
+import { Bell, BellOff, BellRing, LogOut } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { usePushAlerts } from '@/hooks/use-push-alerts';
 import { useInvalidateSession } from '@/hooks/use-session';
 import { useRouter } from '@/i18n/navigation';
 import { api } from '@/lib/api/client';
@@ -54,6 +55,7 @@ export function DeliveryHeader() {
             className="size-4 accent-white"
           />
         </label>
+        <PushAlertsButton />
         <button
           type="button"
           onClick={() => logout.mutate()}
@@ -64,5 +66,47 @@ export function DeliveryHeader() {
         </button>
       </div>
     </header>
+  );
+}
+
+/**
+ * M10 — a rider shouldn't have to keep reopening the app to notice a new
+ * assignment. One tap asks the browser for permission and registers this
+ * device; after that, `assignRider` (src/lib/admin/orders.ts) buzzes it.
+ * Renders nothing where the browser has no push support at all.
+ */
+function PushAlertsButton() {
+  const t = useTranslations('delivery');
+  const { status, enable } = usePushAlerts();
+
+  if (status === 'unsupported') return null;
+
+  if (status === 'enabled') {
+    return (
+      <span aria-label={t('alertsEnabled')} title={t('alertsEnabled')} className="grid size-11 place-items-center">
+        <BellRing className="size-4" aria-hidden />
+      </span>
+    );
+  }
+
+  if (status === 'denied') {
+    return (
+      <span aria-label={t('alertsBlocked')} title={t('alertsBlocked')} className="grid size-11 place-items-center opacity-50">
+        <BellOff className="size-4" aria-hidden />
+      </span>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={enable}
+      disabled={status === 'enabling'}
+      aria-label={t('enableAlerts')}
+      title={t('enableAlerts')}
+      className="grid size-11 place-items-center rounded-full disabled:opacity-50"
+    >
+      <Bell className="size-4" aria-hidden />
+    </button>
   );
 }

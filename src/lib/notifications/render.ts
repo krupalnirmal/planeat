@@ -35,6 +35,7 @@ const MESSAGE_ID: Record<TemplateKey, string> = {
   [TEMPLATE.subscriptionCancelled]: 'subscriptionCancelled',
   [TEMPLATE.mealPlanReady]: 'mealPlanReady',
   [TEMPLATE.orderPlacedAdmin]: 'orderPlacedAdmin',
+  [TEMPLATE.orderAssignedRider]: 'orderAssignedRider',
 };
 
 export interface RenderedNotification {
@@ -116,6 +117,11 @@ function variablesFor(
         orderNumber: String(payload.orderNumber ?? ''),
         amount: money(payload.totalPaise),
       };
+    case TEMPLATE.orderAssignedRider:
+      return {
+        orderNumber: String(payload.orderNumber ?? ''),
+        area: String(payload.area ?? ''),
+      };
     default:
       return {};
   }
@@ -149,4 +155,40 @@ export function renderNotification(
     title: t(`${messageId}.title`),
     body: t(`${messageId}.body`, variables),
   };
+}
+
+/**
+ * Where tapping the notification should land.
+ *
+ * `PushMessage.url` and `public/sw.js`'s `notificationclick` handler have
+ * both always supported a deep link; nothing ever supplied one, so every
+ * push opened the storefront home instead of the thing it was about. Routes
+ * are locale-prefixed, so the recipient's own language decides the path.
+ */
+export function urlFor(
+  templateKey: TemplateKey,
+  locale: Locale,
+  payload: Record<string, unknown>,
+): string | undefined {
+  const orderId = typeof payload.orderId === 'string' ? payload.orderId : null;
+
+  switch (templateKey) {
+    case TEMPLATE.orderAssignedRider:
+      return orderId ? `/${locale}/delivery/orders/${orderId}` : `/${locale}/delivery`;
+    case TEMPLATE.orderPlacedAdmin:
+      return orderId ? `/${locale}/admin/orders/${orderId}` : `/${locale}/admin/orders`;
+    case TEMPLATE.orderStatusChanged:
+    case TEMPLATE.orderSubstituted:
+    case TEMPLATE.orderItemDropped:
+    case TEMPLATE.orderPaymentPending:
+    case TEMPLATE.orderSkippedUnpaid:
+      return orderId ? `/${locale}/orders/${orderId}` : `/${locale}/orders`;
+    case TEMPLATE.mealPlanReady:
+    case TEMPLATE.tomorrowPreview:
+      return `/${locale}/meal-plan`;
+    case TEMPLATE.lowWalletBalance:
+      return `/${locale}/wallet`;
+    default:
+      return undefined;
+  }
 }

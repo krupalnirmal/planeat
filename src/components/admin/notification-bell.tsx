@@ -3,13 +3,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bell, BellRing, Loader2 } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
-import { useState, useSyncExternalStore } from 'react';
+import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { api, qs } from '@/lib/api/client';
-import { enablePush, isPushSupported, type EnablePushResult } from '@/lib/push/subscribe';
+import { usePushAlerts } from '@/hooks/use-push-alerts';
 import { cn } from '@/lib/utils';
-
-const ENABLED_FLAG = 'getfresh.admin.push_enabled';
 
 /**
  * M9 — the admin bell: every store admin's own recent IN_APP notifications
@@ -148,65 +146,16 @@ export function NotificationBell({ align = 'right' }: { align?: 'left' | 'right'
   );
 }
 
-type Status =
-  | 'promptable'
-  | 'enabling'
-  | 'enabled'
-  | Extract<EnablePushResult, { ok: false }>['reason'];
-
-function readBrowserStatus(): Status {
-  if (!isPushSupported()) return 'unsupported';
-  if (Notification.permission === 'denied') return 'denied';
-  if (Notification.permission === 'granted') {
-    try {
-      return localStorage.getItem(ENABLED_FLAG) === '1' ? 'enabled' : 'promptable';
-    } catch {
-      return 'promptable';
-    }
-  }
-  return 'promptable';
-}
-
-// Nothing external ever changes this on its own (a browser gives no event
-// for "the user just flipped the notification permission"), but reading it
-// through useSyncExternalStore — same pattern as useWishlisted in
-// product-card.tsx — is what lets the CLIENT's real value replace the
-// SSR-safe placeholder after hydration without a setState-in-effect.
-function subscribeNever() {
-  return () => {};
-}
-function getServerStatus(): Status {
-  return 'promptable';
-}
-
 /**
- * The strip that turns IN_APP-only into a real phone/browser buzz — see
- * `src/lib/push/subscribe.ts` for why this is the first place in the whole
- * app anything actually calls `Notification.requestPermission()`. Silent
+ * The strip that turns IN_APP-only into a real phone/browser buzz. Silent
  * (renders nothing) on a browser that doesn't support push at all, so it
- * never clutters the dropdown with an affordance nobody there can use.
+ * never clutters the dropdown with an affordance nobody there can use. The
+ * permission state machine itself is shared with the rider header — see
+ * `usePushAlerts`.
  */
 function PushAlertsRow() {
   const t = useTranslations('admin.notifications');
-  const browserStatus = useSyncExternalStore(subscribeNever, readBrowserStatus, getServerStatus);
-  const [override, setOverride] = useState<Status | null>(null);
-  const status = override ?? browserStatus;
-
-  async function handleEnable() {
-    setOverride('enabling');
-    const result = await enablePush();
-    if (result.ok) {
-      try {
-        localStorage.setItem(ENABLED_FLAG, '1');
-      } catch {
-        // Private mode — the token is still registered server-side; only
-        // the "already enabled" shortcut for next time is lost.
-      }
-      setOverride('enabled');
-    } else {
-      setOverride(result.reason);
-    }
-  }
+  const { status, enable } = usePushAlerts();
 
   if (status === 'unsupported') return null;
 
@@ -224,7 +173,7 @@ function PushAlertsRow() {
       ) : (
         <button
           type="button"
-          onClick={handleEnable}
+          onClick={enable}
           disabled={status === 'enabling'}
           className="flex items-center gap-1.5 font-semibold text-primary disabled:opacity-60"
         >
