@@ -191,8 +191,28 @@ export async function saveCustomerPlan(
           await tx.mealPlanDay.deleteMany({ where: { id: { in: dayIds } } });
         }
       } else {
+        // `@@unique([userId, version])` is scoped to the user, not to
+        // generatedBy — leaving `version` at its schema default (1) collided
+        // with anyone who has an old AI-generated plan sitting at version 1
+        // from before this feature was rebuilt as a manual picker (session
+        // 2026-08-30). That's every customer who ever touched the old
+        // AI flow: their very first save here threw an unhandled unique-
+        // constraint error ("Something went wrong", session 2026-09-06).
+        // Next version above whatever this user already has, AI or not.
+        const highest = await tx.mealPlan.findFirst({
+          where: { userId },
+          orderBy: { version: 'desc' },
+          select: { version: true },
+        });
         await tx.mealPlan.create({
-          data: { id: mealPlanId, userId, status: 'ACTIVE', generatedBy: 'CUSTOMER', profileSnapshot: undefined },
+          data: {
+            id: mealPlanId,
+            userId,
+            version: (highest?.version ?? 0) + 1,
+            status: 'ACTIVE',
+            generatedBy: 'CUSTOMER',
+            profileSnapshot: undefined,
+          },
         });
       }
 
