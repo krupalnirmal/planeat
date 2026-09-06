@@ -7,6 +7,7 @@ import { useState, useSyncExternalStore } from 'react';
 import { Link } from '@/i18n/navigation';
 import { api, qs } from '@/lib/api/client';
 import { enablePush, isPushSupported, type EnablePushResult } from '@/lib/push/subscribe';
+import { cn } from '@/lib/utils';
 
 const ENABLED_FLAG = 'getfresh.admin.push_enabled';
 
@@ -30,7 +31,7 @@ interface NotificationRow {
   createdAt: string;
 }
 
-export function NotificationBell() {
+export function NotificationBell({ align = 'right' }: { align?: 'left' | 'right' }) {
   const t = useTranslations('admin.notifications');
   const tc = useTranslations('admin.common');
   const locale = useLocale();
@@ -86,7 +87,19 @@ export function NotificationBell() {
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-30 cursor-default"
           />
-          <div className="absolute top-full right-0 z-40 mt-1 max-h-96 w-80 overflow-y-auto rounded-[var(--radius)] border border-border bg-card shadow-lg">
+          {/* `align` picks which edge the panel opens from — the bell sits in
+              two very different contexts (a narrow left sidebar on desktop,
+              a right-pinned icon in the mobile top bar), and a fixed edge
+              here has one of them extend a 320px panel past the browser's
+              own viewport edge. Desktop passes "left" (opens rightward, into
+              the spacious main content area); mobile keeps the default
+              "right" (opens leftward, back onto the screen). */}
+          <div
+            className={cn(
+              'absolute top-full z-40 mt-1 max-h-96 w-80 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-[var(--radius)] border border-border bg-card shadow-lg',
+              align === 'left' ? 'left-0' : 'right-0',
+            )}
+          >
             <p className="border-b border-border px-3 py-2 text-xs font-bold text-muted-foreground">
               {t('title')}
             </p>

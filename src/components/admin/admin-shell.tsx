@@ -60,7 +60,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <p className="text-sm font-bold">Get Fresh</p>
             <p className="text-xs text-muted-foreground">{tAdmin('title')}</p>
           </div>
-          <NotificationBell />
+          <NotificationBell align="left" />
         </div>
 
         <nav className="p-2">
