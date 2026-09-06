@@ -28,6 +28,11 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+/** Where the layout's pre-hydration script parks the captured event. */
+type WindowWithInstallPrompt = Window & {
+  __installPromptEvent?: BeforeInstallPromptEvent;
+};
+
 function isStandalone(): boolean {
   if (typeof window === 'undefined') return true; // Assume installed on the server: render nothing until the client says otherwise.
   return (
@@ -64,31 +69,42 @@ function getServerState() {
   return 'hidden' as const;
 }
 
+// The captured `beforeinstallprompt`, read the same way — it lives on
+// `window`, put there by the layout's pre-hydration script, and the script
+// announces each capture with `installpromptready`.
+function subscribeInstallPrompt(onChange: () => void) {
+  window.addEventListener('installpromptready', onChange);
+  return () => window.removeEventListener('installpromptready', onChange);
+}
+function getInstallPrompt(): BeforeInstallPromptEvent | null {
+  return (window as WindowWithInstallPrompt).__installPromptEvent ?? null;
+}
+function getServerInstallPrompt(): null {
+  return null;
+}
+
 export function InstallPrompt() {
   const t = useTranslations('delivery');
   const state = useSyncExternalStore(subscribeNever, getClientState, getServerState);
-  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
+  const captured = useSyncExternalStore(
+    subscribeInstallPrompt,
+    getInstallPrompt,
+    getServerInstallPrompt,
+  );
+  const [used, setUsed] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const deferred = used ? null : captured;
 
-  // A real subscription to a browser event, which is exactly what an effect
-  // is for — the setState happens in the listener, not in the effect body.
+  // Hide the strip the moment the install actually completes. setState in
+  // an event listener is fine; it's setState in the effect BODY that
+  // cascades renders, which is why the deferred event above comes through
+  // useSyncExternalStore instead.
   useEffect(() => {
-    function onBeforeInstallPrompt(event: Event) {
-      // Keep the event so the install can happen on the rider's tap instead
-      // of whenever Chrome happened to decide to ask.
-      event.preventDefault();
-      setDeferred(event as BeforeInstallPromptEvent);
-    }
     function onInstalled() {
       setDismissed(true);
     }
-
-    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
     window.addEventListener('appinstalled', onInstalled);
-    return () => {
-      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', onInstalled);
-    };
+    return () => window.removeEventListener('appinstalled', onInstalled);
   }, []);
 
   function dismiss() {
@@ -120,7 +136,9 @@ export function InstallPrompt() {
             onClick={async () => {
               await deferred.prompt();
               const choice = await deferred.userChoice;
-              setDeferred(null);
+              // A prompt can only be replayed once; drop back to the menu
+              // instructions if the rider declined it.
+              setUsed(true);
               if (choice.outcome === 'accepted') setDismissed(true);
             }}
             className="mt-1 flex h-8 items-center gap-1.5 rounded-full bg-primary px-3 text-[11px] font-bold text-primary-foreground"

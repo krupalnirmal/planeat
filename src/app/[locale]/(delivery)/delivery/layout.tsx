@@ -60,6 +60,17 @@ export default async function DeliveryLayout({
 
   return (
     <div className="mx-auto min-h-dvh w-full max-w-[480px] bg-background">
+      {/* Chrome fires `beforeinstallprompt` during page load, routinely
+          before React has hydrated — a listener attached inside a component
+          misses it, which is why riders only ever saw the manual
+          instructions. This runs before hydration and parks the event on
+          `window` for InstallPrompt to pick up (immediately, or via the
+          custom event if it lands after mount). */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__installPromptEvent=e;window.dispatchEvent(new Event('installpromptready'));});`,
+        }}
+      />
       <DeliveryHeader />
       <InstallPrompt />
       <main className="p-4">{children}</main>
