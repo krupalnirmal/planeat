@@ -23,6 +23,7 @@ interface PlanResponse {
   plan: { id: string; days: InitialPlanDay[] } | null;
   columns: PlanColumn[];
   dailyEssentials: PlanProduct[];
+  sprouts: PlanProduct[];
 }
 
 export function MealPlanScreen() {
@@ -107,6 +108,7 @@ export function MealPlanScreen() {
             columns={data?.columns ?? []}
             initialDays={data?.plan?.days}
             dailyEssentials={data?.dailyEssentials ?? []}
+            sprouts={data?.sprouts ?? []}
             onSave={(days) => save.mutate(days)}
             saving={save.isPending}
             saved={saved}

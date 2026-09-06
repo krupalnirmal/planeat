@@ -83,33 +83,36 @@ export function PlanTable({
   columns,
   initialDays,
   dailyEssentials,
+  sprouts,
   onSave,
   saving,
   saved,
 }: {
   columns: PlanColumn[];
   initialDays: InitialPlanDay[] | undefined;
-  /** "Daily Use Vegetables" — a curated subset of the Vegetables category,
-      pulled into its own column so the same product is never pickable in
-      two places at once. Picked per day exactly like every other column
-      (client feedback, session 2026-09-06 — an earlier version made this
-      one pick apply to all 7 days at once, which wasn't what was wanted).
-      Empty until a real product exists for it (e.g. a future "Sprouts"
-      column with nothing in the catalogue yet), in which case it just
+  /** "Daily Use Vegetables" and "Sprouts" — curated subsets of the
+      Vegetables category, each pulled into its own column so the same
+      product is never pickable in two places at once. Picked per day
+      exactly like every other column (client feedback, session
+      2026-09-06 — an earlier version made "Daily Use Vegetables" apply
+      one pick to all 7 days at once, which wasn't what was wanted). Empty
+      until real products exist for a list, in which case that column just
       doesn't render. */
   dailyEssentials: PlanProduct[];
+  sprouts: PlanProduct[];
   onSave: (days: SavePlanDay[]) => void;
   saving: boolean;
   saved: boolean;
 }) {
   const t = useTranslations('mealPlan');
-  // The essentials column is just another column for edit-state purposes —
-  // folding it into the same list here means every render below (header,
-  // body cells, summary) needs exactly one code path, not two near-duplicates.
-  const allColumns: PlanColumn[] =
-    dailyEssentials.length > 0
-      ? [...columns, { slug: '__daily_essentials__', name: t('builder.dailyEssentialsTitle'), products: dailyEssentials }]
-      : columns;
+  // The curated columns are just more columns for edit-state purposes —
+  // folding them into the same list here means every render below (header,
+  // body cells, summary) needs exactly one code path, not three near-duplicates.
+  const curated: Array<{ slug: string; name: string; products: PlanProduct[] }> = [
+    { slug: '__daily_essentials__', name: t('builder.dailyEssentialsTitle'), products: dailyEssentials },
+    { slug: '__sprouts__', name: t('builder.sproutsTitle'), products: sprouts },
+  ];
+  const allColumns: PlanColumn[] = [...columns, ...curated.filter((c) => c.products.length > 0)];
   const [selections, setSelections] = useState<Selections>(() => buildInitialSelections(initialDays));
   const [picker, setPicker] = useState<{ dayOfWeek: number; product: PlanProduct } | null>(null);
 

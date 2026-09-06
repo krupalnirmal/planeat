@@ -21,12 +21,12 @@ export const GET = route(async (request: Request) => {
   const session = await requireUser();
   const { locale } = parseQuery(request, querySchema);
 
-  const [plan, { columns, dailyEssentials }] = await Promise.all([
+  const [plan, { columns, dailyEssentials, sprouts }] = await Promise.all([
     getCustomerPlan(session.userId, locale),
     getPlanColumns(locale),
   ]);
 
-  return ok({ plan, columns, dailyEssentials });
+  return ok({ plan, columns, dailyEssentials, sprouts });
 });
 
 const saveSchema = z.object({

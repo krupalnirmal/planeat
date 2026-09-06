@@ -422,7 +422,8 @@
       "summaryTitle": "Your weekly plan",
       "summaryEmpty": "Pick items above to see them here.",
       "dailyEssentialsTitle": "Daily Use Vegetables",
-      "dailyEssentialsHint": "Picked once, used every day of the week"
+      "dailyEssentialsHint": "Picked once, used every day of the week",
+      "sproutsTitle": "Sprouts"
     }
   },
   "subscription": {

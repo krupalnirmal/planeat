@@ -422,7 +422,8 @@
       "summaryTitle": "तुमचा साप्ताहिक प्लॅन",
       "summaryEmpty": "वरून वस्तू निवडा, इथे दिसतील.",
       "dailyEssentialsTitle": "रोजच्या वापरातील भाज्या",
-      "dailyEssentialsHint": "एकदा निवडा, आठवड्याभर तेच वापरले जाईल"
+      "dailyEssentialsHint": "एकदा निवडा, आठवड्याभर तेच वापरले जाईल",
+      "sproutsTitle": "स्प्राऊट्स"
     }
   },
   "subscription": {

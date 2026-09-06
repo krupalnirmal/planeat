@@ -2,7 +2,7 @@ import { db } from '@/lib/db';
 import { pickName } from '@/lib/catalog/text';
 import { ID_PREFIX, newId } from '@/lib/ids';
 import type { Locale } from '@/generated/prisma/enums';
-import { DAILY_ESSENTIAL_VEGETABLE_SKUS, PLAN_CATEGORY_SLUGS, type PlanCategorySlug } from './plan-categories';
+import { DAILY_ESSENTIAL_VEGETABLE_SKUS, PLAN_CATEGORY_SLUGS, SPROUT_SKUS, type PlanCategorySlug } from './plan-categories';
 
 /**
  * Reads and writes for the manual weekly plan picker (session 2026-08-30).
@@ -229,10 +229,13 @@ export interface PlanColumnsView {
       (not duplicated), so the same product is never pickable in two places
       at once. Empty if none of the curated SKUs currently exist/are active. */
   dailyEssentials: PlanColumnProduct[];
+  /** "Sprouts" — same treatment as `dailyEssentials`. Empty until real
+      products exist for the curated SKU list (SPROUT_SKUS). */
+  sprouts: PlanColumnProduct[];
 }
 
 /** The 4 category columns and their pickable products, in display order,
-    plus the always-visible "Daily Use Vegetables" set. */
+    plus the always-visible "Daily Use Vegetables" and "Sprouts" sets. */
 export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
   const categories = await db.category.findMany({
     where: { slug: { in: [...PLAN_CATEGORY_SLUGS] }, isActive: true },
@@ -261,8 +264,14 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
   });
 
   const bySlug = new Map(categories.map((c) => [c.slug, c]));
-  const essentialSkus: readonly string[] = DAILY_ESSENTIAL_VEGETABLE_SKUS;
-  const essentialsBySku = new Map<string, PlanColumnProduct>();
+
+  // Two curated subsets of Vegetables get pulled into their own columns
+  // (session 2026-09-06) rather than duplicated, so the same product is
+  // never pickable in two places at once.
+  const curatedLists: Array<{ skus: readonly string[]; bySku: Map<string, PlanColumnProduct> }> = [
+    { skus: DAILY_ESSENTIAL_VEGETABLE_SKUS, bySku: new Map() },
+    { skus: SPROUT_SKUS, bySku: new Map() },
+  ];
 
   const columns = PLAN_CATEGORY_SLUGS.map((slug) => {
     const category = bySlug.get(slug);
@@ -270,8 +279,10 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
 
     const products = category.products
       .filter((product) => {
-        if (slug !== 'vegetables' || !essentialSkus.includes(product.sku)) return true;
-        essentialsBySku.set(product.sku, { id: product.id, name: pickName(product, locale), variants: product.variants });
+        if (slug !== 'vegetables') return true;
+        const curated = curatedLists.find((list) => list.skus.includes(product.sku));
+        if (!curated) return true;
+        curated.bySku.set(product.sku, { id: product.id, name: pickName(product, locale), variants: product.variants });
         return false;
       })
       .map((product) => ({
@@ -283,11 +294,11 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
     return { slug, name: pickName(category, locale), products };
   });
 
-  // Display order follows the curated list (session 2026-09-06's own
-  // ordering), not whatever order the query happened to return them in.
-  const dailyEssentials = essentialSkus
-    .map((sku) => essentialsBySku.get(sku))
-    .filter((product): product is PlanColumnProduct => product !== undefined);
+  // Display order follows each curated list's own ordering, not whatever
+  // order the query happened to return them in.
+  const [dailyEssentials, sprouts] = curatedLists.map(({ skus, bySku }) =>
+    skus.map((sku) => bySku.get(sku)).filter((product): product is PlanColumnProduct => product !== undefined),
+  );
 
-  return { columns, dailyEssentials };
+  return { columns, dailyEssentials, sprouts };
 }
