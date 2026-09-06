@@ -176,41 +176,6 @@ export function PlanTable({
 
   return (
     <div>
-      {/* "Daily Use Vegetables" (session 2026-09-06) — picked once, applied
-          to every day, so it sits outside the day × category grid entirely
-          rather than as an eighth column or an extra row repeated 7 times.
-          Renders nothing if the section has no products yet (e.g. a
-          "Sprouts" section with no matching real product in the catalogue
-          yet) rather than showing an empty, confusing card. */}
-      {dailyEssentials.length > 0 && (
-        <section className="mb-4 rounded-[var(--radius)] border border-border/60 bg-background p-4">
-          <h2 className="text-sm font-bold">{t('builder.dailyEssentialsTitle')}</h2>
-          <p className="mt-0.5 text-xs text-muted-foreground">{t('builder.dailyEssentialsHint')}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {dailyEssentials.map((product) => {
-              const variantId = essentialSelections[product.id];
-              const activeVariant = variantLabelOf(product, variantId);
-              return (
-                <button
-                  key={product.id}
-                  type="button"
-                  onClick={() => setPicker({ kind: 'essential', product })}
-                  className={cn(
-                    'h-9 rounded-full border px-3.5 text-xs font-semibold whitespace-nowrap',
-                    activeVariant
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-card text-foreground',
-                  )}
-                >
-                  {product.name}
-                  {activeVariant ? ` (${activeVariant.label})` : ''}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
       {/* `max-h` + `overflow-auto` (both axes) rather than plain `overflow-x-auto`:
           per the CSS overflow spec, giving only one axis a non-`visible` value
           silently forces the other axis to `auto` too, so this div was already
@@ -238,6 +203,18 @@ export function PlanTable({
                   {col.name}
                 </th>
               ))}
+              {/* "Daily Use Vegetables" (session 2026-09-06) — a column like
+                  any other, except its cell renders the exact same chips
+                  (reading/writing the day-agnostic essentialSelections, not
+                  the day-keyed selections) on every row, so picking one
+                  updates all 7 at once. Omitted entirely if there's nothing
+                  to pick yet (e.g. a future "Sprouts" column with no real
+                  product behind it) rather than showing an empty column. */}
+              {dailyEssentials.length > 0 && (
+                <th className="sticky top-0 z-20 border border-border bg-secondary p-2 text-center text-xs font-bold">
+                  {t('builder.dailyEssentialsTitle')}
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -281,6 +258,32 @@ export function PlanTable({
                     </div>
                   </td>
                 ))}
+                {dailyEssentials.length > 0 && (
+                  <td className="border border-border bg-background p-1.5 align-top">
+                    <div className="flex flex-wrap gap-1.5">
+                      {dailyEssentials.map((product) => {
+                        const variantId = essentialSelections[product.id];
+                        const activeVariant = variantLabelOf(product, variantId);
+                        return (
+                          <button
+                            key={product.id}
+                            type="button"
+                            onClick={() => setPicker({ kind: 'essential', product })}
+                            className={cn(
+                              'min-h-0 h-7 rounded-full border px-2.5 py-1 text-[11px] whitespace-nowrap',
+                              activeVariant
+                                ? 'border-primary bg-primary text-primary-foreground font-semibold'
+                                : 'border-border bg-card text-foreground',
+                            )}
+                          >
+                            {product.name}
+                            {activeVariant ? ` (${activeVariant.label})` : ''}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
