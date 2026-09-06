@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { ID_PREFIX, newId } from '@/lib/ids';
+import { STORE_ROLES } from '@/lib/auth/session';
 import type { NotificationChannel } from '@/generated/prisma/enums';
 
 /**
@@ -26,6 +27,7 @@ export const TEMPLATE = {
   subscriptionExpiring: 'subscription.expiring',
   subscriptionCancelled: 'subscription.cancelled',
   mealPlanReady: 'meal_plan.ready',
+  orderPlacedAdmin: 'order.placed_admin',
 } as const;
 
 export type TemplateKey = (typeof TEMPLATE)[keyof typeof TEMPLATE];
@@ -49,6 +51,7 @@ export const CHANNELS_BY_TEMPLATE: Record<TemplateKey, readonly NotificationChan
   [TEMPLATE.tomorrowPreview]: ['IN_APP', 'WHATSAPP', 'PUSH'],
   [TEMPLATE.subscriptionExpiring]: ['IN_APP', 'WHATSAPP'],
   [TEMPLATE.subscriptionCancelled]: ['IN_APP'],
+  [TEMPLATE.orderPlacedAdmin]: ['IN_APP', 'PUSH'],
 };
 
 export interface NotifyInput {
@@ -100,6 +103,24 @@ export async function notifyEvent(
 ): Promise<void> {
   const channels = CHANNELS_BY_TEMPLATE[templateKey];
   await Promise.all(channels.map((channel) => notify({ userId, templateKey, payload, channel })));
+}
+
+/**
+ * Fans one event out to every STORE_ADMIN/SUPER_ADMIN, for events with no
+ * single "owning" customer — a new order is the shop's business, not any one
+ * user's. Same per-channel fan-out as `notifyEvent`, just over many
+ * recipients instead of one.
+ */
+export async function notifyAdmins(
+  templateKey: TemplateKey,
+  payload: Record<string, unknown>,
+): Promise<void> {
+  const admins = await db.user.findMany({
+    where: { role: { in: STORE_ROLES } },
+    select: { id: true },
+  });
+
+  await Promise.all(admins.map((admin) => notifyEvent(admin.id, templateKey, payload)));
 }
 
 /** BigInt does not survive the Json column (R4). */

@@ -674,6 +674,14 @@
       "auditLog": "Audit log",
       "backToShop": "Back to shop"
     },
+    "notifications": {
+      "title": "Notifications",
+      "empty": "No notifications yet",
+      "enableAlerts": "Enable order alerts",
+      "alertsEnabled": "Order alerts on",
+      "alertsBlocked": "Notifications blocked in browser settings",
+      "alertsFailed": "Couldn't enable order alerts"
+    },
     "dashboard": {
       "title": "Today",
       "todayOrders": "Orders today",
@@ -990,6 +998,10 @@
     "mealPlanReadyFlagged": {
       "title": "Meal plan ready",
       "body": "Your meal plan is ready. Please consult a doctor"
+    },
+    "orderPlacedAdmin": {
+      "title": "New order",
+      "body": "Order {orderNumber} — {amount}"
     }
   },
   "safety": {

@@ -34,6 +34,7 @@ const MESSAGE_ID: Record<TemplateKey, string> = {
   [TEMPLATE.subscriptionExpiring]: 'subscriptionExpiring',
   [TEMPLATE.subscriptionCancelled]: 'subscriptionCancelled',
   [TEMPLATE.mealPlanReady]: 'mealPlanReady',
+  [TEMPLATE.orderPlacedAdmin]: 'orderPlacedAdmin',
 };
 
 export interface RenderedNotification {
@@ -110,6 +111,11 @@ function variablesFor(
       };
     case TEMPLATE.mealPlanReady:
       return {};
+    case TEMPLATE.orderPlacedAdmin:
+      return {
+        orderNumber: String(payload.orderNumber ?? ''),
+        amount: money(payload.totalPaise),
+      };
     default:
       return {};
   }

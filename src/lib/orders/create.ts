@@ -47,7 +47,7 @@ export type PlaceOrderFailure =
   | { reason: 'INSUFFICIENT_BALANCE'; requiredPaise: bigint; availablePaise: bigint };
 
 export type PlaceOrderResult =
-  | { ok: true; orderId: string; orderNumber: string; duplicate: boolean }
+  | { ok: true; orderId: string; orderNumber: string; totalPaise: bigint; duplicate: boolean }
   | ({ ok: false } & PlaceOrderFailure);
 
 /** Thrown inside the transaction to roll it back with a typed reason. */
@@ -63,7 +63,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
   // order. The unique constraint is the real guarantee; this is the fast path.
   const existing = await db.order.findUnique({
     where: { idempotencyKey: input.idempotencyKey },
-    select: { id: true, orderNumber: true, userId: true },
+    select: { id: true, orderNumber: true, userId: true, totalPaise: true },
   });
 
   if (existing) {
@@ -74,6 +74,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
         ok: true,
         orderId: existing.id,
         orderNumber: existing.orderNumber,
+        totalPaise: existing.totalPaise,
         duplicate: true,
       };
     }
@@ -274,7 +275,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
             })),
           },
         },
-        select: { id: true, orderNumber: true },
+        select: { id: true, orderNumber: true, totalPaise: true },
       });
 
       await tx.orderStatusHistory.create({
@@ -325,7 +326,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
         await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
       }
 
-      return { orderId: order.id, orderNumber: order.orderNumber };
+      return { orderId: order.id, orderNumber: order.orderNumber, totalPaise: order.totalPaise };
     });
 
     return { ok: true, ...result, duplicate: false };
@@ -339,13 +340,14 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
     if (isUniqueViolation(error)) {
       const winner = await db.order.findUnique({
         where: { idempotencyKey: input.idempotencyKey },
-        select: { id: true, orderNumber: true },
+        select: { id: true, orderNumber: true, totalPaise: true },
       });
       if (winner) {
         return {
           ok: true,
           orderId: winner.id,
           orderNumber: winner.orderNumber,
+          totalPaise: winner.totalPaise,
           duplicate: true,
         };
       }

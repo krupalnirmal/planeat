@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { ApiError, parseJson, parseQuery, route } from '@/lib/api/handler';
 import { ERROR_CODES, fail, ok } from '@/lib/api/response';
 import { requireUser } from '@/lib/auth/session';
+import { TEMPLATE, notifyAdmins } from '@/lib/notifications/notify';
 import { placeOrder } from '@/lib/orders/create';
 import { listOrders } from '@/lib/orders/queries';
 import { localeSchema, paginate, paginationSchema } from '@/lib/validators/common';
@@ -54,6 +55,17 @@ export const POST = route(async (request: Request) => {
   });
 
   if (result.ok) {
+    // M8/M9 — every admin gets a heads-up on a genuinely new order. Gated on
+    // !duplicate so a client retry (R5) never fires a second notification for
+    // the same order.
+    if (!result.duplicate) {
+      await notifyAdmins(TEMPLATE.orderPlacedAdmin, {
+        orderId: result.orderId,
+        orderNumber: result.orderNumber,
+        totalPaise: result.totalPaise.toString(),
+      });
+    }
+
     return ok(
       { orderId: result.orderId, orderNumber: result.orderNumber, duplicate: result.duplicate },
       { status: result.duplicate ? 200 : 201 },

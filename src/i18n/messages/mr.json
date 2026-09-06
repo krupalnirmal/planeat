@@ -674,6 +674,14 @@
       "auditLog": "नोंदवही",
       "backToShop": "दुकानाकडे परत"
     },
+    "notifications": {
+      "title": "सूचना",
+      "empty": "अजून काही सूचना नाहीत",
+      "enableAlerts": "ऑर्डर अलर्ट सुरू करा",
+      "alertsEnabled": "ऑर्डर अलर्ट सुरू आहेत",
+      "alertsBlocked": "ब्राउझर सेटिंग्जमध्ये सूचना बंद केल्या आहेत",
+      "alertsFailed": "ऑर्डर अलर्ट सुरू करता आले नाहीत"
+    },
     "dashboard": {
       "title": "आजची स्थिती",
       "todayOrders": "आजच्या ऑर्डर",
@@ -990,6 +998,10 @@
     "mealPlanReadyFlagged": {
       "title": "आहार प्लॅन तयार",
       "body": "तुमचा आहार प्लॅन तयार आहे. कृपया डॉक्टरांचा सल्ला घ्या"
+    },
+    "orderPlacedAdmin": {
+      "title": "नवीन ऑर्डर",
+      "body": "ऑर्डर {orderNumber} — {amount}"
     }
   },
   "safety": {

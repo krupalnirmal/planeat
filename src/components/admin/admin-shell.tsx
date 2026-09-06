@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
+import { NotificationBell } from '@/components/admin/notification-bell';
 import { cn } from '@/lib/utils';
 
 /**
@@ -54,9 +55,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           paper and carried to the market, and a nav column would waste a
           third of the page. */}
       <aside className="hidden w-56 shrink-0 border-r border-border bg-card lg:block print:hidden">
-        <div className="border-b border-border px-5 py-4">
-          <p className="text-sm font-bold">Get Fresh</p>
-          <p className="text-xs text-muted-foreground">{tAdmin('title')}</p>
+        <div className="flex items-start justify-between border-b border-border px-5 py-4">
+          <div>
+            <p className="text-sm font-bold">Get Fresh</p>
+            <p className="text-xs text-muted-foreground">{tAdmin('title')}</p>
+          </div>
+          <NotificationBell />
         </div>
 
         <nav className="p-2">
@@ -103,8 +107,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <div className="min-w-0 flex-1">
         {/* A horizontal nav on narrow screens, so the panel is still usable on
             a phone when the owner is standing in the shop. */}
-        <nav className="border-b border-border bg-card px-3 py-2 lg:hidden print:hidden">
-          <ul className="flex gap-1 overflow-x-auto">
+        <nav className="flex items-center gap-2 border-b border-border bg-card px-3 py-2 lg:hidden print:hidden">
+          <ul className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
             {SECTIONS.map((section) => {
               const active =
                 'exact' in section && section.exact
@@ -130,6 +134,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               );
             })}
           </ul>
+          <NotificationBell />
         </nav>
 
         <main className="p-4 lg:p-6 print:p-0">{children}</main>

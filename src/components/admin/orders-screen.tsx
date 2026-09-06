@@ -101,6 +101,10 @@ export function AdminOrdersScreen() {
           perPage: 50,
         })}`,
       ),
+    // A new order should show up without a manual refresh — matches the
+    // Dashboard's own polling (dashboard-screen.tsx), tighter than its 60s
+    // since this list is where the admin actually acts on a new order.
+    refetchInterval: 30_000,
   });
 
   const suggestions = useQuery({
