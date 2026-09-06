@@ -46,6 +46,18 @@ export interface InitialPlanDay {
   items: PlanItem[];
 }
 
+/** The shape `PUT /api/meal-plan/current` actually validates against
+    (`variantIds: string[]`) — deliberately not `InitialPlanDay`, which is
+    what the GET response looks like. Session 2026-09-06: `handleSave` used
+    to send `InitialPlanDay`-shaped days (an `items` array of
+    `{productId, variantId}` objects), which the server's Zod schema
+    rejected outright — the save silently failed with no `onError` handler
+    to surface it, so nothing was ever actually persisted. */
+export interface SavePlanDay {
+  dayOfWeek: number;
+  variantIds: string[];
+}
+
 /** `{ [dayOfWeek]: { [productId]: variantId } }` — the whole table's edit state. */
 type Selections = Record<number, Record<string, string>>;
 
@@ -70,17 +82,13 @@ function variantLabelOf(product: PlanProduct, variantId: string | undefined): Pl
 export function PlanTable({
   columns,
   initialDays,
-  planKey,
   onSave,
   saving,
   saved,
 }: {
   columns: PlanColumn[];
   initialDays: InitialPlanDay[] | undefined;
-  /** Remount key from the parent — bumps once after the first save so a
-      freshly-created plan's id doesn't force a re-hydration of in-progress edits. */
-  planKey: string;
-  onSave: (days: InitialPlanDay[]) => void;
+  onSave: (days: SavePlanDay[]) => void;
   saving: boolean;
   saved: boolean;
 }) {
@@ -109,10 +117,7 @@ export function PlanTable({
     onSave(
       DAYS.map((dayOfWeek) => ({
         dayOfWeek,
-        items: Object.entries(selections[dayOfWeek] ?? {}).map(([productId, variantId]) => ({
-          productId,
-          variantId,
-        })),
+        variantIds: Object.values(selections[dayOfWeek] ?? {}),
       })),
     );
   }
@@ -120,7 +125,7 @@ export function PlanTable({
   const hasAnySelection = DAYS.some((d) => Object.keys(selections[d] ?? {}).length > 0);
 
   return (
-    <div key={planKey}>
+    <div>
       {/* `max-h` + `overflow-auto` (both axes) rather than plain `overflow-x-auto`:
           per the CSS overflow spec, giving only one axis a non-`visible` value
           silently forces the other axis to `auto` too, so this div was already
