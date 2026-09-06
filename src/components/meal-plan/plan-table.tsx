@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, X } from 'lucide-react';
+import { Check, ClipboardList, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -227,13 +227,20 @@ export function PlanTable({
       </div>
 
       {/* Live summary — pure derived render off the same `selections` state,
-          no second query. Only days with at least one pick show up. */}
-      <section className="mt-5 rounded-[var(--radius)] border border-border/60 bg-background p-4">
-        <h2 className="text-sm font-bold">{t('builder.summaryTitle')}</h2>
+          no second query. Only days with at least one pick show up.
+          Redesigned (session 2026-09-06, client feedback: the plain
+          bordered text list "didn't look proper") to match the rounded-
+          card/shadow language the rest of the app already uses — a day
+          badge per row instead of a bare "Monday:" label. */}
+      <section className="card-3d mt-5 rounded-[var(--radius-2xl)] bg-card p-4">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-primary-dark">
+          <ClipboardList className="size-4 text-primary" aria-hidden />
+          {t('builder.summaryTitle')}
+        </h2>
         {!hasAnySelection ? (
-          <p className="mt-2 text-xs text-muted-foreground">{t('builder.summaryEmpty')}</p>
+          <p className="mt-3 text-xs text-muted-foreground">{t('builder.summaryEmpty')}</p>
         ) : (
-          <ul className="mt-2 space-y-1.5">
+          <ul className="mt-3 divide-y divide-border/60">
             {DAYS.filter((d) => Object.keys(selections[d] ?? {}).length > 0).map((dayOfWeek) => {
               const names = allColumns
                 .flatMap((col) => col.products)
@@ -243,8 +250,11 @@ export function PlanTable({
                   return v ? `${p.name} (${v.label})` : p.name;
                 });
               return (
-                <li key={dayOfWeek} className="text-xs">
-                  <span className="font-bold">{t(`days.${dayOfWeek}`)}:</span> {names.join(', ')}
+                <li key={dayOfWeek} className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0">
+                  <span className="mt-0.5 shrink-0 rounded-full bg-tint-green px-2.5 py-1 text-[11px] font-bold text-primary-dark">
+                    {t(`daysShort.${dayOfWeek}`)}
+                  </span>
+                  <p className="text-xs leading-relaxed">{names.join(', ')}</p>
                 </li>
               );
             })}
