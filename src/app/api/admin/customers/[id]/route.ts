@@ -1,24 +1,27 @@
-import { ApiError, route } from '@/lib/api/handler';
+import { ApiError, parseQuery, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
 import { requireStoreAdmin } from '@/lib/admin/guard';
 import { getCustomerDetail } from '@/lib/admin/customers';
+import { adminListQuerySchema } from '@/lib/validators/admin';
 
 export const dynamic = 'force-dynamic';
 
 type Context = { params: Promise<{ id: string }> };
 
 /**
- * GET /api/admin/customers/:id — profile, orders, wallet ledger (M9).
+ * GET /api/admin/customers/:id — profile, orders, wallet ledger, meal plan (M9).
  *
  * S6 — the health profile is NOT here. It is a separate call that logs the
  * access and requires Super Admin, so a routine customer lookup never silently
- * reads sensitive medical data.
+ * reads sensitive medical data. The meal plan IS here — it's not S6 data (see
+ * `getCustomerDetail`'s own doc comment).
  */
-export const GET = route(async (_request: Request, context: Context) => {
+export const GET = route(async (request: Request, context: Context) => {
   await requireStoreAdmin();
   const { id } = await context.params;
+  const { locale } = parseQuery(request, adminListQuerySchema);
 
-  const customer = await getCustomerDetail(id);
+  const customer = await getCustomerDetail(id, locale);
   if (!customer) throw ApiError.notFound('Customer not found');
 
   return ok({ customer });

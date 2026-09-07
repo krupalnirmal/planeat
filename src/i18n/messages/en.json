@@ -870,7 +870,13 @@
       "healthReason": "Why do you need to see it?",
       "healthReasonHint": "This is recorded — required under the DPDP Act",
       "healthOpen": "Open",
-      "superAdminOnly": "Only a Super Admin can see this"
+      "superAdminOnly": "Only a Super Admin can see this",
+      "walletBalance": "Wallet balance",
+      "addresses": "Addresses",
+      "subscriptions": "Subscriptions",
+      "recentOrders": "Recent orders",
+      "noMealPlan": "This customer hasn't saved a meal plan yet",
+      "today": "Today"
     },
     "settings": {
       "title": "Settings",

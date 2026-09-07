@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ChevronRight, MapPin, Package } from 'lucide-react';
+import { ChevronRight, ClipboardList, MapPin, Package } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { api } from '@/lib/api/client';
@@ -23,6 +23,7 @@ interface DeliveryOrderRow {
   items: Array<{ name: string }>;
   totalPaise: string;
   isCod: boolean;
+  isMealPlan: boolean;
 }
 
 interface Summary {
@@ -36,6 +37,7 @@ const DONE_STATUSES: AssignmentStatus[] = ['DELIVERED', 'FAILED'];
 
 export function DeliveryDashboard() {
   const t = useTranslations('delivery');
+  const tPlan = useTranslations('mealPlan');
   const tc = useTranslations('common');
 
   const orders = useQuery({
@@ -51,6 +53,7 @@ export function DeliveryDashboard() {
   });
 
   const rows = orders.data?.orders ?? [];
+  const mealPlanRows = rows.filter((row) => row.isMealPlan);
   const s = summary.data?.summary;
 
   return (
@@ -69,6 +72,25 @@ export function DeliveryDashboard() {
         </div>
       )}
 
+      {/* "My Meal Plan" — today's meal-plan-sourced deliveries, surfaced as
+          their own rail above the full list below (which still shows every
+          assignment, these included). Renders nothing when there are none
+          today, same as OrderAgainRow's "nothing for a first-time buyer"
+          precedent — an empty section is clutter on a small rider screen. */}
+      {mealPlanRows.length > 0 && (
+        <section>
+          <h2 className="mb-2 flex items-center gap-1.5 text-sm font-bold">
+            <ClipboardList className="size-4 text-primary" aria-hidden />
+            {tPlan('title')}
+          </h2>
+          <ul className="space-y-2">
+            {mealPlanRows.map((row) => (
+              <AssignmentRow key={row.assignmentId} row={row} />
+            ))}
+          </ul>
+        </section>
+      )}
+
       {orders.isLoading ? (
         <p className="text-sm text-muted-foreground">{tc('loading')}</p>
       ) : rows.length === 0 ? (
@@ -77,44 +99,50 @@ export function DeliveryDashboard() {
         </p>
       ) : (
         <ul className="space-y-2">
-          {rows.map((row) => {
-            const done = DONE_STATUSES.includes(row.status);
-            return (
-              <li key={row.assignmentId}>
-                <Link
-                  href={`/delivery/orders/${row.orderId}`}
-                  className={cn(
-                    'flex items-center gap-3 rounded-[var(--radius)] border border-border bg-card p-3',
-                    done && 'opacity-60',
-                  )}
-                >
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-secondary">
-                    <Package className="size-4 text-muted-foreground" aria-hidden />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-1.5">
-                      <span className="truncate text-sm font-semibold">{row.customerName}</span>
-                      <StatusPill status={row.status} />
-                    </span>
-                    <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                      <MapPin className="size-3 shrink-0" aria-hidden />
-                      <span className="truncate">
-                        {row.address.line1}, {row.address.city}
-                      </span>
-                    </span>
-                    <span className="mt-0.5 block text-[11px] text-muted-foreground">
-                      {t('itemCount', { count: row.items.length })}
-                      {row.isCod && ` · ${t('codBadge')} ${formatPaise(paise(row.totalPaise))}`}
-                    </span>
-                  </span>
-                  <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-                </Link>
-              </li>
-            );
-          })}
+          {rows.map((row) => (
+            <AssignmentRow key={row.assignmentId} row={row} />
+          ))}
         </ul>
       )}
     </div>
+  );
+}
+
+function AssignmentRow({ row }: { row: DeliveryOrderRow }) {
+  const t = useTranslations('delivery');
+  const done = DONE_STATUSES.includes(row.status);
+
+  return (
+    <li>
+      <Link
+        href={`/delivery/orders/${row.orderId}`}
+        className={cn(
+          'flex items-center gap-3 rounded-[var(--radius)] border border-border bg-card p-3',
+          done && 'opacity-60',
+        )}
+      >
+        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-secondary">
+          <Package className="size-4 text-muted-foreground" aria-hidden />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-1.5">
+            <span className="truncate text-sm font-semibold">{row.customerName}</span>
+            <StatusPill status={row.status} />
+          </span>
+          <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+            <MapPin className="size-3 shrink-0" aria-hidden />
+            <span className="truncate">
+              {row.address.line1}, {row.address.city}
+            </span>
+          </span>
+          <span className="mt-0.5 block text-[11px] text-muted-foreground">
+            {t('itemCount', { count: row.items.length })}
+            {row.isCod && ` · ${t('codBadge')} ${formatPaise(paise(row.totalPaise))}`}
+          </span>
+        </span>
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+      </Link>
+    </li>
   );
 }
 

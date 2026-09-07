@@ -870,7 +870,13 @@
       "healthReason": "का पहायची आहे?",
       "healthReasonHint": "हे नोंदवले जाईल — DPDP कायद्यानुसार आवश्यक",
       "healthOpen": "उघडा",
-      "superAdminOnly": "ही माहिती फक्त मुख्य प्रशासकच पाहू शकतात"
+      "superAdminOnly": "ही माहिती फक्त मुख्य प्रशासकच पाहू शकतात",
+      "walletBalance": "वॉलेट शिल्लक",
+      "addresses": "पत्ते",
+      "subscriptions": "सबस्क्रिप्शन",
+      "recentOrders": "अलीकडील ऑर्डर",
+      "noMealPlan": "या ग्राहकाने अजून meal plan सेव्ह केलेला नाही",
+      "today": "आज"
     },
     "settings": {
       "title": "सेटिंग्ज",

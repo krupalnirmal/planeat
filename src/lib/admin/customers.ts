@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
+import { getCustomerPlan, type CustomerPlanView } from '@/lib/meal-plan/queries';
 import { getBalance } from '@/lib/wallet/ledger';
-import type { UserRole } from '@/generated/prisma/enums';
+import type { Locale, UserRole } from '@/generated/prisma/enums';
 
 /**
  * M9 — Customers: search, profile, health profile, orders, wallet ledger,
@@ -23,6 +24,10 @@ export interface CustomerRow {
   orderCount: number;
   hasHealthProfile: boolean;
   hasActiveSubscription: boolean;
+  /** Has saved a manual weekly meal plan (`MealPlan.generatedBy = CUSTOMER`)
+      — not S6 data, just an existence check, same shape as
+      `hasHealthProfile`/`hasActiveSubscription` below. */
+  hasMealPlan: boolean;
 }
 
 export async function searchCustomers(
@@ -54,6 +59,7 @@ export async function searchCustomers(
         _count: { select: { orders: true } },
         healthProfile: { select: { id: true } },
         subscriptions: { where: { status: 'ACTIVE' }, select: { id: true }, take: 1 },
+        mealPlans: { where: { generatedBy: 'CUSTOMER' }, select: { id: true }, take: 1 },
       },
     }),
     db.user.count({ where }),
@@ -72,6 +78,7 @@ export async function searchCustomers(
       // Whether one EXISTS, never its contents (S6).
       hasHealthProfile: row.healthProfile !== null,
       hasActiveSubscription: row.subscriptions.length > 0,
+      hasMealPlan: row.mealPlans.length > 0,
     })),
   };
 }
@@ -117,9 +124,18 @@ export interface CustomerDetail {
     endDate: Date;
   }>;
   hasHealthProfile: boolean;
+  /** The customer's saved weekly plan, if they've built one — not S6 data
+      (see `src/lib/meal-plan/queries.ts`'s own docs: the manual picker has
+      no health-profile link at all), so this is included directly rather
+      than gated behind a separate logged call the way `hasHealthProfile`'s
+      actual contents are. */
+  mealPlan: CustomerPlanView | null;
 }
 
-export async function getCustomerDetail(userId: string): Promise<CustomerDetail | null> {
+export async function getCustomerDetail(
+  userId: string,
+  locale: Locale,
+): Promise<CustomerDetail | null> {
   const user = await db.user.findUnique({
     where: { id: userId },
     select: {
@@ -192,5 +208,6 @@ export async function getCustomerDetail(userId: string): Promise<CustomerDetail 
     walletTransactions: user.walletTransactions,
     subscriptions: user.subscriptions,
     hasHealthProfile: user.healthProfile !== null,
+    mealPlan: await getCustomerPlan(user.id, locale),
   };
 }

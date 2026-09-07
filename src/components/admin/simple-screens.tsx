@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
+import { Link } from '@/i18n/navigation';
 import { api, qs } from '@/lib/api/client';
 
 /**
@@ -164,6 +165,7 @@ export function AdminCustomersScreen() {
           orderCount: number;
           hasHealthProfile: boolean;
           hasActiveSubscription: boolean;
+          hasMealPlan: boolean;
           createdAt: string;
         }>;
       }>(`/api/admin/customers${qs({ query: query || undefined, perPage: 50 })}`),
@@ -194,14 +196,19 @@ export function AdminCustomersScreen() {
           />
           <tbody>
             {rows.map((customer) => (
-              <tr key={customer.id} className="border-b border-border last:border-0">
-                <td className="px-3 py-2.5 font-medium">{customer.name ?? '—'}</td>
+              <tr key={customer.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
+                <td className="px-3 py-2.5 font-medium">
+                  <Link href={`/admin/customers/${customer.id}`} className="text-primary hover:underline">
+                    {customer.name ?? '—'}
+                  </Link>
+                </td>
                 <td className="px-3 py-2.5 font-mono text-xs">{customer.phone}</td>
                 <td className="px-3 py-2.5 text-right tabular-nums">{customer.orderCount}</td>
                 <td className="px-3 py-2.5 text-xs">
-                  {customer.hasActiveSubscription ? '✓' : '—'}
-                  {/* S6 — we say a health profile EXISTS, never what is in it.
-                      Reading one is a separate, logged, Super-Admin-only call. */}
+                  {customer.hasMealPlan ? '✓' : '—'}
+                  {/* S6 — a health profile's own existence isn't shown here at
+                      all, let alone its contents. Reading one is a separate,
+                      logged, Super-Admin-only call from the detail page. */}
                 </td>
                 <td className="px-3 py-2.5 text-xs text-muted-foreground">
                   {format.dateTime(new Date(customer.createdAt), {

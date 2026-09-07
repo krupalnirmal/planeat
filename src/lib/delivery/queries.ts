@@ -41,6 +41,10 @@ export interface DeliveryOrderRow {
   paymentMethod: string;
   isCod: boolean;
   failureReason: string | null;
+  /** `Order.type === 'MEAL_PLAN_DAILY'` — drives the dashboard's separate
+      "My Meal Plan" section, so a rider can see at a glance which of
+      today's deliveries came from a customer's saved plan. */
+  isMealPlan: boolean;
 }
 
 const ACTIVE_STATUSES: DeliveryAssignmentStatus[] = [
@@ -90,6 +94,7 @@ export async function listTodayAssignments(partnerId: string): Promise<DeliveryO
         select: {
           id: true,
           orderNumber: true,
+          type: true,
           addressSnapshot: true,
           deliverySlot: true,
           totalPaise: true,
@@ -134,6 +139,7 @@ export async function listTodayAssignments(partnerId: string): Promise<DeliveryO
     paymentMethod: assignment.order.paymentMethod,
     isCod: assignment.order.paymentMethod === 'COD' && assignment.order.paymentStatus !== 'PAID',
     failureReason: assignment.failureReason,
+    isMealPlan: assignment.order.type === 'MEAL_PLAN_DAILY',
   }));
 
   // Not-yet-delivered first, in assignment order (roughly the packing/route
@@ -161,6 +167,7 @@ export async function getAssignmentDetail(
         select: {
           id: true,
           orderNumber: true,
+          type: true,
           addressSnapshot: true,
           deliverySlot: true,
           totalPaise: true,
@@ -207,6 +214,7 @@ export async function getAssignmentDetail(
     paymentMethod: assignment.order.paymentMethod,
     isCod: assignment.order.paymentMethod === 'COD' && assignment.order.paymentStatus !== 'PAID',
     failureReason: assignment.failureReason,
+    isMealPlan: assignment.order.type === 'MEAL_PLAN_DAILY',
   };
 }
 
