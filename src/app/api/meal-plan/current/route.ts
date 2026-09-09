@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { parseJson, parseQuery, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
 import { requireUser } from '@/lib/auth/session';
+import { db } from '@/lib/db';
 import { getCustomerPlan, getPlanColumns, saveCustomerPlan } from '@/lib/meal-plan/queries';
 import { localeSchema } from '@/lib/validators/common';
 
@@ -21,12 +22,18 @@ export const GET = route(async (request: Request) => {
   const session = await requireUser();
   const { locale } = parseQuery(request, querySchema);
 
-  const [plan, { columns, dailyEssentials, sprouts }] = await Promise.all([
+  const [plan, { columns, dailyEssentials, sprouts }, activeSubscription] = await Promise.all([
     getCustomerPlan(session.userId, locale),
     getPlanColumns(locale),
+    // Cheap existence check — drives the meal-plan screen's "Start my
+    // deliveries" CTA (hidden once one is already running).
+    db.subscription.findFirst({
+      where: { userId: session.userId, status: { in: ['ACTIVE', 'PAUSED'] } },
+      select: { id: true },
+    }),
   ]);
 
-  return ok({ plan, columns, dailyEssentials, sprouts });
+  return ok({ plan, columns, dailyEssentials, sprouts, hasActiveSubscription: activeSubscription !== null });
 });
 
 const saveSchema = z.object({

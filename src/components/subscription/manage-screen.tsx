@@ -121,8 +121,11 @@ export function SubscriptionManageScreen() {
           <div className="bg-card">
             <CenteredState>
               <p className="text-sm text-muted-foreground">{t('noSubscription')}</p>
-              <Link href="/meal-plan" className="mt-4 inline-block text-sm font-semibold text-primary">
-                {tc('back')}
+              <Link
+                href="/meal-plan/subscribe"
+                className="mt-4 inline-block text-sm font-semibold text-primary"
+              >
+                {t('startPlan')}
               </Link>
             </CenteredState>
           </div>

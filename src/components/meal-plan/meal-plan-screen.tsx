@@ -1,11 +1,12 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Salad } from 'lucide-react';
+import { ChevronRight, Salad } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { LoginPrompt } from '@/components/shop/login-prompt';
 import { PageHeader } from '@/components/shop/page-header';
+import { Link } from '@/i18n/navigation';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api, qs } from '@/lib/api/client';
 import { type InitialPlanDay, type PlanColumn, type PlanProduct, type SavePlanDay, PlanTable } from './plan-table';
@@ -24,6 +25,7 @@ interface PlanResponse {
   columns: PlanColumn[];
   dailyEssentials: PlanProduct[];
   sprouts: PlanProduct[];
+  hasActiveSubscription: boolean;
 }
 
 export function MealPlanScreen() {
@@ -87,6 +89,7 @@ export function MealPlanScreen() {
   }
 
   const data = current.data;
+  const hasSavedItems = (data?.plan?.days ?? []).some((day) => day.items.length > 0);
 
   return (
     <>
@@ -113,6 +116,20 @@ export function MealPlanScreen() {
             saving={save.isPending}
             saved={saved}
           />
+
+          {/* The missing next step (Phase 5): a saved plan alone never did
+              anything — nothing created the Subscription row the daily
+              generation cron reads from. Hidden once one is already
+              running, so this is never a double-subscribe entry point. */}
+          {hasSavedItems && !data?.hasActiveSubscription && (
+            <Link
+              href="/meal-plan/subscribe"
+              className="mt-4 flex items-center justify-between rounded-[var(--radius-2xl)] bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground"
+            >
+              {t('subscribe.cta')}
+              <ChevronRight className="size-4" aria-hidden />
+            </Link>
+          )}
         </div>
       </main>
     </>

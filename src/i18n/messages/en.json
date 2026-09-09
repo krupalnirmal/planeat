@@ -424,6 +424,30 @@
       "dailyEssentialsTitle": "Daily Use Vegetables",
       "dailyEssentialsHint": "Picked once, used every day of the week",
       "sproutsTitle": "Sprouts"
+    },
+    "subscribe": {
+      "cta": "Start my deliveries",
+      "title": "Start my deliveries",
+      "subtitle": "Turn your saved plan into daily deliveries",
+      "duration": "How long?",
+      "days": "{count} days",
+      "deliverTo": "Deliver to",
+      "changeAddress": "Change",
+      "noAddress": "Add a delivery address first",
+      "costTitle": "What this costs",
+      "averageDaily": "Average per day",
+      "estimatedTotal": "Estimated for {days} days",
+      "planFee": "Plan fee",
+      "freeTrial": "FREE — first 7-day trial",
+      "buffer": "Price-safety buffer",
+      "bufferHint": "vegetable prices change day to day",
+      "requiredBalance": "Wallet must have at least",
+      "walletBalance": "Your wallet balance",
+      "shortfall": "You need {amount} more in your wallet.",
+      "topUp": "Top up",
+      "walletCovered": "Your wallet covers this — you're ready to start",
+      "activate": "Activate my plan",
+      "needsTopup": "Add money to your wallet to continue"
     }
   },
   "subscription": {
@@ -456,6 +480,7 @@
     "addressNote": "Applies from tomorrow's delivery onwards",
     "substituted": "{to} sent instead of {from}",
     "noSubscription": "No plan running yet",
+    "startPlan": "Start my deliveries",
     "status": {
       "SCHEDULED": "Scheduled",
       "PLACED": "Being prepared",

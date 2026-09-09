@@ -90,6 +90,35 @@ export async function getCustomerPlan(userId: string, locale: Locale): Promise<C
   return shapePlan(plan, locale);
 }
 
+export interface PlanDayCost {
+  dayOfWeek: number;
+  /** Sum of that day's picked variants at today's catalogue price — the
+      exact shape `src/lib/meal-plan/pricing.ts`'s `estimatePeriodCost`/
+      `averageDailyCost` take. Each picked item's `pricePaise` is already
+      the price for that specific variant size (e.g. "Onion 250g" = ₹18),
+      not a per-unit price needing a separate quantity multiplier — the
+      manual picker's `MealPlanItem.quantity` stores the variant's own
+      weight, not an order count (see `saveCustomerPlan` below). */
+  costPaise: bigint;
+}
+
+/** Turns a saved plan into the `PlanDayCost[]` shape the subscribe flow's
+    pricing math (`estimatePeriodCost`, `averageDailyCost`) consumes. */
+export async function getPlanDayCosts(mealPlanId: string): Promise<PlanDayCost[]> {
+  const days = await db.mealPlanDay.findMany({
+    where: { mealPlanId },
+    select: {
+      dayOfWeek: true,
+      items: { select: { variant: { select: { pricePaise: true } } } },
+    },
+  });
+
+  return days.map((day) => ({
+    dayOfWeek: day.dayOfWeek,
+    costPaise: day.items.reduce((sum, item) => sum + (item.variant?.pricePaise ?? 0n), 0n),
+  }));
+}
+
 export interface SaveDayInput {
   dayOfWeek: number;
   variantIds: string[];
