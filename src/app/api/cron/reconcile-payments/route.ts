@@ -7,15 +7,19 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 /**
- * POST /api/cron/reconcile-payments — P2's safety net.
+ * POST /api/cron/reconcile-payments — P2's daily backstop.
  *
- * Runs every 15 minutes (see `vercel.json`). Anything PENDING for longer than
- * `PAYMENT_PENDING_RECONCILE_MINUTES` is re-queried against the gateway and
- * resolved.
+ * Runs once a day (`vercel.json` — every cron in this project does; that's
+ * the platform's own limit, not a choice made for this job specifically).
+ * Anything still PENDING for longer than `PAYMENT_PENDING_RECONCILE_MINUTES`
+ * is re-queried against the gateway and resolved.
  *
- * Webhooks get lost — a deploy restarts the process mid-request, a tunnel
- * drops, the retry budget runs out. Without this job a customer who genuinely
- * paid sits with no balance and no explanation.
+ * This is the backstop under `reconcileOnePayment` (`src/lib/wallet/
+ * reconcile.ts`), which the status-polling routes now call inline — that is
+ * what actually catches a lost webhook within seconds for someone watching
+ * the "waiting for your bank" screen. This job exists for the payment
+ * nobody ever polled for again (closed the tab, lost signal) once a day is
+ * still far better than never.
  *
  * Idempotent: the ledger entry is keyed on the gateway payment id, so a
  * payment resolved here and then again by a late webhook credits exactly once.
