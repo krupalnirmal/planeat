@@ -263,10 +263,12 @@ export function SubscribeScreen() {
         )}
       </main>
 
-      {/* Fixed action bar, matching the checkout/variant-picker pattern of
-          a bottom-pinned primary action rather than a button lost at the
-          end of a scroll. */}
-      <div className="fixed inset-x-0 bottom-0 border-t border-border bg-card p-4">
+      {/* Fixed action bar, matching checkout/variant-picker's own pattern —
+          `mx-auto max-w-[480px]` is the part this was missing: without it
+          the bar stretched the full browser width edge to edge instead of
+          staying inside the app's mobile-width column, which is what made
+          it look broken/oversized once tested in a real (wide) browser. */}
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4">
         <button
           type="button"
           disabled={!canActivate || activate.isPending}
