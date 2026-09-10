@@ -901,7 +901,8 @@
       "subscriptions": "Subscriptions",
       "recentOrders": "Recent orders",
       "noMealPlan": "This customer hasn't saved a meal plan yet",
-      "today": "Today"
+      "today": "Today",
+      "dayTotal": "Bill for this day"
     },
     "settings": {
       "title": "Settings",

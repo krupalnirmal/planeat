@@ -50,7 +50,13 @@ interface CustomerDetail {
   recentOrders: Array<{ id: string; orderNumber: string; status: string; totalPaise: string; placedAt: string }>;
   subscriptions: Array<{ id: string; status: string; startDate: string; endDate: string }>;
   hasHealthProfile: boolean;
-  mealPlan: { id: string; days: Array<{ dayOfWeek: number; items: Array<{ name: string; variantLabel: string }> }> } | null;
+  mealPlan: {
+    id: string;
+    days: Array<{
+      dayOfWeek: number;
+      items: Array<{ name: string; variantLabel: string; pricePaise: string }>;
+    }>;
+  } | null;
 }
 
 /** IST day-of-week (1 = Monday … 7 = Sunday) — same UTC+5:30 shift as
@@ -200,6 +206,12 @@ export function CustomerDetailScreen({ customerId }: { customerId: string }) {
                 .filter((day) => day.items.length > 0)
                 .map((day) => {
                   const isToday = day.dayOfWeek === today;
+                  // Same figure `getPlanDayCosts`/`averageDailyCost`
+                  // (src/lib/meal-plan/pricing.ts) compute server-side for
+                  // the subscription quote — summed here too so admin sees,
+                  // per day, exactly what to collect from this customer
+                  // without needing to add up each chip by hand.
+                  const dayTotalPaise = day.items.reduce((sum, item) => sum + paise(item.pricePaise), 0n);
                   return (
                     <li
                       key={day.dayOfWeek}
@@ -208,16 +220,26 @@ export function CustomerDetailScreen({ customerId }: { customerId: string }) {
                         isToday ? 'bg-tint-green' : 'bg-secondary/40',
                       )}
                     >
-                      <div className="mb-1.5 flex items-center gap-2">
-                        <span
-                          className={cn(
-                            'rounded-full px-2.5 py-0.5 text-[11px] font-bold',
-                            isToday ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground',
+                      <div className="mb-1.5 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={cn(
+                              'rounded-full px-2.5 py-0.5 text-[11px] font-bold',
+                              isToday ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground',
+                            )}
+                          >
+                            {tPlan(`days.${day.dayOfWeek}`)}
+                          </span>
+                          {isToday && (
+                            <span className="text-[11px] font-bold text-primary-dark">· {t('today')}</span>
                           )}
+                        </div>
+                        <span
+                          className="text-xs font-bold text-primary-dark"
+                          title={t('dayTotal')}
                         >
-                          {tPlan(`days.${day.dayOfWeek}`)}
+                          {formatPaise(dayTotalPaise)}
                         </span>
-                        {isToday && <span className="text-[11px] font-bold text-primary-dark">· {t('today')}</span>}
                       </div>
                       <div className="flex flex-wrap gap-1.5">
                         {day.items.map((item, index) => (

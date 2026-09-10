@@ -901,7 +901,8 @@
       "subscriptions": "सब्सक्रिप्शन",
       "recentOrders": "हाल के ऑर्डर",
       "noMealPlan": "इस ग्राहक ने अभी तक meal plan सेव नहीं किया",
-      "today": "आज"
+      "today": "आज",
+      "dayTotal": "इस दिन का बिल"
     },
     "settings": {
       "title": "सेटिंग्स",
