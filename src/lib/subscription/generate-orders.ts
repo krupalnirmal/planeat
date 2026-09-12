@@ -253,8 +253,12 @@ async function generateForSubscription(
   const chosenProductIds: string[] = [];
 
   for (const item of day.items) {
-    const inStock =
-      item.variant !== null && item.variant.isActive && item.variant.stockQty >= item.quantity;
+    // `MealPlanItem.quantity` is the variant's own weight (e.g. 500 for a
+    // "500 g" pack), not an order count — same field, same meaning
+    // `getPlanDayCosts` already documents (src/lib/meal-plan/queries.ts).
+    // Every meal-plan pick is exactly one pack of that specific size, so
+    // stock and pricing here must never multiply by it.
+    const inStock = item.variant !== null && item.variant.isActive && item.variant.stockQty >= 1;
 
     if (inStock && item.variant) {
       resolved.push({
@@ -263,7 +267,7 @@ async function generateForSubscription(
         variantId: item.variant.id,
         name: pickName(item.product, locale),
         imageUrl: firstImage(item.product.imageUrls),
-        quantity: item.quantity,
+        quantity: 1,
         unitPricePaise: item.variant.pricePaise,
         isSubstituted: false,
         originalProductId: null,
@@ -299,7 +303,7 @@ async function generateForSubscription(
       variantId: substitute.product.variant.id,
       name: substitute.product.name,
       imageUrl: null,
-      quantity: item.quantity,
+      quantity: 1,
       unitPricePaise: substitute.product.variant.pricePaise,
       isSubstituted: true,
       // B7 — retain what it replaced, so the customer can be told and the
@@ -437,7 +441,13 @@ async function generateForSubscription(
           },
         });
       }
-    });
+    }, { timeout: 20_000 });
+    // ↑ Prisma's default interactive-transaction timeout is 5s. This one does
+    // a sequential round trip per item (stock decrement) plus the order,
+    // history and wallet-ledger writes — a plan with several items can pass
+    // 5s on its own under ordinary network latency, well within the route's
+    // own `maxDuration = 300`, so there is no reason this specific job needs
+    // the tighter default.
   } catch (error) {
     // R5 — two runs racing each other. The unique constraint caught the loser.
     if (isUniqueViolation(error)) return { kind: 'DUPLICATE' };
