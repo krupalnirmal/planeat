@@ -46,6 +46,13 @@ interface Suggestion {
   rationale: string;
 }
 
+interface Partner {
+  id: string;
+  name: string;
+  isAvailable: boolean;
+  todayLoad: number;
+}
+
 export const STATUS_TONE: Record<string, string> = {
   PLACED: 'bg-secondary text-muted-foreground',
   CONFIRMED: 'bg-primary/10 text-primary',
@@ -113,6 +120,19 @@ export function AdminOrdersScreen() {
     enabled: showSuggestions,
   });
 
+  // For the per-zone override below: the suggestion panel only ever proposes
+  // ONE partner per order (B12), so overriding an entire pincode's worth of
+  // orders onto a different rider (someone is on leave, a cluster is out of
+  // the suggested rider's way today) needs the full roster, not just whoever
+  // the algorithm picked.
+  const partners = useQuery({
+    queryKey: ['admin-delivery-partners-list'],
+    queryFn: () => api.get<{ partners: Partner[] }>('/api/admin/delivery-partners'),
+    enabled: showSuggestions,
+  });
+
+  const [zonePartner, setZonePartner] = useState<Record<string, string>>({});
+
   const assignAll = useMutation({
     mutationFn: (assignments: Array<{ orderId: string; partnerId: string }>) =>
       api.post<{ assigned: number }>('/api/admin/riders/suggest', { assignments }),
@@ -128,6 +148,16 @@ export function AdminOrdersScreen() {
     (suggestion): suggestion is Suggestion & { suggestedPartnerId: string } =>
       suggestion.suggestedPartnerId !== null,
   );
+
+  // Grouped so the owner can hand a whole cluster to one rider in a tap —
+  // "all of 422001 goes to Ramesh today" — instead of confirming the
+  // algorithm's per-order pick one at a time.
+  const byPincode = new Map<string, Suggestion[]>();
+  for (const suggestion of assignable) {
+    const group = byPincode.get(suggestion.pincode) ?? [];
+    group.push(suggestion);
+    byPincode.set(suggestion.pincode, group);
+  }
 
   return (
     <>
@@ -158,18 +188,65 @@ export function AdminOrdersScreen() {
             <p className="text-sm text-muted-foreground">{t('noSuggestions')}</p>
           ) : (
             <>
-              <ul className="mb-3 space-y-1.5">
-                {assignable.map((suggestion) => (
-                  <li
-                    key={suggestion.orderId}
-                    className="flex flex-wrap items-center justify-between gap-2 text-sm"
-                  >
-                    <span className="font-mono text-xs text-muted-foreground">
-                      {suggestion.orderNumber} · {suggestion.pincode}
-                    </span>
-                    <span className="font-semibold">{suggestion.suggestedPartnerName}</span>
-                  </li>
-                ))}
+              {/* Per-pincode override: the owner's own choice of rider for a
+                  whole cluster, instead of confirming the algorithm's pick
+                  order by order. */}
+              <ul className="mb-4 space-y-3">
+                {[...byPincode.entries()].map(([pincode, group]) => {
+                  const selected = zonePartner[pincode] ?? group[0].suggestedPartnerId;
+                  return (
+                    <li key={pincode} className="rounded-[var(--radius)] border border-border p-3">
+                      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-sm font-bold">
+                          {pincode} · {t('zoneOrderCount', { count: group.length })}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={selected}
+                            onChange={(event) =>
+                              setZonePartner((prev) => ({ ...prev, [pincode]: event.target.value }))
+                            }
+                            className="h-9 rounded-[var(--radius)] border border-border bg-background px-2 text-xs"
+                          >
+                            {(partners.data?.partners ?? []).map((partner) => (
+                              <option key={partner.id} value={partner.id}>
+                                {partner.name}
+                                {!partner.isAvailable ? ` (${tc('unavailable')})` : ''} ·{' '}
+                                {t('zoneLoad', { count: partner.todayLoad })}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              assignAll.mutate(
+                                group.map((suggestion) => ({
+                                  orderId: suggestion.orderId,
+                                  partnerId: selected,
+                                })),
+                              )
+                            }
+                            disabled={assignAll.isPending}
+                            className="flex h-9 items-center gap-1.5 rounded-[var(--radius)] bg-primary px-3 text-xs font-bold text-primary-foreground disabled:opacity-50"
+                          >
+                            {t('zoneAssign')}
+                          </button>
+                        </div>
+                      </div>
+                      <ul className="space-y-1">
+                        {group.map((suggestion) => (
+                          <li
+                            key={suggestion.orderId}
+                            className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground"
+                          >
+                            <span className="font-mono">{suggestion.orderNumber}</span>
+                            <span>{suggestion.suggestedPartnerName}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  );
+                })}
               </ul>
 
               <button

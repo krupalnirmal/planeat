@@ -788,6 +788,9 @@
       "assignAll": "सगळे सुचवलेले नेमा",
       "assigned": "{count} ऑर्डरना रायडर नेमला",
       "noSuggestions": "नेमायच्या ऑर्डर नाहीत",
+      "zoneOrderCount": "{count} ऑर्डर",
+      "zoneLoad": "आज {count}",
+      "zoneAssign": "या भागाला नेमा",
       "filterAll": "सर्व",
       "filterUnassigned": "रायडर नसलेल्या",
       "viewDetails": "तपशील पहा",
@@ -942,7 +945,8 @@
       "actions": "क्रिया",
       "noAccess": "तुम्हाला या पानाची परवानगी नाही",
       "back": "मागे",
-      "dismiss": "नको"
+      "dismiss": "नको",
+      "unavailable": "उपलब्ध नाही"
     }
   },
   "delivery": {
@@ -964,9 +968,11 @@
     "noOrdersToday": "आज एकही ऑर्डर नेमलेली नाही",
     "itemCount": "{count} वस्तू",
     "codBadge": "रोख घ्या",
+    "prepaidShort": "प्रीपेड, ₹0 घ्यायचे",
     "call": "कॉल करा",
     "openMap": "नकाशावर पहा",
     "codCollect": "{amount} रोख घ्या",
+    "prepaidBadge": "100% प्रीपेड · ₹0 घ्यायचे आहेत",
     "items": "वस्तूंची यादी",
     "markPickedUp": "उचलले असे नोंदवा",
     "markOutForDelivery": "निघालो असे नोंदवा",

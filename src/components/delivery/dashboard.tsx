@@ -138,6 +138,9 @@ function AssignmentRow({ row }: { row: DeliveryOrderRow }) {
           <span className="mt-0.5 block text-[11px] text-muted-foreground">
             {t('itemCount', { count: row.items.length })}
             {row.isCod && ` · ${t('codBadge')} ${formatPaise(paise(row.totalPaise))}`}
+            {row.isMealPlan && !row.isCod && (
+              <span className="font-semibold text-success"> · {t('prepaidShort')}</span>
+            )}
           </span>
         </span>
         <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />

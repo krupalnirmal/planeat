@@ -29,6 +29,7 @@ interface OrderDetailResponse {
     items: Array<{ name: string; displayQuantity: string; slot: 'MORNING' | 'EVENING' | null }>;
     totalPaise: string;
     isCod: boolean;
+    isMealPlan: boolean;
     failureReason: string | null;
   };
 }
@@ -171,6 +172,16 @@ export function DeliveryOrderDetail({ orderId }: { orderId: string }) {
         {order.isCod && (
           <p className="mt-3 rounded-[var(--radius)] bg-secondary px-3 py-2 text-xs font-semibold">
             {t('codCollect', { amount: formatPaise(paise(order.totalPaise)) })}
+          </p>
+        )}
+
+        {/* Meal-plan deliveries are always wallet-prepaid (B9 — COD is never
+            offered on a daily plan order) — called out explicitly so a rider
+            never wastes a doorstep asking for money that was already taken
+            from the wallet at generation. */}
+        {order.isMealPlan && !order.isCod && (
+          <p className="mt-3 rounded-[var(--radius)] bg-success/10 px-3 py-2 text-center text-xs font-bold text-success">
+            {t('prepaidBadge')}
           </p>
         )}
       </section>

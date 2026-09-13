@@ -788,6 +788,9 @@
       "assignAll": "सभी सुझाए तय करें",
       "assigned": "{count} ऑर्डर को राइडर मिला",
       "noSuggestions": "तय करने को कुछ नहीं",
+      "zoneOrderCount": "{count} ऑर्डर",
+      "zoneLoad": "आज {count}",
+      "zoneAssign": "इस ज़ोन को तय करें",
       "filterAll": "सभी",
       "filterUnassigned": "बिना राइडर",
       "viewDetails": "विवरण देखें",
@@ -942,7 +945,8 @@
       "actions": "क्रियाएँ",
       "noAccess": "आपको इस पेज की अनुमति नहीं है",
       "back": "वापस",
-      "dismiss": "रहने दें"
+      "dismiss": "रहने दें",
+      "unavailable": "उपलब्ध नहीं"
     }
   },
   "delivery": {
@@ -964,9 +968,11 @@
     "noOrdersToday": "आज कोई ऑर्डर तय नहीं हुआ",
     "itemCount": "{count} चीज़ें",
     "codBadge": "नकद लें",
+    "prepaidShort": "प्रीपेड, ₹0 लेना है",
     "call": "कॉल करें",
     "openMap": "नक़्शे पर देखें",
     "codCollect": "{amount} नकद लें",
+    "prepaidBadge": "100% प्रीपेड · ₹0 लेना है",
     "items": "चीज़ों की सूची",
     "markPickedUp": "उठाया — दर्ज करें",
     "markOutForDelivery": "निकल पड़े — दर्ज करें",

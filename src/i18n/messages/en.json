@@ -788,6 +788,9 @@
       "assignAll": "Assign all suggested",
       "assigned": "{count} orders assigned",
       "noSuggestions": "Nothing to assign",
+      "zoneOrderCount": "{count} orders",
+      "zoneLoad": "{count} today",
+      "zoneAssign": "Assign this zone",
       "filterAll": "All",
       "filterUnassigned": "Unassigned",
       "viewDetails": "View details",
@@ -942,7 +945,8 @@
       "actions": "Actions",
       "noAccess": "You don't have access to this page",
       "back": "Back",
-      "dismiss": "Never mind"
+      "dismiss": "Never mind",
+      "unavailable": "unavailable"
     }
   },
   "delivery": {
@@ -964,9 +968,11 @@
     "noOrdersToday": "No orders assigned to you today",
     "itemCount": "{count} items",
     "codBadge": "Collect cash",
+    "prepaidShort": "Prepaid, ₹0 to collect",
     "call": "Call",
     "openMap": "Open in maps",
     "codCollect": "Collect {amount} cash",
+    "prepaidBadge": "100% PREPAID · ₹0 to collect",
     "items": "Item checklist",
     "markPickedUp": "Mark picked up",
     "markOutForDelivery": "Mark out for delivery",
