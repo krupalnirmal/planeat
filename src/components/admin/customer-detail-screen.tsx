@@ -1,17 +1,20 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  Bike,
   Calendar,
   ChevronLeft,
   ChevronRight,
   Leaf,
+  Loader2,
   MapPin,
   ShoppingCart,
   UtensilsCrossed,
   Wallet,
 } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
@@ -48,7 +51,14 @@ interface CustomerDetail {
   walletBalancePaise: string;
   addresses: Array<{ id: string; label: string; line1: string; city: string; pincode: string; isDefault: boolean }>;
   recentOrders: Array<{ id: string; orderNumber: string; status: string; totalPaise: string; placedAt: string }>;
-  subscriptions: Array<{ id: string; status: string; startDate: string; endDate: string }>;
+  subscriptions: Array<{
+    id: string;
+    status: string;
+    startDate: string;
+    endDate: string;
+    assignedPartnerId: string | null;
+    assignedPartnerName: string | null;
+  }>;
   hasHealthProfile: boolean;
   mealPlan: {
     id: string;
@@ -269,14 +279,23 @@ export function CustomerDetailScreen({ customerId }: { customerId: string }) {
               <p className="text-sm text-muted-foreground">{tc('empty')}</p>
             </div>
           ) : (
-            <ul className="space-y-2.5">
+            <ul className="space-y-3">
               {customer.subscriptions.map((sub) => (
-                <li key={sub.id} className="flex items-center justify-between text-sm">
-                  <span className="font-medium">{sub.status}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {format.dateTime(new Date(sub.startDate), { day: 'numeric', month: 'short' })} –{' '}
-                    {format.dateTime(new Date(sub.endDate), { day: 'numeric', month: 'short' })}
-                  </span>
+                <li key={sub.id} className="space-y-2 border-b border-border/60 pb-3 last:border-0 last:pb-0">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium">{sub.status}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {format.dateTime(new Date(sub.startDate), { day: 'numeric', month: 'short' })} –{' '}
+                      {format.dateTime(new Date(sub.endDate), { day: 'numeric', month: 'short' })}
+                    </span>
+                  </div>
+                  {sub.status === 'ACTIVE' && (
+                    <SubscriptionRiderControl
+                      subscriptionId={sub.id}
+                      assignedPartnerId={sub.assignedPartnerId}
+                      assignedPartnerName={sub.assignedPartnerName}
+                    />
+                  )}
                 </li>
               ))}
             </ul>
@@ -317,6 +336,104 @@ export function CustomerDetailScreen({ customerId }: { customerId: string }) {
           )}
         </section>
       </div>
+    </div>
+  );
+}
+
+interface DeliveryPartnerOption {
+  id: string;
+  name: string;
+  isAvailable: boolean;
+  todayLoad: number;
+}
+
+/**
+ * A subscription's standing rider: assigned once here, then applied
+ * automatically to every day's generated order by the 00:30 cron
+ * (`generateForSubscription`, src/lib/subscription/generate-orders.ts) —
+ * the manual per-order picker on the order detail page still exists for a
+ * one-off override, but a meal-plan customer does not need the owner to
+ * re-assign the same rider every single morning.
+ */
+function SubscriptionRiderControl({
+  subscriptionId,
+  assignedPartnerId,
+  assignedPartnerName,
+}: {
+  subscriptionId: string;
+  assignedPartnerId: string | null;
+  assignedPartnerName: string | null;
+}) {
+  const t = useTranslations('admin.customers');
+  const tc = useTranslations('admin.common');
+  const queryClient = useQueryClient();
+  const [editing, setEditing] = useState(false);
+  const [selectedPartnerId, setSelectedPartnerId] = useState(assignedPartnerId ?? '');
+
+  const partners = useQuery({
+    queryKey: ['admin-delivery-partners'],
+    queryFn: () => api.get<{ partners: DeliveryPartnerOption[] }>('/api/admin/delivery-partners'),
+    enabled: editing,
+  });
+
+  const assign = useMutation({
+    mutationFn: (partnerId: string | null) =>
+      api.post(`/api/admin/subscriptions/${subscriptionId}/assign-rider`, { partnerId }),
+    onSuccess: () => {
+      setEditing(false);
+      void queryClient.invalidateQueries({ queryKey: ['admin-customer'] });
+    },
+  });
+
+  if (!editing) {
+    return (
+      <div className="flex items-center justify-between gap-2">
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Bike className="size-3.5 shrink-0" aria-hidden />
+          {assignedPartnerName ?? t('noStandingRider')}
+        </span>
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          className="text-xs font-semibold text-primary"
+        >
+          {assignedPartnerName ? t('changeStandingRider') : t('setStandingRider')}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <select
+        value={selectedPartnerId}
+        onChange={(event) => setSelectedPartnerId(event.target.value)}
+        className="h-9 flex-1 rounded-[var(--radius)] border border-border bg-background px-2 text-xs outline-none"
+      >
+        <option value="">{t('noStandingRider')}</option>
+        {(partners.data?.partners ?? []).map((partner) => (
+          <option key={partner.id} value={partner.id}>
+            {partner.name}
+            {!partner.isAvailable ? ` (${t('riderUnavailable')})` : ''} · {partner.todayLoad}
+          </option>
+        ))}
+      </select>
+      <button
+        type="button"
+        disabled={assign.isPending}
+        onClick={() => assign.mutate(selectedPartnerId || null)}
+        className="flex h-9 items-center gap-1.5 rounded-[var(--radius)] bg-primary px-3 text-xs font-bold text-primary-foreground disabled:opacity-50"
+      >
+        {assign.isPending && <Loader2 className="size-3.5 animate-spin" aria-hidden />}
+        {t('confirmRider')}
+      </button>
+      <button
+        type="button"
+        onClick={() => setEditing(false)}
+        className="text-xs font-medium text-muted-foreground"
+      >
+        {tc('back')}
+      </button>
     </div>
   );
 }

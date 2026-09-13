@@ -788,9 +788,6 @@
       "assignAll": "Assign all suggested",
       "assigned": "{count} orders assigned",
       "noSuggestions": "Nothing to assign",
-      "zoneOrderCount": "{count} orders",
-      "zoneLoad": "{count} today",
-      "zoneAssign": "Assign this zone",
       "filterAll": "All",
       "filterUnassigned": "Unassigned",
       "viewDetails": "View details",
@@ -905,7 +902,12 @@
       "recentOrders": "Recent orders",
       "noMealPlan": "This customer hasn't saved a meal plan yet",
       "today": "Today",
-      "dayTotal": "Bill for this day"
+      "dayTotal": "Bill for this day",
+      "noStandingRider": "No standing rider set",
+      "setStandingRider": "Set a standing rider",
+      "changeStandingRider": "Change rider",
+      "riderUnavailable": "unavailable",
+      "confirmRider": "Assign"
     },
     "settings": {
       "title": "Settings",
@@ -945,8 +947,7 @@
       "actions": "Actions",
       "noAccess": "You don't have access to this page",
       "back": "Back",
-      "dismiss": "Never mind",
-      "unavailable": "unavailable"
+      "dismiss": "Never mind"
     }
   },
   "delivery": {

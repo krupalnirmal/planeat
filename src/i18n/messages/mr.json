@@ -788,9 +788,6 @@
       "assignAll": "सगळे सुचवलेले नेमा",
       "assigned": "{count} ऑर्डरना रायडर नेमला",
       "noSuggestions": "नेमायच्या ऑर्डर नाहीत",
-      "zoneOrderCount": "{count} ऑर्डर",
-      "zoneLoad": "आज {count}",
-      "zoneAssign": "या भागाला नेमा",
       "filterAll": "सर्व",
       "filterUnassigned": "रायडर नसलेल्या",
       "viewDetails": "तपशील पहा",
@@ -905,7 +902,12 @@
       "recentOrders": "अलीकडील ऑर्डर",
       "noMealPlan": "या ग्राहकाने अजून meal plan सेव्ह केलेला नाही",
       "today": "आज",
-      "dayTotal": "या दिवसाचे बिल"
+      "dayTotal": "या दिवसाचे बिल",
+      "noStandingRider": "कायमचा rider नेमलेला नाही",
+      "setStandingRider": "कायमचा rider नेमा",
+      "changeStandingRider": "Rider बदला",
+      "riderUnavailable": "उपलब्ध नाही",
+      "confirmRider": "नेमा"
     },
     "settings": {
       "title": "सेटिंग्ज",
@@ -945,8 +947,7 @@
       "actions": "क्रिया",
       "noAccess": "तुम्हाला या पानाची परवानगी नाही",
       "back": "मागे",
-      "dismiss": "नको",
-      "unavailable": "उपलब्ध नाही"
+      "dismiss": "नको"
     }
   },
   "delivery": {

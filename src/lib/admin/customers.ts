@@ -122,6 +122,8 @@ export interface CustomerDetail {
     status: string;
     startDate: Date;
     endDate: Date;
+    assignedPartnerId: string | null;
+    assignedPartnerName: string | null;
   }>;
   hasHealthProfile: boolean;
   /** The customer's saved weekly plan, if they've built one — not S6 data
@@ -184,7 +186,14 @@ export async function getCustomerDetail(
       },
       subscriptions: {
         orderBy: { createdAt: 'desc' },
-        select: { id: true, status: true, startDate: true, endDate: true },
+        select: {
+          id: true,
+          status: true,
+          startDate: true,
+          endDate: true,
+          assignedPartnerId: true,
+          assignedPartner: { select: { user: { select: { name: true, phone: true } } } },
+        },
       },
       healthProfile: { select: { id: true } },
     },
@@ -206,7 +215,16 @@ export async function getCustomerDetail(
     addresses: user.addresses,
     recentOrders: user.orders,
     walletTransactions: user.walletTransactions,
-    subscriptions: user.subscriptions,
+    subscriptions: user.subscriptions.map((sub) => ({
+      id: sub.id,
+      status: sub.status,
+      startDate: sub.startDate,
+      endDate: sub.endDate,
+      assignedPartnerId: sub.assignedPartnerId,
+      assignedPartnerName: sub.assignedPartner
+        ? (sub.assignedPartner.user.name ?? sub.assignedPartner.user.phone)
+        : null,
+    })),
     hasHealthProfile: user.healthProfile !== null,
     mealPlan: await getCustomerPlan(user.id, locale),
   };

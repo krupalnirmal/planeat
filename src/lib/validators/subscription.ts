@@ -37,3 +37,11 @@ export const scheduleQuerySchema = z.object({
 export const regenerateSchema = z.object({
   date: z.iso.date().optional(),
 });
+
+/** The owner assigning (or clearing) a subscription's standing rider —
+    applied automatically to every day's generated order from then on,
+    instead of assigning each day's order by hand. */
+export const assignSubscriptionRiderSchema = z.object({
+  partnerId: cuidSchema.nullable(),
+});
+export type AssignSubscriptionRiderInput = z.infer<typeof assignSubscriptionRiderSchema>;

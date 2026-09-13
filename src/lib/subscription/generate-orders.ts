@@ -1,3 +1,4 @@
+import { newDeliveryOtp } from '@/lib/admin/orders';
 import { pickName } from '@/lib/catalog/text';
 import { db } from '@/lib/db';
 import { isUniqueViolation } from '@/lib/db-errors';
@@ -5,6 +6,7 @@ import { ID_PREFIX, newId, newOrderNumber } from '@/lib/ids';
 import { buildCandidates } from '@/lib/meal-plan/candidates';
 import { parseDateKey, weekdayNumber } from '@/lib/meal-plan/pricing';
 import { TEMPLATE, notifyEvent } from '@/lib/notifications/notify';
+import { notifyEventNow } from '@/lib/notifications/notify-now';
 import { InsufficientBalanceError, LEDGER_REF, debit } from '@/lib/wallet/ledger';
 import type { Locale } from '@/generated/prisma/enums';
 import { findSubstitute } from './substitute';
@@ -84,6 +86,7 @@ export async function generateDailyOrders(
       userId: true,
       mealPlanId: true,
       deliverySlot: true,
+      assignedPartnerId: true,
       address: {
         select: {
           id: true,
@@ -149,6 +152,7 @@ interface PerSubscriptionInput {
     userId: string;
     mealPlanId: string;
     deliverySlot: string;
+    assignedPartnerId: string | null;
     address: {
       id: string;
       label: string;
@@ -338,6 +342,7 @@ async function generateForSubscription(
   );
 
   const orderId = newId(ID_PREFIX.order);
+  const orderNumber = newOrderNumber(scheduledDate);
   let paymentPending = false;
 
   try {
@@ -358,7 +363,7 @@ async function generateForSubscription(
       await tx.order.create({
         data: {
           id: orderId,
-          orderNumber: newOrderNumber(scheduledDate),
+          orderNumber,
           userId: subscription.userId,
           addressSnapshot: subscription.address,
           type: 'MEAL_PLAN_DAILY',
@@ -454,6 +459,24 @@ async function generateForSubscription(
     throw error;
   }
 
+  // A customer with a standing rider assigned to their subscription
+  // (`Subscription.assignedPartnerId` — the owner sets this once instead of
+  // assigning each day's order by hand) gets that same rider on today's
+  // order automatically. Skipped while paymentPending: the 08:00 retry can
+  // still cancel this order outright if the wallet never gets topped up, and
+  // a rider should not be notified about a delivery that might vanish.
+  if (!paymentPending && subscription.assignedPartnerId) {
+    // A rider-assignment failure (partner deleted, notification down) must
+    // never undo the order itself — the owner can still assign manually from
+    // the order screen if this silently does nothing.
+    const area = [subscription.address.city, subscription.address.pincode]
+      .filter(Boolean)
+      .join(' ');
+    await autoAssignStandingRider(orderId, orderNumber, subscription.assignedPartnerId, area).catch(
+      () => {},
+    );
+  }
+
   // ── Notifications. Recorded outside the transaction: a failed notification
   // must never roll back the order it was describing.
   if (paymentPending) {
@@ -489,6 +512,40 @@ async function generateForSubscription(
     substituted: substitutions.length,
     dropped: dropped.length,
   };
+}
+
+/** Applies a subscription's standing rider to today's freshly created order —
+    the same write `assignRider` (src/lib/admin/orders.ts) makes for a manual
+    single-order assignment, just triggered by the daily job instead of an
+    admin tap. Throws if the partner no longer exists; the caller swallows
+    that rather than letting a stale assignment undo a real order. */
+async function autoAssignStandingRider(
+  orderId: string,
+  orderNumber: string,
+  partnerId: string,
+  area: string,
+): Promise<void> {
+  const partner = await db.deliveryPartner.findUniqueOrThrow({
+    where: { id: partnerId },
+    select: { userId: true },
+  });
+
+  const assignmentId = newId(ID_PREFIX.deliveryAssignment);
+  await db.deliveryAssignment.create({
+    data: {
+      id: assignmentId,
+      orderId,
+      partnerId,
+      status: 'ASSIGNED',
+      // Never shown to the rider or printed on the picklist — only the
+      // customer reads this out at the door (M10).
+      deliveryOtp: newDeliveryOtp(),
+    },
+  });
+
+  // Immediate, not queued: the nightly notification cron would deliver this
+  // hours after the rider should already be moving.
+  await notifyEventNow(partner.userId, TEMPLATE.orderAssignedRider, { orderId, orderNumber, area });
 }
 
 function firstImage(imageUrls: unknown): string | null {

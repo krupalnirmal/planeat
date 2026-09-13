@@ -788,9 +788,6 @@
       "assignAll": "सभी सुझाए तय करें",
       "assigned": "{count} ऑर्डर को राइडर मिला",
       "noSuggestions": "तय करने को कुछ नहीं",
-      "zoneOrderCount": "{count} ऑर्डर",
-      "zoneLoad": "आज {count}",
-      "zoneAssign": "इस ज़ोन को तय करें",
       "filterAll": "सभी",
       "filterUnassigned": "बिना राइडर",
       "viewDetails": "विवरण देखें",
@@ -905,7 +902,12 @@
       "recentOrders": "हाल के ऑर्डर",
       "noMealPlan": "इस ग्राहक ने अभी तक meal plan सेव नहीं किया",
       "today": "आज",
-      "dayTotal": "इस दिन का बिल"
+      "dayTotal": "इस दिन का बिल",
+      "noStandingRider": "कोई स्थायी राइडर तय नहीं",
+      "setStandingRider": "स्थायी राइडर तय करें",
+      "changeStandingRider": "राइडर बदलें",
+      "riderUnavailable": "उपलब्ध नहीं",
+      "confirmRider": "तय करें"
     },
     "settings": {
       "title": "सेटिंग्स",
@@ -945,8 +947,7 @@
       "actions": "क्रियाएँ",
       "noAccess": "आपको इस पेज की अनुमति नहीं है",
       "back": "वापस",
-      "dismiss": "रहने दें",
-      "unavailable": "उपलब्ध नहीं"
+      "dismiss": "रहने दें"
     }
   },
   "delivery": {

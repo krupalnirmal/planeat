@@ -429,8 +429,10 @@ export type AssignResult =
   | { ok: true; assignmentId: string }
   | { ok: false; reason: 'ORDER_NOT_FOUND' | 'PARTNER_NOT_FOUND' | 'ALREADY_ASSIGNED' };
 
-/** A 4-digit code the customer reads out at the door (M10). */
-function newDeliveryOtp(): string {
+/** A 4-digit code the customer reads out at the door (M10). Also used by
+    `generateForSubscription` (src/lib/subscription/generate-orders.ts) when
+    auto-assigning a subscription's standing rider to its daily order. */
+export function newDeliveryOtp(): string {
   const bytes = new Uint32Array(1);
   crypto.getRandomValues(bytes);
   return String(bytes[0] % 10_000).padStart(4, '0');
