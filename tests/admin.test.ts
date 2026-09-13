@@ -17,6 +17,8 @@ const dbMock = vi.hoisted(() => ({
   product: { findMany: vi.fn() },
   deliveryPartner: { findMany: vi.fn() },
   deliveryAssignment: { groupBy: vi.fn() },
+  subscription: { findMany: vi.fn().mockResolvedValue([]) },
+  mealPlanDay: { findMany: vi.fn().mockResolvedValue([]) },
 }));
 
 vi.mock('@/lib/db', () => ({ db: dbMock }));
@@ -53,6 +55,7 @@ describe('picklist CSV', () => {
     orderCount: 3,
     shortfallCount: 1,
     slips: [],
+    subscriptionStatuses: [],
     lines: [
       {
         productId: 'prd_spinach',

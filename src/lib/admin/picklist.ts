@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
-import { parseDateKey, toDateKey } from '@/lib/meal-plan/pricing';
+import { pickName } from '@/lib/catalog/text';
+import { parseDateKey, toDateKey, weekdayNumber } from '@/lib/meal-plan/pricing';
 import { formatQuantity, type QuantityUnit } from '@/lib/quantity';
 import { istDateKeyOf } from '@/lib/subscription/schedule';
 import type { MealSlot } from '@/generated/prisma/enums';
@@ -69,6 +70,28 @@ export interface PackingSlip {
   notes: string | null;
 }
 
+export interface SubscriptionStatusItem {
+  name: string;
+  variantLabel: string;
+}
+
+export interface SubscriptionStatusRow {
+  subscriptionId: string;
+  customerName: string;
+  customerPhone: string;
+  /** Null when the 00:30 job has not (yet, or ever) generated today's order
+      for this subscription — the gap this section exists to surface, since
+      the aggregate list/slips above are built FROM orders and so show
+      nothing at all for a subscriber the cron failed on. */
+  orderId: string | null;
+  orderStatus: string | null;
+  paymentStatus: string | null;
+  riderName: string | null;
+  /** The plan TEMPLATE for this weekday — what should go out today,
+      regardless of whether an order actually exists yet. */
+  items: SubscriptionStatusItem[];
+}
+
 export interface Picklist {
   dateKey: string;
   orderCount: number;
@@ -76,6 +99,10 @@ export interface Picklist {
   slips: PackingSlip[];
   /** Lines the shop cannot currently cover — the reason to leave early. */
   shortfallCount: number;
+  /** M6 — "My Meal Plan": every ACTIVE subscription covering this date,
+      user-wise, so a cron failure (nothing generated) is still visible here
+      instead of the picklist looking simply empty. */
+  subscriptionStatuses: SubscriptionStatusRow[];
 }
 
 /**
@@ -260,13 +287,86 @@ export async function buildPicklist(
     };
   });
 
+  const subscriptionStatuses = await buildSubscriptionStatuses(scheduledDate, locale);
+
   return {
     dateKey,
     orderCount: orders.length,
     lines,
     slips,
     shortfallCount: lines.filter((line) => line.shortfall > 0).length,
+    subscriptionStatuses,
   };
+}
+
+/** Every ACTIVE subscription covering `scheduledDate`, with whatever order
+    already exists for it (if any) and the plan template for that weekday —
+    so the owner can see a cron failure directly instead of a blank
+    picklist. */
+async function buildSubscriptionStatuses(
+  scheduledDate: Date,
+  locale: string,
+): Promise<SubscriptionStatusRow[]> {
+  const weekday = weekdayNumber(scheduledDate);
+
+  const subscriptions = await db.subscription.findMany({
+    where: { status: 'ACTIVE', startDate: { lte: scheduledDate }, endDate: { gte: scheduledDate } },
+    orderBy: { createdAt: 'asc' },
+    select: {
+      id: true,
+      mealPlanId: true,
+      user: { select: { name: true, phone: true } },
+      orders: {
+        where: { scheduledDate },
+        take: 1,
+        select: {
+          id: true,
+          status: true,
+          paymentStatus: true,
+          assignment: { select: { partner: { select: { user: { select: { name: true } } } } } },
+        },
+      },
+    },
+  });
+
+  if (subscriptions.length === 0) return [];
+
+  const mealPlanIds = [...new Set(subscriptions.map((sub) => sub.mealPlanId))];
+  const days = await db.mealPlanDay.findMany({
+    where: { mealPlanId: { in: mealPlanIds }, dayOfWeek: weekday },
+    select: {
+      mealPlanId: true,
+      items: {
+        orderBy: { sortOrder: 'asc' },
+        select: {
+          product: { select: { nameEn: true, nameMr: true, nameHi: true } },
+          variant: { select: { label: true } },
+        },
+      },
+    },
+  });
+  const dayByPlanId = new Map(days.map((day) => [day.mealPlanId, day]));
+
+  return subscriptions.map((sub) => {
+    const order = sub.orders[0] ?? null;
+    const day = dayByPlanId.get(sub.mealPlanId);
+
+    return {
+      subscriptionId: sub.id,
+      customerName: sub.user.name ?? sub.user.phone,
+      customerPhone: sub.user.phone,
+      orderId: order?.id ?? null,
+      orderStatus: order?.status ?? null,
+      paymentStatus: order?.paymentStatus ?? null,
+      riderName: order?.assignment?.partner.user.name ?? null,
+      items: (day?.items ?? [])
+        .filter((item) => item.variant !== null)
+        .map((item) => ({
+          name: pickName(item.product, locale),
+          variantLabel: item.variant!.label,
+        })),
+    };
+  });
 }
 
 /** Defaults to tomorrow — the picklist is prepared the evening before. */

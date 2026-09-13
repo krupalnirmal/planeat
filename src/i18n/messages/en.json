@@ -733,6 +733,8 @@
     "picklist": {
       "title": "Picklist",
       "subtitle": "For delivery on {date}",
+      "mealPlanTitle": "My Meal Plan",
+      "notGenerated": "Not generated yet",
       "aggregate": "What to buy",
       "slips": "Packing slips",
       "item": "Item",

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { AlertTriangle, Download, Printer, Sunrise, Sunset } from 'lucide-react';
+import { AlertTriangle, Download, Printer, Sunrise, Sunset, UtensilsCrossed } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
@@ -60,17 +60,35 @@ interface PackingSlip {
   notes: string | null;
 }
 
+interface SubscriptionStatusItem {
+  name: string;
+  variantLabel: string;
+}
+
+interface SubscriptionStatusRow {
+  subscriptionId: string;
+  customerName: string;
+  customerPhone: string;
+  orderId: string | null;
+  orderStatus: string | null;
+  paymentStatus: string | null;
+  riderName: string | null;
+  items: SubscriptionStatusItem[];
+}
+
 interface PicklistResponse {
   dateKey: string;
   orderCount: number;
   lines: PicklistLine[];
   slips: PackingSlip[];
   shortfallCount: number;
+  subscriptionStatuses: SubscriptionStatusRow[];
 }
 
 export function PicklistScreen() {
   const t = useTranslations('admin.picklist');
   const tc = useTranslations('admin.common');
+  const tStatus = useTranslations('orders.status');
   const locale = useLocale();
 
   const [date, setDate] = useState<string | null>(null);
@@ -121,6 +139,26 @@ export function PicklistScreen() {
           </>
         }
       />
+
+      {/* ── M6 — every ACTIVE subscription for this date, user-wise, whether
+          or not the 00:30 job actually generated its order. The aggregate
+          and slips below are built FROM orders, so a cron failure (nothing
+          generated) leaves them completely blank with no way to tell which
+          subscribers were even supposed to get a delivery today — this
+          section is the one that still shows something in that case. */}
+      {data.subscriptionStatuses.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-3 flex items-center gap-2 text-base font-semibold">
+            <UtensilsCrossed className="size-4 text-primary" aria-hidden />
+            {t('mealPlanTitle')}
+          </h2>
+          <ul className="space-y-2">
+            {data.subscriptionStatuses.map((sub) => (
+              <SubscriptionStatusCard key={sub.subscriptionId} sub={sub} t={t} tStatus={tStatus} />
+            ))}
+          </ul>
+        </section>
+      )}
 
       {data.orderCount === 0 ? (
         <p className="rounded-[var(--radius)] border border-dashed border-border bg-card px-4 py-10 text-center text-sm text-muted-foreground">
@@ -244,6 +282,60 @@ export function PicklistScreen() {
         </>
       )}
     </>
+  );
+}
+
+function SubscriptionStatusCard({
+  sub,
+  t,
+  tStatus,
+}: {
+  sub: SubscriptionStatusRow;
+  t: ReturnType<typeof useTranslations<'admin.picklist'>>;
+  tStatus: ReturnType<typeof useTranslations<'orders.status'>>;
+}) {
+  const generated = sub.orderStatus !== null;
+
+  return (
+    <li
+      className={cn(
+        'rounded-[var(--radius)] border p-3',
+        generated ? 'border-border bg-card' : 'border-danger/40 bg-danger/5',
+      )}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-bold">{sub.customerName}</p>
+          <p className="text-xs text-muted-foreground">{sub.customerPhone}</p>
+        </div>
+        <div className="text-right">
+          <span
+            className={cn(
+              'rounded-full px-2.5 py-0.5 text-[11px] font-bold',
+              generated ? 'bg-secondary text-muted-foreground' : 'bg-danger/10 text-danger',
+            )}
+          >
+            {generated ? tStatus(sub.orderStatus as never) : t('notGenerated')}
+          </span>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            {sub.riderName ?? t('unassigned')}
+          </p>
+        </div>
+      </div>
+
+      {sub.items.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {sub.items.map((item, index) => (
+            <span
+              key={`${item.name}-${index}`}
+              className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium"
+            >
+              {item.name} <span className="text-muted-foreground">({item.variantLabel})</span>
+            </span>
+          ))}
+        </div>
+      )}
+    </li>
   );
 }
 

@@ -733,6 +733,8 @@
     "picklist": {
       "title": "खरीद की सूची",
       "subtitle": "{date} की डिलीवरी के लिए",
+      "mealPlanTitle": "मेरा मील प्लान",
+      "notGenerated": "अभी तैयार नहीं हुआ",
       "aggregate": "कुल खरीद",
       "slips": "हर ग्राहक की पर्ची",
       "item": "चीज़",
