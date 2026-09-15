@@ -1,5 +1,5 @@
 import { newDeliveryOtp } from '@/lib/admin/orders';
-import { pickName } from '@/lib/catalog/text';
+import { firstImage, pickName } from '@/lib/catalog/text';
 import { db } from '@/lib/db';
 import { isUniqueViolation } from '@/lib/db-errors';
 import { ID_PREFIX, newId, newOrderNumber } from '@/lib/ids';
@@ -546,12 +546,6 @@ async function autoAssignStandingRider(
   // Immediate, not queued: the nightly notification cron would deliver this
   // hours after the rider should already be moving.
   await notifyEventNow(partner.userId, TEMPLATE.orderAssignedRider, { orderId, orderNumber, area });
-}
-
-function firstImage(imageUrls: unknown): string | null {
-  if (!Array.isArray(imageUrls) || imageUrls.length === 0) return null;
-  const first = imageUrls[0];
-  return typeof first === 'string' && first !== '' ? first : null;
 }
 
 export type { SubscriptionRow };

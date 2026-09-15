@@ -3,12 +3,11 @@ import { ApiError, parseJson, parseQuery, route } from '@/lib/api/handler';
 import { ERROR_CODES, ok } from '@/lib/api/response';
 import { requireUser } from '@/lib/auth/session';
 import { db } from '@/lib/db';
+import { DURATION_OPTIONS } from '@/lib/meal-plan/pricing';
 import { activateSubscription, getSubscriptionQuote } from '@/lib/meal-plan/subscribe';
 import { cuidSchema } from '@/lib/validators/common';
 
 export const dynamic = 'force-dynamic';
-
-const DURATION_OPTIONS = [7, 15, 30] as const;
 
 const quoteQuerySchema = z.object({
   durationDays: z.coerce.number().int().refine((n) => (DURATION_OPTIONS as readonly number[]).includes(n)),

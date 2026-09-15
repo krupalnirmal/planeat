@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { pickName } from '@/lib/catalog/text';
+import { firstImage, pickName } from '@/lib/catalog/text';
 import { ID_PREFIX, newId } from '@/lib/ids';
 import type { Locale } from '@/generated/prisma/enums';
 import { DAILY_ESSENTIAL_VEGETABLE_SKUS, PLAN_CATEGORY_SLUGS, SPROUT_SKUS, type PlanCategorySlug } from './plan-categories';
@@ -263,6 +263,7 @@ export async function saveCustomerPlan(
 export interface PlanColumnProduct {
   id: string;
   name: string;
+  imageUrl: string | null;
   variants: Array<{ id: string; label: string; pricePaise: bigint }>;
 }
 
@@ -302,6 +303,7 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
           nameEn: true,
           nameMr: true,
           nameHi: true,
+          imageUrls: true,
           variants: {
             where: { isActive: true, stockQty: { gt: 0 } },
             orderBy: [{ isDefault: 'desc' }, { quantity: 'asc' }],
@@ -331,12 +333,18 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
         if (slug !== 'vegetables') return true;
         const curated = curatedLists.find((list) => list.skus.includes(product.sku));
         if (!curated) return true;
-        curated.bySku.set(product.sku, { id: product.id, name: pickName(product, locale), variants: product.variants });
+        curated.bySku.set(product.sku, {
+          id: product.id,
+          name: pickName(product, locale),
+          imageUrl: firstImage(product.imageUrls),
+          variants: product.variants,
+        });
         return false;
       })
       .map((product) => ({
         id: product.id,
         name: pickName(product, locale),
+        imageUrl: firstImage(product.imageUrls),
         variants: product.variants,
       }));
 

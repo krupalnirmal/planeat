@@ -148,9 +148,14 @@ export const env = {
     complaintAutoCreditMaxPaise: num('COMPLAINT_AUTO_CREDIT_MAX_PAISE', 10000),
     complaintAutoCreditMonthlyLimit: num('COMPLAINT_AUTO_CREDIT_MONTHLY_LIMIT', 2),
 
-    mealPlanTrialDays: num('MEAL_PLAN_TRIAL_DAYS', 7),
+    // Session 2026-09-15 (client reference): raised from 7 so the trial
+    // actually covers the "10-day trial" the marketing copy promises — a
+    // 10-day option was added to the durations below specifically so a
+    // first-time customer can pick a duration this threshold actually
+    // waives the plan fee for, rather than the number being decorative.
+    mealPlanTrialDays: num('MEAL_PLAN_TRIAL_DAYS', 10),
     mealPlanDefaultDurationDays: num('MEAL_PLAN_DEFAULT_DURATION_DAYS', 30),
-    mealPlanDurationOptions: csv('MEAL_PLAN_DURATION_OPTIONS', ['7', '15', '30']).map(Number),
+    mealPlanDurationOptions: csv('MEAL_PLAN_DURATION_OPTIONS', ['7', '10', '15', '30']).map(Number),
     mealPlanRefreshPromptWeeks: num('MEAL_PLAN_REFRESH_PROMPT_WEEKS', 4),
     servingGramsPerAdult: num('DEFAULT_SERVING_GRAMS_PER_ADULT', 200),
     childServingMultiplier: num('CHILD_SERVING_MULTIPLIER', 0.5),

@@ -46,6 +46,9 @@ const SHARED_LATIN_KEYS = new Set([
   'admin.catalogue.mrp',
   'app.name',
   'home.benefitsFreshTitle',
+  // Always written in Latin even in Marathi/Hindi UI — the payment gateway's
+  // own name, not a translatable word.
+  'mealPlan.subscribe.method.upi',
 ]);
 
 describe('message catalogues', () => {

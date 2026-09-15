@@ -62,6 +62,16 @@ export function hasDevanagari(input: string): boolean {
   return /[ऀ-ॿ]/.test(input);
 }
 
+/** `Product.imageUrls` is a freeform JSON array — this is the one place
+    that trusts its shape enough to pull out a usable cover image. Shared
+    so the daily-order generator and the meal-plan product cards agree on
+    what "no photo" looks like. */
+export function firstImage(imageUrls: unknown): string | null {
+  if (!Array.isArray(imageUrls) || imageUrls.length === 0) return null;
+  const first = imageUrls[0];
+  return typeof first === 'string' && first !== '' ? first : null;
+}
+
 /**
  * Common Latin spellings of Marathi/Hindi sounds, so `kanda`, `kaanda` and
  * `khanda` collapse to the same key. This catches the typing variation the

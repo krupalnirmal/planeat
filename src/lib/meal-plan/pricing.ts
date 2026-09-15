@@ -16,8 +16,10 @@ import { addPercent } from '@/lib/money';
 /** 1 = Monday … 7 = Sunday, matching `meal_plan_days.day_of_week`. */
 export type WeekdayNumber = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
-/** B5 — the only durations offered. */
-export const DURATION_OPTIONS = [7, 15, 30] as const;
+/** B5 — the only durations offered. 10 added (session 2026-09-15) so the
+    trial-days threshold below waives the plan fee for a real, selectable
+    duration rather than being a number nobody can actually pick. */
+export const DURATION_OPTIONS = [7, 10, 15, 30] as const;
 export type DurationDays = (typeof DURATION_OPTIONS)[number];
 
 /**

@@ -1,17 +1,56 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarRange, ChevronLeft, MapPin, PauseCircle, PlayCircle, XCircle } from 'lucide-react';
+import {
+  AlertTriangle,
+  CalendarRange,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  MapPin,
+  Package,
+  PauseCircle,
+  PlayCircle,
+  Wallet,
+  XCircle,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { CenteredState, PageHeader } from '@/components/shop/page-header';
+import { MyWeek, type WeekDay } from '@/components/subscription/my-week';
+import { TopupSheet } from '@/components/wallet/topup-sheet';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
-/** M6 — pause a range, resume, cancel, and change address for future days. */
+/** M6 — pause a range, resume, cancel, and change address for future days.
+    Extended (session 2026-09-15, client reference) into the "During Plan"
+    dashboard: a progress bar, a wallet quick-view with a low-balance
+    reminder, and the day-by-day schedule (`MyWeek`, previously built but
+    never mounted anywhere) instead of just the bare "N days left" this
+    screen used to show. */
+
+interface WalletResponse {
+  balancePaise: string;
+  isLowBalance: boolean;
+  lowBalanceThresholdPaise: string;
+  topupPresetsPaise: string[];
+  minimumTopupPaise: string;
+}
+
+/** IST calendar date "now" — same UTC+5:30 shift the server-side
+    `istDateKeyOf` uses, reimplemented since this runs client-side. */
+function todayIstDateKey(): string {
+  return new Date(Date.now() + 5.5 * 3_600_000).toISOString().slice(0, 10);
+}
+
+/** Whole calendar days between two dates — accepts either a `YYYY-MM-DD` key
+    or a full ISO timestamp (the subscription API returns the latter). */
+function daysBetween(from: string, to: string): number {
+  return Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000);
+}
 
 interface SubscriptionResponse {
   subscription: {
@@ -22,6 +61,11 @@ interface SubscriptionResponse {
     daysUntilEnd: number;
     address: { id: string; label: string; line1: string; city: string; pincode: string };
   } | null;
+  /** M6's "My Week" — already bundled into this same response
+      (`src/app/api/subscriptions/current/route.ts`: "two round trips to
+      Singapore for one screen is one too many"), so `MyWeek` below reads
+      straight off it instead of its own fetch. */
+  week: { subscriptionId: string; days: WeekDay[] } | null;
 }
 
 export function SubscriptionManageScreen() {
@@ -35,6 +79,7 @@ export function SubscriptionManageScreen() {
   const [pauseTo, setPauseTo] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [topupOpen, setTopupOpen] = useState(false);
 
   const current = useQuery({
     queryKey: ['subscription-current'],
@@ -42,6 +87,11 @@ export function SubscriptionManageScreen() {
   });
 
   const subscription = current.data?.subscription ?? null;
+
+  const wallet = useQuery({
+    queryKey: ['wallet'],
+    queryFn: () => api.get<WalletResponse>('/api/wallet'),
+  });
 
   function refresh() {
     void queryClient.invalidateQueries({ queryKey: ['subscription-current'] });
@@ -157,6 +207,23 @@ export function SubscriptionManageScreen() {
       </header>
 
       <main className="space-y-2 pb-2">
+      {/* ── Screen 9: "During Plan" — progress, wallet, quick links.
+          Replaces the bare "N days left" the header used to be the only
+          place showing. */}
+      {subscription.status === 'ACTIVE' && (
+        <DuringPlanDashboard
+          subscription={subscription}
+          wallet={wallet.data}
+          onAddMoney={() => setTopupOpen(true)}
+        />
+      )}
+
+      {subscription.status === 'ACTIVE' && current.data?.week && current.data.week.days.length > 0 && (
+        <section className="bg-card px-4 py-4">
+          <MyWeek subscriptionId={subscription.id} days={current.data.week.days} todayKey={todayIstDateKey()} />
+        </section>
+      )}
+
       {(notice || error) && (
         <div className="bg-card px-4 py-4">
           {notice && (
@@ -286,6 +353,126 @@ export function SubscriptionManageScreen() {
         </section>
       )}
       </main>
+
+      {topupOpen && wallet.data && (
+        <TopupSheet
+          presetsPaise={wallet.data.topupPresetsPaise}
+          minimumPaise={wallet.data.minimumTopupPaise}
+          onClose={() => setTopupOpen(false)}
+        />
+      )}
     </>
+  );
+}
+
+function DuringPlanDashboard({
+  subscription,
+  wallet,
+  onAddMoney,
+}: {
+  subscription: NonNullable<SubscriptionResponse['subscription']>;
+  wallet: WalletResponse | undefined;
+  onAddMoney: () => void;
+}) {
+  const t = useTranslations('subscription');
+
+  const totalDays = daysBetween(subscription.startDate, subscription.endDate) + 1;
+  const daysCompleted = Math.max(0, totalDays - subscription.daysUntilEnd);
+  const progressPercent = totalDays > 0 ? Math.min(100, Math.round((daysCompleted / totalDays) * 100)) : 0;
+
+  return (
+    <section className="space-y-3 bg-card px-4 py-4">
+      <div>
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-bold">{daysCompleted}</span>
+          <span className="font-bold">{subscription.daysUntilEnd}</span>
+        </div>
+        <div className="h-2 overflow-hidden rounded-full bg-secondary">
+          <div className="h-full rounded-full bg-primary" style={{ width: `${progressPercent}%` }} />
+        </div>
+        <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+          <span>{t('daysCompleted')}</span>
+          <span>{t('daysRemaining')}</span>
+        </div>
+      </div>
+
+      {wallet && (
+        <div className="flex items-center justify-between rounded-[var(--radius)] bg-tint-green px-3 py-2.5">
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-primary-dark">
+            <Wallet className="size-3.5" aria-hidden />
+            {t('walletBalance')}
+          </span>
+          <span className="text-sm font-bold">{formatPaise(paise(wallet.balancePaise))}</span>
+        </div>
+      )}
+
+      {wallet?.isLowBalance && (
+        <LowBalanceReminder wallet={wallet} onAddMoney={onAddMoney} />
+      )}
+
+      <ul className="divide-y divide-border overflow-hidden rounded-[var(--radius)] border border-border">
+        <QuickLink href="/meal-plan/build/summary" icon={ClipboardList} label={t('viewPlanDetails')} />
+        <QuickLink href="/orders" icon={Package} label={t('ordersAndDeliveries')} />
+        <li>
+          <button
+            type="button"
+            onClick={onAddMoney}
+            className="flex w-full items-center justify-between gap-3 px-3 py-3 text-left"
+          >
+            <span className="flex items-center gap-2.5 text-sm font-medium">
+              <Wallet className="size-4 text-muted-foreground" aria-hidden />
+              {t('addMoneyToWallet')}
+            </span>
+            <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
+          </button>
+        </li>
+      </ul>
+    </section>
+  );
+}
+
+function QuickLink({ href, icon: Icon, label }: { href: string; icon: typeof ClipboardList; label: string }) {
+  return (
+    <li>
+      <Link href={href} className="flex items-center justify-between gap-3 px-3 py-3">
+        <span className="flex items-center gap-2.5 text-sm font-medium">
+          <Icon className="size-4 text-muted-foreground" aria-hidden />
+          {label}
+        </span>
+        <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
+      </Link>
+    </li>
+  );
+}
+
+/** Screen 10 — a recommended top-up sized to clear the low-balance
+    threshold, rounded up to whichever configured preset covers it (falling
+    back to the largest preset if none do). */
+function LowBalanceReminder({ wallet, onAddMoney }: { wallet: WalletResponse; onAddMoney: () => void }) {
+  const t = useTranslations('subscription');
+
+  const gap = paise(wallet.lowBalanceThresholdPaise) - paise(wallet.balancePaise);
+  const presets = wallet.topupPresetsPaise
+    .map((p) => paise(p))
+    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  const recommended = presets.find((p) => p >= gap) ?? presets[presets.length - 1] ?? gap;
+
+  return (
+    <div className="rounded-[var(--radius)] border border-warning/40 bg-[#FDF3E3] p-3">
+      <p className="flex items-center gap-1.5 text-sm font-bold text-warning">
+        <AlertTriangle className="size-4 shrink-0" aria-hidden />
+        {t('lowBalanceTitle')}
+      </p>
+      <p className="mt-1 text-xs text-warning/90">
+        {t('lowBalanceSubtitle', { amount: formatPaise(paise(wallet.balancePaise)) })}
+      </p>
+      <button
+        type="button"
+        onClick={onAddMoney}
+        className="mt-2.5 flex h-10 w-full items-center justify-center gap-1.5 rounded-[var(--radius)] bg-primary text-xs font-bold text-primary-foreground"
+      >
+        {t('recommendedAdd', { amount: formatPaise(recommended, { hidePaise: true }) })}
+      </button>
+    </div>
   );
 }
