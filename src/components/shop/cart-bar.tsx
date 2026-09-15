@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
 import { useCart } from '@/hooks/use-cart';
-import { useIsAtTop } from '@/hooks/use-is-at-top';
 import { formatPaise, paise } from '@/lib/money';
 
 /**
@@ -50,7 +49,6 @@ export function CartBar() {
   const t = useTranslations('cart');
   const pathname = usePathname();
   const cart = useCart();
-  const atTop = useIsAtTop();
   const barRef = useRef<HTMLDivElement>(null);
 
   const visible =
@@ -97,16 +95,12 @@ export function CartBar() {
       // 2026-08-26, client feedback: the full-width bar read as too big) —
       // still one stacked unit with the free-delivery nudge above it, just
       // a compact floating pill instead of a bar spanning the screen.
-      className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-14 transition-[bottom] duration-300 ease-out"
+      className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-14"
       style={{
-        // The nav (BottomNav) stays laid out even while scroll-hidden — it
-        // only translates off-screen — so reserving its height here
-        // unconditionally left this bar floating above a strip of empty
-        // page with nothing under it whenever the nav was hidden (session
-        // 2026-08-30). Drop to just the safe-area gap in that state.
-        bottom: atTop
-          ? `calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 0.5rem)`
-          : `calc(env(safe-area-inset-bottom, 0px) + 0.5rem)`,
+        // BottomNav is always visible now (session 2026-09-16), so this
+        // always sits above its fixed height — same pattern every other
+        // sticky bar in the app already uses.
+        bottom: `calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 0.5rem)`,
       }}
     >
       {forFreeDelivery > 0n && (

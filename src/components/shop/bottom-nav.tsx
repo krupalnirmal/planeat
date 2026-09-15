@@ -3,7 +3,6 @@
 import { Home, Mic, Salad, User, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
-import { useIsAtTop } from '@/hooks/use-is-at-top';
 import { cn } from '@/lib/utils';
 
 /**
@@ -20,6 +19,14 @@ import { cn } from '@/lib/utils';
  * four sections (cart, checkout, product pages, orders, login, …) — the
  * reference shows Home highlighted on the cart screen even though "/cart"
  * isn't itself one of the five tab routes.
+ *
+ * Session 2026-09-16 (client feedback): always visible now, not just at the
+ * top of the page — the earlier "hide on scroll" behaviour (session
+ * 2026-08-26) read as the nav disappearing/breaking rather than as
+ * intentional chrome. `CartBar` (src/components/shop/cart-bar.tsx), the
+ * only other thing that used to watch scroll position for this, now just
+ * always sits above this nav's fixed height instead of conditionally
+ * dropping to the raw screen edge.
  */
 
 const TABS = [
@@ -42,20 +49,11 @@ const NON_HOME_PREFIXES = ['/smart-list', '/meal-plan', '/wallet', '/profile'] a
 export function BottomNav() {
   const t = useTranslations('nav');
   const pathname = usePathname();
-  const atTop = useIsAtTop();
 
   return (
     <nav
       aria-label={t('home')}
-      // Kept in the DOM and always laid out — only transform/opacity move,
-      // so nothing that positions itself off this nav's height (CartBar,
-      // the various sticky action bars via --bottom-nav-height) has to
-      // know or care whether it's currently showing.
-      inert={!atTop}
-      className={cn(
-        'fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] border-t border-border bg-accent-faint transition-[transform,opacity] duration-300 ease-out',
-        atTop ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-full opacity-0',
-      )}
+      className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] border-t border-border bg-accent-faint"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <ul className="grid grid-cols-5 gap-1 px-1.5 py-2">
