@@ -463,7 +463,10 @@ function DurationStep({
         {t('durationHint')}
       </p>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4">
+      <div
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+        style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
+      >
         <button
           type="button"
           onClick={onContinue}
@@ -601,7 +604,10 @@ function SummaryStep({
         )}
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4">
+      <div
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+        style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
+      >
         <button
           type="button"
           onClick={shortfall > 0n ? onNeedsTopup : onContinue}
@@ -688,7 +694,10 @@ function TopupStep({
         )}
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4">
+      <div
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+        style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
+      >
         <button
           type="button"
           disabled={belowMinimum}
@@ -790,7 +799,10 @@ function PaymentMethodStep({
         <span className="text-base font-black">{formatPaise(paise(amountPaise))}</span>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4">
+      <div
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+        style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
+      >
         <button
           type="button"
           disabled={paying}
@@ -892,7 +904,10 @@ function ConfirmStep({
 
       {error && <p className="rounded-[var(--radius)] bg-danger/10 px-3 py-2.5 text-sm text-danger">{error}</p>}
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4">
+      <div
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+        style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
+      >
         <button
           type="button"
           disabled={activating}

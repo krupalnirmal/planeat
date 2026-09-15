@@ -112,7 +112,10 @@ export function WeeklySummaryScreen() {
         </div>
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4">
+      <div
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+        style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
+      >
         <button
           type="button"
           disabled={weekItems === 0 || save.isPending}
