@@ -7,6 +7,7 @@ import { LoginPrompt } from '@/components/shop/login-prompt';
 import { Link } from '@/i18n/navigation';
 import { useSession } from '@/hooks/use-session';
 import { api, qs } from '@/lib/api/client';
+import { formatPaise, paise } from '@/lib/money';
 
 /**
  * Wizard screen 1 — "My Meal Plan" home / entry point. Restyled (session
@@ -14,17 +15,21 @@ import { api, qs } from '@/lib/api/client';
  * cards, `public/meal-plan/*`, cropped from the client's own asset sheet)
  * from the earlier gradient-and-lucide-icon version.
  *
- * The reference mockup also had a second row — "Quick & Smart Plan",
- * "Daily Dairy & Bakery", "Your Savings & Stats" (a fabricated "₹1200 saved
- * this month") — deliberately left out: none of those correspond to a real,
- * working feature (there is no curated starter pack, no savings-tracking
- * calculation anywhere in the app), and showing a made-up number would be
- * showing the customer something false about their own account.
+ * The reference mockup's second row — "Quick & Smart Plan", "Daily Dairy &
+ * Bakery", "Your Savings & Stats" — is built for real rather than as
+ * decoration: the savings figure is `weeklySavingsPaise`
+ * (src/lib/meal-plan/queries.ts), the actual MRP-vs-price gap summed across
+ * the saved plan, not a made-up number; the dairy/bakery photo is that
+ * category's own real `iconUrl` (already fetched for the builder's category
+ * tabs); both cards link somewhere real (the builder, and the storefront's
+ * own dairy category) instead of nowhere.
  */
 
 interface PlanSummary {
   plan: { days: Array<{ items: unknown[] }> } | null;
   hasActiveSubscription: boolean;
+  weeklySavingsPaise: string;
+  columns: Array<{ slug: string; iconUrl: string | null }>;
 }
 
 export function MealPlanScreen() {
@@ -58,6 +63,8 @@ export function MealPlanScreen() {
 
   const data = current.data;
   const hasSavedItems = (data?.plan?.days ?? []).some((day) => day.items.length > 0);
+  const dairyImage = data?.columns.find((c) => c.slug === 'dairy')?.iconUrl ?? null;
+  const savings = paise(data?.weeklySavingsPaise ?? '0');
 
   return (
     <main className="pb-6">
@@ -90,7 +97,49 @@ export function MealPlanScreen() {
           {hasSavedItems ? t('wizard.viewMyPlanCta') : t('wizard.createMyPlanCta')}
           <ChevronRight className="size-4" aria-hidden />
         </Link>
+      </div>
 
+      {/* Screen 1's second row — a real shortcut into the builder, a real
+          shortcut into the dairy/bakery shelf, and the plan's own real
+          savings total, not the mockup's decorative trio. */}
+      <div className="grid grid-cols-3 gap-2.5 px-4 pt-4">
+        <Link
+          href="/meal-plan/build"
+          className="flex flex-col items-center gap-2 rounded-2xl bg-card p-2.5 text-center ring-1 ring-border"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/meal-plan/icon-quickplan.png" alt="" className="aspect-[3/2] w-full rounded-xl object-cover" />
+          <span className="text-[11px] leading-tight font-bold">{t('wizard.quickPlanTitle')}</span>
+          <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold text-primary-foreground">
+            {t('wizard.seeOptions')}
+          </span>
+        </Link>
+
+        <Link
+          href="/category/dairy"
+          className="flex flex-col items-center gap-2 rounded-2xl bg-card p-2.5 text-center ring-1 ring-border"
+        >
+          {dairyImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={dairyImage} alt="" className="aspect-[3/2] w-full rounded-xl object-cover" />
+          ) : (
+            <div className="aspect-[3/2] w-full rounded-xl bg-tint-green" />
+          )}
+          <span className="text-[11px] leading-tight font-bold">{t('wizard.dairyBakeryTitle')}</span>
+        </Link>
+
+        <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-card p-2.5 text-center ring-1 ring-border">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/meal-plan/icon-savings.png" alt="" className="size-14 object-contain" />
+          <span className="text-[10px] leading-tight font-semibold text-muted-foreground">
+            {t('wizard.savingsTitle')}
+          </span>
+          <span className="text-base font-black text-primary">{formatPaise(savings, { hidePaise: true })}</span>
+          <span className="text-[9px] leading-tight text-muted-foreground">{t('wizard.savingsHint')}</span>
+        </div>
+      </div>
+
+      <div className="space-y-3 px-4 pt-4">
         {/* The missing next step: a saved plan alone never did anything —
             nothing created the Subscription row the daily generation cron
             reads from. Hidden once one is already running, so this is

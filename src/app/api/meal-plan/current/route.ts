@@ -3,7 +3,7 @@ import { parseJson, parseQuery, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
 import { requireUser } from '@/lib/auth/session';
 import { db } from '@/lib/db';
-import { getCustomerPlan, getPlanColumns, saveCustomerPlan } from '@/lib/meal-plan/queries';
+import { getCustomerPlan, getPlanColumns, saveCustomerPlan, weeklySavingsPaise } from '@/lib/meal-plan/queries';
 import { localeSchema } from '@/lib/validators/common';
 
 export const dynamic = 'force-dynamic';
@@ -33,7 +33,16 @@ export const GET = route(async (request: Request) => {
     }),
   ]);
 
-  return ok({ plan, columns, dailyEssentials, sprouts, hasActiveSubscription: activeSubscription !== null });
+  return ok({
+    plan,
+    columns,
+    dailyEssentials,
+    sprouts,
+    hasActiveSubscription: activeSubscription !== null,
+    // The home screen's "Your Savings" card — real, computed from the
+    // saved plan's own MRP-vs-price gap, never a decorative number.
+    weeklySavingsPaise: plan ? weeklySavingsPaise(plan).toString() : '0',
+  });
 });
 
 const saveSchema = z.object({

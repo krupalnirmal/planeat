@@ -458,7 +458,12 @@
       "homeHealthy": "सेहतमंद जीवनशैली",
       "viewMyPlanCta": "मेरा प्लान देखें",
       "createMyPlanCta": "मेरा प्लान बनाएं",
-      "viewSubscription": "मेरा सब्सक्रिप्शन देखें"
+      "viewSubscription": "मेरा सब्सक्रिप्शन देखें",
+      "quickPlanTitle": "झटपट स्मार्ट प्लान",
+      "seeOptions": "विकल्प देखें",
+      "dairyBakeryTitle": "रोज़ का दूध व बेकरी",
+      "savingsTitle": "आपकी बचत",
+      "savingsHint": "आपके प्लान पर बचत"
     },
     "subscribe": {
       "cta": "मेरी डिलीवरी शुरू करें",

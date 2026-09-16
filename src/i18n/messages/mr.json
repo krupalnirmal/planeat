@@ -458,7 +458,12 @@
       "homeHealthy": "आरोग्यदायी जीवनशैली",
       "viewMyPlanCta": "माझा प्लॅन बघा",
       "createMyPlanCta": "माझा प्लॅन तयार करा",
-      "viewSubscription": "माझं सबस्क्रिप्शन बघा"
+      "viewSubscription": "माझं सबस्क्रिप्शन बघा",
+      "quickPlanTitle": "झटपट स्मार्ट प्लॅन",
+      "seeOptions": "पर्याय बघा",
+      "dairyBakeryTitle": "रोजचं दूध व बेकरी",
+      "savingsTitle": "तुमची बचत",
+      "savingsHint": "तुमच्या प्लॅनवर बचत"
     },
     "subscribe": {
       "cta": "माझी डिलिव्हरी सुरू करा",

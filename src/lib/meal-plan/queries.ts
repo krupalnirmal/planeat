@@ -22,6 +22,7 @@ export interface PlanItemView {
   name: string;
   variantLabel: string;
   pricePaise: bigint;
+  mrpPaise: bigint;
 }
 
 export interface PlanDayView {
@@ -46,7 +47,7 @@ const planSelect = {
           productId: true,
           variantId: true,
           product: { select: { nameEn: true, nameMr: true, nameHi: true } },
-          variant: { select: { label: true, pricePaise: true } },
+          variant: { select: { label: true, pricePaise: true, mrpPaise: true } },
         },
       },
     },
@@ -73,6 +74,7 @@ function shapePlan(plan: RawPlan, locale: Locale): CustomerPlanView {
           name: pickName(item.product, locale),
           variantLabel: item.variant.label,
           pricePaise: item.variant.pricePaise,
+          mrpPaise: item.variant.mrpPaise,
         })),
     })),
   };
@@ -88,6 +90,22 @@ export async function getCustomerPlan(userId: string, locale: Locale): Promise<C
   if (!plan) return null;
 
   return shapePlan(plan, locale);
+}
+
+/** Real savings, not a decorative number: the sum of (MRP − price) across
+    every picked item for the whole week, the same discount every product
+    card already shows per item (`ProductCard`'s own `hasDiscount`) — just
+    totalled across a saved plan for the home screen's "Your Savings" card. */
+export function weeklySavingsPaise(plan: CustomerPlanView): bigint {
+  return plan.days.reduce(
+    (weekSum, day) =>
+      weekSum +
+      day.items.reduce((daySum, item) => {
+        const discount = item.mrpPaise - item.pricePaise;
+        return daySum + (discount > 0n ? discount : 0n);
+      }, 0n),
+    0n,
+  );
 }
 
 export interface PlanDayCost {

@@ -458,7 +458,12 @@
       "homeHealthy": "Healthy Lifestyle",
       "viewMyPlanCta": "View My Plan",
       "createMyPlanCta": "Create My Plan",
-      "viewSubscription": "View My Subscription"
+      "viewSubscription": "View My Subscription",
+      "quickPlanTitle": "Quick & Smart Plan",
+      "seeOptions": "See Options",
+      "dairyBakeryTitle": "Daily Dairy & Bakery",
+      "savingsTitle": "Your Savings",
+      "savingsHint": "Saved on your plan"
     },
     "subscribe": {
       "cta": "Start my deliveries",
