@@ -270,6 +270,11 @@ export interface PlanColumnProduct {
 export interface PlanColumn {
   slug: PlanCategorySlug;
   name: string;
+  /** The category's own real photo (admin-uploaded) — falls back to its
+      first pickable product's photo when the category has none set, so the
+      wizard's category tab is never a bare glyph while any real product
+      image exists to show instead. */
+  iconUrl: string | null;
   products: PlanColumnProduct[];
 }
 
@@ -294,6 +299,7 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
       nameEn: true,
       nameMr: true,
       nameHi: true,
+      iconUrl: true,
       products: {
         where: { isActive: true, isMealPlanEligible: true, variants: { some: { isActive: true, stockQty: { gt: 0 } } } },
         orderBy: [{ sortOrder: 'asc' }, { nameEn: 'asc' }],
@@ -326,7 +332,7 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
 
   const columns = PLAN_CATEGORY_SLUGS.map((slug) => {
     const category = bySlug.get(slug);
-    if (!category) return { slug, name: slug, products: [] };
+    if (!category) return { slug, name: slug, iconUrl: null, products: [] };
 
     const products = category.products
       .filter((product) => {
@@ -348,7 +354,12 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
         variants: product.variants,
       }));
 
-    return { slug, name: pickName(category, locale), products };
+    return {
+      slug,
+      name: pickName(category, locale),
+      iconUrl: category.iconUrl ?? firstImage(category.products[0]?.imageUrls),
+      products,
+    };
   });
 
   // Display order follows each curated list's own ordering, not whatever

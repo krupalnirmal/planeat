@@ -38,6 +38,7 @@ export interface DraftProduct {
 export interface DraftColumn {
   slug: string;
   name: string;
+  iconUrl: string | null;
   products: DraftProduct[];
 }
 
@@ -112,8 +113,8 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
   const allColumns = useMemo<DraftColumn[]>(() => {
     if (!data) return [];
     const curated: DraftColumn[] = [
-      { slug: '__daily_essentials__', name: '', products: data.dailyEssentials },
-      { slug: '__sprouts__', name: '', products: data.sprouts },
+      { slug: '__daily_essentials__', name: '', iconUrl: null, products: data.dailyEssentials },
+      { slug: '__sprouts__', name: '', iconUrl: null, products: data.sprouts },
     ].filter((c) => c.products.length > 0);
     return [...data.columns, ...curated];
   }, [data]);
