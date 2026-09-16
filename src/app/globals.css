@@ -148,8 +148,9 @@
      reading as a solid yellow band. */
   --accent-faint: #fdf6e6;
 
-  /* Safe-area aware height of the 5-tab bottom navigation. */
-  --bottom-nav-height: 4.25rem;
+  /* Safe-area aware height of the 5-tab bottom navigation — bumped 0.5rem
+     (session 2026-09-17) to match the floating card's own bottom gap. */
+  --bottom-nav-height: 4.75rem;
 
   /* The floating cart bar's actual rendered height, written by CartBar
      itself (0px when it isn't showing) — see .app-scroll below. Never

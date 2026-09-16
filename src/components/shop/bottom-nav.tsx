@@ -10,23 +10,22 @@ import { cn } from '@/lib/utils';
  *
  *   Home | Smart List | My Meal Plan | Wallet | Profile
  *
- * Plain black-active/gray-inactive (session 2026-09-02, client's cart-page
- * reference) — replaces the earlier green-highlight-pill treatment app-wide,
- * an explicit reversal of that prior decision. No colour, no background
- * pill: the active tab is just bold and black, everything else is muted.
+ * A floating white rounded card (session 2026-09-17, client reference) —
+ * inset from all four edges rather than a bar spanning the screen, with the
+ * active tab picked out by a green pill (icon + label in white) instead of
+ * plain bold text. Reverses the session-2026-09-02 "no colour, no pill"
+ * decision this same nav went through earlier — client direction on this
+ * changed again, so the pill is back, just as a floating card this time
+ * rather than the old edge-to-edge bar's own highlight.
  *
  * Home is the fallback active tab on any route that isn't one of the other
  * four sections (cart, checkout, product pages, orders, login, …) — the
  * reference shows Home highlighted on the cart screen even though "/cart"
  * isn't itself one of the five tab routes.
  *
- * Session 2026-09-16 (client feedback): always visible now, not just at the
- * top of the page — the earlier "hide on scroll" behaviour (session
- * 2026-08-26) read as the nav disappearing/breaking rather than as
- * intentional chrome. `CartBar` (src/components/shop/cart-bar.tsx), the
- * only other thing that used to watch scroll position for this, now just
- * always sits above this nav's fixed height instead of conditionally
- * dropping to the raw screen edge.
+ * Always visible (session 2026-09-16) — see `CartBar`
+ * (src/components/shop/cart-bar.tsx), which always sits above this nav's
+ * fixed height instead of reacting to it hiding.
  */
 
 const TABS = [
@@ -39,13 +38,6 @@ const TABS = [
 
 const NON_HOME_PREFIXES = ['/smart-list', '/meal-plan', '/wallet', '/profile'] as const;
 
-// Blinkit-style scroll behaviour (session 2026-08-26): visible only at the
-// very top of the page, hidden the instant the customer scrolls down, back
-// the moment they scroll back to the top — position-based, not direction-
-// based, so a partial scroll-up while still mid-page leaves it hidden.
-// `useIsAtTop` (src/hooks/use-is-at-top.ts) is shared with CartBar, which
-// needs the same signal to know when to drop down to the real screen edge.
-
 export function BottomNav() {
   const t = useTranslations('nav');
   const pathname = usePathname();
@@ -53,10 +45,10 @@ export function BottomNav() {
   return (
     <nav
       aria-label={t('home')}
-      className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] border-t border-border bg-accent-faint"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] px-3"
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)' }}
     >
-      <ul className="grid grid-cols-5 gap-1 px-1.5 py-2">
+      <ul className="card-3d grid grid-cols-5 gap-1 rounded-[24px] bg-card px-1.5 py-2">
         {TABS.map((tab) => {
           const active =
             tab.href === '/'
@@ -69,17 +61,20 @@ export function BottomNav() {
               <Link
                 href={tab.href}
                 aria-current={active ? 'page' : undefined}
-                className="flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-2xl py-1.5"
+                className={cn(
+                  'flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-full py-1.5 transition-colors',
+                  active && 'bg-primary',
+                )}
               >
                 <Icon
-                  className={cn(active ? 'text-foreground' : 'text-muted-foreground', 'size-5')}
+                  className={cn(active ? 'text-primary-foreground' : 'text-muted-foreground', 'size-5')}
                   strokeWidth={active ? 2.4 : 1.8}
                   aria-hidden
                 />
                 <span
                   className={cn(
                     'text-[10.5px] leading-none',
-                    active ? 'font-bold text-foreground' : 'text-muted-foreground',
+                    active ? 'font-bold text-primary-foreground' : 'text-muted-foreground',
                   )}
                 >
                   {t(tab.key)}
