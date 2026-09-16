@@ -244,7 +244,12 @@ function PlanProductCard({
         )}
       </div>
       <div className="flex min-h-[3.4em] flex-col px-2.5 pt-2">
-        <h3 className="line-clamp-2 text-[13px] leading-tight font-semibold">{product.name}</h3>
+        <h3 className="line-clamp-2 text-[13px] leading-tight font-semibold">
+          {product.nameEn ?? product.name}
+          {product.localName && (
+            <span className="font-normal text-muted-foreground"> ({product.localName})</span>
+          )}
+        </h3>
         {displayVariant && (
           <p className="mt-auto truncate text-[12px] text-muted-foreground">
             {formatPaise(paise(displayVariant.pricePaise), { hidePaise: true })} / {displayVariant.label}
@@ -285,7 +290,12 @@ function QuantityModal({
                 <ImageIcon className="size-6 text-muted-foreground/40" aria-hidden />
               )}
             </div>
-            <h2 className="text-sm font-bold">{product.name}</h2>
+            <h2 className="text-sm font-bold">
+              {product.nameEn ?? product.name}
+              {product.localName && (
+                <span className="font-normal text-muted-foreground"> ({product.localName})</span>
+              )}
+            </h2>
           </div>
           <button
             type="button"
@@ -393,7 +403,12 @@ function DaySummaryView({
                 )}
               </div>
               <button type="button" onClick={() => onEdit(product)} className="min-w-0 flex-1 text-left">
-                <p className="truncate text-sm font-semibold">{product.name}</p>
+                <p className="truncate text-sm font-semibold">
+                  {product.nameEn ?? product.name}
+                  {product.localName && (
+                    <span className="font-normal text-muted-foreground"> ({product.localName})</span>
+                  )}
+                </p>
                 <p className="text-xs text-muted-foreground">{variant.label}</p>
               </button>
               <span className="text-sm font-bold">{formatPaise(paise(variant.pricePaise))}</span>

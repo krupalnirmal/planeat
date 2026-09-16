@@ -31,6 +31,12 @@ export interface DraftVariant {
 export interface DraftProduct {
   id: string;
   name: string;
+  /** English name — shown together with `localName` as "English (local)",
+      matching the storefront's own product card. Optional so a curated
+      list that hasn't been updated still renders using `name` alone. */
+  nameEn?: string;
+  /** Always the Marathi name, regardless of the UI's own current locale. */
+  localName?: string | null;
   imageUrl: string | null;
   variants: DraftVariant[];
 }

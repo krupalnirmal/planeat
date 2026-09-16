@@ -281,6 +281,12 @@ export async function saveCustomerPlan(
 export interface PlanColumnProduct {
   id: string;
   name: string;
+  /** English name — shown together with `localName` as "English (local)",
+      matching the storefront's own `ProductCard` (session 2026-09-17). */
+  nameEn: string;
+  /** Always the Marathi name, regardless of the UI's own current locale —
+      same convention as `localNameOf` in `src/lib/catalog/queries.ts`. */
+  localName: string | null;
   imageUrl: string | null;
   variants: Array<{ id: string; label: string; pricePaise: bigint }>;
 }
@@ -360,6 +366,8 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
         curated.bySku.set(product.sku, {
           id: product.id,
           name: pickName(product, locale),
+          nameEn: product.nameEn,
+          localName: product.nameMr,
           imageUrl: firstImage(product.imageUrls),
           variants: product.variants,
         });
@@ -368,6 +376,8 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
       .map((product) => ({
         id: product.id,
         name: pickName(product, locale),
+        nameEn: product.nameEn,
+        localName: product.nameMr,
         imageUrl: firstImage(product.imageUrls),
         variants: product.variants,
       }));
