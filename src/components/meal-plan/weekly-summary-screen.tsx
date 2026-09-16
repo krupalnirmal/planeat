@@ -113,14 +113,14 @@ export function WeeklySummaryScreen() {
       </main>
 
       <div
-        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
         style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
       >
         <button
           type="button"
           disabled={weekItems === 0 || save.isPending}
           onClick={() => save.mutate()}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
           {save.isPending ? tc('loading') : tw('confirmSave')}
         </button>

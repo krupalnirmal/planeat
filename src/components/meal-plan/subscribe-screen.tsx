@@ -464,13 +464,13 @@ function DurationStep({
       </p>
 
       <div
-        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
         style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
       >
         <button
           type="button"
           onClick={onContinue}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground"
         >
           {t('viewPlanDetails')}
           <ChevronRight className="size-4" aria-hidden />
@@ -605,14 +605,14 @@ function SummaryStep({
       </section>
 
       <div
-        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
         style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
       >
         <button
           type="button"
           onClick={shortfall > 0n ? onNeedsTopup : onContinue}
           disabled={!canContinue && shortfall <= 0n}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
           {shortfall > 0n ? t('addMoneyToWallet') : t('continueToActivate')}
         </button>
@@ -695,7 +695,7 @@ function TopupStep({
       </div>
 
       <div
-        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
         style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
       >
         <button
@@ -705,7 +705,7 @@ function TopupStep({
             setAmountPaise(effectiveAmount.toString());
             onContinue();
           }}
-          className="flex h-12 w-full items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+          className="flex h-12 w-full items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
           {t('proceedToAddMoney')}
         </button>
@@ -800,14 +800,14 @@ function PaymentMethodStep({
       </div>
 
       <div
-        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
         style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
       >
         <button
           type="button"
           disabled={paying}
           onClick={onPay}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
           {paying && <Loader2 className="size-4 animate-spin" aria-hidden />}
           {t('pay', { amount: formatPaise(paise(amountPaise), { hidePaise: true }) })}
@@ -905,14 +905,14 @@ function ConfirmStep({
       {error && <p className="rounded-[var(--radius)] bg-danger/10 px-3 py-2.5 text-sm text-danger">{error}</p>}
 
       <div
-        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
         style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
       >
         <button
           type="button"
           disabled={activating}
           onClick={onActivate}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
           {activating && <Loader2 className="size-4 animate-spin" aria-hidden />}
           {t('activate')}

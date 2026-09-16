@@ -118,7 +118,17 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
                     active ? 'border-primary bg-tint-green text-primary-dark' : 'border-border text-muted-foreground',
                   )}
                 >
-                  <Icon className="size-3.5" aria-hidden />
+                  {/* The category's own real photo when one exists (admin-set
+                      icon, or its first product's), matching the same photo
+                      treatment the home page's category grid already uses —
+                      a generic line icon only when no real image exists at
+                      all (the curated Daily Essentials/Sprouts columns). */}
+                  {column.iconUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={column.iconUrl} alt="" className="size-5 shrink-0 rounded-full object-cover" />
+                  ) : (
+                    <Icon className="size-3.5 shrink-0" aria-hidden />
+                  )}
                   {categoryLabel(column)}
                 </button>
               );
@@ -164,13 +174,13 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
 
       {!showSummary && dayCount > 0 && (
         <div
-          className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+          className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
           style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
         >
           <button
             type="button"
             onClick={() => setShowSummary(true)}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground"
           >
             {tw('viewDayPlan', { count: dayCount })}
             <ChevronRight className="size-4" aria-hidden />
@@ -180,13 +190,13 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
 
       {showSummary && (
         <div
-          className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card p-4"
+          className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
           style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
         >
           <button
             type="button"
             onClick={() => router.push('/meal-plan/build')}
-            className="flex h-12 w-full items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+            className="flex h-12 w-full items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground"
           >
             {tw('saveForDay', { day: t(`days.${dayOfWeek}`) })}
           </button>
