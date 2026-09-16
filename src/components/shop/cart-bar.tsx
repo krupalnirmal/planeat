@@ -86,7 +86,11 @@ export function CartBar() {
   if (!visible) return null;
 
   const forFreeDelivery = paise(cart.amountForFreeDeliveryPaise);
-  const total = paise(cart.itemTotalPaise);
+  // The most recently touched line — the one photo worth showing on the
+  // bar, matching the same "confirm that tap landed" job the icon used to
+  // do (client feedback, session 2026-09-02), now with the actual product
+  // instead of a generic cart glyph (session 2026-09-16, client reference).
+  const latestImage = cart.lines[cart.lines.length - 1]?.imageUrl ?? null;
 
   return (
     <div
@@ -114,31 +118,34 @@ export function CartBar() {
         </p>
       )}
 
-      {/* Blinkit-matched (session 2026-08-25), sized down further (session
-          2026-08-30, client feedback: read as too big) — 44px, the
-          accessibility touch-target floor, rather than the earlier 52px. */}
       <Link
         href="/cart"
-        className="animate-in slide-in-from-bottom-4 fade-in relative flex h-11 items-center justify-between gap-3 rounded-[12px] bg-primary py-1.5 pr-4 pl-3 text-primary-foreground duration-300"
+        className="animate-in slide-in-from-bottom-4 fade-in relative flex min-h-14 items-center gap-3 rounded-full bg-primary py-2 pr-4 pl-16 text-primary-foreground duration-300"
       >
-        {/* `key` remounts this group on every count change, replaying the pop
-            — the one floating element visible from anywhere in the catalogue,
-            so it's the right place to confirm "that tap landed" (client
-            feedback, session 2026-09-02). */}
-        <span key={cart.itemCount} className="animate-in zoom-in-75 flex items-center gap-2 duration-200">
-          <ShoppingCart className="size-4.5 shrink-0" aria-hidden />
-          <span className="text-[11px] font-medium">{t('itemCount', { count: cart.itemCount })}</span>
-          {total > 0n && (
-            <span className="text-[11px] font-semibold">
-              {formatPaise(total, { hidePaise: true })}
-            </span>
+        {/* Pops half out of the pill's top-left corner, a white ring
+            separating it from the green — the reference's "product peeking
+            out of the bag" treatment. `key` remounts it on every count
+            change to replay the pop-in, same trigger the old icon used. */}
+        <span
+          key={cart.itemCount}
+          className="absolute -top-2.5 left-1.5 grid size-14 shrink-0 animate-in zoom-in-75 place-items-center overflow-hidden rounded-full border-[3px] border-background bg-card duration-200"
+        >
+          {latestImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={latestImage} alt="" className="size-full object-cover" />
+          ) : (
+            <ShoppingCart className="size-5 text-primary" aria-hidden />
           )}
         </span>
 
-        <span className="flex items-center gap-1">
-          <span className="text-[14px] font-normal">{t('viewCart')}</span>
-          <ChevronRight className="size-4 shrink-0" aria-hidden />
+        <span className="min-w-0 flex-1">
+          <span className="block text-[15px] leading-tight font-bold">{t('viewCart')}</span>
+          <span className="block text-[11px] leading-tight text-primary-foreground/80">
+            {t('itemCount', { count: cart.itemCount })}
+          </span>
         </span>
+
+        <ChevronRight className="size-5 shrink-0" aria-hidden />
       </Link>
     </div>
   );
