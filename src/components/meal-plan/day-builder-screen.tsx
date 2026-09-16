@@ -250,7 +250,13 @@ function PlanProductCard({
           </span>
         )}
       </div>
-      <div className="flex min-h-[3.4em] flex-col px-2.5 pt-2">
+      {/* No `min-h`/`mt-auto` gap-filler here (dropped, session 2026-09-17
+          — client feedback): the storefront's own card reserves 2 lines'
+          worth of name height so the price row lines up across a grid row,
+          but that left a large dead gap above a short one-line name here.
+          A plain small gap plus real bottom padding (`pb-2.5`, previously
+          missing entirely) reads far tighter. */}
+      <div className="flex flex-col gap-1 px-2.5 pt-2 pb-2.5">
         <h3 className="line-clamp-2 text-[13px] leading-tight font-semibold">
           {product.nameEn ?? product.name}
           {product.localName && (
@@ -258,7 +264,7 @@ function PlanProductCard({
           )}
         </h3>
         {displayVariant && (
-          <p className="mt-auto truncate text-[12px] text-muted-foreground">
+          <p className="truncate text-[12px] text-muted-foreground">
             {formatPaise(paise(displayVariant.pricePaise), { hidePaise: true })} / {displayVariant.label}
           </p>
         )}
