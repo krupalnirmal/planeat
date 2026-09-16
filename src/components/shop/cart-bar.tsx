@@ -96,10 +96,12 @@ export function CartBar() {
     <div
       ref={barRef}
       // Narrower side inset than the edge-to-edge Blinkit original (session
-      // 2026-08-26, client feedback: the full-width bar read as too big) —
-      // still one stacked unit with the free-delivery nudge above it, just
-      // a compact floating pill instead of a bar spanning the screen.
-      className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-14"
+      // 2026-08-26, client feedback: the full-width bar read as too big),
+      // narrowed again (session 2026-09-17, client feedback: still too
+      // wide) — still one stacked unit with the free-delivery nudge above
+      // it, just a compact floating pill instead of a bar spanning the
+      // screen.
+      className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-32"
       style={{
         // BottomNav is always visible now (session 2026-09-16), so this
         // always sits above its fixed height — same pattern every other
