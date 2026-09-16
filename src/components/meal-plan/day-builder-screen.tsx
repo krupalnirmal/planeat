@@ -224,11 +224,11 @@ function PlanProductCard({
       onClick={onTap}
       disabled={product.variants.length === 0}
       // Smaller and more clearly "raised" (client feedback, session
-      // 2026-09-17): a shorter photo instead of a full square, rounder
-      // corners, and no hard border — `.card-3d`'s own shadow is what reads
-      // as elevated, so a visible outline on top of it just flattened the
-      // effect back out.
-      className="card-3d relative flex flex-col overflow-hidden rounded-2xl bg-card text-left disabled:opacity-50"
+      // 2026-09-17): a shorter photo instead of a full square, square
+      // corners (client asked for no rounding), and no hard border —
+      // `.card-3d`'s own shadow is what reads as elevated, so a visible
+      // outline on top of it just flattened the effect back out.
+      className="card-3d relative flex flex-col overflow-hidden bg-card text-left disabled:opacity-50"
     >
       <div className="relative grid aspect-[4/3] place-items-center bg-white">
         {product.imageUrl ? (
