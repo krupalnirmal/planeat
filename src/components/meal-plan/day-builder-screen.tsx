@@ -241,8 +241,12 @@ function PlanProductCard({
           <ImageIcon className="size-8 text-muted-foreground/40" aria-hidden />
         )}
         {selected && (
-          <span className="absolute top-1.5 right-1.5 grid size-7 place-items-center rounded-full bg-card/95 shadow-sm">
-            <Check className="size-3.5 text-primary" aria-hidden />
+          // Bolder than the earlier faint white-on-card badge (client
+          // feedback, session 2026-09-17): a solid filled circle with a
+          // white ring to pop off the photo, not a translucent chip that
+          // read as barely-there against a busy image.
+          <span className="absolute top-2 right-2 grid size-7 place-items-center rounded-full bg-primary shadow-md ring-2 ring-white">
+            <Check className="size-4 text-primary-foreground" strokeWidth={3} aria-hidden />
           </span>
         )}
       </div>
