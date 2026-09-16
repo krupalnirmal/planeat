@@ -223,30 +223,30 @@ function PlanProductCard({
       type="button"
       onClick={onTap}
       disabled={product.variants.length === 0}
-      // Smaller and more clearly "raised" (client feedback, session
-      // 2026-09-17): a shorter photo instead of a full square, square
-      // corners (client asked for no rounding), and no hard border —
-      // `.card-3d`'s own shadow is what reads as elevated, so a visible
-      // outline on top of it just flattened the effect back out.
-      className="card-3d relative flex flex-col overflow-hidden bg-card text-left disabled:opacity-50"
+      // Matches the storefront's own `ProductCard` (`src/components/shop/
+      // product-card.tsx`) — same `.card-3d` shadow, same rounded corners
+      // and faint border, same square photo and name/price sizing — so the
+      // builder's cards look consistent with the rest of the app instead of
+      // a one-off style (client feedback, session 2026-09-17).
+      className="card-3d relative flex flex-col overflow-hidden rounded-[var(--radius)] border border-border/50 bg-card text-left disabled:opacity-50"
     >
-      <div className="relative grid aspect-[4/3] place-items-center bg-white">
+      <div className="relative grid aspect-square place-items-center bg-white">
         {product.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={product.imageUrl} alt={product.name} loading="lazy" className="size-full object-cover" />
         ) : (
-          <ImageIcon className="size-6 text-muted-foreground/40" aria-hidden />
+          <ImageIcon className="size-8 text-muted-foreground/40" aria-hidden />
         )}
         {selected && (
-          <span className="absolute top-1.5 right-1.5 grid size-5 place-items-center rounded-full bg-primary text-primary-foreground shadow-sm">
-            <Check className="size-3" aria-hidden />
+          <span className="absolute top-1.5 right-1.5 grid size-7 place-items-center rounded-full bg-card/95 shadow-sm">
+            <Check className="size-3.5 text-primary" aria-hidden />
           </span>
         )}
       </div>
-      <div className="flex flex-col gap-0.5 px-2 py-1.5">
-        <h3 className="line-clamp-1 text-[12px] leading-tight font-semibold">{product.name}</h3>
+      <div className="flex min-h-[3.4em] flex-col px-2.5 pt-2">
+        <h3 className="line-clamp-2 text-[13px] leading-tight font-semibold">{product.name}</h3>
         {displayVariant && (
-          <p className="text-[11px] text-muted-foreground">
+          <p className="mt-auto truncate text-[12px] text-muted-foreground">
             {formatPaise(paise(displayVariant.pricePaise), { hidePaise: true })} / {displayVariant.label}
           </p>
         )}
