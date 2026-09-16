@@ -223,25 +223,30 @@ function PlanProductCard({
       type="button"
       onClick={onTap}
       disabled={product.variants.length === 0}
-      className="card-3d relative flex flex-col overflow-hidden rounded-[var(--radius)] border border-border/50 bg-card text-left disabled:opacity-50"
+      // Smaller and more clearly "raised" (client feedback, session
+      // 2026-09-17): a shorter photo instead of a full square, rounder
+      // corners, and no hard border — `.card-3d`'s own shadow is what reads
+      // as elevated, so a visible outline on top of it just flattened the
+      // effect back out.
+      className="card-3d relative flex flex-col overflow-hidden rounded-2xl bg-card text-left disabled:opacity-50"
     >
-      <div className="relative grid aspect-square place-items-center bg-white">
+      <div className="relative grid aspect-[4/3] place-items-center bg-white">
         {product.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={product.imageUrl} alt={product.name} loading="lazy" className="size-full object-cover" />
         ) : (
-          <ImageIcon className="size-8 text-muted-foreground/40" aria-hidden />
+          <ImageIcon className="size-6 text-muted-foreground/40" aria-hidden />
         )}
         {selected && (
-          <span className="absolute top-1.5 right-1.5 grid size-6 place-items-center rounded-full bg-primary text-primary-foreground shadow-sm">
-            <Check className="size-3.5" aria-hidden />
+          <span className="absolute top-1.5 right-1.5 grid size-5 place-items-center rounded-full bg-primary text-primary-foreground shadow-sm">
+            <Check className="size-3" aria-hidden />
           </span>
         )}
       </div>
-      <div className="flex flex-col gap-0.5 px-2.5 py-2">
-        <h3 className="line-clamp-2 text-[13px] leading-tight font-semibold">{product.name}</h3>
+      <div className="flex flex-col gap-0.5 px-2 py-1.5">
+        <h3 className="line-clamp-1 text-[12px] leading-tight font-semibold">{product.name}</h3>
         {displayVariant && (
-          <p className="text-[12px] text-muted-foreground">
+          <p className="text-[11px] text-muted-foreground">
             {formatPaise(paise(displayVariant.pricePaise), { hidePaise: true })} / {displayVariant.label}
           </p>
         )}
