@@ -114,7 +114,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
                     setSearch('');
                   }}
                   className={cn(
-                    'flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold whitespace-nowrap',
+                    'flex shrink-0 items-center gap-2 rounded-full border py-1.5 pr-3.5 pl-1.5 text-xs font-semibold whitespace-nowrap',
                     active ? 'border-primary bg-tint-green text-primary-dark' : 'border-border text-muted-foreground',
                   )}
                 >
@@ -122,12 +122,15 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
                       icon, or its first product's), matching the same photo
                       treatment the home page's category grid already uses —
                       a generic line icon only when no real image exists at
-                      all (the curated Daily Essentials/Sprouts columns). */}
+                      all (the curated Daily Essentials/Sprouts columns).
+                      Sized up (client feedback, session 2026-09-17) — the
+                      previous size-5 photo read as an afterthought next to
+                      the label. */}
                   {column.iconUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={column.iconUrl} alt="" className="size-5 shrink-0 rounded-full object-cover" />
+                    <img src={column.iconUrl} alt="" className="size-9 shrink-0 rounded-full object-cover" />
                   ) : (
-                    <Icon className="size-3.5 shrink-0" aria-hidden />
+                    <Icon className="size-5 shrink-0" aria-hidden />
                   )}
                   {categoryLabel(column)}
                 </button>
