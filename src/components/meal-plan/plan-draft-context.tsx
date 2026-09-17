@@ -119,9 +119,20 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
 
   const allColumns = useMemo<DraftColumn[]>(() => {
     if (!data) return [];
+    // Neither curated list is a real `Category` row, so neither has an
+    // admin-set `iconUrl` — reusing its own first product's photo as the
+    // rail icon is the same fallback a real category already gets when it
+    // has none set (`getPlanColumns`), so these two stop being the only
+    // bare glyph in a rail of otherwise real photos (client feedback,
+    // session 2026-09-17).
     const curated: DraftColumn[] = [
-      { slug: '__daily_essentials__', name: '', iconUrl: null, products: data.dailyEssentials },
-      { slug: '__sprouts__', name: '', iconUrl: null, products: data.sprouts },
+      {
+        slug: '__daily_essentials__',
+        name: '',
+        iconUrl: data.dailyEssentials[0]?.imageUrl ?? null,
+        products: data.dailyEssentials,
+      },
+      { slug: '__sprouts__', name: '', iconUrl: data.sprouts[0]?.imageUrl ?? null, products: data.sprouts },
     ].filter((c) => c.products.length > 0);
     return [...data.columns, ...curated];
   }, [data]);
