@@ -1,6 +1,6 @@
 import { parseQuery, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { listAdminOrders } from '@/lib/admin/orders';
 import { paginate } from '@/lib/validators/common';
 import { ordersQuerySchema } from '@/lib/validators/admin';
@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 /** GET /api/admin/orders — filters over every order (M9). */
 export const GET = route(async (request: Request) => {
-  await requireStoreAdmin();
+  await requirePermission('orders');
   const query = parseQuery(request, ordersQuerySchema);
 
   const { orders, total } = await listAdminOrders(

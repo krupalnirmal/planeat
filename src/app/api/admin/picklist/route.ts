@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { parseQuery, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { buildPicklist, defaultPicklistDate, picklistToCsv } from '@/lib/admin/picklist';
 import { picklistQuerySchema } from '@/lib/validators/admin';
 import { z } from 'zod';
@@ -25,7 +25,7 @@ const querySchema = picklistQuerySchema.extend({
  * so the list is finally stable.
  */
 export const GET = route(async (request: Request) => {
-  await requireStoreAdmin();
+  await requirePermission('picklist');
   const query = parseQuery(request, querySchema);
 
   const dateKey = query.date ?? defaultPicklistDate();

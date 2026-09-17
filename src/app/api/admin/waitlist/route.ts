@@ -1,6 +1,6 @@
 import { route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { getWaitlistByPincode } from '@/lib/admin/dashboard';
 
 export const dynamic = 'force-dynamic';
@@ -15,6 +15,6 @@ export const dynamic = 'force-dynamic';
  * "where should we go next", not "who signed up".
  */
 export const GET = route(async () => {
-  await requireStoreAdmin();
+  await requirePermission('waitlist');
   return ok({ pincodes: await getWaitlistByPincode() });
 });

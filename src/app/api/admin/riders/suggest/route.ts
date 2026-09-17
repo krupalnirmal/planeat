@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { clientIp, parseJson, parseQuery, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { assignRider, suggestRiders } from '@/lib/admin/orders';
 import { defaultPicklistDate } from '@/lib/admin/picklist';
 import { assignRiderSchema } from '@/lib/validators/admin';
@@ -22,7 +22,7 @@ const querySchema = z.object({ date: z.iso.date().optional() });
  * and why, and the owner decides.
  */
 export const GET = route(async (request: Request) => {
-  await requireStoreAdmin();
+  await requirePermission('orders');
   const { date } = parseQuery(request, querySchema);
 
   const suggestions = await suggestRiders(date ?? defaultPicklistDate());
@@ -37,7 +37,7 @@ export const GET = route(async (request: Request) => {
  * between.
  */
 export const POST = route(async (request: Request) => {
-  const session = await requireStoreAdmin();
+  const session = await requirePermission('orders');
   const { assignments } = await parseJson(request, assignRiderSchema);
   const ip = clientIp(request);
 

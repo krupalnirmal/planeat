@@ -255,6 +255,14 @@ model User {
   dob               DateTime?
   gender            Gender?
   role              UserRole  @default(CUSTOMER)
+  /// STORE_ADMIN-tier access control (session 2026-09-17) — a JSON array of
+  /// admin section keys this account may reach (see `src/lib/admin/
+  /// permissions.ts`). `null` means unrestricted for that role — every
+  /// existing account keeps today's access with no data backfill. SUPER_ADMIN
+  /// ignores this field entirely (always unrestricted); DELIVERY_PARTNER
+  /// carries the same column for forward-compatibility even though nothing
+  /// on the rider side is gateable yet.
+  permissions       Json?
   preferredLanguage Locale    @default(mr)
   isActive          Boolean   @default(true)
   createdAt         DateTime  @default(now())

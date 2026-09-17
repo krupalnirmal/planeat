@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { ApiError, parseQuery, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { getStorageProvider } from '@/lib/services/storage';
 import { IMAGE_MIME_TYPES, MAX_IMAGE_BYTES } from '@/lib/validators/smart-list';
 
@@ -19,7 +19,7 @@ const querySchema = z.object({ folder: z.enum(['products']).default('products') 
  * equivalent rather than widening its RBAC.
  */
 export const POST = route(async (request: Request) => {
-  await requireStoreAdmin();
+  await requirePermission('catalogue');
   const { folder } = parseQuery(request, querySchema);
 
   const mimeType = (request.headers.get('content-type') ?? '').split(';')[0].trim();

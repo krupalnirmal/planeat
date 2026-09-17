@@ -1,6 +1,6 @@
 import { ApiError, clientIp, parseJson, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { getProductDetail, updateProduct, upsertVariant } from '@/lib/admin/catalogue';
 import { productPatchSchema, variantSchema } from '@/lib/validators/admin';
 
@@ -11,7 +11,7 @@ type Context = { params: Promise<{ id: string }> };
 /** GET /api/admin/products/:id — full detail for the edit form: every
     editable field plus full variant rows (M9). */
 export const GET = route(async (_request: Request, context: Context) => {
-  await requireStoreAdmin();
+  await requirePermission('catalogue');
   const { id } = await context.params;
 
   const product = await getProductDetail(id);
@@ -22,7 +22,7 @@ export const GET = route(async (_request: Request, context: Context) => {
 
 /** PATCH /api/admin/products/:id — edit a product (M9). */
 export const PATCH = route(async (request: Request, context: Context) => {
-  const session = await requireStoreAdmin();
+  const session = await requirePermission('catalogue');
   const { id } = await context.params;
   const input = await parseJson(request, productPatchSchema);
 
@@ -45,7 +45,7 @@ export const PATCH = route(async (request: Request, context: Context) => {
  * disagree about which size is being priced.
  */
 export const PUT = route(async (request: Request, context: Context) => {
-  const session = await requireStoreAdmin();
+  const session = await requirePermission('catalogue');
   const { id } = await context.params;
   const input = await parseJson(request, variantSchema);
 

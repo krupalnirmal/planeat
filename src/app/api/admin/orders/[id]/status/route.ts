@@ -1,6 +1,6 @@
 import { ApiError, clientIp, parseJson, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { changeOrderStatus } from '@/lib/admin/orders';
 import { cancelOrder } from '@/lib/orders/cancel';
 import { changeStatusSchema } from '@/lib/validators/admin';
@@ -27,7 +27,7 @@ type Context = { params: Promise<{ id: string }> };
  * which doesn't have an admin surface yet — not a name-only status flip.
  */
 export const POST = route(async (request: Request, context: Context) => {
-  const session = await requireStoreAdmin();
+  const session = await requirePermission('orders');
   const { id } = await context.params;
   const input = await parseJson(request, changeStatusSchema);
   const ip = clientIp(request);

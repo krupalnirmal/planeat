@@ -1,6 +1,6 @@
 import { ApiError, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { getAdminOrderDetail } from '@/lib/admin/orders';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +13,7 @@ type Context = { params: Promise<{ id: string }> };
  * detail page never offers an illegal transition.
  */
 export const GET = route(async (_request: Request, context: Context) => {
-  await requireStoreAdmin();
+  await requirePermission('orders');
   const { id } = await context.params;
 
   const order = await getAdminOrderDetail(id);

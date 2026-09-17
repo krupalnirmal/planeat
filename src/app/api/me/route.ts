@@ -1,5 +1,6 @@
 import { ApiError, clientIp, parseJson, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
+import { parsePermissions } from '@/lib/admin/permissions';
 import { endSession, getSession, requireUser } from '@/lib/auth/session';
 import { db } from '@/lib/db';
 import { ID_PREFIX, newId } from '@/lib/ids';
@@ -28,6 +29,7 @@ export const GET = route(async () => {
       dob: true,
       gender: true,
       role: true,
+      permissions: true,
       preferredLanguage: true,
       createdAt: true,
       addresses: {
@@ -50,7 +52,10 @@ export const GET = route(async () => {
   });
 
   if (!user) return ok({ user: null });
-  return ok({ user });
+  // `permissions` — admin-section access for STORE_ADMIN accounts (session
+  // 2026-09-17). `null` means unrestricted; parsed here so the client never
+  // has to interpret the raw JSON column shape itself.
+  return ok({ user: { ...user, permissions: parsePermissions(user.permissions) } });
 });
 
 /** PATCH /api/me — the profile step of onboarding, and later edits. */

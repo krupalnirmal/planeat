@@ -1,6 +1,6 @@
 import { clientIp, parseJson, parseQuery, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { bulkUpdateStock, listInventory } from '@/lib/admin/inventory';
 import { paginate } from '@/lib/validators/common';
 import { bulkStockSchema, inventoryQuerySchema } from '@/lib/validators/admin';
@@ -10,7 +10,7 @@ export const maxDuration = 60;
 
 /** GET /api/admin/inventory — stock levels, low and out-of-stock views. */
 export const GET = route(async (request: Request) => {
-  await requireStoreAdmin();
+  await requirePermission('inventory');
   const query = parseQuery(request, inventoryQuerySchema);
 
   const { rows, total } = await listInventory(
@@ -41,7 +41,7 @@ export const GET = route(async (request: Request) => {
  * the wrong price.
  */
 export const PATCH = route(async (request: Request) => {
-  const session = await requireStoreAdmin();
+  const session = await requirePermission('inventory');
   const { updates } = await parseJson(request, bulkStockSchema);
 
   const result = await bulkUpdateStock(

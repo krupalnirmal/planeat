@@ -1,6 +1,6 @@
 import { ApiError, clientIp, parseJson, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { assignSubscriptionRider } from '@/lib/admin/subscriptions';
 import { assignSubscriptionRiderSchema } from '@/lib/validators/subscription';
 
@@ -22,7 +22,7 @@ const MESSAGE: Record<string, string> = {
  * needed.
  */
 export const POST = route(async (request: Request, context: Context) => {
-  const session = await requireStoreAdmin();
+  const session = await requirePermission('customers');
   const { id: subscriptionId } = await context.params;
   const { partnerId } = await parseJson(request, assignSubscriptionRiderSchema);
   const ip = clientIp(request);

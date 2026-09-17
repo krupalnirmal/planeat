@@ -1,6 +1,6 @@
 import { ApiError, clientIp, parseJson, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { addAlias } from '@/lib/admin/catalogue';
 import { aliasSchema } from '@/lib/validators/admin';
 
@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
  * unlike a model, the fix is visible, permanent and attributable.
  */
 export const POST = route(async (request: Request) => {
-  const session = await requireStoreAdmin();
+  const session = await requirePermission('catalogue');
   const input = await parseJson(request, aliasSchema);
 
   const result = await addAlias(

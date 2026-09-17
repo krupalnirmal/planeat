@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { ApiError, clientIp, parseJson, parseQuery, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { createProduct, listProducts } from '@/lib/admin/catalogue';
 import { paginate } from '@/lib/validators/common';
 import { adminListQuerySchema, productSchema } from '@/lib/validators/admin';
@@ -14,7 +14,7 @@ const listQuerySchema = adminListQuerySchema.extend({
 });
 
 export const GET = route(async (request: Request) => {
-  await requireStoreAdmin();
+  await requirePermission('catalogue');
   const query = parseQuery(request, listQuerySchema);
 
   const { products, total } = await listProducts(
@@ -45,7 +45,7 @@ export const GET = route(async (request: Request) => {
  * reached them.
  */
 export const POST = route(async (request: Request) => {
-  const session = await requireStoreAdmin();
+  const session = await requirePermission('catalogue');
   const input = await parseJson(request, productSchema);
 
   const result = await createProduct(

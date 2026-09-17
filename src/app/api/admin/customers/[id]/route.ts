@@ -1,6 +1,6 @@
 import { ApiError, parseQuery, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { requireStoreAdmin } from '@/lib/admin/guard';
+import { requirePermission } from '@/lib/admin/guard';
 import { getCustomerDetail } from '@/lib/admin/customers';
 import { adminListQuerySchema } from '@/lib/validators/admin';
 
@@ -17,7 +17,7 @@ type Context = { params: Promise<{ id: string }> };
  * `getCustomerDetail`'s own doc comment).
  */
 export const GET = route(async (request: Request, context: Context) => {
-  await requireStoreAdmin();
+  await requirePermission('customers');
   const { id } = await context.params;
   const { locale } = parseQuery(request, adminListQuerySchema);
 
