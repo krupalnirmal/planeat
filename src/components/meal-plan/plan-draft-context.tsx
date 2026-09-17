@@ -26,6 +26,7 @@ export interface DraftVariant {
   id: string;
   label: string;
   pricePaise: string;
+  mrpPaise: string;
 }
 
 export interface DraftProduct {

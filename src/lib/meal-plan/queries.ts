@@ -288,7 +288,7 @@ export interface PlanColumnProduct {
       same convention as `localNameOf` in `src/lib/catalog/queries.ts`. */
   localName: string | null;
   imageUrl: string | null;
-  variants: Array<{ id: string; label: string; pricePaise: bigint }>;
+  variants: Array<{ id: string; label: string; pricePaise: bigint; mrpPaise: bigint }>;
 }
 
 export interface PlanColumn {
@@ -337,7 +337,7 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
           variants: {
             where: { isActive: true, stockQty: { gt: 0 } },
             orderBy: [{ isDefault: 'desc' }, { quantity: 'asc' }],
-            select: { id: true, label: true, pricePaise: true },
+            select: { id: true, label: true, pricePaise: true, mrpPaise: true },
           },
         },
       },

@@ -230,8 +230,13 @@ function PlanProductCard({
   selectedVariantId: string | undefined;
   onTap: () => void;
 }) {
+  const t = useTranslations('product');
   const selected = product.variants.find((v) => v.id === selectedVariantId);
   const displayVariant = selected ?? product.variants[0];
+  const price = displayVariant ? paise(displayVariant.pricePaise) : 0n;
+  const mrp = displayVariant ? paise(displayVariant.mrpPaise) : 0n;
+  const hasDiscount = mrp > price;
+  const multiVariant = product.variants.length > 1;
 
   return (
     <button
@@ -240,9 +245,10 @@ function PlanProductCard({
       disabled={product.variants.length === 0}
       // Matches the storefront's own `ProductCard` (`src/components/shop/
       // product-card.tsx`) — same `.card-3d` shadow, same rounded corners
-      // and faint border, same square photo and name/price sizing — so the
-      // builder's cards look consistent with the rest of the app instead of
-      // a one-off style (client feedback, session 2026-09-17).
+      // and faint border, same square photo, discount badge, MRP strike-
+      // through and bordered pill CTA — so the builder's cards look
+      // consistent with the rest of the app instead of a one-off style
+      // (client feedback, session 2026-09-17).
       className="card-3d relative flex flex-col overflow-hidden rounded-[var(--radius)] border border-border/50 bg-card text-left disabled:opacity-50"
     >
       <div className="relative grid aspect-square place-items-center bg-white">
@@ -251,6 +257,11 @@ function PlanProductCard({
           <img src={product.imageUrl} alt={product.name} loading="lazy" className="size-full object-cover" />
         ) : (
           <ImageIcon className="size-8 text-muted-foreground/40" aria-hidden />
+        )}
+        {hasDiscount && (
+          <span className="absolute top-1.5 left-1.5 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+            {Math.round((1 - Number(price) / Number(mrp)) * 100)}% {t('off')}
+          </span>
         )}
         {selected && (
           // Bolder than the earlier faint white-on-card badge (client
@@ -276,9 +287,31 @@ function PlanProductCard({
           )}
         </h3>
         {displayVariant && (
-          <p className="truncate text-[12px] text-muted-foreground">
-            {formatPaise(paise(displayVariant.pricePaise), { hidePaise: true })} / {displayVariant.label}
-          </p>
+          <div className="mt-auto flex items-end justify-between gap-1.5 pt-1">
+            <div className="min-w-0">
+              <div className="flex items-baseline gap-1">
+                <span className="text-[14px] font-bold">{formatPaise(price, { hidePaise: true })}</span>
+                {hasDiscount && (
+                  <span className="text-[11px] text-muted-foreground line-through">
+                    {formatPaise(mrp, { hidePaise: true })}
+                  </span>
+                )}
+              </div>
+              <p className="truncate text-[11px] text-muted-foreground">{displayVariant.label}</p>
+            </div>
+            {/* Decorative, not a nested `<button>` — the whole card is
+                already the tap target (it opens the quantity/weight
+                modal), so this just mirrors the storefront's bordered
+                pill visually instead of duplicating its click handler. */}
+            <span className="flex shrink-0 min-w-[44px] flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-1.5 py-1 text-[12px] font-bold text-primary">
+              {t('add')}
+              {multiVariant && (
+                <span className="text-[8px] leading-none font-semibold text-muted-foreground">
+                  {t('nOptions', { count: product.variants.length })}
+                </span>
+              )}
+            </span>
+          </div>
         )}
       </div>
     </button>
