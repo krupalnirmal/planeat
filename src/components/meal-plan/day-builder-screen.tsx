@@ -68,9 +68,13 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
   const daySelections = draft.selections[dayOfWeek] ?? {};
   const dayCount = draft.itemCount(dayOfWeek);
 
-  const filteredProducts = (activeColumn?.products ?? []).filter((product) =>
-    product.name.toLowerCase().includes(search.trim().toLowerCase()),
-  );
+  // Already-picked items float to the top (client feedback, session
+  // 2026-09-17) — `.sort()` is stable, so within "selected" and
+  // "unselected" each keeps the catalogue's own order rather than being
+  // reshuffled every render.
+  const filteredProducts = (activeColumn?.products ?? [])
+    .filter((product) => product.name.toLowerCase().includes(search.trim().toLowerCase()))
+    .sort((a, b) => Number(!daySelections[a.id]) - Number(!daySelections[b.id]));
 
   function categoryLabel(column: DraftColumn) {
     if (column.slug === '__daily_essentials__') return t('builder.dailyEssentialsTitle');
