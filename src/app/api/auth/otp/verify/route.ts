@@ -21,8 +21,10 @@ const OTP_FAILURE_MESSAGES: Record<string, string> = {
  * Verifies the code, creates the user on first login, and starts a session.
  * `isNewUser` tells the client whether to route into the profile step (M1).
  */
+const STAFF_ROLES = ['STORE_ADMIN', 'SUPER_ADMIN', 'DELIVERY_PARTNER'] as const;
+
 export const POST = route(async (request: Request) => {
-  const { phone, code } = await parseJson(request, verifyOtpSchema);
+  const { phone, code, context } = await parseJson(request, verifyOtpSchema);
 
   const result = await verifyOtp(phone, code, 'LOGIN');
 
@@ -43,6 +45,17 @@ export const POST = route(async (request: Request) => {
 
   if (existing && !existing.isActive) {
     throw ApiError.forbidden('This account has been closed');
+  }
+
+  // `/staff/login` (session 2026-09-17): a phone with no staff-role account
+  // yet must not silently become a CUSTOMER the way the storefront login
+  // intentionally does — that would both onboard a stray customer account
+  // from a staff-branded page and mislead the caller with a session that
+  // gets immediately bounced by the admin/delivery layout's own role check.
+  // A phone must already be a staff-role account (created from the admin
+  // panel) before it can ever reach `/admin` or `/delivery` this way.
+  if (context === 'staff' && (!existing || !STAFF_ROLES.includes(existing.role as (typeof STAFF_ROLES)[number]))) {
+    throw ApiError.forbidden('This phone number is not registered for staff access');
   }
 
   const user =

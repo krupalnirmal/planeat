@@ -50,7 +50,15 @@ function formatCountdown(totalSeconds: number): string {
   return `${minutes}:${seconds}`;
 }
 
-export function LoginFlow() {
+/**
+ * `variant: 'staff'` (session 2026-09-17) — the same phone→OTP flow, same
+ * backend endpoints, rendered for `/staff/login` instead of the customer
+ * `/login`: no marketing hero/feature list/skip-to-browsing link, and a
+ * fixed redirect by role (`/admin` or `/delivery`) rather than the
+ * customer's `?next=`/profile-completion path. See `verify()` below for the
+ * one backend difference (`context: 'staff'` on the verify call).
+ */
+export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
   const t = useTranslations('auth');
   const ta = useTranslations('app');
   const te = useTranslations('errors');
@@ -58,6 +66,7 @@ export function LoginFlow() {
   const searchParams = useSearchParams();
   const invalidateSession = useInvalidateSession();
   const queryClient = useQueryClient();
+  const isStaff = variant === 'staff';
 
   const next = searchParams.get('next') ?? '/';
 
@@ -134,7 +143,17 @@ export function LoginFlow() {
       const result = await api.post<VerifyResult>('/api/auth/otp/verify', {
         phone,
         code: submitted,
+        ...(isStaff ? { context: 'staff' as const } : {}),
       });
+
+      if (isStaff) {
+        // No guest cart, no `?next=`, no profile-completion step — a staff
+        // account is pre-created from the admin panel with a name already
+        // set, and always lands on its own panel, never the storefront.
+        await invalidateSession();
+        router.replace(result.user.role === 'DELIVERY_PARTNER' ? '/delivery' : '/admin');
+        return;
+      }
 
       // M3 — hand the guest's localStorage cart over before anything else
       // navigates. Somebody who spent ten minutes filling a cart and then hit
@@ -224,46 +243,58 @@ export function LoginFlow() {
           </div>
 
           {/* B17 — the catalogue is public, so a customer who lands here by
-              accident must have a way back out that is not the OS back button. */}
-          <Link
-            href="/"
-            className="shrink-0 rounded-full bg-card px-4 py-2 text-[13px] font-bold shadow-sm"
-          >
-            {t('skipLogin')}
-          </Link>
+              accident must have a way back out that is not the OS back button.
+              Skipped entirely on the staff variant — there's nothing on this
+              page to "skip past" into browsing. */}
+          {!isStaff && (
+            <Link
+              href="/"
+              className="shrink-0 rounded-full bg-card px-4 py-2 text-[13px] font-bold shadow-sm"
+            >
+              {t('skipLogin')}
+            </Link>
+          )}
         </div>
 
         <h1 className="mt-4 text-center text-xl leading-snug font-bold whitespace-pre-line">
-          {ta('tagline')}
+          {isStaff ? t('staffHeading') : ta('tagline')}
         </h1>
 
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/promo/veg-basket-hero.png"
-          alt=""
-          aria-hidden
-          className="mx-auto mt-6 w-full max-w-[260px] drop-shadow-lg"
-        />
+        {/* The customer marketing hero/feature list has no place on a plain
+            staff sign-in page — swapped for one short subtitle instead. */}
+        {isStaff ? (
+          <p className="mt-2 text-center text-sm text-muted-foreground">{t('staffSubtitle')}</p>
+        ) : (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/promo/veg-basket-hero.png"
+              alt=""
+              aria-hidden
+              className="mx-auto mt-6 w-full max-w-[260px] drop-shadow-lg"
+            />
 
-        {/* Icon left, title + a short subtitle stacked to its right — a
-            proper feature list (client's reference) rather than a row of
-            single-line checkmarks. */}
-        <ul className="mt-7 flex flex-col gap-3.5">
-          {FEATURES.map(({ titleKey, bodyKey }) => (
-            <li key={titleKey} className="flex items-start gap-3">
-              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
-                <Check className="size-4.5" aria-hidden />
-              </span>
-              <span className="min-w-0 pt-0.5">
-                <span className="block text-sm font-bold">{t(titleKey)}</span>
-                <span className="block text-xs text-muted-foreground">{t(bodyKey)}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
+            {/* Icon left, title + a short subtitle stacked to its right — a
+                proper feature list (client's reference) rather than a row of
+                single-line checkmarks. */}
+            <ul className="mt-7 flex flex-col gap-3.5">
+              {FEATURES.map(({ titleKey, bodyKey }) => (
+                <li key={titleKey} className="flex items-start gap-3">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
+                    <Check className="size-4.5" aria-hidden />
+                  </span>
+                  <span className="min-w-0 pt-0.5">
+                    <span className="block text-sm font-bold">{t(titleKey)}</span>
+                    <span className="block text-xs text-muted-foreground">{t(bodyKey)}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
 
         <form
-          className="mt-7 w-full"
+          className={cn('w-full', isStaff ? 'mt-8' : 'mt-7')}
           onSubmit={(event) => {
             event.preventDefault();
             if (phoneValid && !busy) void sendCode('sms');

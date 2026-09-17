@@ -49,6 +49,8 @@
     "loginOrSignup": "Log In or Sign Up",
     "continue": "Continue",
     "skipLogin": "Skip for now",
+    "staffHeading": "Staff sign in",
+    "staffSubtitle": "For Get Fresh admins and delivery partners only",
     "termsNote": "By continuing, you agree to our Terms of Service and Privacy Policy",
     "phoneLabel": "Mobile number",
     "phonePlaceholder": "Enter mobile number",

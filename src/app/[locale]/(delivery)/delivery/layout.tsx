@@ -10,8 +10,8 @@ import type { Metadata } from 'next';
  * manifest (`public/manifest-rider.json`) rather than the customer one —
  * same icons, but it is named "Get Fresh Rider" and opens on `/mr/delivery`
  * instead of the storefront. Its `scope` stays `/` on purpose: a rider whose
- * session has expired lands on `/login?next=/delivery`, which has to open
- * inside the installed app rather than bouncing out to a browser tab.
+ * session has expired lands on `/staff/login`, which has to open inside the
+ * installed app rather than bouncing out to a browser tab.
  */
 export async function generateMetadata({
   params,
@@ -53,7 +53,7 @@ export default async function DeliveryLayout({
   const session = await getSession();
 
   if (!session) {
-    redirect({ href: '/login?next=/delivery', locale });
+    redirect({ href: '/staff/login', locale });
   } else if (session.role !== 'DELIVERY_PARTNER') {
     redirect({ href: '/', locale });
   }

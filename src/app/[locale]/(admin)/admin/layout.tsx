@@ -29,7 +29,7 @@ export default async function AdminLayout({
   const session = await getSession();
 
   if (!session) {
-    redirect({ href: '/login?next=/admin', locale });
+    redirect({ href: '/staff/login', locale });
   } else if (!STORE_ROLES.includes(session.role)) {
     redirect({ href: '/', locale });
   }

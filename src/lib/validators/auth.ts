@@ -12,6 +12,10 @@ export type SendOtpInput = z.infer<typeof sendOtpSchema>;
 export const verifyOtpSchema = z.object({
   phone: phoneSchema,
   code: otpCodeSchema,
+  // 'staff' — the `/staff/login` entry point (session 2026-09-17). Same OTP
+  // backend as the customer flow; this flag only changes what happens for a
+  // phone with no staff access (see the verify route).
+  context: z.enum(['staff']).optional(),
 });
 export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
 
