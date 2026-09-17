@@ -34,6 +34,11 @@ const CATEGORY_ICONS: Record<string, typeof Leaf> = {
   __sprouts__: Leaf,
 };
 
+// Roughly this screen's own sticky `PageHeader`'s height (title + subtitle
+// line, `py-3` padding) — same approach as `category-product-list.tsx`'s own
+// `HEADER_OFFSET_PX`, which the left rail below is otherwise a copy of.
+const HEADER_OFFSET_PX = 78;
+
 export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
   const t = useTranslations('mealPlan');
   const tw = useTranslations('mealPlan.wizard');
@@ -99,80 +104,96 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
           onEdit={(product) => setPicker(product)}
         />
       ) : (
-        <main className="pb-28">
-          {/* ── Category tabs */}
-          {/* Relative wrapper + a right-edge fade (client feedback, session
-              2026-09-17): the row cuts a tab off mid-label at the scrollport
-              edge with nothing hinting there's more to scroll to — the fade
-              reads as "this keeps going" the way the same trick does on the
-              home page's horizontal rails. `pointer-events-none` so it never
-              blocks a tap on whatever tab sits underneath it. */}
-          <div className="relative border-b border-border bg-card">
-            <div className="flex gap-2 overflow-x-auto px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {columns.map((column) => {
-                const Icon = CATEGORY_ICONS[column.slug] ?? Leaf;
-                const active = (activeColumn?.slug ?? columns[0]?.slug) === column.slug;
-                return (
-                  <button
-                    key={column.slug}
-                    type="button"
-                    onClick={() => {
-                      setActiveSlug(column.slug);
-                      setSearch('');
-                    }}
+        <main className="flex items-start gap-0 pb-28">
+          {/* ── Category rail — matches the storefront's own left-rail
+              category browser (`category-product-list.tsx`) the client
+              pointed at as the reference: round photo tiles, a sticky
+              column, a right-edge accent bar and bold label on whichever
+              one is active (session 2026-09-17, replacing the earlier
+              horizontal scrolling tab row). Selecting a tab still swaps the
+              whole grid on the right rather than jump-scrolling to an
+              anchor — this screen shows one category at a time, it never
+              renders all of them on one combined page the way the
+              storefront's rail does. */}
+          <nav
+            aria-label={tw('categoriesLabel')}
+            className="sticky w-[76px] shrink-0 self-start overflow-y-auto bg-card"
+            style={{ top: HEADER_OFFSET_PX, maxHeight: `calc(100dvh - ${HEADER_OFFSET_PX}px)` }}
+          >
+            {columns.map((column) => {
+              const Icon = CATEGORY_ICONS[column.slug] ?? Leaf;
+              const active = (activeColumn?.slug ?? columns[0]?.slug) === column.slug;
+              return (
+                <button
+                  key={column.slug}
+                  type="button"
+                  onClick={() => {
+                    setActiveSlug(column.slug);
+                    setSearch('');
+                  }}
+                  aria-current={active}
+                  className={cn(
+                    'flex w-full flex-col items-center gap-1 border-r-4 px-1.5 py-3 text-center',
+                    active ? 'border-primary' : 'border-transparent',
+                  )}
+                >
+                  {/* The category's own real photo when one exists (admin-set
+                      icon, or its first product's) — a generic line icon
+                      only when no real image exists at all (the curated
+                      Daily Essentials/Sprouts columns). */}
+                  <span
                     className={cn(
-                      'flex shrink-0 items-center gap-2 rounded-full border py-1.5 pr-3.5 pl-1.5 text-xs font-semibold whitespace-nowrap',
-                      active ? 'border-primary bg-tint-green text-primary-dark' : 'border-border text-muted-foreground',
+                      'grid size-14 shrink-0 place-items-center overflow-hidden rounded-full p-1',
+                      active ? 'bg-tint-lime' : 'bg-background',
                     )}
+                    aria-hidden
                   >
-                    {/* The category's own real photo when one exists (admin-set
-                        icon, or its first product's), matching the same photo
-                        treatment the home page's category grid already uses —
-                        a generic line icon only when no real image exists at
-                        all (the curated Daily Essentials/Sprouts columns).
-                        Sized up (client feedback, session 2026-09-17) — the
-                        previous size-5 photo read as an afterthought next to
-                        the label. */}
                     {column.iconUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={column.iconUrl} alt="" className="size-9 shrink-0 rounded-full object-cover" />
+                      <img src={column.iconUrl} alt="" className="size-full rounded-full object-cover" />
                     ) : (
-                      <Icon className="size-5 shrink-0" aria-hidden />
+                      <Icon className={cn('size-5', active ? 'text-primary' : 'text-muted-foreground')} aria-hidden />
                     )}
+                  </span>
+                  <span
+                    className={cn(
+                      'text-[11px] leading-tight',
+                      active ? 'font-bold text-foreground' : 'font-medium text-foreground',
+                    )}
+                  >
                     {categoryLabel(column)}
-                  </button>
-                );
-              })}
-            </div>
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-card to-transparent"
-            />
-          </div>
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
 
-          {/* ── Search */}
-          <div className="px-4 py-3">
-            <div className="flex items-center gap-2 rounded-[var(--radius)] border border-border bg-card px-3 py-2.5">
-              <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder={tw('searchPlaceholder', { category: activeColumn ? categoryLabel(activeColumn) : '' })}
-                className="w-full bg-transparent text-sm outline-none"
-              />
+          {/* ── Right pane — search + product grid, tinted like the
+              storefront's own category page reads as its own column next
+              to the white rail. */}
+          <div className="min-w-0 flex-1 bg-tint-lime">
+            <div className="px-4 py-3">
+              <div className="flex items-center gap-2 rounded-[var(--radius)] border border-border bg-card px-3 py-2.5">
+                <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                <input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder={tw('searchPlaceholder', { category: activeColumn ? categoryLabel(activeColumn) : '' })}
+                  className="w-full bg-transparent text-sm outline-none"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* ── Product grid */}
-          <div className="grid grid-cols-2 gap-3 px-4">
-            {filteredProducts.map((product) => (
-              <PlanProductCard
-                key={product.id}
-                product={product}
-                selectedVariantId={daySelections[product.id]}
-                onTap={() => setPicker(product)}
-              />
-            ))}
+            <div className="grid grid-cols-2 gap-3 px-4 pb-4">
+              {filteredProducts.map((product) => (
+                <PlanProductCard
+                  key={product.id}
+                  product={product}
+                  selectedVariantId={daySelections[product.id]}
+                  onTap={() => setPicker(product)}
+                />
+              ))}
+            </div>
           </div>
         </main>
       )}

@@ -432,6 +432,7 @@
       "viewPlan": "View Plan ({count} items)",
       "addItemsHint": "Add items for your meal plan",
       "reviewHint": "Review selected items",
+      "categoriesLabel": "Categories",
       "searchPlaceholder": "Search {category}…",
       "viewDayPlan": "View Plan ({count} items)",
       "saveForDay": "Save for {day}",

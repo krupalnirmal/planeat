@@ -432,6 +432,7 @@
       "viewPlan": "प्लान देखें ({count} आइटम)",
       "addItemsHint": "अपने मील प्लान के लिए आइटम जोड़ें",
       "reviewHint": "चुने हुए आइटम देखें",
+      "categoriesLabel": "श्रेणियाँ",
       "searchPlaceholder": "{category} खोजें…",
       "viewDayPlan": "प्लान देखें ({count} आइटम)",
       "saveForDay": "{day} के लिए सेव करें",
