@@ -210,7 +210,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
 
       {!showSummary && dayCount > 0 && (
         <div
-          className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
+          className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-32 py-4"
           style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
         >
           <button
@@ -226,7 +226,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
 
       {showSummary && (
         <div
-          className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
+          className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-32 py-4"
           style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
         >
           <button
