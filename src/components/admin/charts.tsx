@@ -332,6 +332,109 @@ export function HorizontalBarChart({
   );
 }
 
+/* ── Sparkline — a stat tile's own tiny trend line, not a standalone chart:
+   no axes, no labels, no tooltip (the tile's own value/delta already carry
+   the numbers; this is decoration with a real shape behind it, per the
+   skill's "stat tile: value + delta + trend" contract). ────────────────── */
+
+export function Sparkline({ data, color = SEQUENTIAL_HUE }: { data: number[]; color?: string }) {
+  const width = 80;
+  const height = 28;
+  const max = Math.max(...data, 1);
+  const min = Math.min(...data, 0);
+  const range = max - min || 1;
+
+  const points = data.map((v, i) => {
+    const x = data.length === 1 ? width / 2 : (i / (data.length - 1)) * width;
+    const y = height - ((v - min) / range) * height;
+    return `${x},${y}`;
+  });
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="h-7 w-20 shrink-0" aria-hidden>
+      <polyline points={points.join(' ')} fill="none" stroke={color} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/* ── Donut — an explicit exception to the skill's bar-over-donut default:
+   genuine part-to-whole, <=6 segments, with a meaningful center total is an
+   allowed case, and the client's own reference uses exactly this treatment
+   for payment methods. Always paired with a legend (the skill's own rule
+   for >=2 series) so identity never rests on color alone. ─────────────── */
+
+export function DonutChart({
+  items,
+  formatTotal,
+}: {
+  items: Array<{ key: string; label: string; value: number; color: string }>;
+  formatTotal: (total: number) => string;
+}) {
+  const total = items.reduce((sum, i) => sum + i.value, 0);
+  const size = 140;
+  const strokeWidth = 20;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const gapDeg = total > 0 ? 2 : 0; // a thin surface gap between segments, not a border
+
+  let cumulative = 0;
+
+  return (
+    <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center">
+      <div className="relative shrink-0" style={{ width: size, height: size }}>
+        <svg viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
+          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="var(--border)" strokeWidth={strokeWidth} />
+          {total > 0 &&
+            items.map((item) => {
+              const fraction = item.value / total;
+              const dash = Math.max(fraction * circumference - gapDeg, 0);
+              const offset = -((cumulative / total) * circumference);
+              cumulative += item.value;
+              return (
+                <circle
+                  key={item.key}
+                  cx={size / 2}
+                  cy={size / 2}
+                  r={radius}
+                  fill="none"
+                  stroke={item.color}
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={`${dash} ${circumference - dash}`}
+                  strokeDashoffset={offset}
+                  strokeLinecap="butt"
+                />
+              );
+            })}
+        </svg>
+        <div className="absolute inset-0 grid place-items-center">
+          <div className="text-center">
+            <p className="text-2xl font-bold tabular-nums text-foreground">{formatTotal(total)}</p>
+            <p className="text-[11px] text-muted-foreground">Total</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Legend — required for >=2 series; values are the direct labels. */}
+      <ul className="flex w-full min-w-0 flex-col gap-2">
+        {items.map((item) => {
+          const pct = total > 0 ? Math.round((item.value / total) * 100) : 0;
+          return (
+            <li key={item.key} className="flex items-center justify-between gap-2 text-xs">
+              <span className="flex min-w-0 items-center gap-1.5">
+                <span aria-hidden className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: item.color }} />
+                <span className="truncate font-medium text-foreground">{item.label}</span>
+              </span>
+              <span className="shrink-0 tabular-nums text-muted-foreground">
+                {item.value} · {pct}%
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 function formatShortDate(dateKey: string | undefined): string {
   if (!dateKey) return '';
   const [, month, day] = dateKey.split('-');
