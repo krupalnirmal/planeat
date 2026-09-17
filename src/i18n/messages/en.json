@@ -795,7 +795,14 @@
       "auditLog": "Audit log",
       "backToShop": "Back to shop",
       "openMenu": "Open menu",
-      "closeMenu": "Close menu"
+      "closeMenu": "Close menu",
+      "tagline": "Fresh Groceries. Happier Homes.",
+      "searchPlaceholder": "Search orders, customers, products…",
+      "logout": "Logout",
+      "promoTitle": "Fresh food, better tomorrow",
+      "roleStoreAdmin": "Admin",
+      "roleSuperAdmin": "Super Admin",
+      "roleDeliveryPartner": "Delivery Partner"
     },
     "notifications": {
       "title": "Notifications",

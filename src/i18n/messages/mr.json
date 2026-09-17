@@ -795,7 +795,14 @@
       "auditLog": "नोंदवही",
       "backToShop": "दुकानाकडे परत",
       "openMenu": "मेनू उघडा",
-      "closeMenu": "मेनू बंद करा"
+      "closeMenu": "मेनू बंद करा",
+      "tagline": "ताज्या भाज्या. आनंदी घर.",
+      "searchPlaceholder": "ऑर्डर्स, ग्राहक, उत्पादने शोधा…",
+      "logout": "लॉगआउट",
+      "promoTitle": "ताजे अन्न, उद्याचं आरोग्य",
+      "roleStoreAdmin": "अ‍ॅडमिन",
+      "roleSuperAdmin": "सुपर अ‍ॅडमिन",
+      "roleDeliveryPartner": "डिलिव्हरी पार्टनर"
     },
     "notifications": {
       "title": "सूचना",

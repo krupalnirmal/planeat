@@ -795,7 +795,14 @@
       "auditLog": "रिकॉर्ड बही",
       "backToShop": "दुकान पर वापस",
       "openMenu": "मेनू खोलें",
-      "closeMenu": "मेनू बंद करें"
+      "closeMenu": "मेनू बंद करें",
+      "tagline": "ताज़ी सब्ज़ियाँ. खुशहाल घर.",
+      "searchPlaceholder": "ऑर्डर, ग्राहक, उत्पाद खोजें…",
+      "logout": "लॉगआउट",
+      "promoTitle": "ताज़ा खाना, बेहतर कल",
+      "roleStoreAdmin": "एडमिन",
+      "roleSuperAdmin": "सुपर एडमिन",
+      "roleDeliveryPartner": "डिलीवरी पार्टनर"
     },
     "notifications": {
       "title": "सूचनाएं",

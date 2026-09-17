@@ -1,25 +1,32 @@
 'use client';
 
+import { useMutation } from '@tanstack/react-query';
 import {
   Bike,
+  ChevronDown,
   ChevronLeft,
   ClipboardList,
   FileClock,
   Home,
   LayoutDashboard,
+  LogOut,
   MapPinned,
   Menu,
   Package,
+  Search,
   Settings,
   ShoppingBag,
+  Sprout,
   Users,
   Warehouse,
   X,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
-import { Link, usePathname } from '@/i18n/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useRouter, usePathname } from '@/i18n/navigation';
 import { NotificationBell } from '@/components/admin/notification-bell';
+import { useInvalidateSession, useSession } from '@/hooks/use-session';
+import { api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
 
 /**
@@ -100,6 +107,133 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
+/** The header's global search (session 2026-09-17) — scoped to Orders for
+    now, the only admin list with a real free-text filter already
+    (`listAdminOrders`, matches order number/customer name/phone); this
+    submits into it rather than pretending to search customers/catalogue
+    too, which have no such filter yet. Cmd/Ctrl+K focuses it from
+    anywhere in the admin panel. */
+function AdminSearchBox() {
+  const t = useTranslations('admin.nav');
+  const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [value, setValue] = useState('');
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        inputRef.current?.focus();
+      }
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
+
+  return (
+    <form
+      className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-[var(--radius)] border border-border bg-secondary/60 px-3"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const q = value.trim();
+        if (q) router.push(`/admin/orders?q=${encodeURIComponent(q)}`);
+      }}
+    >
+      <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+      <input
+        ref={inputRef}
+        type="search"
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        placeholder={t('searchPlaceholder')}
+        className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+      />
+      <kbd className="hidden shrink-0 rounded border border-border bg-card px-1.5 py-0.5 text-[10px] text-muted-foreground sm:block">
+        ⌘K
+      </kbd>
+    </form>
+  );
+}
+
+const ROLE_LABEL_KEY: Record<string, string> = {
+  STORE_ADMIN: 'roleStoreAdmin',
+  SUPER_ADMIN: 'roleSuperAdmin',
+  DELIVERY_PARTNER: 'roleDeliveryPartner',
+};
+
+/** The real logged-in admin (session 2026-09-17) — name/role from the same
+    `useSession()` every other part of the app already uses, not a static
+    mock. Logout mirrors the delivery header's own mutation
+    (`src/components/delivery/header.tsx`), redirecting to `/staff/login`
+    instead of the customer `/login`. */
+function ProfileMenu() {
+  const t = useTranslations('admin.nav');
+  const router = useRouter();
+  const invalidateSession = useInvalidateSession();
+  const { user } = useSession();
+  const [open, setOpen] = useState(false);
+
+  const logout = useMutation({
+    mutationFn: () => api.post('/api/auth/logout'),
+    onSuccess: async () => {
+      await invalidateSession();
+      router.replace('/staff/login');
+    },
+  });
+
+  const name = user?.name ?? user?.phone ?? '';
+  const initials = name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('') || 'A';
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex shrink-0 items-center gap-2 rounded-full py-1 pr-2 pl-1 hover:bg-secondary"
+        aria-expanded={open}
+      >
+        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+          {initials}
+        </span>
+        <span className="hidden min-w-0 text-left lg:block">
+          <span className="block truncate text-xs font-semibold text-foreground">{name}</span>
+          <span className="block text-[10px] text-muted-foreground">
+            {user ? t(ROLE_LABEL_KEY[user.role] ?? 'roleStoreAdmin') : ''}
+          </span>
+        </span>
+        <ChevronDown className="hidden size-3.5 shrink-0 text-muted-foreground lg:block" aria-hidden />
+      </button>
+
+      {open && (
+        <>
+          <button
+            type="button"
+            aria-label={t('closeMenu')}
+            className="fixed inset-0 z-40"
+            onClick={() => setOpen(false)}
+          />
+          <div className="absolute top-full right-0 z-50 mt-1 w-44 rounded-[var(--radius)] border border-border bg-card py-1 shadow-lg">
+            <button
+              type="button"
+              onClick={() => logout.mutate()}
+              disabled={logout.isPending}
+              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-danger hover:bg-secondary"
+            >
+              <LogOut className="size-4" aria-hidden />
+              {t('logout')}
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const tAdmin = useTranslations('admin');
   const pathname = usePathname();
@@ -120,19 +254,42 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       {/* The sidebar is hidden when printing — the picklist is printed on
           paper and carried to the market, and a nav column would waste a
           third of the page. */}
-      <aside className="hidden w-56 shrink-0 border-r border-border bg-card lg:block print:hidden">
-        <div className="flex items-start justify-between border-b border-border px-5 py-4">
-          <div>
-            <p className="text-sm font-bold">Get Fresh</p>
-            <p className="text-xs text-muted-foreground">{tAdmin('title')}</p>
-          </div>
-          <NotificationBell align="left" />
+      <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-card lg:flex print:hidden">
+        <div className="border-b border-border px-5 py-4">
+          <p className="text-sm font-bold">Get Fresh</p>
+          <p className="text-[11px] text-muted-foreground">{tAdmin('nav.tagline')}</p>
         </div>
 
-        <NavList />
+        <div className="flex flex-1 flex-col justify-between overflow-y-auto">
+          <NavList />
+
+          {/* Cosmetic branding, matching the client's reference — not tied
+              to any data. */}
+          <div className="px-2 pb-2">
+            <div className="flex items-center gap-2.5 rounded-[var(--radius)] bg-tint-green px-3 py-3">
+              <Sprout className="size-6 shrink-0 text-primary" aria-hidden />
+              <p className="text-xs leading-tight font-semibold text-primary-dark">
+                {tAdmin('nav.promoTitle')}
+              </p>
+            </div>
+          </div>
+        </div>
       </aside>
 
       <div className="min-w-0 flex-1">
+        {/* Full-width top bar, desktop only — search + notifications +
+            the real logged-in admin's own profile, matching the client's
+            reference. Export/date-range stay on the dashboard page itself
+            (AdminPageHeader's action slot) since they're dashboard-specific,
+            not chrome every admin screen needs. */}
+        <header className="hidden h-16 items-center gap-4 border-b border-border bg-card px-6 lg:flex print:hidden">
+          <AdminSearchBox />
+          <div className="flex shrink-0 items-center gap-1">
+            <NotificationBell align="right" />
+            <ProfileMenu />
+          </div>
+        </header>
+
         {/* The client's reference for "a normal mobile menu": a compact top
             bar (hamburger, title, bell) with the same section list as the
             desktop sidebar opening as a slide-over drawer — not the
