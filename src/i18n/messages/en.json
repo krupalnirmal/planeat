@@ -827,13 +827,21 @@
       "regenerated": "{created} created, {duplicates} already existed",
       "revenueTrend": "Revenue",
       "ordersTrend": "Orders",
-      "last14Days": "Last 14 days",
-      "last7Days": "Last 7 days",
       "orderPipeline": "Today's order pipeline",
       "noOrdersToday": "No orders placed yet today",
       "topCategories": "Top categories by revenue",
       "noRecentSales": "No sales in this window yet",
-      "paymentMethods": "Payment methods"
+      "paymentMethods": "Payment methods",
+      "export": "Export",
+      "pipelinePreparing": "Preparing",
+      "recentOrders": "Recent orders",
+      "viewAllOrders": "View all orders",
+      "needsAttention": "Needs attention",
+      "range": {
+        "14d": "Last 14 days",
+        "30d": "Last 30 days",
+        "month": "This month"
+      }
     },
     "picklist": {
       "title": "Picklist",

@@ -284,7 +284,20 @@ export function HorizontalBarChart({
   items,
   valueFormat,
 }: {
-  items: Array<{ key: string; label: string; value: number; color: string; sublabel?: string }>;
+  items: Array<{
+    key: string;
+    label: string;
+    value: number;
+    color: string;
+    sublabel?: string;
+    /** An optional leading icon (e.g. a per-category glyph) — rendered
+        before the color dot, not instead of it, since the dot still carries
+        the bar's own color identity. */
+    icon?: React.ReactNode;
+    /** An optional trailing pill (e.g. a revenue-share %) shown after the
+        formatted value. */
+    badge?: string;
+  }>;
   valueFormat: (value: number) => string;
 }) {
   const [hoverKey, setHoverKey] = useState<string | null>(null);
@@ -307,6 +320,7 @@ export function HorizontalBarChart({
             >
               <div className="flex items-baseline justify-between gap-2 text-xs">
                 <span className="flex min-w-0 items-center gap-1.5 font-medium text-foreground">
+                  {item.icon}
                   <span
                     aria-hidden
                     className="size-2 shrink-0 rounded-full"
@@ -314,8 +328,13 @@ export function HorizontalBarChart({
                   />
                   <span className="truncate">{item.label}</span>
                 </span>
-                <span className="shrink-0 font-semibold tabular-nums text-foreground">
-                  {valueFormat(item.value)}
+                <span className="flex shrink-0 items-center gap-1.5">
+                  <span className="font-semibold tabular-nums text-foreground">{valueFormat(item.value)}</span>
+                  {item.badge && (
+                    <span className="rounded-full bg-secondary px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                      {item.badge}
+                    </span>
+                  )}
                 </span>
               </div>
               <div className={cn('h-2.5 min-h-[10px] w-full overflow-hidden rounded-full bg-secondary')}>
