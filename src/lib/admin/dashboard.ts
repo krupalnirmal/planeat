@@ -1,7 +1,12 @@
+import type { Locale, OrderStatus, PaymentMethod } from '@/generated/prisma/enums';
 import { db } from '@/lib/db';
+import { pickName } from '@/lib/catalog/text';
 import { parseDateKey } from '@/lib/meal-plan/pricing';
 import { getCronHealth, type CronHealth } from '@/lib/subscription/daily-jobs';
 import { istDateKeyOf } from '@/lib/subscription/schedule';
+
+const TREND_DAYS = 14;
+const RECENT_WINDOW_DAYS = 7;
 
 /**
  * M9 dashboard — "Today's orders, revenue, active subscriptions, low stock,
@@ -35,9 +40,122 @@ export interface DashboardMetrics {
   waitlistTopPincodes: Array<{ pincode: string; count: number }>;
 
   cron: CronHealth;
+
+  analytics: DashboardAnalytics;
 }
 
-export async function getDashboardMetrics(now: Date = new Date()): Promise<DashboardMetrics> {
+/**
+ * The dashboard's charts (session 2026-09-17) — every number here is real,
+ * queried the same way the stat tiles above are; nothing is placeholder or
+ * sample data. Kept as a nested object rather than flattened onto
+ * `DashboardMetrics` so the chart-feeding shape stays obviously distinct
+ * from the single-value stat tiles.
+ */
+export interface DashboardAnalytics {
+  /** Orders placed + revenue actually paid, per day, oldest first — always
+      exactly `TREND_DAYS` entries, zero-filled for a day with no orders. */
+  dailySeries: Array<{ dateKey: string; orders: number; revenuePaise: bigint }>;
+  /** Today's orders by status — the pipeline snapshot, not history. */
+  orderStatusToday: Array<{ status: OrderStatus; count: number }>;
+  /** Revenue by category over the last `RECENT_WINDOW_DAYS`, paid orders
+      only, highest first, capped at 6 (the categorical-palette ceiling). */
+  topCategories: Array<{ slug: string; name: string; revenuePaise: bigint }>;
+  /** Orders by payment method over the last `RECENT_WINDOW_DAYS`. */
+  paymentMethodSplit: Array<{ method: PaymentMethod; count: number; revenuePaise: bigint }>;
+}
+
+async function getDashboardAnalytics(now: Date, locale: Locale): Promise<DashboardAnalytics> {
+  const dateKey = istDateKeyOf(now);
+  const dayStart = new Date(`${dateKey}T00:00:00.000Z`);
+  const dayEnd = new Date(`${dateKey}T23:59:59.999Z`);
+  const trendStart = new Date(now.getTime() - (TREND_DAYS - 1) * 86_400_000);
+  const recentStart = new Date(now.getTime() - RECENT_WINDOW_DAYS * 86_400_000);
+
+  const [trendOrders, todayStatusGroups, recentItems, paymentGroups] = await Promise.all([
+    // Bucketed in memory by IST date-key rather than a DB-side date-trunc
+    // groupBy (Prisma has none for MySQL) — the same trade-off this file
+    // already makes for low-stock filtering, and fine at this data volume.
+    db.order.findMany({
+      where: { placedAt: { gte: trendStart } },
+      select: { placedAt: true, totalPaise: true, paymentStatus: true },
+    }),
+
+    db.order.groupBy({
+      by: ['status'],
+      where: { placedAt: { gte: dayStart, lte: dayEnd } },
+      _count: { status: true },
+    }),
+
+    // No `categorySnapshot` on OrderItem, so the category comes from the
+    // live product via its variant — the same join path `getPlanColumns`
+    // uses for its own category rollups.
+    db.orderItem.findMany({
+      where: {
+        order: { placedAt: { gte: recentStart }, paymentStatus: 'PAID' },
+      },
+      select: {
+        totalPaise: true,
+        variant: {
+          select: {
+            product: {
+              select: { category: { select: { slug: true, nameEn: true, nameMr: true, nameHi: true } } },
+            },
+          },
+        },
+      },
+    }),
+
+    db.order.groupBy({
+      by: ['paymentMethod'],
+      where: { placedAt: { gte: recentStart } },
+      _count: { paymentMethod: true },
+      _sum: { totalPaise: true },
+    }),
+  ]);
+
+  const byDay = new Map<string, { orders: number; revenuePaise: bigint }>();
+  for (const order of trendOrders) {
+    const key = istDateKeyOf(order.placedAt);
+    const bucket = byDay.get(key) ?? { orders: 0, revenuePaise: 0n };
+    bucket.orders += 1;
+    if (order.paymentStatus === 'PAID') bucket.revenuePaise += order.totalPaise;
+    byDay.set(key, bucket);
+  }
+  const dailySeries: DashboardAnalytics['dailySeries'] = [];
+  for (let i = TREND_DAYS - 1; i >= 0; i--) {
+    const key = istDateKeyOf(new Date(now.getTime() - i * 86_400_000));
+    const bucket = byDay.get(key) ?? { orders: 0, revenuePaise: 0n };
+    dailySeries.push({ dateKey: key, ...bucket });
+  }
+
+  const byCategory = new Map<string, { name: string; revenuePaise: bigint }>();
+  for (const item of recentItems) {
+    const category = item.variant.product.category;
+    const existing = byCategory.get(category.slug);
+    if (existing) existing.revenuePaise += item.totalPaise;
+    else byCategory.set(category.slug, { name: pickName(category, locale), revenuePaise: item.totalPaise });
+  }
+  const topCategories = [...byCategory.entries()]
+    .map(([slug, v]) => ({ slug, ...v }))
+    .sort((a, b) => (b.revenuePaise > a.revenuePaise ? 1 : b.revenuePaise < a.revenuePaise ? -1 : 0))
+    .slice(0, 6);
+
+  return {
+    dailySeries,
+    orderStatusToday: todayStatusGroups.map((g) => ({ status: g.status, count: g._count.status })),
+    topCategories,
+    paymentMethodSplit: paymentGroups.map((g) => ({
+      method: g.paymentMethod,
+      count: g._count.paymentMethod,
+      revenuePaise: g._sum.totalPaise ?? 0n,
+    })),
+  };
+}
+
+export async function getDashboardMetrics(
+  now: Date = new Date(),
+  locale: Locale = 'en',
+): Promise<DashboardMetrics> {
   const dateKey = istDateKeyOf(now);
   const scheduledDate = parseDateKey(dateKey);
 
@@ -59,6 +177,7 @@ export async function getDashboardMetrics(now: Date = new Date()): Promise<Dashb
     waitlistTotal,
     waitlistGroups,
     cron,
+    analytics,
   ] = await Promise.all([
     db.order.count({ where: { placedAt: { gte: dayStart, lte: dayEnd } } }),
 
@@ -98,6 +217,7 @@ export async function getDashboardMetrics(now: Date = new Date()): Promise<Dashb
     }),
 
     getCronHealth(now),
+    getDashboardAnalytics(now, locale),
   ]);
 
   return {
@@ -120,6 +240,7 @@ export async function getDashboardMetrics(now: Date = new Date()): Promise<Dashb
       count: group._count.pincode,
     })),
     cron,
+    analytics,
   };
 }
 

@@ -824,7 +824,16 @@
       "cronAlertHint": "{count} चालू प्लान हैं पर ऑर्डर नहीं। तुरंत जाँचें।",
       "regenerate": "अभी दोबारा चलाएँ",
       "regenerating": "चल रहा है…",
-      "regenerated": "{created} बने, {duplicates} पहले से थे"
+      "regenerated": "{created} बने, {duplicates} पहले से थे",
+      "revenueTrend": "राजस्व",
+      "ordersTrend": "ऑर्डर",
+      "last14Days": "पिछले 14 दिनों में",
+      "last7Days": "पिछले 7 दिनों में",
+      "orderPipeline": "आज के ऑर्डर की स्थिति",
+      "noOrdersToday": "आज अभी तक कोई ऑर्डर नहीं आया",
+      "topCategories": "सबसे ज़्यादा बिक्री वाली श्रेणियाँ",
+      "noRecentSales": "इस अवधि में अभी तक कोई बिक्री नहीं हुई",
+      "paymentMethods": "भुगतान के तरीके"
     },
     "picklist": {
       "title": "खरीद की सूची",

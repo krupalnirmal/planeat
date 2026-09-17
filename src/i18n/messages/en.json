@@ -824,7 +824,16 @@
       "cronAlertHint": "{count} active plans and no orders. Check this now.",
       "regenerate": "Run it again now",
       "regenerating": "Running…",
-      "regenerated": "{created} created, {duplicates} already existed"
+      "regenerated": "{created} created, {duplicates} already existed",
+      "revenueTrend": "Revenue",
+      "ordersTrend": "Orders",
+      "last14Days": "Last 14 days",
+      "last7Days": "Last 7 days",
+      "orderPipeline": "Today's order pipeline",
+      "noOrdersToday": "No orders placed yet today",
+      "topCategories": "Top categories by revenue",
+      "noRecentSales": "No sales in this window yet",
+      "paymentMethods": "Payment methods"
     },
     "picklist": {
       "title": "Picklist",

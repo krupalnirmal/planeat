@@ -2,11 +2,18 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, CheckCircle2, Loader2, RefreshCw } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { AdminPageHeader } from '@/components/admin/admin-shell';
-import { api } from '@/lib/api/client';
+import {
+  HorizontalBarChart,
+  ORDER_STATUS_COLORS,
+  OrdersTrendChart,
+  PAYMENT_METHOD_COLORS,
+  RevenueTrendChart,
+} from '@/components/admin/charts';
+import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
@@ -48,20 +55,36 @@ interface Metrics {
     paymentPending: number;
     alert: boolean;
   };
+
+  analytics: {
+    dailySeries: Array<{ dateKey: string; orders: number; revenuePaise: string }>;
+    orderStatusToday: Array<{ status: string; count: number }>;
+    topCategories: Array<{ slug: string; name: string; revenuePaise: string }>;
+    paymentMethodSplit: Array<{ method: string; count: number; revenuePaise: string }>;
+  };
 }
 
 export function AdminDashboard() {
   const t = useTranslations('admin.dashboard');
   const tc = useTranslations('admin.common');
+  // Reused rather than duplicated — the same short labels the customer-
+  // facing order tracker already has for every OrderStatus/PaymentMethod.
+  const tStatus = useTranslations('orders.status');
+  const tPayment = useTranslations('orders.payment');
+  const locale = useLocale();
   const queryClient = useQueryClient();
   const [notice, setNotice] = useState<string | null>(null);
 
   const metrics = useQuery({
-    queryKey: ['admin-dashboard'],
-    queryFn: () => api.get<Metrics>('/api/admin/dashboard'),
+    queryKey: ['admin-dashboard', locale],
+    queryFn: () => api.get<Metrics>(`/api/admin/dashboard${qs({ locale })}`),
     // The owner leaves this open on a laptop all morning; a stale cron alert
     // is exactly the thing that must not sit there unnoticed.
     refetchInterval: 60_000,
+    // Interaction spec: refetch keeps the previous render, not a skeleton
+    // flash — the charts below hold their last data at reduced opacity
+    // while `isFetching` (but not the initial `isLoading`) is true.
+    placeholderData: (previous) => previous,
   });
 
   const regenerate = useMutation({
@@ -81,7 +104,12 @@ export function AdminDashboard() {
   if (!data) return <p className="text-sm text-danger">{tc('failed')}</p>;
 
   return (
-    <>
+    // Interaction spec: a background refetch (the 60s poll) holds the
+    // previous render at reduced opacity instead of a skeleton flash or
+    // layout jump — `isFetching` is also true on the very first load, so
+    // this only kicks in once `data` already exists (the `isLoading` guard
+    // above returns before this point on that first load).
+    <div className={cn('transition-opacity', metrics.isFetching && 'opacity-60')}>
       <AdminPageHeader title={t('title')} subtitle={data.dateKey} />
 
       {notice && (
@@ -182,7 +210,99 @@ export function AdminDashboard() {
           </ul>
         </section>
       )}
-    </>
+
+      {/* ── Analytics — real queries, same as every stat tile above, just
+          charted instead of a single number. A "revenue vs orders" pair
+          stays two single-hue charts rather than one dual-axis plot (the
+          #1 anti-pattern the skill calls out: two different scales sharing
+          one axis invents a correlation that isn't there). */}
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <ChartCard title={t('revenueTrend')} subtitle={t('last14Days')}>
+          <RevenueTrendChart data={data.analytics.dailySeries} />
+        </ChartCard>
+        <ChartCard title={t('ordersTrend')} subtitle={t('last14Days')}>
+          <OrdersTrendChart data={data.analytics.dailySeries} />
+        </ChartCard>
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+        <ChartCard title={t('orderPipeline')} subtitle={data.dateKey}>
+          {data.analytics.orderStatusToday.length > 0 ? (
+            <HorizontalBarChart
+              items={data.analytics.orderStatusToday.map((s) => ({
+                key: s.status,
+                label: tStatus(s.status),
+                value: s.count,
+                color: ORDER_STATUS_COLORS[s.status] ?? '#8a8a8a',
+              }))}
+              valueFormat={(v) => String(v)}
+            />
+          ) : (
+            <EmptyChart label={t('noOrdersToday')} />
+          )}
+        </ChartCard>
+
+        <ChartCard title={t('topCategories')} subtitle={t('last7Days')}>
+          {data.analytics.topCategories.length > 0 ? (
+            <HorizontalBarChart
+              items={data.analytics.topCategories.map((c) => ({
+                key: c.slug,
+                label: c.name,
+                value: Number(paise(c.revenuePaise)) / 100,
+                color: '#2fa355',
+              }))}
+              valueFormat={(v) => formatPaise(paise(BigInt(Math.round(v * 100))), { hidePaise: true })}
+            />
+          ) : (
+            <EmptyChart label={t('noRecentSales')} />
+          )}
+        </ChartCard>
+
+        <ChartCard title={t('paymentMethods')} subtitle={t('last7Days')}>
+          {data.analytics.paymentMethodSplit.length > 0 ? (
+            <HorizontalBarChart
+              items={data.analytics.paymentMethodSplit.map((p) => ({
+                key: p.method,
+                label: tPayment(p.method),
+                value: p.count,
+                color: PAYMENT_METHOD_COLORS[p.method] ?? '#8a8a8a',
+              }))}
+              valueFormat={(v) => String(v)}
+            />
+          ) : (
+            <EmptyChart label={t('noRecentSales')} />
+          )}
+        </ChartCard>
+      </div>
+    </div>
+  );
+}
+
+function ChartCard({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-[var(--radius)] border border-border bg-card p-4">
+      <div className="mb-3 flex items-baseline justify-between gap-2">
+        <h2 className="text-sm font-semibold">{title}</h2>
+        {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function EmptyChart({ label }: { label: string }) {
+  return (
+    <p className="grid h-[120px] place-items-center text-center text-xs text-muted-foreground">
+      {label}
+    </p>
   );
 }
 
