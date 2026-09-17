@@ -109,6 +109,25 @@ const SEARCHES = {
   'FRT-CASHEW': 'cashew nuts bowl',
   'FRT-WALNUT': 'walnuts shelled nuts',
   'FRT-RAISINS': 'raisins dried grapes',
+
+  // Sprouts (session 2026-09-06's product list never got image-fetch
+  // entries — session 2026-09-17: the meal-plan builder's Sprouts column
+  // showed broken images because of it). Commons has no clean, distinct
+  // sprout photo for every one of these Indian legumes specifically — the
+  // 5 marked below deliberately share one real, honest "mixed sprouts"
+  // photo rather than risk a wrong species-specific match (this file's own
+  // rule: a wrong photo is worse than no photo).
+  'VEG-SPROUT-MOONG': 'mung bean sprouts',
+  'VEG-SPROUT-MATKI': 'organic mixed beans shoots', // shared — see note above
+  'VEG-SPROUT-CHANA': 'sprouted chickpea stages',
+  'VEG-SPROUT-COWPEA': 'organic mixed beans shoots', // shared — see note above
+  'VEG-SPROUT-MASOOR': 'lentil sprouts',
+  'VEG-SPROUT-ALFALFA': 'alfalfa sprouts',
+  'VEG-SPROUT-SOYBEAN': 'kongnamul soybean sprout',
+  'VEG-SPROUT-MOONG-MATKI-MIX': 'organic mixed beans shoots', // shared — see note above
+  'VEG-SPROUT-MIXED-DAL': 'organic mixed beans shoots', // shared — see note above
+  'VEG-SPROUT-BLACK-CHANA': 'organic mixed beans shoots', // shared — see note above
+  'VEG-SPROUT-GREEN-PEA': 'garden pea sprouts',
 };
 
 /**
@@ -162,6 +181,9 @@ const REJECT_IF_TITLE_CONTAINS = {
   'FRT-CASHEW': ['brazil nut', 'shell halves', 'coconut'],
   'DRY-BUTTERMILK-500': ['making', 'churn', 'butter-'],
   'DRY-CHEESESLICE-200': ['fondue', 'omelette', 'pizza', 'burger', 'market', 'apple pie', 'triscuit', 'crispbread', 'sauerkraut', 'sausage', 'chops', 'herring', 'toast'],
+  'VEG-SPROUT-MASOOR': ['burger', 'pasta', 'germination'],
+  'VEG-SPROUT-SOYBEAN': ['muchim', 'bulgogi', 'early growth'],
+  'VEG-SPROUT-GREEN-PEA': ['catalogue', 'descriptive', '1886', 'annual'],
 };
 
 function isRejected(sku, title) {

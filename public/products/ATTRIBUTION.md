@@ -1,12 +1,9 @@
 # Product image attribution
 
 Every image in this folder comes from Wikimedia Commons, fetched by
-`scripts/fetch-product-images.mjs` or `scripts/fetch-white-bg-images.mjs`, EXCEPT the
-vegetable/milk/fruit photos the client supplied directly from their own
-product-photo set (session 2026-08-28/29) — those have no Commons attribution
-to record. They are demo catalogue assets: the shop owner replaces them with
-photos of their own stock from the admin panel. Licences are recorded here
-because several require credit.
+`scripts/fetch-product-images.mjs`. They are demo catalogue assets: the
+shop owner replaces them with photos of their own stock from the admin
+panel. Licences are recorded here because several require credit.
 
 | SKU | Photo | Author | Licence |
 |---|---|---|---|
@@ -51,3 +48,14 @@ because several require credit.
 | `VEG-GARLIC` | [Opened garlic bulb with garlic clove.jpg](https://commons.wikimedia.org/wiki/File:Opened_garlic_bulb_with_garlic_clove.jpg) | Dubravko Sorić SoraZG on Flickr | CC BY 2.0 |
 | `VEG-PUMPKIN` | [Cucurbita 2011 G1.jpg](https://commons.wikimedia.org/wiki/File:Cucurbita_2011_G1.jpg) | George Chernilevsky | Public domain |
 | `VEG-RIDGEGOURD` | [Luffa acutangula1.jpg](https://commons.wikimedia.org/wiki/File:Luffa_acutangula1.jpg) | No machine-readable author provided. Hans B.~commonswiki assumed (based on copyright claims). | Public domain |
+| `VEG-SPROUT-ALFALFA` | [Medicago sativa (alfalfa).jpg](https://commons.wikimedia.org/wiki/File:Medicago_sativa_(alfalfa).jpg) | No machine-readable author provided. Hans B.~commonswiki assumed (based on copyright claims). | Public domain |
+| `VEG-SPROUT-BLACK-CHANA` | [Organic mixed beans shoots.jpg](https://commons.wikimedia.org/wiki/File:Organic_mixed_beans_shoots.jpg) | Unknown | CC BY-SA 3.0 |
+| `VEG-SPROUT-CHANA` | [Sprouted-chickpea-stages.jpg](https://commons.wikimedia.org/wiki/File:Sprouted-chickpea-stages.jpg) | Navaneeth Krishnan S | CC BY-SA 3.0 |
+| `VEG-SPROUT-COWPEA` | [Organic mixed beans shoots.jpg](https://commons.wikimedia.org/wiki/File:Organic_mixed_beans_shoots.jpg) | Unknown | CC BY-SA 3.0 |
+| `VEG-SPROUT-GREEN-PEA` | [Garden pea sprouts.jpg](https://commons.wikimedia.org/wiki/File:Garden_pea_sprouts.jpg) | Yarzaryeni | CC BY 3.0 |
+| `VEG-SPROUT-MASOOR` | [Sprouted Lentils (4694761160).jpg](https://commons.wikimedia.org/wiki/File:Sprouted_Lentils_(4694761160).jpg) | Veganbaking.net from USA | CC BY-SA 2.0 |
+| `VEG-SPROUT-MATKI` | [Organic mixed beans shoots.jpg](https://commons.wikimedia.org/wiki/File:Organic_mixed_beans_shoots.jpg) | Unknown | CC BY-SA 3.0 |
+| `VEG-SPROUT-MIXED-DAL` | [Organic mixed beans shoots.jpg](https://commons.wikimedia.org/wiki/File:Organic_mixed_beans_shoots.jpg) | Unknown | CC BY-SA 3.0 |
+| `VEG-SPROUT-MOONG` | [Bean-sprouts.jpg](https://commons.wikimedia.org/wiki/File:Bean-sprouts.jpg) | Kwantonge at English Wikipedia | Public domain |
+| `VEG-SPROUT-MOONG-MATKI-MIX` | [Organic mixed beans shoots.jpg](https://commons.wikimedia.org/wiki/File:Organic_mixed_beans_shoots.jpg) | Unknown | CC BY-SA 3.0 |
+| `VEG-SPROUT-SOYBEAN` | [Soybean sprouts.jpg](https://commons.wikimedia.org/wiki/File:Soybean_sprouts.jpg) | No machine-readable author provided. Сергей Зеленцов assumed (based on copyright claims). | CC BY-SA 3.0 |

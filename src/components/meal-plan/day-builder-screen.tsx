@@ -101,41 +101,53 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
       ) : (
         <main className="pb-28">
           {/* ── Category tabs */}
-          <div className="flex gap-2 overflow-x-auto border-b border-border bg-card px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {columns.map((column) => {
-              const Icon = CATEGORY_ICONS[column.slug] ?? Leaf;
-              const active = (activeColumn?.slug ?? columns[0]?.slug) === column.slug;
-              return (
-                <button
-                  key={column.slug}
-                  type="button"
-                  onClick={() => {
-                    setActiveSlug(column.slug);
-                    setSearch('');
-                  }}
-                  className={cn(
-                    'flex shrink-0 items-center gap-2 rounded-full border py-1.5 pr-3.5 pl-1.5 text-xs font-semibold whitespace-nowrap',
-                    active ? 'border-primary bg-tint-green text-primary-dark' : 'border-border text-muted-foreground',
-                  )}
-                >
-                  {/* The category's own real photo when one exists (admin-set
-                      icon, or its first product's), matching the same photo
-                      treatment the home page's category grid already uses —
-                      a generic line icon only when no real image exists at
-                      all (the curated Daily Essentials/Sprouts columns).
-                      Sized up (client feedback, session 2026-09-17) — the
-                      previous size-5 photo read as an afterthought next to
-                      the label. */}
-                  {column.iconUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={column.iconUrl} alt="" className="size-9 shrink-0 rounded-full object-cover" />
-                  ) : (
-                    <Icon className="size-5 shrink-0" aria-hidden />
-                  )}
-                  {categoryLabel(column)}
-                </button>
-              );
-            })}
+          {/* Relative wrapper + a right-edge fade (client feedback, session
+              2026-09-17): the row cuts a tab off mid-label at the scrollport
+              edge with nothing hinting there's more to scroll to — the fade
+              reads as "this keeps going" the way the same trick does on the
+              home page's horizontal rails. `pointer-events-none` so it never
+              blocks a tap on whatever tab sits underneath it. */}
+          <div className="relative border-b border-border bg-card">
+            <div className="flex gap-2 overflow-x-auto px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {columns.map((column) => {
+                const Icon = CATEGORY_ICONS[column.slug] ?? Leaf;
+                const active = (activeColumn?.slug ?? columns[0]?.slug) === column.slug;
+                return (
+                  <button
+                    key={column.slug}
+                    type="button"
+                    onClick={() => {
+                      setActiveSlug(column.slug);
+                      setSearch('');
+                    }}
+                    className={cn(
+                      'flex shrink-0 items-center gap-2 rounded-full border py-1.5 pr-3.5 pl-1.5 text-xs font-semibold whitespace-nowrap',
+                      active ? 'border-primary bg-tint-green text-primary-dark' : 'border-border text-muted-foreground',
+                    )}
+                  >
+                    {/* The category's own real photo when one exists (admin-set
+                        icon, or its first product's), matching the same photo
+                        treatment the home page's category grid already uses —
+                        a generic line icon only when no real image exists at
+                        all (the curated Daily Essentials/Sprouts columns).
+                        Sized up (client feedback, session 2026-09-17) — the
+                        previous size-5 photo read as an afterthought next to
+                        the label. */}
+                    {column.iconUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={column.iconUrl} alt="" className="size-9 shrink-0 rounded-full object-cover" />
+                    ) : (
+                      <Icon className="size-5 shrink-0" aria-hidden />
+                    )}
+                    {categoryLabel(column)}
+                  </button>
+                );
+              })}
+            </div>
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-card to-transparent"
+            />
           </div>
 
           {/* ── Search */}
