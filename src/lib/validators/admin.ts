@@ -32,6 +32,12 @@ export const ordersQuerySchema = adminListQuerySchema.extend({
   type: z.enum(['INSTANT', 'MEAL_PLAN_DAILY']).optional(),
   date: z.iso.date().optional(),
   unassignedOnly: z.coerce.boolean().optional(),
+  // The dashboard's "Export" button (session 2026-09-17) scopes the CSV to
+  // its own active date-range control — separate from `date`, which is a
+  // single scheduled-delivery day, not a placed-at range.
+  dateFrom: z.iso.date().optional(),
+  dateTo: z.iso.date().optional(),
+  format: z.enum(['json', 'csv']).default('json'),
 });
 
 export const changeStatusSchema = z.object({

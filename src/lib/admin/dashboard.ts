@@ -5,8 +5,21 @@ import { parseDateKey } from '@/lib/meal-plan/pricing';
 import { getCronHealth, type CronHealth } from '@/lib/subscription/daily-jobs';
 import { istDateKeyOf } from '@/lib/subscription/schedule';
 
-const TREND_DAYS = 14;
-const RECENT_WINDOW_DAYS = 7;
+/** The dashboard's own date-range control (session 2026-09-17) — matches the
+    3 presets the client's reference mockup shows as pills, now a single
+    control above the whole analytics section rather than one per chart. */
+export type DashboardRange = '14d' | '30d' | 'month';
+
+function resolveRange(range: DashboardRange, now: Date): { start: Date; days: number } {
+  if (range === 'month') {
+    const [year, month] = istDateKeyOf(now).split('-');
+    const monthStart = new Date(`${year}-${month}-01T00:00:00.000Z`);
+    const days = Math.floor((now.getTime() - monthStart.getTime()) / 86_400_000) + 1;
+    return { start: monthStart, days };
+  }
+  const days = range === '30d' ? 30 : 14;
+  return { start: new Date(now.getTime() - (days - 1) * 86_400_000), days };
+}
 
 /**
  * M9 dashboard — "Today's orders, revenue, active subscriptions, low stock,
@@ -41,6 +54,12 @@ export interface DashboardMetrics {
 
   cron: CronHealth;
 
+  /** Today vs. yesterday — always this exact comparison regardless of the
+      analytics `range`, since a stat tile's delta is a fixed idea ("how did
+      today go so far") independent of whichever trend window the charts
+      below happen to be showing. */
+  deltas: DashboardDeltas;
+
   analytics: DashboardAnalytics;
 }
 
@@ -52,32 +71,39 @@ export interface DashboardMetrics {
  * from the single-value stat tiles.
  */
 export interface DashboardAnalytics {
-  /** Orders placed + revenue actually paid, per day, oldest first — always
-      exactly `TREND_DAYS` entries, zero-filled for a day with no orders. */
-  dailySeries: Array<{ dateKey: string; orders: number; revenuePaise: bigint }>;
-  /** Today's orders by status — the pipeline snapshot, not history. */
+  range: DashboardRange;
+  /** Orders placed + delivered + revenue actually paid, per day, oldest
+      first — one entry per day in the selected range, zero-filled for a day
+      with no orders. */
+  dailySeries: Array<{ dateKey: string; orders: number; delivered: number; revenuePaise: bigint }>;
+  /** Today's orders by status — the pipeline snapshot, not history; always
+      today regardless of `range` (a "pipeline" only means anything for the
+      day in progress). */
   orderStatusToday: Array<{ status: OrderStatus; count: number }>;
-  /** Revenue by category over the last `RECENT_WINDOW_DAYS`, paid orders
-      only, highest first, capped at 6 (the categorical-palette ceiling). */
+  /** Revenue by category over the selected range, paid orders only, highest
+      first, capped at 6 (the categorical-palette ceiling). */
   topCategories: Array<{ slug: string; name: string; revenuePaise: bigint }>;
-  /** Orders by payment method over the last `RECENT_WINDOW_DAYS`. */
+  /** Orders by payment method over the selected range. */
   paymentMethodSplit: Array<{ method: PaymentMethod; count: number; revenuePaise: bigint }>;
 }
 
-async function getDashboardAnalytics(now: Date, locale: Locale): Promise<DashboardAnalytics> {
+async function getDashboardAnalytics(
+  now: Date,
+  locale: Locale,
+  range: DashboardRange,
+): Promise<DashboardAnalytics> {
   const dateKey = istDateKeyOf(now);
   const dayStart = new Date(`${dateKey}T00:00:00.000Z`);
   const dayEnd = new Date(`${dateKey}T23:59:59.999Z`);
-  const trendStart = new Date(now.getTime() - (TREND_DAYS - 1) * 86_400_000);
-  const recentStart = new Date(now.getTime() - RECENT_WINDOW_DAYS * 86_400_000);
+  const { start: rangeStart, days } = resolveRange(range, now);
 
-  const [trendOrders, todayStatusGroups, recentItems, paymentGroups] = await Promise.all([
+  const [rangeOrders, todayStatusGroups, rangeItems, paymentGroups] = await Promise.all([
     // Bucketed in memory by IST date-key rather than a DB-side date-trunc
     // groupBy (Prisma has none for MySQL) — the same trade-off this file
     // already makes for low-stock filtering, and fine at this data volume.
     db.order.findMany({
-      where: { placedAt: { gte: trendStart } },
-      select: { placedAt: true, totalPaise: true, paymentStatus: true },
+      where: { placedAt: { gte: rangeStart } },
+      select: { placedAt: true, deliveredAt: true, totalPaise: true, paymentStatus: true },
     }),
 
     db.order.groupBy({
@@ -91,7 +117,7 @@ async function getDashboardAnalytics(now: Date, locale: Locale): Promise<Dashboa
     // uses for its own category rollups.
     db.orderItem.findMany({
       where: {
-        order: { placedAt: { gte: recentStart }, paymentStatus: 'PAID' },
+        order: { placedAt: { gte: rangeStart }, paymentStatus: 'PAID' },
       },
       select: {
         totalPaise: true,
@@ -107,29 +133,38 @@ async function getDashboardAnalytics(now: Date, locale: Locale): Promise<Dashboa
 
     db.order.groupBy({
       by: ['paymentMethod'],
-      where: { placedAt: { gte: recentStart } },
+      where: { placedAt: { gte: rangeStart } },
       _count: { paymentMethod: true },
       _sum: { totalPaise: true },
     }),
   ]);
 
-  const byDay = new Map<string, { orders: number; revenuePaise: bigint }>();
-  for (const order of trendOrders) {
+  const byDay = new Map<string, { orders: number; delivered: number; revenuePaise: bigint }>();
+  for (const order of rangeOrders) {
     const key = istDateKeyOf(order.placedAt);
-    const bucket = byDay.get(key) ?? { orders: 0, revenuePaise: 0n };
+    const bucket = byDay.get(key) ?? { orders: 0, delivered: 0, revenuePaise: 0n };
     bucket.orders += 1;
     if (order.paymentStatus === 'PAID') bucket.revenuePaise += order.totalPaise;
     byDay.set(key, bucket);
   }
+  // Delivered counts its own day separately — an order placed on day N can
+  // deliver on day N+1, so this is a second pass keyed by `deliveredAt`, not
+  // folded into the `placedAt` loop above.
+  for (const order of rangeOrders) {
+    if (!order.deliveredAt) continue;
+    const key = istDateKeyOf(order.deliveredAt);
+    const bucket = byDay.get(key);
+    if (bucket) bucket.delivered += 1;
+  }
   const dailySeries: DashboardAnalytics['dailySeries'] = [];
-  for (let i = TREND_DAYS - 1; i >= 0; i--) {
+  for (let i = days - 1; i >= 0; i--) {
     const key = istDateKeyOf(new Date(now.getTime() - i * 86_400_000));
-    const bucket = byDay.get(key) ?? { orders: 0, revenuePaise: 0n };
+    const bucket = byDay.get(key) ?? { orders: 0, delivered: 0, revenuePaise: 0n };
     dailySeries.push({ dateKey: key, ...bucket });
   }
 
   const byCategory = new Map<string, { name: string; revenuePaise: bigint }>();
-  for (const item of recentItems) {
+  for (const item of rangeItems) {
     const category = item.variant.product.category;
     const existing = byCategory.get(category.slug);
     if (existing) existing.revenuePaise += item.totalPaise;
@@ -141,6 +176,7 @@ async function getDashboardAnalytics(now: Date, locale: Locale): Promise<Dashboa
     .slice(0, 6);
 
   return {
+    range,
     dailySeries,
     orderStatusToday: todayStatusGroups.map((g) => ({ status: g.status, count: g._count.status })),
     topCategories,
@@ -152,15 +188,33 @@ async function getDashboardAnalytics(now: Date, locale: Locale): Promise<Dashboa
   };
 }
 
+/** `null` — no meaningful percentage to show (yesterday was zero and today
+    isn't, so any % would be an artifact of the small base, not a real
+    trend). The UI shows a plain "New" badge in that case instead of a
+    number. */
+function pctDelta(today: number, yesterday: number): number | null {
+  if (yesterday === 0) return today === 0 ? 0 : null;
+  return Math.round(((today - yesterday) / yesterday) * 1000) / 10;
+}
+
+export interface DashboardDeltas {
+  orders: number | null;
+  revenue: number | null;
+  delivered: number | null;
+}
+
 export async function getDashboardMetrics(
   now: Date = new Date(),
   locale: Locale = 'en',
+  range: DashboardRange = '14d',
 ): Promise<DashboardMetrics> {
   const dateKey = istDateKeyOf(now);
   const scheduledDate = parseDateKey(dateKey);
 
   const dayStart = new Date(`${dateKey}T00:00:00.000Z`);
   const dayEnd = new Date(`${dateKey}T23:59:59.999Z`);
+  const yesterdayStart = new Date(dayStart.getTime() - 86_400_000);
+  const yesterdayEnd = new Date(dayEnd.getTime() - 86_400_000);
   const twoDaysOut = new Date(scheduledDate.getTime() + 2 * 86_400_000);
 
   const [
@@ -168,6 +222,9 @@ export async function getDashboardMetrics(
     revenue,
     todayDelivered,
     todayPaymentPending,
+    yesterdayOrders,
+    yesterdayRevenue,
+    yesterdayDelivered,
     activeSubscriptions,
     pausedSubscriptions,
     expiringWithin2Days,
@@ -191,6 +248,15 @@ export async function getDashboardMetrics(
 
     db.order.count({ where: { deliveredAt: { gte: dayStart, lte: dayEnd } } }),
     db.order.count({ where: { status: 'PAYMENT_PENDING' } }),
+
+    // Yesterday's equivalents — feed `deltas` only, same "what was actually
+    // paid" rule as today's revenue above.
+    db.order.count({ where: { placedAt: { gte: yesterdayStart, lte: yesterdayEnd } } }),
+    db.order.aggregate({
+      where: { placedAt: { gte: yesterdayStart, lte: yesterdayEnd }, paymentStatus: 'PAID' },
+      _sum: { totalPaise: true },
+    }),
+    db.order.count({ where: { deliveredAt: { gte: yesterdayStart, lte: yesterdayEnd } } }),
 
     db.subscription.count({ where: { status: 'ACTIVE' } }),
     db.subscription.count({ where: { status: 'PAUSED' } }),
@@ -217,7 +283,7 @@ export async function getDashboardMetrics(
     }),
 
     getCronHealth(now),
-    getDashboardAnalytics(now, locale),
+    getDashboardAnalytics(now, locale, range),
   ]);
 
   return {
@@ -240,6 +306,11 @@ export async function getDashboardMetrics(
       count: group._count.pincode,
     })),
     cron,
+    deltas: {
+      orders: pctDelta(todayOrders, yesterdayOrders),
+      revenue: pctDelta(Number(revenue._sum.totalPaise ?? 0n), Number(yesterdayRevenue._sum.totalPaise ?? 0n)),
+      delivered: pctDelta(todayDelivered, yesterdayDelivered),
+    },
     analytics,
   };
 }

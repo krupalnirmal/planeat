@@ -7,7 +7,10 @@ import { localeSchema } from '@/lib/validators/common';
 
 export const dynamic = 'force-dynamic';
 
-const querySchema = z.object({ locale: localeSchema.default('en') });
+const querySchema = z.object({
+  locale: localeSchema.default('en'),
+  range: z.enum(['14d', '30d', 'month']).default('14d'),
+});
 
 /**
  * GET /api/admin/dashboard (M9).
@@ -18,6 +21,6 @@ const querySchema = z.object({ locale: localeSchema.default('en') });
  */
 export const GET = route(async (request: Request) => {
   await requireStoreAdmin();
-  const { locale } = parseQuery(request, querySchema);
-  return ok(await getDashboardMetrics(new Date(), locale));
+  const { locale, range } = parseQuery(request, querySchema);
+  return ok(await getDashboardMetrics(new Date(), locale, range));
 });

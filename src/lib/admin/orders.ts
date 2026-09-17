@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { ID_PREFIX, newId } from '@/lib/ids';
+import { formatPaise, paise } from '@/lib/money';
 import { parseDateKey } from '@/lib/meal-plan/pricing';
 import { TEMPLATE, notifyEvent } from '@/lib/notifications/notify';
 import { notifyEventNow } from '@/lib/notifications/notify-now';
@@ -23,6 +24,12 @@ export interface AdminOrderFilter {
   dateKey?: string;
   query?: string;
   unassignedOnly?: boolean;
+  /** `placedAt` range (inclusive) — separate from `dateKey`, which filters
+      `scheduledDate` (a meal-plan delivery day), not when the order was
+      placed. Used by the dashboard's CSV export to scope to its active
+      date-range control. */
+  dateFrom?: Date;
+  dateTo?: Date;
 }
 
 export interface AdminOrderRow {
@@ -53,6 +60,14 @@ export async function listAdminOrders(
     ...(filter.type ? { type: filter.type } : {}),
     ...(scheduled ? { scheduledDate: scheduled } : {}),
     ...(filter.unassignedOnly ? { assignment: { is: null } } : {}),
+    ...(filter.dateFrom || filter.dateTo
+      ? {
+          placedAt: {
+            ...(filter.dateFrom ? { gte: filter.dateFrom } : {}),
+            ...(filter.dateTo ? { lte: filter.dateTo } : {}),
+          },
+        }
+      : {}),
     ...(filter.query
       ? {
           OR: [
@@ -113,6 +128,34 @@ export async function listAdminOrders(
       };
     }),
   };
+}
+
+/** The dashboard's "Export" button (session 2026-09-17) — same hand-rolled
+    CSV shape `picklistToCsv` (`src/lib/admin/picklist.ts`) already uses:
+    quote-escaped fields, CRLF rows, a UTF-8 BOM so Excel opens it correctly
+    rather than mangling the rupee amounts or any non-Latin customer name. */
+export function ordersToCsv(orders: AdminOrderRow[]): string {
+  const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
+
+  const rows = [
+    ['Order #', 'Customer', 'Phone', 'Items', 'Amount', 'Payment', 'Status', 'Placed at']
+      .map(escape)
+      .join(','),
+    ...orders.map((order) =>
+      [
+        escape(order.orderNumber),
+        escape(order.customerName),
+        escape(order.customerPhone),
+        String(order.itemCount),
+        escape(formatPaise(paise(order.totalPaise))),
+        escape(order.paymentMethod),
+        escape(order.status),
+        escape(order.placedAt.toISOString()),
+      ].join(','),
+    ),
+  ];
+
+  return `﻿${rows.join('\r\n')}\r\n`;
 }
 
 // ─────────────────────────────────────────────────────────────
