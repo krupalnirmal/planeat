@@ -165,14 +165,21 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
         backHref="/admin/orders"
         backLabel={tc('back')}
         action={
-          <span
-            className={cn(
-              'rounded-full px-2.5 py-1 text-xs font-semibold',
-              STATUS_TONE[order.status] ?? 'bg-secondary',
+          <>
+            {order.type === 'MEAL_PLAN_DAILY' && (
+              <span className="rounded-full bg-tint-green px-2.5 py-1 text-xs font-semibold text-primary-dark">
+                {t('typeLabel.MEAL_PLAN_DAILY')}
+              </span>
             )}
-          >
-            {tStatus(order.status)}
-          </span>
+            <span
+              className={cn(
+                'rounded-full px-2.5 py-1 text-xs font-semibold',
+                STATUS_TONE[order.status] ?? 'bg-secondary',
+              )}
+            >
+              {tStatus(order.status)}
+            </span>
+          </>
         }
       />
 

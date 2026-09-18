@@ -282,6 +282,11 @@ export function AdminOrdersScreen() {
                       <Link href={`/admin/orders/${order.id}`} className="text-primary hover:underline">
                         {order.orderNumber}
                       </Link>
+                      {order.type === 'MEAL_PLAN_DAILY' && (
+                        <span className="ml-1.5 rounded-full bg-tint-green px-1.5 py-0.5 text-[10px] font-semibold text-primary-dark">
+                          {tType('MEAL_PLAN_DAILY')}
+                        </span>
+                      )}
                     </td>
                     <td className="px-3 py-2.5">
                       <span className="block font-medium">{order.customerName}</span>
@@ -327,10 +332,17 @@ export function AdminOrdersScreen() {
                 className="card-3d flex flex-col gap-2 rounded-[var(--radius)] border border-border/60 bg-card p-3"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-xs text-primary">{order.orderNumber}</span>
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <span className="truncate font-mono text-xs text-primary">{order.orderNumber}</span>
+                    {order.type === 'MEAL_PLAN_DAILY' && (
+                      <span className="shrink-0 rounded-full bg-tint-green px-1.5 py-0.5 text-[10px] font-semibold text-primary-dark">
+                        {tType('MEAL_PLAN_DAILY')}
+                      </span>
+                    )}
+                  </span>
                   <span
                     className={cn(
-                      'rounded-full px-2 py-1 text-[11px] font-semibold',
+                      'shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold',
                       STATUS_TONE[order.status] ?? 'bg-secondary',
                     )}
                   >
