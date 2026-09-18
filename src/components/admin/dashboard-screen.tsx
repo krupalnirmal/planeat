@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { AdminPageHeader } from '@/components/admin/admin-shell';
 import { ExplorerEmpty, ExplorerTabs, type ExplorerTab } from '@/components/admin/explorer';
 import { CustomersExplorerTab } from '@/components/admin/tabs/customers-tab';
+import { DeliveriesExplorerTab } from '@/components/admin/tabs/deliveries-tab';
 import { InventoryExplorerTab } from '@/components/admin/tabs/inventory-tab';
 import { OrdersExplorerTab } from '@/components/admin/tabs/orders-tab';
 import { PaymentsExplorerTab } from '@/components/admin/tabs/payments-tab';
@@ -155,6 +156,8 @@ export function AdminDashboard() {
           <OrdersExplorerTab />
         ) : tab === 'revenue' ? (
           <RevenueExplorerTab />
+        ) : tab === 'deliveries' ? (
+          <DeliveriesExplorerTab />
         ) : tab === 'payments' ? (
           <PaymentsExplorerTab />
         ) : tab === 'customers' ? (

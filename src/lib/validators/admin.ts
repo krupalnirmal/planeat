@@ -53,6 +53,13 @@ export const ordersQuerySchema = adminListQuerySchema.extend({
   format: z.enum(['json', 'csv']).default('json'),
 });
 
+/** Dashboard v2's Deliveries tab (session 2026-09-19, Part P). */
+export const deliveriesQuerySchema = adminListQuerySchema.extend({
+  assignmentStatus: z.enum(['ASSIGNED', 'PICKED_UP', 'OUT_FOR_DELIVERY', 'DELIVERED', 'FAILED']).optional(),
+  dateFrom: z.iso.date().optional(),
+  dateTo: z.iso.date().optional(),
+});
+
 export const changeStatusSchema = z.object({
   status: z.enum([
     'PLACED',

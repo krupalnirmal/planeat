@@ -6,7 +6,13 @@ import { TEMPLATE, notifyEvent } from '@/lib/notifications/notify';
 import { notifyEventNow } from '@/lib/notifications/notify-now';
 import { type AddressSnapshot, parseAddress } from '@/lib/orders/queries';
 import { canTransition, nextStatuses as legalNextStatuses } from '@/lib/orders/status';
-import type { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from '@/generated/prisma/enums';
+import type {
+  DeliveryAssignmentStatus,
+  OrderStatus,
+  OrderType,
+  PaymentMethod,
+  PaymentStatus,
+} from '@/generated/prisma/enums';
 import { audit } from './audit';
 
 /**
@@ -168,6 +174,114 @@ export function ordersToCsv(orders: AdminOrderRow[]): string {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Deliveries — dashboard v2's Deliveries tab (session 2026-09-19, Part P)
+// ─────────────────────────────────────────────────────────────
+
+export interface AdminDeliveryFilter {
+  query?: string;
+  assignmentStatus?: DeliveryAssignmentStatus;
+  /** `placedAt` range, same convention as `AdminOrderFilter`. */
+  dateFrom?: Date;
+  dateTo?: Date;
+}
+
+export interface AdminDeliveryRow {
+  id: string;
+  orderNumber: string;
+  customerName: string;
+  pincode: string;
+  riderName: string;
+  riderPhone: string;
+  assignmentStatus: DeliveryAssignmentStatus;
+  assignedAt: Date;
+  pickedAt: Date | null;
+  deliveredAt: Date | null;
+  placedAt: Date;
+}
+
+/** Orders that actually have a rider assigned, joined with the real
+    `DeliveryAssignment`/`DeliveryPartner` fields — confirmed nothing like
+    an ETA or a per-hop timeline exists anywhere in the schema, so this
+    surfaces only the three real timestamps (`assignedAt`/`pickedAt`/
+    `deliveredAt`) rather than inventing one. */
+export async function listDeliveryOrders(
+  filter: AdminDeliveryFilter,
+  { skip, take }: { skip: number; take: number },
+): Promise<{ orders: AdminDeliveryRow[]; total: number }> {
+  const where = {
+    ...(filter.assignmentStatus
+      ? { assignment: { is: { status: filter.assignmentStatus } } }
+      : { assignment: { isNot: null } }),
+    ...(filter.dateFrom || filter.dateTo
+      ? {
+          placedAt: {
+            ...(filter.dateFrom ? { gte: filter.dateFrom } : {}),
+            ...(filter.dateTo ? { lte: filter.dateTo } : {}),
+          },
+        }
+      : {}),
+    ...(filter.query
+      ? {
+          OR: [
+            { orderNumber: { contains: filter.query } },
+            { user: { phone: { contains: filter.query } } },
+            { user: { name: { contains: filter.query } } },
+          ],
+        }
+      : {}),
+  };
+
+  const [rows, total] = await Promise.all([
+    db.order.findMany({
+      where,
+      orderBy: { placedAt: 'desc' },
+      skip,
+      take,
+      select: {
+        id: true,
+        orderNumber: true,
+        placedAt: true,
+        addressSnapshot: true,
+        user: { select: { name: true, phone: true } },
+        assignment: {
+          select: {
+            status: true,
+            assignedAt: true,
+            pickedAt: true,
+            deliveredAt: true,
+            partner: { select: { user: { select: { name: true, phone: true } } } },
+          },
+        },
+      },
+    }),
+    db.order.count({ where }),
+  ]);
+
+  return {
+    total,
+    // Every row in `where` requires a non-null assignment, so `!` here
+    // reflects that guarantee rather than assuming it.
+    orders: rows.map((row) => {
+      const assignment = row.assignment!;
+      const address = (row.addressSnapshot ?? {}) as Record<string, unknown>;
+      return {
+        id: row.id,
+        orderNumber: row.orderNumber,
+        customerName: row.user.name ?? row.user.phone,
+        pincode: typeof address.pincode === 'string' ? address.pincode : '',
+        riderName: assignment.partner.user.name ?? assignment.partner.user.phone,
+        riderPhone: assignment.partner.user.phone,
+        assignmentStatus: assignment.status,
+        assignedAt: assignment.assignedAt,
+        pickedAt: assignment.pickedAt,
+        deliveredAt: assignment.deliveredAt,
+        placedAt: row.placedAt,
+      };
+    }),
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
 // Detail
 // ─────────────────────────────────────────────────────────────
 
@@ -211,8 +325,18 @@ export interface AdminOrderDetailView {
     totalPaise: bigint;
   }>;
   /** Never the delivery OTP — that stays customer-only (M10); staff have no
-      reason to see the code the customer reads out at the door. */
-  rider: { name: string; phone: string; status: string } | null;
+      reason to see the code the customer reads out at the door. Real
+      assignment timestamps (dashboard v2's Deliveries tab, Part P) —
+      `pickedAt`/`deliveredAt` are `null` until the rider actually reaches
+      that stage. */
+  rider: {
+    name: string;
+    phone: string;
+    status: string;
+    assignedAt: Date;
+    pickedAt: Date | null;
+    deliveredAt: Date | null;
+  } | null;
   history: Array<{
     fromStatus: OrderStatus | null;
     toStatus: OrderStatus;
@@ -260,7 +384,13 @@ export async function getAdminOrderDetail(orderId: string): Promise<AdminOrderDe
         },
       },
       assignment: {
-        select: { status: true, partner: { select: { user: { select: { name: true, phone: true } } } } },
+        select: {
+          status: true,
+          assignedAt: true,
+          pickedAt: true,
+          deliveredAt: true,
+          partner: { select: { user: { select: { name: true, phone: true } } } },
+        },
       },
       statusHistory: {
         orderBy: { createdAt: 'asc' },
@@ -316,6 +446,9 @@ export async function getAdminOrderDetail(orderId: string): Promise<AdminOrderDe
           name: order.assignment.partner.user.name ?? order.assignment.partner.user.phone,
           phone: order.assignment.partner.user.phone,
           status: order.assignment.status,
+          assignedAt: order.assignment.assignedAt,
+          pickedAt: order.assignment.pickedAt,
+          deliveredAt: order.assignment.deliveredAt,
         }
       : null,
     history: order.statusHistory.map((h) => ({

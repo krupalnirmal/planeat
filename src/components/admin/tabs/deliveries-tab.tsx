@@ -12,56 +12,69 @@ import {
 } from '@/components/admin/explorer';
 import { OrderDetailPanel } from '@/components/admin/order-detail-screen';
 import { api, qs } from '@/lib/api/client';
-import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
-/** Dashboard v2's Revenue tab (session 2026-09-19, Part O) — a "revenue
-    entry" is just an order with `paymentStatus: PAID`, not a separate
-    entity: `listAdminOrders` already covers everything this needs after
-    the `paymentStatus` filter added alongside this tab. The detail panel
-    reuses the exact same `OrderDetailPanel` the Orders tab uses (a revenue
-    line IS an order) — no new detail UI. */
+/** Dashboard v2's Deliveries tab (session 2026-09-19, Part P) — new
+    `listDeliveryOrders()` (orders joined with their real `DeliveryAssignment`
+    + `DeliveryPartner`), reusing the real `delivery.status` labels the
+    rider app already has rather than inventing new ones. No ETA anywhere
+    — confirmed nothing like it exists in the schema. Detail panel reuses
+    `OrderDetailPanel`, which now also shows the three real assignment
+    timestamps in its Rider section. */
 
-interface RevenueRow {
+interface DeliveryRow {
   id: string;
   orderNumber: string;
   customerName: string;
-  totalPaise: string;
-  paymentMethod: string;
-  placedAt: string;
+  pincode: string;
+  riderName: string;
+  assignmentStatus: 'ASSIGNED' | 'PICKED_UP' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'FAILED';
+  assignedAt: string;
+  deliveredAt: string | null;
 }
 
-interface RevenueResponse {
-  orders: RevenueRow[];
+interface DeliveriesResponse {
+  orders: DeliveryRow[];
   page: number;
   perPage: number;
   total: number;
 }
 
+const STATUS_OPTIONS = ['ASSIGNED', 'PICKED_UP', 'OUT_FOR_DELIVERY', 'DELIVERED', 'FAILED'] as const;
+
+const STATUS_TONE: Record<string, string> = {
+  ASSIGNED: 'bg-secondary text-muted-foreground',
+  PICKED_UP: 'bg-primary/10 text-primary',
+  OUT_FOR_DELIVERY: 'bg-accent/20 text-[#8A5A2B]',
+  DELIVERED: 'bg-primary/10 text-success',
+  FAILED: 'bg-danger/10 text-danger',
+};
+
 const PER_PAGE = 10;
 
-export function RevenueExplorerTab() {
+export function DeliveriesExplorerTab() {
   const t = useTranslations('admin.orders');
   const te = useTranslations('admin.explorer');
   const tc = useTranslations('admin.common');
-  const tPayment = useTranslations('orders.payment');
+  const tStatus = useTranslations('delivery.status');
   const format = useFormatter();
 
   const [query, setQuery] = useState('');
-  const [range, setRange] = useState<ExplorerRange>('30d');
+  const [status, setStatus] = useState('');
+  const [range, setRange] = useState<ExplorerRange>('7d');
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
 
   const { dateFrom, dateTo } = rangeToDateParams(range);
 
-  const revenue = useQuery({
-    queryKey: ['admin-dashboard-revenue', query, range, page],
+  const deliveries = useQuery({
+    queryKey: ['admin-dashboard-deliveries', query, status, range, page],
     queryFn: () =>
-      api.get<RevenueResponse>(
-        `/api/admin/orders${qs({
+      api.get<DeliveriesResponse>(
+        `/api/admin/deliveries${qs({
           query: query || undefined,
-          paymentStatus: 'PAID',
+          assignmentStatus: status || undefined,
           dateFrom,
           dateTo,
           page,
@@ -71,7 +84,7 @@ export function RevenueExplorerTab() {
     placeholderData: (previous) => previous,
   });
 
-  const rows = revenue.data?.orders ?? [];
+  const rows = deliveries.data?.orders ?? [];
   const effectiveSelectedId = rows.some((row) => row.id === selectedId)
     ? selectedId
     : (rows[0]?.id ?? null);
@@ -90,9 +103,24 @@ export function RevenueExplorerTab() {
         <div className="card-3d rounded-[var(--radius)] border border-border/60 bg-card">
           <div className="flex flex-wrap items-center gap-2 border-b border-border p-3">
             <h2 className="text-sm font-bold">
-              {te('tabs.revenue')} <span className="font-normal text-muted-foreground">({revenue.data?.total ?? 0})</span>
+              {te('tabs.deliveries')} <span className="font-normal text-muted-foreground">({deliveries.data?.total ?? 0})</span>
             </h2>
             <div className="ml-auto flex flex-wrap items-center gap-2">
+              <select
+                value={status}
+                onChange={(event) => {
+                  setStatus(event.target.value);
+                  setPage(1);
+                }}
+                className="h-10 rounded-[var(--radius)] border border-border bg-card px-2 text-xs outline-none"
+              >
+                <option value="">{tc('actions')}</option>
+                {STATUS_OPTIONS.map((value) => (
+                  <option key={value} value={value}>
+                    {tStatus(value)}
+                  </option>
+                ))}
+              </select>
               <DateRangeDropdown
                 value={range}
                 onChange={(value) => {
@@ -112,7 +140,7 @@ export function RevenueExplorerTab() {
             </div>
           </div>
 
-          {revenue.isLoading ? (
+          {deliveries.isLoading ? (
             <p className="px-4 py-10 text-center text-sm text-muted-foreground">{tc('loading')}</p>
           ) : rows.length === 0 ? (
             <p className="px-4 py-10 text-center text-sm text-muted-foreground">{tc('empty')}</p>
@@ -124,9 +152,9 @@ export function RevenueExplorerTab() {
                     <tr>
                       <th className="px-3 py-2 font-medium">{t('orderNumber')}</th>
                       <th className="px-3 py-2 font-medium">{t('customer')}</th>
-                      <th className="px-3 py-2 text-right font-medium">{t('total')}</th>
-                      <th className="px-3 py-2 font-medium">{t('paymentMethod')}</th>
-                      <th className="px-3 py-2 text-right font-medium">{t('placedAt')}</th>
+                      <th className="px-3 py-2 font-medium">{t('rider')}</th>
+                      <th className="px-3 py-2 font-medium">{t('status')}</th>
+                      <th className="px-3 py-2 text-right font-medium">{t('assignedAt')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -143,12 +171,19 @@ export function RevenueExplorerTab() {
                           #{row.orderNumber}
                         </td>
                         <td className="px-3 py-2.5 text-sm">{row.customerName}</td>
-                        <td className="px-3 py-2.5 text-right text-sm font-semibold text-success tabular-nums">
-                          + {formatPaise(paise(row.totalPaise), { hidePaise: true })}
+                        <td className="px-3 py-2.5 text-xs text-muted-foreground">{row.riderName}</td>
+                        <td className="px-3 py-2.5">
+                          <span
+                            className={cn(
+                              'rounded-full px-2 py-1 text-[11px] font-semibold',
+                              STATUS_TONE[row.assignmentStatus] ?? 'bg-secondary',
+                            )}
+                          >
+                            {tStatus(row.assignmentStatus)}
+                          </span>
                         </td>
-                        <td className="px-3 py-2.5 text-xs text-muted-foreground">{tPayment(row.paymentMethod)}</td>
                         <td className="px-3 py-2.5 text-right text-xs text-muted-foreground">
-                          {format.dateTime(new Date(row.placedAt), { day: 'numeric', month: 'short' })}
+                          {format.dateTime(new Date(row.assignedAt), { day: 'numeric', month: 'short' })}
                         </td>
                       </tr>
                     ))}
@@ -163,27 +198,33 @@ export function RevenueExplorerTab() {
                       type="button"
                       onClick={() => selectRow(row.id)}
                       className={cn(
-                        'flex w-full items-center justify-between gap-2 rounded-[var(--radius)] border border-border/60 bg-card p-3 text-left',
+                        'flex w-full flex-col gap-2 rounded-[var(--radius)] border border-border/60 bg-card p-3 text-left',
                         effectiveSelectedId === row.id && 'border-l-4 border-l-primary bg-tint-green/40',
                       )}
                     >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">{row.customerName}</p>
-                        <p className="font-mono text-xs text-muted-foreground">#{row.orderNumber}</p>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-mono text-xs font-semibold text-primary">#{row.orderNumber}</span>
+                        <span
+                          className={cn(
+                            'shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold',
+                            STATUS_TONE[row.assignmentStatus] ?? 'bg-secondary',
+                          )}
+                        >
+                          {tStatus(row.assignmentStatus)}
+                        </span>
                       </div>
-                      <p className="shrink-0 text-sm font-semibold text-success tabular-nums">
-                        + {formatPaise(paise(row.totalPaise), { hidePaise: true })}
-                      </p>
+                      <p className="truncate text-sm font-medium">{row.customerName}</p>
+                      <p className="text-xs text-muted-foreground">{row.riderName}</p>
                     </button>
                   </li>
                 ))}
               </ul>
 
-              {revenue.data && (
+              {deliveries.data && (
                 <ExplorerPagination
-                  page={revenue.data.page}
-                  perPage={revenue.data.perPage}
-                  total={revenue.data.total}
+                  page={deliveries.data.page}
+                  perPage={deliveries.data.perPage}
+                  total={deliveries.data.total}
                   onPageChange={setPage}
                 />
               )}

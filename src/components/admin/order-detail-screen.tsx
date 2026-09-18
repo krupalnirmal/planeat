@@ -66,7 +66,14 @@ interface OrderDetail {
     unitPricePaise: string;
     totalPaise: string;
   }>;
-  rider: { name: string; phone: string; status: string } | null;
+  rider: {
+    name: string;
+    phone: string;
+    status: string;
+    assignedAt: string;
+    pickedAt: string | null;
+    deliveredAt: string | null;
+  } | null;
   history: Array<{
     fromStatus: OrderStatus | null;
     toStatus: OrderStatus;
@@ -397,9 +404,58 @@ export function OrderDetailPanel({
         <section className="card-3d rounded-[var(--radius)] border border-border/60 bg-card p-4">
           <h2 className="mb-2 text-sm font-bold">{t('riderTitle')}</h2>
           {order.rider ? (
-            <p className="text-sm">
-              {order.rider.name} · {order.rider.phone}
-            </p>
+            <div>
+              <p className="text-sm">
+                {order.rider.name} · {order.rider.phone}
+              </p>
+              {/* The real assignment timestamps (dashboard v2's Deliveries
+                  tab, Part P) — no fabricated ETA, just what actually
+                  happened and when. `pickedAt`/`deliveredAt` stay dim until
+                  the rider reaches that stage. */}
+              <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                <li>
+                  {t('assignedAt')}:{' '}
+                  <span className="font-medium text-foreground">
+                    {format.dateTime(new Date(order.rider.assignedAt), {
+                      day: 'numeric',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                </li>
+                <li>
+                  {t('pickedUpAt')}:{' '}
+                  {order.rider.pickedAt ? (
+                    <span className="font-medium text-foreground">
+                      {format.dateTime(new Date(order.rider.pickedAt), {
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  ) : (
+                    '—'
+                  )}
+                </li>
+                <li>
+                  {t('riderDeliveredAt')}:{' '}
+                  {order.rider.deliveredAt ? (
+                    <span className="font-medium text-foreground">
+                      {format.dateTime(new Date(order.rider.deliveredAt), {
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  ) : (
+                    '—'
+                  )}
+                </li>
+              </ul>
+            </div>
           ) : (
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-sm text-muted-foreground">{t('noRiderAssigned')}</p>

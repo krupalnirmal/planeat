@@ -94,7 +94,7 @@ export function PlansExplorerTab() {
         ) : null
       }
       list={
-        <div className="card-3d overflow-hidden rounded-[var(--radius)] border border-border/60 bg-card">
+        <div className="card-3d rounded-[var(--radius)] border border-border/60 bg-card">
           <div className="flex flex-wrap items-center gap-2 border-b border-border p-3">
             <h2 className="text-sm font-bold">
               {t('title')} <span className="font-normal text-muted-foreground">({subscriptions.data?.total ?? 0})</span>
