@@ -406,3 +406,28 @@ export function AdminTable({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+/** The mobile-responsive answer to `AdminTable` (session 2026-09-18): the
+    same `<table>` above `lg`, unchanged — desktop rendering never
+    regresses — and a caller-supplied card list below it, since a dense
+    many-column table has no honest way to reflow to a phone width. Each
+    screen writes its own small card (its columns carry different priority —
+    an order card leads with status/total, a catalogue card leads with a
+    photo — so this isn't a generic "auto-render columns" engine, just the
+    show/hide split every screen would otherwise duplicate). */
+export function AdminResponsiveTable({
+  table,
+  cards,
+}: {
+  table: React.ReactNode;
+  cards: React.ReactNode;
+}) {
+  return (
+    <>
+      <div className="hidden lg:block">
+        <AdminTable>{table}</AdminTable>
+      </div>
+      <ul className="flex flex-col gap-2.5 lg:hidden">{cards}</ul>
+    </>
+  );
+}

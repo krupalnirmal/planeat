@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Save } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
+import { AdminPageHeader, AdminResponsiveTable } from '@/components/admin/admin-shell';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise, rupeesToPaise } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -146,94 +146,176 @@ export function AdminInventoryScreen() {
           {tc('empty')}
         </p>
       ) : (
-        <AdminTable>
-          <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
-            <tr>
-              <th className="px-3 py-2 font-medium">{t('product')}</th>
-              <th className="px-3 py-2 font-medium">{t('variant')}</th>
-              <th className="px-3 py-2 text-right font-medium">{t('stock')}</th>
-              <th className="px-3 py-2 text-right font-medium">{t('threshold')}</th>
-              <th className="px-3 py-2 text-right font-medium">{t('price')}</th>
-              <th className="px-3 py-2 text-center font-medium">{t('active')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => {
-              const draft = drafts[row.variantId] ?? {};
-              const dirty = Object.keys(draft).length > 0;
+        <AdminResponsiveTable
+          table={
+            <>
+              <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 font-medium">{t('product')}</th>
+                  <th className="px-3 py-2 font-medium">{t('variant')}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t('stock')}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t('threshold')}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t('price')}</th>
+                  <th className="px-3 py-2 text-center font-medium">{t('active')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => {
+                  const draft = drafts[row.variantId] ?? {};
+                  const dirty = Object.keys(draft).length > 0;
 
-              return (
-                <tr
-                  key={row.variantId}
+                  return (
+                    <tr
+                      key={row.variantId}
+                      className={cn(
+                        'border-b border-border last:border-0',
+                        dirty && 'bg-primary/5',
+                      )}
+                    >
+                      <td className="px-3 py-2 font-medium">
+                        {row.productName}
+                        {row.isOut ? (
+                          <span className="ml-2 rounded-full bg-danger/10 px-2 py-0.5 text-[10px] font-bold text-danger">
+                            {t('outBadge')}
+                          </span>
+                        ) : row.isLow ? (
+                          <span className="ml-2 rounded-full bg-[#FDF3E3] px-2 py-0.5 text-[10px] font-bold text-warning">
+                            {t('lowBadge')}
+                          </span>
+                        ) : null}
+                      </td>
+                      <td className="px-3 py-2 text-xs text-muted-foreground">{row.label}</td>
+                      <td className="px-3 py-2 text-right">
+                        <input
+                          type="number"
+                          min={0}
+                          value={draft.stockQty ?? row.stockQty}
+                          onChange={(event) =>
+                            setDraft(row.variantId, { stockQty: Number(event.target.value) })
+                          }
+                          className="h-9 w-20 rounded border border-border bg-background px-2 text-right text-sm tabular-nums outline-none"
+                        />
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <input
+                          type="number"
+                          min={0}
+                          value={draft.lowStockThreshold ?? row.lowStockThreshold}
+                          onChange={(event) =>
+                            setDraft(row.variantId, {
+                              lowStockThreshold: Number(event.target.value),
+                            })
+                          }
+                          className="h-9 w-16 rounded border border-border bg-background px-2 text-right text-sm tabular-nums outline-none"
+                        />
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <input
+                          inputMode="decimal"
+                          defaultValue={formatPaise(paise(row.pricePaise), { withSymbol: false })}
+                          onChange={(event) => {
+                            const value = event.target.value.replace(/[^\d.]/g, '');
+                            if (value)
+                              setDraft(row.variantId, { pricePaise: Number(rupeesToPaise(value)) });
+                          }}
+                          className="h-9 w-24 rounded border border-border bg-background px-2 text-right text-sm tabular-nums outline-none"
+                        />
+                      </td>
+                      <td className="px-3 py-2 text-center">
+                        <input
+                          type="checkbox"
+                          checked={draft.isActive ?? row.isActive}
+                          onChange={(event) =>
+                            setDraft(row.variantId, { isActive: event.target.checked })
+                          }
+                          className="size-4 accent-[var(--primary)]"
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </>
+          }
+          cards={rows.map((row) => {
+            const draft = drafts[row.variantId] ?? {};
+            const dirty = Object.keys(draft).length > 0;
+
+            return (
+              <li key={row.variantId}>
+                <div
                   className={cn(
-                    'border-b border-border last:border-0',
+                    'card-3d flex flex-col gap-2.5 rounded-[var(--radius)] border border-border/60 bg-card p-3',
                     dirty && 'bg-primary/5',
                   )}
                 >
-                  <td className="px-3 py-2 font-medium">
-                    {row.productName}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{row.productName}</p>
+                      <p className="text-xs text-muted-foreground">{row.label}</p>
+                    </div>
                     {row.isOut ? (
-                      <span className="ml-2 rounded-full bg-danger/10 px-2 py-0.5 text-[10px] font-bold text-danger">
+                      <span className="shrink-0 rounded-full bg-danger/10 px-2 py-0.5 text-[10px] font-bold text-danger">
                         {t('outBadge')}
                       </span>
                     ) : row.isLow ? (
-                      <span className="ml-2 rounded-full bg-[#FDF3E3] px-2 py-0.5 text-[10px] font-bold text-warning">
+                      <span className="shrink-0 rounded-full bg-[#FDF3E3] px-2 py-0.5 text-[10px] font-bold text-warning">
                         {t('lowBadge')}
                       </span>
                     ) : null}
-                  </td>
-                  <td className="px-3 py-2 text-xs text-muted-foreground">{row.label}</td>
-                  <td className="px-3 py-2 text-right">
-                    <input
-                      type="number"
-                      min={0}
-                      value={draft.stockQty ?? row.stockQty}
-                      onChange={(event) =>
-                        setDraft(row.variantId, { stockQty: Number(event.target.value) })
-                      }
-                      className="h-9 w-20 rounded border border-border bg-background px-2 text-right text-sm tabular-nums outline-none"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <input
-                      type="number"
-                      min={0}
-                      value={draft.lowStockThreshold ?? row.lowStockThreshold}
-                      onChange={(event) =>
-                        setDraft(row.variantId, {
-                          lowStockThreshold: Number(event.target.value),
-                        })
-                      }
-                      className="h-9 w-16 rounded border border-border bg-background px-2 text-right text-sm tabular-nums outline-none"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <input
-                      inputMode="decimal"
-                      defaultValue={formatPaise(paise(row.pricePaise), { withSymbol: false })}
-                      onChange={(event) => {
-                        const value = event.target.value.replace(/[^\d.]/g, '');
-                        if (value)
-                          setDraft(row.variantId, { pricePaise: Number(rupeesToPaise(value)) });
-                      }}
-                      className="h-9 w-24 rounded border border-border bg-background px-2 text-right text-sm tabular-nums outline-none"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-center">
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <label className="flex flex-col gap-1 text-[11px] text-muted-foreground">
+                      {t('stock')}
+                      <input
+                        type="number"
+                        min={0}
+                        value={draft.stockQty ?? row.stockQty}
+                        onChange={(event) => setDraft(row.variantId, { stockQty: Number(event.target.value) })}
+                        className="h-9 w-full rounded border border-border bg-background px-2 text-right text-sm tabular-nums outline-none"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-1 text-[11px] text-muted-foreground">
+                      {t('threshold')}
+                      <input
+                        type="number"
+                        min={0}
+                        value={draft.lowStockThreshold ?? row.lowStockThreshold}
+                        onChange={(event) =>
+                          setDraft(row.variantId, { lowStockThreshold: Number(event.target.value) })
+                        }
+                        className="h-9 w-full rounded border border-border bg-background px-2 text-right text-sm tabular-nums outline-none"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-1 text-[11px] text-muted-foreground">
+                      {t('price')}
+                      <input
+                        inputMode="decimal"
+                        defaultValue={formatPaise(paise(row.pricePaise), { withSymbol: false })}
+                        onChange={(event) => {
+                          const value = event.target.value.replace(/[^\d.]/g, '');
+                          if (value) setDraft(row.variantId, { pricePaise: Number(rupeesToPaise(value)) });
+                        }}
+                        className="h-9 w-full rounded border border-border bg-background px-2 text-right text-sm tabular-nums outline-none"
+                      />
+                    </label>
+                  </div>
+
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
                     <input
                       type="checkbox"
                       checked={draft.isActive ?? row.isActive}
-                      onChange={(event) =>
-                        setDraft(row.variantId, { isActive: event.target.checked })
-                      }
+                      onChange={(event) => setDraft(row.variantId, { isActive: event.target.checked })}
                       className="size-4 accent-[var(--primary)]"
                     />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </AdminTable>
+                    {t('active')}
+                  </label>
+                </div>
+              </li>
+            );
+          })}
+        />
       )}
     </>
   );

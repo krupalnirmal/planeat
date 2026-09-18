@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
+import { AdminPageHeader, AdminResponsiveTable } from '@/components/admin/admin-shell';
 import { ApiClientError, api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
 
@@ -101,46 +101,76 @@ export function AdminDeliveryPartnersScreen() {
           {tc('empty')}
         </p>
       ) : (
-        <AdminTable>
-          <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
-            <tr>
-              <th className="px-3 py-2 font-medium">{t('name')}</th>
-              <th className="px-3 py-2 font-medium">{t('phone')}</th>
-              <th className="px-3 py-2 font-medium">{t('vehicle')}</th>
-              <th className="px-3 py-2 font-medium">{t('area')}</th>
-              <th className="px-3 py-2 text-right font-medium">{t('load')}</th>
-              <th className="px-3 py-2 text-center font-medium">{t('available')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((partner) => (
-              <tr key={partner.id} className="border-b border-border last:border-0">
-                <td className="px-3 py-2 font-medium">{partner.name}</td>
-                <td className="px-3 py-2 font-mono text-xs">{partner.phone}</td>
-                <td className="px-3 py-2 text-xs text-muted-foreground">
-                  {t(`vehicles.${partner.vehicleType}`)}
-                </td>
-                <td className="px-3 py-2 text-xs text-muted-foreground">
-                  {partner.serviceAreaName ?? '—'}
-                </td>
-                <td className="px-3 py-2 text-right text-base font-bold tabular-nums">
-                  {partner.todayLoad}
-                </td>
-                <td className="px-3 py-2 text-center">
-                  <input
-                    type="checkbox"
-                    checked={partner.isAvailable}
-                    onChange={(event) =>
-                      toggleAvailable.mutate({ id: partner.id, isAvailable: event.target.checked })
-                    }
-                    className="size-4 accent-[var(--primary)]"
-                    aria-label={t('available')}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </AdminTable>
+        <AdminResponsiveTable
+          table={
+            <>
+              <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 font-medium">{t('name')}</th>
+                  <th className="px-3 py-2 font-medium">{t('phone')}</th>
+                  <th className="px-3 py-2 font-medium">{t('vehicle')}</th>
+                  <th className="px-3 py-2 font-medium">{t('area')}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t('load')}</th>
+                  <th className="px-3 py-2 text-center font-medium">{t('available')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((partner) => (
+                  <tr key={partner.id} className="border-b border-border last:border-0">
+                    <td className="px-3 py-2 font-medium">{partner.name}</td>
+                    <td className="px-3 py-2 font-mono text-xs">{partner.phone}</td>
+                    <td className="px-3 py-2 text-xs text-muted-foreground">
+                      {t(`vehicles.${partner.vehicleType}`)}
+                    </td>
+                    <td className="px-3 py-2 text-xs text-muted-foreground">
+                      {partner.serviceAreaName ?? '—'}
+                    </td>
+                    <td className="px-3 py-2 text-right text-base font-bold tabular-nums">
+                      {partner.todayLoad}
+                    </td>
+                    <td className="px-3 py-2 text-center">
+                      <input
+                        type="checkbox"
+                        checked={partner.isAvailable}
+                        onChange={(event) =>
+                          toggleAvailable.mutate({ id: partner.id, isAvailable: event.target.checked })
+                        }
+                        className="size-4 accent-[var(--primary)]"
+                        aria-label={t('available')}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </>
+          }
+          cards={rows.map((partner) => (
+            <li
+              key={partner.id}
+              className="card-3d flex items-center justify-between gap-2 rounded-[var(--radius)] border border-border/60 bg-card p-3"
+            >
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium">{partner.name}</p>
+                <p className="font-mono text-xs text-muted-foreground">{partner.phone}</p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  {t(`vehicles.${partner.vehicleType}`)} · {partner.serviceAreaName ?? '—'}
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-col items-end gap-1.5">
+                <p className="text-lg font-bold tabular-nums">{partner.todayLoad}</p>
+                <input
+                  type="checkbox"
+                  checked={partner.isAvailable}
+                  onChange={(event) =>
+                    toggleAvailable.mutate({ id: partner.id, isAvailable: event.target.checked })
+                  }
+                  className="size-4 accent-[var(--primary)]"
+                  aria-label={t('available')}
+                />
+              </div>
+            </li>
+          ))}
+        />
       )}
     </>
   );

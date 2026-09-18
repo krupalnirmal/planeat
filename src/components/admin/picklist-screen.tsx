@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, Download, Printer, Sunrise, Sunset, UtensilsCrossed } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
+import { AdminPageHeader, AdminResponsiveTable } from '@/components/admin/admin-shell';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -179,41 +179,66 @@ export function PicklistScreen() {
               {t('aggregate')} · {data.orderCount} {t('orders')}
             </h2>
 
-            <AdminTable>
-              <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 font-medium">{t('item')}</th>
-                  <th className="px-3 py-2 text-right font-medium">{t('quantity')}</th>
-                  <th className="px-3 py-2 text-right font-medium">{t('orders')}</th>
-                  <th className="px-3 py-2 text-right font-medium">{t('inStock')}</th>
-                  <th className="px-3 py-2 text-right font-medium">{t('shortBy')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.lines.map((line) => (
-                  <tr key={line.variantId} className="border-b border-border last:border-0">
-                    <td className="px-3 py-2.5 font-medium">{line.name}</td>
-                    <td className="px-3 py-2.5 text-right text-base font-bold tabular-nums">
-                      {line.displayQuantity}
-                    </td>
-                    <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">
-                      {line.orderCount}
-                    </td>
-                    <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">
-                      {line.stockQty}
-                    </td>
-                    <td
-                      className={cn(
-                        'px-3 py-2.5 text-right font-semibold tabular-nums',
-                        line.shortfall > 0 ? 'text-danger' : 'text-muted-foreground',
-                      )}
-                    >
-                      {line.shortfall > 0 ? line.shortfall : '—'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </AdminTable>
+            <AdminResponsiveTable
+              table={
+                <>
+                  <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
+                    <tr>
+                      <th className="px-3 py-2 font-medium">{t('item')}</th>
+                      <th className="px-3 py-2 text-right font-medium">{t('quantity')}</th>
+                      <th className="px-3 py-2 text-right font-medium">{t('orders')}</th>
+                      <th className="px-3 py-2 text-right font-medium">{t('inStock')}</th>
+                      <th className="px-3 py-2 text-right font-medium">{t('shortBy')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.lines.map((line) => (
+                      <tr key={line.variantId} className="border-b border-border last:border-0">
+                        <td className="px-3 py-2.5 font-medium">{line.name}</td>
+                        <td className="px-3 py-2.5 text-right text-base font-bold tabular-nums">
+                          {line.displayQuantity}
+                        </td>
+                        <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">
+                          {line.orderCount}
+                        </td>
+                        <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">
+                          {line.stockQty}
+                        </td>
+                        <td
+                          className={cn(
+                            'px-3 py-2.5 text-right font-semibold tabular-nums',
+                            line.shortfall > 0 ? 'text-danger' : 'text-muted-foreground',
+                          )}
+                        >
+                          {line.shortfall > 0 ? line.shortfall : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </>
+              }
+              cards={data.lines.map((line) => (
+                <li
+                  key={line.variantId}
+                  className="card-3d flex items-center justify-between gap-2 rounded-[var(--radius)] border border-border/60 bg-card p-3"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{line.name}</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      {line.orderCount} {t('orders')} · {t('inStock')}: {line.stockQty}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="text-lg font-bold tabular-nums">{line.displayQuantity}</p>
+                    {line.shortfall > 0 && (
+                      <p className="text-xs font-semibold text-danger">
+                        {t('shortBy')}: {line.shortfall}
+                      </p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            />
           </section>
 
           {/* ── What goes in each bag. One card per customer, each starting on

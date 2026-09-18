@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bike, Loader2 } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
+import { AdminPageHeader, AdminResponsiveTable } from '@/components/admin/admin-shell';
 import { Link } from '@/i18n/navigation';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
@@ -262,32 +262,72 @@ export function AdminOrdersScreen() {
           {tc('empty')}
         </p>
       ) : (
-        <AdminTable>
-          <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
-            <tr>
-              <th className="px-3 py-2 font-medium">{t('orderNumber')}</th>
-              <th className="px-3 py-2 font-medium">{t('customer')}</th>
-              <th className="px-3 py-2 font-medium">{t('status')}</th>
-              <th className="px-3 py-2 text-right font-medium">{t('total')}</th>
-              <th className="px-3 py-2 font-medium">{t('rider')}</th>
-              <th className="px-3 py-2 font-medium">{t('placedAt')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.data?.orders.map((order) => (
-              <tr key={order.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
-                <td className="px-3 py-2.5 font-mono text-xs">
-                  <Link href={`/admin/orders/${order.id}`} className="text-primary hover:underline">
-                    {order.orderNumber}
-                  </Link>
-                </td>
-                <td className="px-3 py-2.5">
-                  <span className="block font-medium">{order.customerName}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {order.customerPhone} · {order.pincode}
-                  </span>
-                </td>
-                <td className="px-3 py-2.5">
+        <AdminResponsiveTable
+          table={
+            <>
+              <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 font-medium">{t('orderNumber')}</th>
+                  <th className="px-3 py-2 font-medium">{t('customer')}</th>
+                  <th className="px-3 py-2 font-medium">{t('status')}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t('total')}</th>
+                  <th className="px-3 py-2 font-medium">{t('rider')}</th>
+                  <th className="px-3 py-2 font-medium">{t('placedAt')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.data?.orders.map((order) => (
+                  <tr key={order.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
+                    <td className="px-3 py-2.5 font-mono text-xs">
+                      <Link href={`/admin/orders/${order.id}`} className="text-primary hover:underline">
+                        {order.orderNumber}
+                      </Link>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <span className="block font-medium">{order.customerName}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {order.customerPhone} · {order.pincode}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <span
+                        className={cn(
+                          'rounded-full px-2 py-1 text-[11px] font-semibold',
+                          STATUS_TONE[order.status] ?? 'bg-secondary',
+                        )}
+                      >
+                        {tStatus(order.status)}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-right font-semibold tabular-nums">
+                      {formatPaise(paise(order.totalPaise), { hidePaise: true })}
+                    </td>
+                    <td className="px-3 py-2.5 text-xs">
+                      {order.riderName ?? (
+                        <span className="text-warning">{t('filterUnassigned')}</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 text-xs text-muted-foreground">
+                      {format.dateTime(new Date(order.placedAt), {
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </>
+          }
+          cards={orders.data?.orders.map((order) => (
+            <li key={order.id}>
+              <Link
+                href={`/admin/orders/${order.id}`}
+                className="card-3d flex flex-col gap-2 rounded-[var(--radius)] border border-border/60 bg-card p-3"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-xs text-primary">{order.orderNumber}</span>
                   <span
                     className={cn(
                       'rounded-full px-2 py-1 text-[11px] font-semibold',
@@ -296,27 +336,35 @@ export function AdminOrdersScreen() {
                   >
                     {tStatus(order.status)}
                   </span>
-                </td>
-                <td className="px-3 py-2.5 text-right font-semibold tabular-nums">
-                  {formatPaise(paise(order.totalPaise), { hidePaise: true })}
-                </td>
-                <td className="px-3 py-2.5 text-xs">
-                  {order.riderName ?? (
-                    <span className="text-warning">{t('filterUnassigned')}</span>
-                  )}
-                </td>
-                <td className="px-3 py-2.5 text-xs text-muted-foreground">
-                  {format.dateTime(new Date(order.placedAt), {
-                    day: 'numeric',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </AdminTable>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{order.customerName}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {order.customerPhone} · {order.pincode}
+                    </p>
+                  </div>
+                  <p className="shrink-0 text-sm font-semibold tabular-nums">
+                    {formatPaise(paise(order.totalPaise), { hidePaise: true })}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                  <span>
+                    {order.riderName ?? <span className="text-warning">{t('filterUnassigned')}</span>}
+                  </span>
+                  <span>
+                    {format.dateTime(new Date(order.placedAt), {
+                      day: 'numeric',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                </div>
+              </Link>
+            </li>
+          ))}
+        />
       )}
     </>
   );

@@ -1,10 +1,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { ImageIcon, Plus } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
+import { AdminPageHeader, AdminResponsiveTable } from '@/components/admin/admin-shell';
 import { Link } from '@/i18n/navigation';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
@@ -25,6 +25,7 @@ interface ProductRow {
   isMealPlanEligible: boolean;
   lowestPricePaise: string | null;
   totalStock: number;
+  imageUrl: string | null;
 }
 
 export function AdminCatalogueScreen() {
@@ -74,39 +75,83 @@ export function AdminCatalogueScreen() {
           {tc('empty')}
         </p>
       ) : (
-        <AdminTable>
-          <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
-            <tr>
-              <th className="px-3 py-2 font-medium">{t('name')}</th>
-              <th className="px-3 py-2 font-medium">{t('category')}</th>
-              <th className="px-3 py-2 text-right font-medium">{t('variants')}</th>
-              <th className="px-3 py-2 text-right font-medium">{t('aliases')}</th>
-              <th className="px-3 py-2 font-medium">{t('mealPlanEligible')}</th>
-              <th className="px-3 py-2 text-right font-medium">{t('stock')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((product) => (
-              <tr key={product.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
-                <td className="px-3 py-2.5">
-                  <Link href={`/admin/catalogue/${product.id}`} className="block font-medium text-primary hover:underline">
-                    {product.name}
-                  </Link>
-                  <span className="font-mono text-[11px] text-muted-foreground">
+        <AdminResponsiveTable
+          table={
+            <>
+              <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 font-medium">{t('name')}</th>
+                  <th className="px-3 py-2 font-medium">{t('category')}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t('variants')}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t('aliases')}</th>
+                  <th className="px-3 py-2 font-medium">{t('mealPlanEligible')}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t('stock')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((product) => (
+                  <tr key={product.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
+                    <td className="px-3 py-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] bg-white ring-1 ring-border">
+                          {product.imageUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={product.imageUrl} alt="" className="size-full object-cover" />
+                          ) : (
+                            <ImageIcon className="size-4 text-muted-foreground/40" aria-hidden />
+                          )}
+                        </span>
+                        <div className="min-w-0">
+                          <Link href={`/admin/catalogue/${product.id}`} className="block truncate font-medium text-primary hover:underline">
+                            {product.name}
+                          </Link>
+                          <span className="font-mono text-[11px] text-muted-foreground">
+                            {product.sku}
+                            {product.lowestPricePaise &&
+                              ` · ${formatPaise(paise(product.lowestPricePaise), { hidePaise: true })}`}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2.5 text-xs text-muted-foreground">{product.categorySlug}</td>
+                    <td className="px-3 py-2.5 text-right tabular-nums">{product.variantCount}</td>
+                    <td className="px-3 py-2.5 text-right tabular-nums">{product.aliasCount}</td>
+                    <td className="px-3 py-2.5 text-xs">{product.isMealPlanEligible ? '✓' : '—'}</td>
+                    <td className="px-3 py-2.5 text-right tabular-nums">{product.totalStock}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </>
+          }
+          cards={rows.map((product) => (
+            <li key={product.id}>
+              <Link
+                href={`/admin/catalogue/${product.id}`}
+                className="card-3d flex items-center gap-3 rounded-[var(--radius)] border border-border/60 bg-card p-3"
+              >
+                <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] bg-white ring-1 ring-border">
+                  {product.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={product.imageUrl} alt="" className="size-full object-cover" />
+                  ) : (
+                    <ImageIcon className="size-5 text-muted-foreground/40" aria-hidden />
+                  )}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-foreground">{product.name}</p>
+                  <p className="font-mono text-[11px] text-muted-foreground">
                     {product.sku}
                     {product.lowestPricePaise &&
                       ` · ${formatPaise(paise(product.lowestPricePaise), { hidePaise: true })}`}
-                  </span>
-                </td>
-                <td className="px-3 py-2.5 text-xs text-muted-foreground">{product.categorySlug}</td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{product.variantCount}</td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{product.aliasCount}</td>
-                <td className="px-3 py-2.5 text-xs">{product.isMealPlanEligible ? '✓' : '—'}</td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{product.totalStock}</td>
-              </tr>
-            ))}
-          </tbody>
-        </AdminTable>
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    {product.categorySlug} · {t('variants')}: {product.variantCount} · {t('stock')}: {product.totalStock}
+                  </p>
+                </div>
+              </Link>
+            </li>
+          ))}
+        />
       )}
     </>
   );

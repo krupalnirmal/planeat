@@ -1,4 +1,4 @@
-import { normaliseSearchText, pickName } from '@/lib/catalog/text';
+import { firstImage, normaliseSearchText, pickName } from '@/lib/catalog/text';
 import { db } from '@/lib/db';
 import { isUniqueViolation } from '@/lib/db-errors';
 import { ID_PREFIX, newId } from '@/lib/ids';
@@ -34,6 +34,7 @@ export interface AdminProductRow {
   aliasCount: number;
   lowestPricePaise: bigint | null;
   totalStock: number;
+  imageUrl: string | null;
 }
 
 export async function listProducts(
@@ -73,6 +74,7 @@ export async function listProducts(
         tags: true,
         isActive: true,
         isMealPlanEligible: true,
+        imageUrls: true,
         category: { select: { slug: true } },
         variants: { select: { pricePaise: true, stockQty: true, isActive: true } },
         _count: { select: { aliases: true } },
@@ -106,6 +108,7 @@ export async function listProducts(
         aliasCount: row._count.aliases,
         lowestPricePaise: prices.length > 0 ? prices.reduce((a, b) => (a < b ? a : b)) : null,
         totalStock: active.reduce((sum, variant) => sum + variant.stockQty, 0),
+        imageUrl: firstImage(row.imageUrls),
       };
     }),
   };

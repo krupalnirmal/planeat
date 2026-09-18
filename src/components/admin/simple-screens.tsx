@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
+import { AdminPageHeader, AdminResponsiveTable } from '@/components/admin/admin-shell';
 import { Link } from '@/i18n/navigation';
 import { api, qs } from '@/lib/api/client';
 
@@ -47,22 +47,38 @@ export function AdminWaitlistScreen() {
       ) : rows.length === 0 ? (
         <EmptyState label={tc('empty')} />
       ) : (
-        <AdminTable>
-          <TableHead labels={[t('pincode'), t('count'), t('latest')]} align={['left', 'right', 'left']} />
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.pincode} className="border-b border-border last:border-0">
-                <td className="px-3 py-2.5 font-mono">{row.pincode}</td>
-                <td className="px-3 py-2.5 text-right text-base font-bold tabular-nums">
-                  {row.count}
-                </td>
-                <td className="px-3 py-2.5 text-xs text-muted-foreground">
-                  {format.dateTime(new Date(row.latest), { day: 'numeric', month: 'short' })}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </AdminTable>
+        <AdminResponsiveTable
+          table={
+            <>
+              <TableHead labels={[t('pincode'), t('count'), t('latest')]} align={['left', 'right', 'left']} />
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.pincode} className="border-b border-border last:border-0">
+                    <td className="px-3 py-2.5 font-mono">{row.pincode}</td>
+                    <td className="px-3 py-2.5 text-right text-base font-bold tabular-nums">
+                      {row.count}
+                    </td>
+                    <td className="px-3 py-2.5 text-xs text-muted-foreground">
+                      {format.dateTime(new Date(row.latest), { day: 'numeric', month: 'short' })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </>
+          }
+          cards={rows.map((row) => (
+            <li
+              key={row.pincode}
+              className="card-3d flex items-center justify-between gap-2 rounded-[var(--radius)] border border-border/60 bg-card p-3"
+            >
+              <span className="font-mono text-sm">{row.pincode}</span>
+              <span className="text-xs text-muted-foreground">
+                {format.dateTime(new Date(row.latest), { day: 'numeric', month: 'short' })}
+              </span>
+              <span className="text-lg font-bold tabular-nums">{row.count}</span>
+            </li>
+          ))}
+        />
       )}
     </>
   );
@@ -105,39 +121,67 @@ export function AdminAuditLogScreen() {
       ) : rows.length === 0 ? (
         <EmptyState label={t('empty')} />
       ) : (
-        <AdminTable>
-          <TableHead
-            labels={[t('when'), t('who'), t('what'), t('entity'), t('before'), t('after')]}
-            align={['left', 'left', 'left', 'left', 'left', 'left']}
-          />
-          <tbody>
-            {rows.map((entry) => (
-              <tr key={entry.id} className="border-b border-border last:border-0 align-top">
-                <td className="px-3 py-2.5 text-xs whitespace-nowrap text-muted-foreground">
+        <AdminResponsiveTable
+          table={
+            <>
+              <TableHead
+                labels={[t('when'), t('who'), t('what'), t('entity'), t('before'), t('after')]}
+                align={['left', 'left', 'left', 'left', 'left', 'left']}
+              />
+              <tbody>
+                {rows.map((entry) => (
+                  <tr key={entry.id} className="border-b border-border last:border-0 align-top">
+                    <td className="px-3 py-2.5 text-xs whitespace-nowrap text-muted-foreground">
+                      {format.dateTime(new Date(entry.createdAt), {
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </td>
+                    <td className="px-3 py-2.5 text-xs">{entry.actorName ?? '—'}</td>
+                    <td className="px-3 py-2.5 font-mono text-xs">{entry.action}</td>
+                    <td className="px-3 py-2.5 font-mono text-[11px] text-muted-foreground">
+                      {entry.entityType}
+                    </td>
+                    {/* before/after are the point — "somebody changed the fee" is
+                        not useful; "₹25 → ₹40" is. */}
+                    <td className="max-w-40 px-3 py-2.5 font-mono text-[11px] break-all text-muted-foreground">
+                      {summarise(entry.before)}
+                    </td>
+                    <td className="max-w-40 px-3 py-2.5 font-mono text-[11px] break-all">
+                      {summarise(entry.after)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </>
+          }
+          cards={rows.map((entry) => (
+            <li
+              key={entry.id}
+              className="card-3d flex flex-col gap-1.5 rounded-[var(--radius)] border border-border/60 bg-card p-3"
+            >
+              <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                <span>{entry.actorName ?? '—'}</span>
+                <span>
                   {format.dateTime(new Date(entry.createdAt), {
                     day: 'numeric',
                     month: 'short',
                     hour: '2-digit',
                     minute: '2-digit',
                   })}
-                </td>
-                <td className="px-3 py-2.5 text-xs">{entry.actorName ?? '—'}</td>
-                <td className="px-3 py-2.5 font-mono text-xs">{entry.action}</td>
-                <td className="px-3 py-2.5 font-mono text-[11px] text-muted-foreground">
-                  {entry.entityType}
-                </td>
-                {/* before/after are the point — "somebody changed the fee" is
-                    not useful; "₹25 → ₹40" is. */}
-                <td className="max-w-40 px-3 py-2.5 font-mono text-[11px] break-all text-muted-foreground">
-                  {summarise(entry.before)}
-                </td>
-                <td className="max-w-40 px-3 py-2.5 font-mono text-[11px] break-all">
-                  {summarise(entry.after)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </AdminTable>
+                </span>
+              </div>
+              <p className="font-mono text-xs">
+                {entry.action} <span className="text-muted-foreground">· {entry.entityType}</span>
+              </p>
+              <p className="font-mono text-[11px] break-all text-muted-foreground">
+                {summarise(entry.before)} → <span className="text-foreground">{summarise(entry.after)}</span>
+              </p>
+            </li>
+          ))}
+        />
       )}
     </>
   );
@@ -189,38 +233,66 @@ export function AdminCustomersScreen() {
       ) : rows.length === 0 ? (
         <EmptyState label={tc('empty')} />
       ) : (
-        <AdminTable>
-          <TableHead
-            labels={[t('name'), t('phone'), t('orders'), t('hasPlan'), t('joined')]}
-            align={['left', 'left', 'right', 'left', 'left']}
-          />
-          <tbody>
-            {rows.map((customer) => (
-              <tr key={customer.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
-                <td className="px-3 py-2.5 font-medium">
-                  <Link href={`/admin/customers/${customer.id}`} className="text-primary hover:underline">
-                    {customer.name ?? '—'}
-                  </Link>
-                </td>
-                <td className="px-3 py-2.5 font-mono text-xs">{customer.phone}</td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{customer.orderCount}</td>
-                <td className="px-3 py-2.5 text-xs">
-                  {customer.hasMealPlan ? '✓' : '—'}
-                  {/* S6 — a health profile's own existence isn't shown here at
-                      all, let alone its contents. Reading one is a separate,
-                      logged, Super-Admin-only call from the detail page. */}
-                </td>
-                <td className="px-3 py-2.5 text-xs text-muted-foreground">
-                  {format.dateTime(new Date(customer.createdAt), {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                  })}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </AdminTable>
+        <AdminResponsiveTable
+          table={
+            <>
+              <TableHead
+                labels={[t('name'), t('phone'), t('orders'), t('hasPlan'), t('joined')]}
+                align={['left', 'left', 'right', 'left', 'left']}
+              />
+              <tbody>
+                {rows.map((customer) => (
+                  <tr key={customer.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
+                    <td className="px-3 py-2.5 font-medium">
+                      <Link href={`/admin/customers/${customer.id}`} className="text-primary hover:underline">
+                        {customer.name ?? '—'}
+                      </Link>
+                    </td>
+                    <td className="px-3 py-2.5 font-mono text-xs">{customer.phone}</td>
+                    <td className="px-3 py-2.5 text-right tabular-nums">{customer.orderCount}</td>
+                    <td className="px-3 py-2.5 text-xs">
+                      {customer.hasMealPlan ? '✓' : '—'}
+                      {/* S6 — a health profile's own existence isn't shown here at
+                          all, let alone its contents. Reading one is a separate,
+                          logged, Super-Admin-only call from the detail page. */}
+                    </td>
+                    <td className="px-3 py-2.5 text-xs text-muted-foreground">
+                      {format.dateTime(new Date(customer.createdAt), {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </>
+          }
+          cards={rows.map((customer) => (
+            <li key={customer.id}>
+              <Link
+                href={`/admin/customers/${customer.id}`}
+                className="card-3d flex items-center justify-between gap-2 rounded-[var(--radius)] border border-border/60 bg-card p-3"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-primary">{customer.name ?? '—'}</p>
+                  <p className="font-mono text-xs text-muted-foreground">{customer.phone}</p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    {format.dateTime(new Date(customer.createdAt), {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })}
+                  </p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-lg font-bold tabular-nums">{customer.orderCount}</p>
+                  <p className="text-[11px] text-muted-foreground">{t('orders')}</p>
+                </div>
+              </Link>
+            </li>
+          ))}
+        />
       )}
     </>
   );
