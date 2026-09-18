@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
+import { ImageIcon, Loader2 } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AdminPageHeader } from '@/components/admin/admin-shell';
@@ -45,7 +45,17 @@ interface OrderDetail {
   cancelledAt: string | null;
   customerName: string;
   customerPhone: string;
-  items: Array<{ id: string; name: string; quantity: number; unitPricePaise: string; totalPaise: string }>;
+  items: Array<{
+    id: string;
+    name: string;
+    nameEn: string | null;
+    localName: string | null;
+    imageUrl: string | null;
+    variantLabel: string;
+    quantity: number;
+    unitPricePaise: string;
+    totalPaise: string;
+  }>;
   rider: { name: string; phone: string; status: string } | null;
   history: Array<{
     fromStatus: OrderStatus | null;
@@ -171,7 +181,7 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
       )}
 
       <div className="space-y-4">
-        <section className="rounded-[var(--radius)] border border-border bg-card p-4">
+        <section className="card-3d rounded-[var(--radius)] border border-border/60 bg-card p-4">
           <h2 className="mb-2 text-sm font-bold">{t('deliverTo')}</h2>
           <p className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">{order.address.label}</span> —{' '}
@@ -194,13 +204,35 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
               price scrolled off-screen unnoticed. This wraps at any width
               instead, matching the customer-facing order detail's own item
               row (src/components/shop/order-detail.tsx). */}
-          <ul className="divide-y divide-border overflow-hidden rounded-[var(--radius)] border border-border bg-card">
+          <ul className="card-3d divide-y divide-border overflow-hidden rounded-[var(--radius)] border border-border/60 bg-card">
             {order.items.map((item) => (
               <li key={item.id} className="flex items-center gap-3 px-3 py-2.5">
+                {/* The product's real photo (frozen at order time —
+                    `OrderItem.imageSnapshot`, the same field the
+                    customer-facing order screen already trusts) rather than
+                    a bare name, so "which product is this" never needs a
+                    second lookup. */}
+                <div className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] bg-white">
+                  {item.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={item.imageUrl} alt="" className="size-full object-cover" />
+                  ) : (
+                    <ImageIcon className="size-5 text-muted-foreground/40" aria-hidden />
+                  )}
+                </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm">{item.name}</p>
+                  {/* "English (Marathi)" — the same bilingual convention the
+                      storefront's own ProductCard and the meal-plan builder
+                      use, pulled live from the product (not in the frozen
+                      snapshot, which only ever kept one locale's name). */}
+                  <p className="truncate text-sm">
+                    {item.nameEn ?? item.name}
+                    {item.localName && (
+                      <span className="font-normal text-muted-foreground"> ({item.localName})</span>
+                    )}
+                  </p>
                   <p className="text-xs text-muted-foreground">
-                    {item.quantity} × {formatPaise(paise(item.unitPricePaise), { hidePaise: true })}
+                    {item.quantity} × {item.variantLabel} · {formatPaise(paise(item.unitPricePaise), { hidePaise: true })}
                   </p>
                 </div>
                 <p className="shrink-0 text-sm font-semibold">
@@ -211,7 +243,7 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
           </ul>
         </section>
 
-        <section className="rounded-[var(--radius)] border border-border bg-card p-4">
+        <section className="card-3d rounded-[var(--radius)] border border-border/60 bg-card p-4">
           <h2 className="mb-2 text-sm font-bold">{t('billSummary')}</h2>
           <dl className="space-y-1 text-sm">
             <BillRow label={t('itemTotal')} value={formatPaise(paise(order.subtotalPaise))} />
@@ -232,7 +264,7 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
           </dl>
         </section>
 
-        <section className="rounded-[var(--radius)] border border-border bg-card p-4">
+        <section className="card-3d rounded-[var(--radius)] border border-border/60 bg-card p-4">
           <h2 className="mb-2 text-sm font-bold">{t('riderTitle')}</h2>
           {order.rider ? (
             <p className="text-sm">
@@ -269,7 +301,7 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
         </section>
 
         {(plainStatusActions.length > 0 || canCancel) && (
-          <section className="rounded-[var(--radius)] border border-border bg-card p-4">
+          <section className="card-3d rounded-[var(--radius)] border border-border/60 bg-card p-4">
             <h2 className="mb-2 text-sm font-bold">{t('changeStatus')}</h2>
             <div className="flex flex-wrap gap-2">
               {plainStatusActions.map((s) => (
@@ -328,7 +360,7 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
           </section>
         )}
 
-        <section className="rounded-[var(--radius)] border border-border bg-card p-4">
+        <section className="card-3d rounded-[var(--radius)] border border-border/60 bg-card p-4">
           <h2 className="mb-2 text-sm font-bold">{t('statusHistory')}</h2>
           {order.history.length === 0 ? (
             <p className="text-xs text-muted-foreground">{t('noHistory')}</p>

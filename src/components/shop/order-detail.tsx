@@ -87,6 +87,8 @@ interface OrderDetailResponse {
     items: Array<{
       id: string;
       name: string;
+      nameEn: string | null;
+      localName: string | null;
       imageUrl: string | null;
       quantity: number;
       unitPricePaise: string;
@@ -339,7 +341,15 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                 )}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium">{item.name}</span>
+                {/* "English (Marathi)" — the same bilingual convention the
+                    storefront's own ProductCard and the meal-plan builder
+                    already use. */}
+                <span className="block truncate text-sm font-medium">
+                  {item.nameEn ?? item.name}
+                  {item.localName && (
+                    <span className="font-normal text-muted-foreground"> ({item.localName})</span>
+                  )}
+                </span>
                 <span className="text-xs text-muted-foreground">
                   {item.quantity} × {formatPaise(paise(item.unitPricePaise), { hidePaise: true })}
                 </span>

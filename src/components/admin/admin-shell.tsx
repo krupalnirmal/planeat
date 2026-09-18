@@ -250,13 +250,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-dvh bg-secondary">
+    // White page background (client feedback, session 2026-09-17) — cards
+    // now read as raised via `.card-3d`'s shadow rather than sitting on a
+    // tinted page to separate them.
+    <div className="flex min-h-dvh bg-background">
       {/* The sidebar is hidden when printing — the picklist is printed on
           paper and carried to the market, and a nav column would waste a
           third of the page. */}
       <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-card lg:flex print:hidden">
         <div className="border-b border-border px-5 py-4">
-          <p className="text-sm font-bold">Get Fresh</p>
+          <p className="text-sm font-bold">
+            <span className="text-primary-dark">Get</span> <span className="text-primary">Fresh</span>
+          </p>
           <p className="text-[11px] text-muted-foreground">{tAdmin('nav.tagline')}</p>
         </div>
 
@@ -305,7 +310,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           >
             <Menu className="size-5" aria-hidden />
           </button>
-          <p className="min-w-0 flex-1 truncate text-sm font-bold">Get Fresh</p>
+          <p className="min-w-0 flex-1 truncate text-sm font-bold">
+            <span className="text-primary-dark">Get</span> <span className="text-primary">Fresh</span>
+          </p>
           <NotificationBell />
         </header>
 
@@ -320,7 +327,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-card shadow-xl">
               <div className="flex items-center justify-between border-b border-border px-5 py-4">
                 <div>
-                  <p className="text-sm font-bold">Get Fresh</p>
+                  <p className="text-sm font-bold">
+            <span className="text-primary-dark">Get</span> <span className="text-primary">Fresh</span>
+          </p>
                   <p className="text-xs text-muted-foreground">{tAdmin('title')}</p>
                 </div>
                 <button
@@ -392,7 +401,7 @@ export function AdminPageHeader({
 /** A dense table wrapper that scrolls horizontally rather than the page. */
 export function AdminTable({ children }: { children: React.ReactNode }) {
   return (
-    <div className="overflow-x-auto rounded-[var(--radius)] border border-border bg-card">
+    <div className="card-3d overflow-x-auto rounded-[var(--radius)] border border-border/60 bg-card">
       <table className="w-full min-w-[640px] text-sm">{children}</table>
     </div>
   );

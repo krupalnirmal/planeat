@@ -31,6 +31,12 @@ export interface OrderItemView {
   productId: string;
   variantId: string;
   name: string;
+  /** Live product name, not the frozen snapshot (which only ever kept one
+      locale) — "English (Marathi)", the same bilingual convention the
+      storefront's ProductCard and the meal-plan builder already use. `null`
+      if the product no longer exists. */
+  nameEn: string | null;
+  localName: string | null;
   imageUrl: string | null;
   quantity: number;
   unitPricePaise: bigint;
@@ -186,6 +192,7 @@ export async function getOrderDetail(
           totalPaise: true,
           isSubstituted: true,
           originalProductId: true,
+          variant: { select: { product: { select: { nameEn: true, nameMr: true } } } },
         },
       },
       assignment: {
@@ -246,6 +253,8 @@ export async function getOrderDetail(
       productId: item.productId,
       variantId: item.variantId,
       name: item.nameSnapshot,
+      nameEn: item.variant.product.nameEn,
+      localName: item.variant.product.nameMr,
       imageUrl: item.imageSnapshot,
       quantity: item.quantity,
       unitPricePaise: item.unitPricePaise,

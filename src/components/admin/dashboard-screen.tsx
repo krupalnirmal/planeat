@@ -111,6 +111,23 @@ interface RecentOrder {
 
 const RANGE_OPTIONS: DashboardRange[] = ['14d', '30d', 'month'];
 
+/** Each stat tile's own fixed decorative identity (client feedback, session
+    2026-09-18 — a tinted card, not just a tinted icon). Purely cosmetic
+    variety, not data encoding (no legend/adjacency comparison the way a
+    chart's categorical palette needs), so these are a separate, softer set
+    from the validated chart palette in charts.tsx. */
+const STAT_HUES = {
+  blue: { bg: '#EAF2FE', icon: '#2a78d6' },
+  violet: { bg: '#F1EEFC', icon: '#4a3aa7' },
+  green: { bg: '#E8F5EA', icon: '#2fa355' },
+  amber: { bg: '#FDF1DE', icon: '#c97a17' },
+  pink: { bg: '#FCEEF3', icon: '#e87ba4' },
+  teal: { bg: '#E7F8F1', icon: '#1baf7a' },
+  red: { bg: '#FBEAEA', icon: '#c0392b' },
+  orange: { bg: '#FDEEE3', icon: '#eb6834' },
+} as const;
+type StatHue = keyof typeof STAT_HUES;
+
 const CATEGORY_ICON: Record<string, typeof Apple> = {
   vegetables: ChefHat,
   fruits: Apple,
@@ -226,7 +243,7 @@ export function AdminDashboard() {
       {/* ── M6: the alarm that matters most operationally. */}
       <section
         className={cn(
-          'mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius)] border px-4 py-3',
+          'card-3d mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius)] border px-4 py-3',
           data.cron.alert
             ? 'border-danger/50 bg-danger/10'
             : 'border-success/30 bg-primary/5',
@@ -271,6 +288,7 @@ export function AdminDashboard() {
           icon={ShoppingCart}
           delta={data.deltas.orders}
           sparklineData={ordersSparkline}
+          hue="blue"
         />
         <Stat
           label={t('todayRevenue')}
@@ -278,6 +296,7 @@ export function AdminDashboard() {
           icon={IndianRupee}
           delta={data.deltas.revenue}
           sparklineData={revenueSparkline}
+          hue="violet"
         />
         <Stat
           label={t('delivered')}
@@ -285,17 +304,19 @@ export function AdminDashboard() {
           icon={Truck}
           delta={data.deltas.delivered}
           sparklineData={deliveredSparkline}
+          hue="green"
         />
         <Stat
           label={t('paymentPending')}
           value={String(data.todayPaymentPending)}
           icon={CreditCard}
           tone={data.todayPaymentPending > 0 ? 'warning' : undefined}
+          hue="amber"
         />
 
-        <Stat label={t('activeSubscriptions')} value={String(data.activeSubscriptions)} icon={Crown} />
-        <Stat label={t('pausedSubscriptions')} value={String(data.pausedSubscriptions)} icon={PauseCircle} />
-        <Stat label={t('expiringSoon')} value={String(data.expiringWithin2Days)} icon={Clock} />
+        <Stat label={t('activeSubscriptions')} value={String(data.activeSubscriptions)} icon={Crown} hue="pink" />
+        <Stat label={t('pausedSubscriptions')} value={String(data.pausedSubscriptions)} icon={PauseCircle} hue="teal" />
+        <Stat label={t('expiringSoon')} value={String(data.expiringWithin2Days)} icon={Clock} hue="violet" />
 
         <Stat
           label={t('lowStock')}
@@ -303,6 +324,7 @@ export function AdminDashboard() {
           icon={Package}
           tone={data.lowStockCount > 0 ? 'warning' : undefined}
           href="/admin/inventory?onlyLow=true"
+          hue="red"
         />
         <Stat
           label={t('outOfStock')}
@@ -310,19 +332,21 @@ export function AdminDashboard() {
           icon={AlertTriangle}
           tone={data.outOfStockCount > 0 ? 'danger' : undefined}
           href="/admin/inventory?onlyOut=true"
+          hue="orange"
         />
         <Stat
           label={t('openIssues')}
           value={String(data.openOrderIssues)}
           icon={MessageCircle}
           tone={data.openOrderIssues > 0 ? 'warning' : undefined}
+          hue="blue"
         />
-        <Stat label={t('waitlist')} value={String(data.waitlistTotal)} icon={Users} href="/admin/waitlist" />
+        <Stat label={t('waitlist')} value={String(data.waitlistTotal)} icon={Users} href="/admin/waitlist" hue="green" />
       </div>
 
       {/* B11 — where the demand is. */}
       {data.waitlistTopPincodes.length > 0 && (
-        <section className="mt-5 rounded-[var(--radius)] border border-border bg-card p-4">
+        <section className="card-3d mt-5 rounded-[var(--radius)] border border-border/60 bg-card p-4">
           <h2 className="mb-3 text-sm font-semibold">{t('waitlist')}</h2>
           <ul className="flex flex-wrap gap-2">
             {data.waitlistTopPincodes.map((entry) => (
@@ -461,7 +485,7 @@ function ChartCard({
   noPad?: boolean;
 }) {
   return (
-    <section className={cn('overflow-hidden rounded-[var(--radius)] border border-border bg-card', className)}>
+    <section className={cn('card-3d overflow-hidden rounded-[var(--radius)] border border-border/60 bg-card', className)}>
       <div className={cn('flex items-baseline justify-between gap-2', noPad ? 'px-4 pt-4 pb-3' : 'p-4 pb-3')}>
         <h2 className="text-sm font-semibold">{title}</h2>
         {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
@@ -622,6 +646,7 @@ function Stat({
   icon: Icon,
   delta,
   sparklineData,
+  hue = 'green',
 }: {
   label: string;
   value: string;
@@ -632,30 +657,27 @@ function Stat({
       no history at all, or yesterday was zero — see `pctDelta` server-side). */
   delta?: number | null;
   sparklineData?: number[];
+  /** The tile's own fixed decorative colour — always applied (even at 0),
+      matching the client's reference; `tone` still adds an urgency border
+      on top when a warning/danger count is actually > 0. */
+  hue?: StatHue;
 }) {
+  const { bg, icon } = STAT_HUES[hue];
+
   const body = (
     <div
       className={cn(
-        'flex items-start justify-between gap-2 rounded-[var(--radius)] border bg-card px-4 py-3',
-        tone === 'danger'
-          ? 'border-danger/40'
-          : tone === 'warning'
-            ? 'border-warning/40'
-            : 'border-border',
+        'card-3d flex items-start justify-between gap-2 rounded-[var(--radius)] border px-4 py-3',
+        tone === 'danger' ? 'border-danger/40' : tone === 'warning' ? 'border-warning/40' : 'border-transparent',
       )}
+      style={{ backgroundColor: bg }}
     >
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           {Icon && (
             <span
-              className={cn(
-                'grid size-8 shrink-0 place-items-center rounded-full',
-                tone === 'danger'
-                  ? 'bg-danger/10 text-danger'
-                  : tone === 'warning'
-                    ? 'bg-warning/10 text-warning'
-                    : 'bg-tint-green text-primary',
-              )}
+              className="grid size-8 shrink-0 place-items-center rounded-full"
+              style={{ backgroundColor: `${icon}26`, color: icon }}
             >
               <Icon className="size-4" aria-hidden />
             </span>
@@ -665,7 +687,7 @@ function Stat({
         <p
           className={cn(
             'mt-1.5 text-2xl font-bold tabular-nums',
-            tone === 'danger' ? 'text-danger' : tone === 'warning' ? 'text-warning' : '',
+            tone === 'danger' ? 'text-danger' : tone === 'warning' ? 'text-warning' : 'text-foreground',
           )}
         >
           {value}
@@ -681,7 +703,7 @@ function Stat({
           </p>
         )}
       </div>
-      {sparklineData && sparklineData.some((v) => v > 0) && <Sparkline data={sparklineData} />}
+      {sparklineData && sparklineData.some((v) => v > 0) && <Sparkline data={sparklineData} color={icon} />}
     </div>
   );
 

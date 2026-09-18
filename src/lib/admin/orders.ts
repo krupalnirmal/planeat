@@ -183,6 +183,19 @@ export interface AdminOrderDetailView {
   items: Array<{
     id: string;
     name: string;
+    /** Live product name, not the frozen snapshot — the snapshot only ever
+        kept one locale's name, so "English (Marathi)" (the same convention
+        the storefront and meal-plan builder use) needs the current product
+        record. `null` if the product was later deleted. */
+    nameEn: string | null;
+    localName: string | null;
+    /** The frozen photo at order time — same field the customer-facing
+        order screen already trusts (`src/lib/orders/queries.ts`). */
+    imageUrl: string | null;
+    /** The variant's own size label ("500 g", "1 kg") — `quantity` alone is
+        a bare count with no unit; this is what makes "3" read as "3 × 500
+        g" instead of just a number. */
+    variantLabel: string;
     quantity: number;
     unitPricePaise: bigint;
     totalPaise: bigint;
@@ -223,7 +236,17 @@ export async function getAdminOrderDetail(orderId: string): Promise<AdminOrderDe
       cancelledAt: true,
       user: { select: { name: true, phone: true } },
       items: {
-        select: { id: true, nameSnapshot: true, quantity: true, unitPricePaise: true, totalPaise: true },
+        select: {
+          id: true,
+          nameSnapshot: true,
+          imageSnapshot: true,
+          quantity: true,
+          unitPricePaise: true,
+          totalPaise: true,
+          variant: {
+            select: { label: true, product: { select: { nameEn: true, nameMr: true } } },
+          },
+        },
       },
       assignment: {
         select: { status: true, partner: { select: { user: { select: { name: true, phone: true } } } } },
@@ -268,6 +291,10 @@ export async function getAdminOrderDetail(orderId: string): Promise<AdminOrderDe
     items: order.items.map((item) => ({
       id: item.id,
       name: item.nameSnapshot,
+      nameEn: item.variant.product.nameEn,
+      localName: item.variant.product.nameMr,
+      imageUrl: item.imageSnapshot,
+      variantLabel: item.variant.label,
       quantity: item.quantity,
       unitPricePaise: item.unitPricePaise,
       totalPaise: item.totalPaise,
