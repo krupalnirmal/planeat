@@ -789,6 +789,7 @@
       "inventory": "स्टॉक",
       "catalogue": "उत्पाद",
       "customers": "ग्राहक",
+      "mealPlans": "मील प्लान",
       "waitlist": "प्रतीक्षा सूची",
       "deliveryPartners": "राइडर",
       "settings": "सेटिंग्स",
@@ -895,6 +896,21 @@
         "EV": "इलेक्ट्रिक वाहन",
         "WALK": "पैदल"
       }
+    },
+    "mealPlans": {
+      "title": "मील प्लान",
+      "hint": "हर ग्राहक का मील-प्लान सब्सक्रिप्शन एक ही जगह",
+      "customer": "ग्राहक",
+      "status": {
+        "ACTIVE": "सक्रिय",
+        "PAUSED": "रुका हुआ",
+        "CANCELLED": "रद्द",
+        "COMPLETED": "पूरा"
+      },
+      "period": "अवधि",
+      "daysLeft": "बचे दिन",
+      "rider": "राइडर",
+      "noRider": "कोई नहीं"
     },
     "orders": {
       "title": "ऑर्डर",

@@ -143,6 +143,12 @@ export const mealPlansQuerySchema = adminListQuerySchema.extend({
   unreviewedOnly: z.coerce.boolean().optional(),
 });
 
+/** The subscription-list admin module (session 2026-09-18) — `query` from
+    `adminListQuerySchema` already covers customer name/phone search. */
+export const subscriptionsQuerySchema = adminListQuerySchema.extend({
+  status: z.enum(['ACTIVE', 'PAUSED', 'CANCELLED', 'COMPLETED']).optional(),
+});
+
 export const reviewPlanSchema = z.object({
   note: z.string().trim().max(1000).optional(),
 });

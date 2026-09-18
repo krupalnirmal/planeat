@@ -789,6 +789,7 @@
       "inventory": "Inventory",
       "catalogue": "Catalogue",
       "customers": "Customers",
+      "mealPlans": "Meal Plans",
       "waitlist": "Waitlist",
       "deliveryPartners": "Delivery partners",
       "settings": "Settings",
@@ -895,6 +896,21 @@
         "EV": "Electric vehicle",
         "WALK": "On foot"
       }
+    },
+    "mealPlans": {
+      "title": "Meal Plans",
+      "hint": "Every customer's meal-plan subscription in one place",
+      "customer": "Customer",
+      "status": {
+        "ACTIVE": "Active",
+        "PAUSED": "Paused",
+        "CANCELLED": "Cancelled",
+        "COMPLETED": "Completed"
+      },
+      "period": "Period",
+      "daysLeft": "Days left",
+      "rider": "Rider",
+      "noRider": "Unassigned"
     },
     "orders": {
       "title": "Orders",
