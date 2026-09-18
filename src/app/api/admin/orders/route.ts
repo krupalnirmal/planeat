@@ -21,6 +21,8 @@ export const GET = route(async (request: Request) => {
     dateKey: query.date,
     query: query.query,
     unassignedOnly: query.unassignedOnly,
+    paymentStatus: query.paymentStatus,
+    paymentMethod: query.paymentMethod,
     dateFrom: query.dateFrom ? new Date(`${query.dateFrom}T00:00:00.000Z`) : undefined,
     dateTo: query.dateTo ? new Date(`${query.dateTo}T23:59:59.999Z`) : undefined,
   };

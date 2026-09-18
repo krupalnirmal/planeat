@@ -23,6 +23,7 @@ import { CustomersExplorerTab } from '@/components/admin/tabs/customers-tab';
 import { InventoryExplorerTab } from '@/components/admin/tabs/inventory-tab';
 import { OrdersExplorerTab } from '@/components/admin/tabs/orders-tab';
 import { PlansExplorerTab } from '@/components/admin/tabs/plans-tab';
+import { RevenueExplorerTab } from '@/components/admin/tabs/revenue-tab';
 import { api, qs } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
 
@@ -151,6 +152,8 @@ export function AdminDashboard() {
       <div className="mt-4">
         {tab === 'orders' ? (
           <OrdersExplorerTab />
+        ) : tab === 'revenue' ? (
+          <RevenueExplorerTab />
         ) : tab === 'customers' ? (
           <CustomersExplorerTab />
         ) : tab === 'plans' ? (

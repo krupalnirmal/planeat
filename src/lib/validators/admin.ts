@@ -40,6 +40,11 @@ export const ordersQuerySchema = adminListQuerySchema.extend({
   type: z.enum(['INSTANT', 'MEAL_PLAN_DAILY']).optional(),
   date: z.iso.date().optional(),
   unassignedOnly: z.coerce.boolean().optional(),
+  // Dashboard v2's Revenue/Payments tabs (Parts O/Q) — a revenue entry or
+  // payment row is just an order re-sliced by these two fields, not a
+  // separate query.
+  paymentStatus: z.enum(['PENDING', 'PAID', 'FAILED', 'REFUNDED']).optional(),
+  paymentMethod: z.enum(['WALLET', 'RAZORPAY', 'COD']).optional(),
   // The dashboard's "Export" button (session 2026-09-17) scopes the CSV to
   // its own active date-range control — separate from `date`, which is a
   // single scheduled-delivery day, not a placed-at range.

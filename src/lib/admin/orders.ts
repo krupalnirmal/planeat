@@ -30,6 +30,13 @@ export interface AdminOrderFilter {
       date-range control. */
   dateFrom?: Date;
   dateTo?: Date;
+  /** Dashboard v2's Revenue tab (session 2026-09-19, Part O) — a "revenue
+      entry" is just an order with `paymentStatus: PAID`, not a separate
+      entity, so this reuses `listAdminOrders` rather than a new query. */
+  paymentStatus?: PaymentStatus;
+  /** Dashboard v2's Payments tab (Part Q) — same reasoning as above, keyed
+      on method instead of status. */
+  paymentMethod?: PaymentMethod;
 }
 
 export interface AdminOrderRow {
@@ -60,6 +67,8 @@ export async function listAdminOrders(
     ...(filter.type ? { type: filter.type } : {}),
     ...(scheduled ? { scheduledDate: scheduled } : {}),
     ...(filter.unassignedOnly ? { assignment: { is: null } } : {}),
+    ...(filter.paymentStatus ? { paymentStatus: filter.paymentStatus } : {}),
+    ...(filter.paymentMethod ? { paymentMethod: filter.paymentMethod } : {}),
     ...(filter.dateFrom || filter.dateTo
       ? {
           placedAt: {
