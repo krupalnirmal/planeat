@@ -10,6 +10,14 @@ export const adminListQuerySchema = paginationSchema.extend({
   locale: localeSchema.default('mr'),
 });
 
+/** Dashboard v2's Customers tab (session 2026-09-18, Part L) — the same
+    `createdAt`-range convention `ordersQuerySchema`'s `dateFrom`/`dateTo`
+    already established for `placedAt`. */
+export const customersQuerySchema = adminListQuerySchema.extend({
+  dateFrom: z.iso.date().optional(),
+  dateTo: z.iso.date().optional(),
+});
+
 export const picklistQuerySchema = z.object({
   date: z.iso.date().optional(),
   locale: localeSchema.default('mr'),

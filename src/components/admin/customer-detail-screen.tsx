@@ -108,9 +108,20 @@ function IconCircle({
   );
 }
 
-export function CustomerDetailScreen({ customerId }: { customerId: string }) {
+export function CustomerDetailScreen({
+  customerId,
+  variant = 'page',
+}: {
+  customerId: string;
+  /** `page` = the standalone `/admin/customers/[id]` route (unchanged hero
+      banner); `inline` = dashboard v2's Customers tab detail panel (Part
+      L) — a compact header plus a single-column version of the same
+      sections, since the panel is a fixed ~380px regardless of viewport. */
+  variant?: 'page' | 'inline';
+}) {
   const t = useTranslations('admin.customers');
   const tc = useTranslations('admin.common');
+  const te = useTranslations('admin.explorer');
   const tPlan = useTranslations('mealPlan');
   const tStatus = useTranslations('orders.status');
   const locale = useLocale();
@@ -122,50 +133,67 @@ export function CustomerDetailScreen({ customerId }: { customerId: string }) {
   });
 
   if (detail.isLoading) {
-    return <p className="text-sm text-muted-foreground">{tc('loading')}</p>;
+    return <p className={cn('text-sm text-muted-foreground', variant === 'inline' && 'p-4')}>{tc('loading')}</p>;
   }
 
   const customer = detail.data?.customer;
   if (!customer) {
-    return <p className="text-sm text-muted-foreground">{tc('empty')}</p>;
+    return <p className={cn('text-sm text-muted-foreground', variant === 'inline' && 'p-4')}>{tc('empty')}</p>;
   }
 
   const today = todayDayOfWeek();
 
   return (
-    <div className="space-y-4">
-      {/* Hero banner — replaces the plain AdminPageHeader text-only look for
-          just this page. The back chevron sits inside it rather than in a
-          separate header row above, so there's one identity block instead
-          of two stacked ones. */}
-      <div className="relative overflow-hidden rounded-[var(--radius-2xl)] bg-gradient-to-br from-tint-green via-tint-green to-tint-yellow px-5 py-5">
-        <Leaf
-          aria-hidden
-          className="pointer-events-none absolute -top-4 -right-6 size-24 rotate-12 text-primary/10"
-        />
-        <Leaf
-          aria-hidden
-          className="pointer-events-none absolute -bottom-6 left-1/3 size-16 -rotate-12 text-primary/10"
-        />
-        <Link
-          href="/admin/customers"
-          aria-label={tc('back')}
-          className="relative z-10 mb-3 inline-grid size-8 place-items-center rounded-full bg-card/70 text-primary-dark hover:bg-card"
-        >
-          <ChevronLeft className="size-4.5" aria-hidden />
-        </Link>
-        <div className="relative z-10 flex items-center gap-3">
-          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-card text-primary">
-            <Leaf className="size-5" aria-hidden />
-          </span>
-          <div className="min-w-0">
-            <h1 className="truncate text-xl font-black text-primary-dark">{customer.name ?? customer.phone}</h1>
-            <p className="text-sm text-muted-foreground">{customer.phone}</p>
+    <div className={cn('space-y-4', variant === 'inline' && 'p-4')}>
+      {variant === 'page' ? (
+        // Hero banner — replaces the plain AdminPageHeader text-only look
+        // for just this page. The back chevron sits inside it rather than
+        // in a separate header row above, so there's one identity block
+        // instead of two stacked ones.
+        <div className="relative overflow-hidden rounded-[var(--radius-2xl)] bg-gradient-to-br from-tint-green via-tint-green to-tint-yellow px-5 py-5">
+          <Leaf
+            aria-hidden
+            className="pointer-events-none absolute -top-4 -right-6 size-24 rotate-12 text-primary/10"
+          />
+          <Leaf
+            aria-hidden
+            className="pointer-events-none absolute -bottom-6 left-1/3 size-16 -rotate-12 text-primary/10"
+          />
+          <Link
+            href="/admin/customers"
+            aria-label={tc('back')}
+            className="relative z-10 mb-3 inline-grid size-8 place-items-center rounded-full bg-card/70 text-primary-dark hover:bg-card"
+          >
+            <ChevronLeft className="size-4.5" aria-hidden />
+          </Link>
+          <div className="relative z-10 flex items-center gap-3">
+            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-card text-primary">
+              <Leaf className="size-5" aria-hidden />
+            </span>
+            <div className="min-w-0">
+              <h1 className="truncate text-xl font-black text-primary-dark">{customer.name ?? customer.phone}</h1>
+              <p className="text-sm text-muted-foreground">{customer.phone}</p>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
+              <Leaf className="size-5" aria-hidden />
+            </span>
+            <div className="min-w-0">
+              <h2 className="truncate text-base font-bold">{customer.name ?? customer.phone}</h2>
+              <p className="text-xs text-muted-foreground">{customer.phone}</p>
+            </div>
+          </div>
+          <Link href={`/admin/customers/${customerId}`} className="shrink-0 text-xs font-semibold text-primary">
+            {te('viewDetails')}
+          </Link>
+        </div>
+      )}
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className={cn('grid gap-4', variant === 'page' && 'lg:grid-cols-2')}>
         <section className="rounded-[var(--radius-2xl)] bg-tint-green p-4">
           <div className="mb-3 flex items-center gap-2.5">
             <IconCircle icon={Wallet} className="bg-card text-primary" />

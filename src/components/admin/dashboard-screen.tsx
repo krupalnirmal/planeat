@@ -19,6 +19,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AdminPageHeader } from '@/components/admin/admin-shell';
 import { ExplorerEmpty, ExplorerTabs, type ExplorerTab } from '@/components/admin/explorer';
+import { CustomersExplorerTab } from '@/components/admin/tabs/customers-tab';
 import { OrdersExplorerTab } from '@/components/admin/tabs/orders-tab';
 import { api, qs } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
@@ -146,7 +147,13 @@ export function AdminDashboard() {
       <ExplorerTabs tabs={tabs} active={tab} onChange={setTab} />
 
       <div className="mt-4">
-        {tab === 'orders' ? <OrdersExplorerTab /> : <ExplorerEmpty label={te('comingSoon')} />}
+        {tab === 'orders' ? (
+          <OrdersExplorerTab />
+        ) : tab === 'customers' ? (
+          <CustomersExplorerTab />
+        ) : (
+          <ExplorerEmpty label={te('comingSoon')} />
+        )}
       </div>
     </div>
   );

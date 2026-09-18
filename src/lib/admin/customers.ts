@@ -30,15 +30,32 @@ export interface CustomerRow {
   hasMealPlan: boolean;
 }
 
+export interface CustomerFilter {
+  query?: string;
+  /** `createdAt` range (inclusive) — dashboard v2's Customers tab date
+      filter (session 2026-09-18, Part L), same convention as
+      `AdminOrderFilter.dateFrom`/`dateTo` for `placedAt`. */
+  dateFrom?: Date;
+  dateTo?: Date;
+}
+
 export async function searchCustomers(
-  query: string | undefined,
+  filter: CustomerFilter,
   { skip, take }: { skip: number; take: number },
 ): Promise<{ customers: CustomerRow[]; total: number }> {
   const where = {
     role: { in: ['CUSTOMER', 'DELIVERY_PARTNER'] as UserRole[] },
-    ...(query
+    ...(filter.query
       ? {
-          OR: [{ phone: { contains: query } }, { name: { contains: query } }],
+          OR: [{ phone: { contains: filter.query } }, { name: { contains: filter.query } }],
+        }
+      : {}),
+    ...(filter.dateFrom || filter.dateTo
+      ? {
+          createdAt: {
+            ...(filter.dateFrom ? { gte: filter.dateFrom } : {}),
+            ...(filter.dateTo ? { lte: filter.dateTo } : {}),
+          },
         }
       : {}),
   };
