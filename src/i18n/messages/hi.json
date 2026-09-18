@@ -339,6 +339,12 @@
       "RAZORPAY": "ऑनलाइन",
       "COD": "नकद"
     },
+    "paymentStatus": {
+      "PENDING": "लंबित",
+      "PAID": "भुगतान हो गया",
+      "FAILED": "असफल",
+      "REFUNDED": "रिफ़ंड हो गया"
+    },
     "confirmedTitle": "ऑर्डर कन्फर्म हो गई!",
     "confirmedBody": "आपके ऑर्डर के लिए धन्यवाद। आपका ऑर्डर सफलतापूर्वक दर्ज हो गया है।",
     "orderIdLabel": "ऑर्डर आईडी",

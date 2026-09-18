@@ -339,6 +339,12 @@
       "RAZORPAY": "Online",
       "COD": "Cash"
     },
+    "paymentStatus": {
+      "PENDING": "Pending",
+      "PAID": "Paid",
+      "FAILED": "Failed",
+      "REFUNDED": "Refunded"
+    },
     "confirmedTitle": "Order Confirmed!",
     "confirmedBody": "Thank you for your order. Your order has been placed successfully.",
     "orderIdLabel": "Order ID",
