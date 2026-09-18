@@ -82,7 +82,12 @@
     "otpChangeLink": "बदलें",
     "otpDigitAria": "अंक {position}, कुल ६",
     "otpFallbackBody": "कोड नहीं मिला? हम इसे WhatsApp पर दोबारा भेज सकते हैं।",
-    "otpSecuredFooter": "सुरक्षित · १००% सुरक्षित"
+    "otpSecuredFooter": "सुरक्षित · १००% सुरक्षित",
+    "otpHeading": "अपना OTP सत्यापित करें",
+    "otpSecureLoginLabel": "सुरक्षित लॉगिन",
+    "otpFooterDataSafe": "आपका डेटा सुरक्षित है",
+    "otpFooterEncrypted": "एन्क्रिप्टेड कनेक्शन",
+    "otpFooterPrivacy": "हम आपकी गोपनीयता का सम्मान करते हैं"
   },
   "home": {
     "tagline": "ताज़ी पसंद, झटपट डिलीवरी",

@@ -82,7 +82,12 @@
     "otpChangeLink": "Change",
     "otpDigitAria": "Digit {position} of 6",
     "otpFallbackBody": "Didn't receive the code? We can resend it on WhatsApp.",
-    "otpSecuredFooter": "Secured · 100% Secure"
+    "otpSecuredFooter": "Secured · 100% Secure",
+    "otpHeading": "Verify Your OTP",
+    "otpSecureLoginLabel": "Secure Login",
+    "otpFooterDataSafe": "Your data is safe",
+    "otpFooterEncrypted": "Encrypted connection",
+    "otpFooterPrivacy": "We respect your privacy"
   },
   "home": {
     "tagline": "Fresh choices, delivered fast",

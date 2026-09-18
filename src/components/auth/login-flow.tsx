@@ -1,6 +1,19 @@
 'use client';
 
-import { ArrowLeft, Check, Leaf, MessageCircle, ShieldCheck, Smartphone } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Code2,
+  Leaf,
+  Lock,
+  MessageCircle,
+  MessageSquareText,
+  PencilLine,
+  Settings,
+  ShieldCheck,
+  Smartphone,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -223,6 +236,16 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
 
   const phoneValid = /^[6-9]\d{9}$/.test(phone.replace(/\D/g, ''));
 
+  // `otpSubtitle`/`devOtpHint` put the phone number/code at different
+  // positions per locale ("{phone} या नंबरवर..." in Marathi vs "...sent to
+  // {phone}" in English) — a sentinel split respects that word order
+  // instead of hardcoding "before"/"after" in English's own order, so the
+  // phone number/code can render in its own bold `<span>` in any locale.
+  const [otpSubtitleBefore, otpSubtitleAfter] = t('otpSubtitle', { phone: '@@SPLIT@@' }).split('@@SPLIT@@');
+  const [devHintBefore, devHintAfter] = devCode
+    ? t('devOtpHint', { code: '@@SPLIT@@' }).split('@@SPLIT@@')
+    : ['', ''];
+
   if (step === 'phone') {
     return (
       // bg-background, not the page's usual white-card-on-white — a premium
@@ -357,7 +380,10 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
           <ArrowLeft className="size-5" aria-hidden />
         </button>
         <h1 className="flex-1 text-base font-bold">{t('otpTitle')}</h1>
-        <ShieldCheck className="size-5 shrink-0 text-primary" aria-hidden />
+        <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-muted-foreground">
+          <ShieldCheck className="size-4 text-primary" aria-hidden />
+          {t('otpSecureLoginLabel')}
+        </span>
       </header>
 
       <main className="bg-background px-5 py-8">
@@ -369,28 +395,44 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
             cards rather than a plain bordered box. */}
         <div className="card-3d rounded-2xl border border-border/50 bg-card px-5 py-8">
           {/* A minimal verification illustration (client's reference) built
-              from two stacked icon circles rather than a shipped SVG asset —
-              one more thing that never goes stale if the icon set changes. */}
-          <div className="relative mx-auto grid size-28 place-items-center rounded-full bg-tint-green">
-            <Smartphone className="size-11 text-primary" aria-hidden />
-            <span className="absolute right-0 bottom-0 grid size-9 place-items-center rounded-full border-4 border-card bg-primary text-primary-foreground">
+              from stacked icon circles rather than a shipped SVG asset — one
+              more thing that never goes stale if the icon set changes. The
+              scattered dots and the chat-bubble badge are the same trick,
+              just decoration around the same two real icons. */}
+          <div className="relative mx-auto grid size-32 place-items-center">
+            <span className="absolute top-1 right-3 size-2 rounded-full bg-primary/25" aria-hidden />
+            <span className="absolute bottom-3 left-0 size-1.5 rounded-full bg-primary/30" aria-hidden />
+            <span className="absolute top-9 left-1 size-1 rounded-full bg-primary/40" aria-hidden />
+
+            <div className="grid size-28 place-items-center rounded-full bg-tint-green">
+              <Smartphone className="size-11 text-primary" strokeWidth={1.75} aria-hidden />
+            </div>
+            <span className="absolute top-0 right-2 grid size-8 place-items-center rounded-2xl bg-card shadow-md">
+              <MessageSquareText className="size-4 text-primary" aria-hidden />
+            </span>
+            <span className="absolute right-1 bottom-1 grid size-9 place-items-center rounded-full border-4 border-card bg-primary text-primary-foreground">
               <Check className="size-4.5" aria-hidden />
             </span>
           </div>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            {t('otpSubtitle', { phone })}{' '}
-            <button
-              type="button"
-              onClick={() => {
-                setStep('phone');
-                setError(null);
-              }}
-              className="font-bold text-primary"
-            >
-              {t('otpChangeLink')}
-            </button>
+          <h2 className="mt-5 text-center text-xl font-black">{t('otpHeading')}</h2>
+
+          <p className="mt-2 text-center text-sm text-muted-foreground">
+            {otpSubtitleBefore}
+            <span className="font-bold text-foreground">{phone}</span>
+            {otpSubtitleAfter}
           </p>
+          <button
+            type="button"
+            onClick={() => {
+              setStep('phone');
+              setError(null);
+            }}
+            className="mx-auto mt-1.5 flex items-center justify-center gap-1 text-sm font-bold text-primary"
+          >
+            <PencilLine className="size-3.5" aria-hidden />
+            {t('changeNumber')}
+          </button>
 
           <form
             className="mt-6"
@@ -427,8 +469,11 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
             </div>
 
             {devCode && (
-              <p className="mt-2 rounded-[var(--radius)] bg-secondary px-3 py-2 text-center text-xs text-muted-foreground">
-                {t('devOtpHint', { code: devCode })}
+              <p className="mt-3 flex items-center justify-center gap-1.5 rounded-full bg-tint-green px-4 py-2.5 text-center text-xs font-medium text-primary-dark">
+                <Code2 className="size-3.5 shrink-0" aria-hidden />
+                {devHintBefore}
+                <span className="font-bold">{devCode}</span>
+                {devHintAfter}
               </p>
             )}
 
@@ -473,16 +518,50 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
             <button
               type="submit"
               disabled={code.length !== OTP_LENGTH || busy}
-              className="mt-6 h-13 w-full rounded-2xl bg-primary text-[15px] font-bold text-primary-foreground shadow-sm disabled:opacity-50 disabled:shadow-none"
+              className="mt-6 flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-[15px] font-bold text-primary-foreground shadow-sm disabled:opacity-50 disabled:shadow-none"
             >
-              {busy ? t('verifying') : t('verify')}
+              {busy ? (
+                t('verifying')
+              ) : (
+                <>
+                  {t('verify')}
+                  <ArrowRight className="size-4" aria-hidden />
+                </>
+              )}
             </button>
 
-            <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-[11px] font-semibold text-muted-foreground">
-              <ShieldCheck className="size-3.5 text-primary" aria-hidden />
-              {t('otpSecuredFooter')}
-            </p>
+            <div className="mt-5 border-t border-border pt-4">
+              <p className="flex items-center justify-center gap-1.5 text-center text-[11px] font-semibold text-muted-foreground">
+                <ShieldCheck className="size-3.5 text-primary" aria-hidden />
+                {t('otpSecuredFooter')}
+              </p>
+            </div>
           </form>
+        </div>
+
+        {/* Trust badges below the card (client's reference) — the same
+            three reassurances the card's own "Secured" line already implies,
+            spelled out once more since this is the highest-stakes screen in
+            the whole flow (entering a code that logs someone in). */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <Lock className="size-3" aria-hidden />
+            {t('otpFooterDataSafe')}
+          </span>
+          <span aria-hidden className="text-border">
+            |
+          </span>
+          <span className="flex items-center gap-1">
+            <ShieldCheck className="size-3" aria-hidden />
+            {t('otpFooterEncrypted')}
+          </span>
+          <span aria-hidden className="text-border">
+            |
+          </span>
+          <span className="flex items-center gap-1">
+            <Settings className="size-3" aria-hidden />
+            {t('otpFooterPrivacy')}
+          </span>
         </div>
       </main>
     </>
