@@ -21,6 +21,7 @@ import { AdminPageHeader } from '@/components/admin/admin-shell';
 import { ExplorerEmpty, ExplorerTabs, type ExplorerTab } from '@/components/admin/explorer';
 import { CustomersExplorerTab } from '@/components/admin/tabs/customers-tab';
 import { OrdersExplorerTab } from '@/components/admin/tabs/orders-tab';
+import { PlansExplorerTab } from '@/components/admin/tabs/plans-tab';
 import { api, qs } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
 
@@ -151,6 +152,8 @@ export function AdminDashboard() {
           <OrdersExplorerTab />
         ) : tab === 'customers' ? (
           <CustomersExplorerTab />
+        ) : tab === 'plans' ? (
+          <PlansExplorerTab />
         ) : (
           <ExplorerEmpty label={te('comingSoon')} />
         )}

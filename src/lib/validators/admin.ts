@@ -152,9 +152,13 @@ export const mealPlansQuerySchema = adminListQuerySchema.extend({
 });
 
 /** The subscription-list admin module (session 2026-09-18) — `query` from
-    `adminListQuerySchema` already covers customer name/phone search. */
+    `adminListQuerySchema` already covers customer name/phone search.
+    `dateFrom`/`dateTo` (Part M) scope by `startDate`, same range
+    convention as `ordersQuerySchema`'s `placedAt` filter. */
 export const subscriptionsQuerySchema = adminListQuerySchema.extend({
   status: z.enum(['ACTIVE', 'PAUSED', 'CANCELLED', 'COMPLETED']).optional(),
+  dateFrom: z.iso.date().optional(),
+  dateTo: z.iso.date().optional(),
 });
 
 export const reviewPlanSchema = z.object({

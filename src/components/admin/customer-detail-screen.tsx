@@ -383,7 +383,9 @@ interface DeliveryPartnerOption {
  * one-off override, but a meal-plan customer does not need the owner to
  * re-assign the same rider every single morning.
  */
-function SubscriptionRiderControl({
+/** Exported for the dashboard v2 Plans tab's detail panel (Part M) — the
+    exact same standing-rider control, not a second copy. */
+export function SubscriptionRiderControl({
   subscriptionId,
   assignedPartnerId,
   assignedPartnerName,

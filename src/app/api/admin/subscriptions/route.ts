@@ -19,7 +19,12 @@ export const GET = route(async (request: Request) => {
   const query = parseQuery(request, subscriptionsQuerySchema);
 
   const { subscriptions, total } = await listSubscriptions(
-    { status: query.status, query: query.query },
+    {
+      status: query.status,
+      query: query.query,
+      dateFrom: query.dateFrom ? new Date(`${query.dateFrom}T00:00:00.000Z`) : undefined,
+      dateTo: query.dateTo ? new Date(`${query.dateTo}T23:59:59.999Z`) : undefined,
+    },
     paginate(query),
   );
 

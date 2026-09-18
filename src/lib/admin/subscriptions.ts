@@ -33,7 +33,14 @@ export interface AdminSubscriptionRow {
     day-by-day plan contents still live on the customer detail page
     (`CustomerPlanView`) rather than being duplicated here. */
 export async function listSubscriptions(
-  filter: { status?: SubscriptionStatus; query?: string },
+  filter: {
+    status?: SubscriptionStatus;
+    query?: string;
+    /** `startDate` range (inclusive) — dashboard v2's Plans tab date
+        filter (session 2026-09-18, Part M). */
+    dateFrom?: Date;
+    dateTo?: Date;
+  },
   { skip, take }: { skip: number; take: number },
 ): Promise<{ subscriptions: AdminSubscriptionRow[]; total: number }> {
   const where = {
@@ -44,6 +51,14 @@ export async function listSubscriptions(
             { user: { name: { contains: filter.query } } },
             { user: { phone: { contains: filter.query } } },
           ],
+        }
+      : {}),
+    ...(filter.dateFrom || filter.dateTo
+      ? {
+          startDate: {
+            ...(filter.dateFrom ? { gte: filter.dateFrom } : {}),
+            ...(filter.dateTo ? { lte: filter.dateTo } : {}),
+          },
         }
       : {}),
   };

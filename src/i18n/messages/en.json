@@ -937,6 +937,7 @@
       "title": "Meal Plans",
       "hint": "Every customer's meal-plan subscription in one place",
       "customer": "Customer",
+      "statusLabel": "Status",
       "status": {
         "ACTIVE": "Active",
         "PAUSED": "Paused",

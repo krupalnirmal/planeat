@@ -30,14 +30,16 @@ interface SubscriptionRow {
   assignedPartnerName: string | null;
 }
 
-const STATUS_TONE: Record<string, string> = {
+/** Exported for the dashboard v2 Plans tab (Part M), which reuses the same
+    tone/option lists rather than redefining them. */
+export const STATUS_TONE: Record<string, string> = {
   ACTIVE: 'bg-primary/10 text-success',
   PAUSED: 'bg-[#FDF3E3] text-warning',
   CANCELLED: 'bg-danger/10 text-danger',
   COMPLETED: 'bg-secondary text-muted-foreground',
 };
 
-const STATUS_OPTIONS = ['ACTIVE', 'PAUSED', 'CANCELLED', 'COMPLETED'] as const;
+export const STATUS_OPTIONS = ['ACTIVE', 'PAUSED', 'CANCELLED', 'COMPLETED'] as const;
 
 export function AdminMealPlansScreen() {
   const t = useTranslations('admin.mealPlans');
@@ -107,7 +109,7 @@ export function AdminMealPlansScreen() {
               <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2 font-medium">{t('customer')}</th>
-                  <th className="px-3 py-2 font-medium">{t('status')}</th>
+                  <th className="px-3 py-2 font-medium">{t('statusLabel')}</th>
                   <th className="px-3 py-2 font-medium">{t('period')}</th>
                   <th className="px-3 py-2 text-right font-medium">{t('daysLeft')}</th>
                   <th className="px-3 py-2 font-medium">{t('rider')}</th>
