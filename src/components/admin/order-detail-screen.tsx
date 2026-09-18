@@ -1,9 +1,10 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ImageIcon, Loader2 } from 'lucide-react';
+import { CheckCircle2, ImageIcon, Loader2, User } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { Link } from '@/i18n/navigation';
 import { AdminPageHeader } from '@/components/admin/admin-shell';
 import { STATUS_TONE } from '@/components/admin/orders-screen';
 import { api } from '@/lib/api/client';
@@ -17,6 +18,14 @@ import type { OrderStatus } from '@/generated/prisma/enums';
  * backend path that already exists (`POST /api/admin/orders/:id/status`,
  * `POST /api/admin/riders/suggest`) — this screen is the missing UI over an
  * otherwise-complete API.
+ *
+ * Dashboard v2 (session 2026-09-18) reuses this exact component as the
+ * right-hand detail panel for the Orders/Revenue/Payments/Deliveries tabs —
+ * `variant="inline"` adds a compact order#/status/customer header and the
+ * "View Details"/"Refill Customer's Cart" action row on top of the same
+ * body every section below already renders; `variant="page"` (the
+ * standalone `/admin/orders/[id]` route, unchanged) keeps the existing
+ * `AdminPageHeader`. One query, one component — no second copy to drift.
  */
 
 interface OrderDetail {
@@ -43,6 +52,7 @@ interface OrderDetail {
   placedAt: string;
   deliveredAt: string | null;
   cancelledAt: string | null;
+  customerId: string;
   customerName: string;
   customerPhone: string;
   items: Array<{
@@ -75,8 +85,22 @@ interface PartnerOption {
 }
 
 export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
+  return <OrderDetailPanel orderId={orderId} variant="page" />;
+}
+
+export function OrderDetailPanel({
+  orderId,
+  variant = 'inline',
+}: {
+  orderId: string;
+  /** `page` = the standalone `/admin/orders/[id]` route (unchanged
+      `AdminPageHeader`); `inline` = the dashboard v2 split-view's right
+      panel (compact order#/status/customer header + action row). */
+  variant?: 'page' | 'inline';
+}) {
   const t = useTranslations('admin.orders');
   const tc = useTranslations('admin.common');
+  const te = useTranslations('admin.explorer');
   const tStatus = useTranslations('orders.status');
   const format = useFormatter();
   const queryClient = useQueryClient();
@@ -85,6 +109,7 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
   const [cancelReason, setCancelReason] = useState('');
   const [selectedPartnerId, setSelectedPartnerId] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
+  const [noticeTone, setNoticeTone] = useState<'error' | 'info'>('error');
 
   const detail = useQuery({
     queryKey: ['admin-order', orderId],
@@ -112,7 +137,10 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
       setNotice(null);
       refresh();
     },
-    onError: () => setNotice(tc('failed')),
+    onError: () => {
+      setNoticeTone('error');
+      setNotice(tc('failed'));
+    },
   });
 
   const assign = useMutation({
@@ -124,14 +152,38 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
       setSelectedPartnerId('');
       refresh();
     },
-    onError: () => setNotice(tc('failed')),
+    onError: () => {
+      setNoticeTone('error');
+      setNotice(tc('failed'));
+    },
+  });
+
+  const refillCart = useMutation({
+    mutationFn: () =>
+      api.post<{ customerName: string; added: number; skipped: unknown[] }>(
+        `/api/admin/orders/${orderId}/refill-cart`,
+      ),
+    onSuccess: (data) => {
+      setNoticeTone('info');
+      setNotice(
+        data.added > 0
+          ? te('refillCartDone', { name: data.customerName, added: data.added })
+          : te('refillCartNone'),
+      );
+    },
+    onError: () => {
+      setNoticeTone('error');
+      setNotice(tc('failed'));
+    },
   });
 
   if (detail.isLoading) {
     return (
       <>
-        <AdminPageHeader title={t('title')} backHref="/admin/orders" backLabel={tc('back')} />
-        <p className="text-sm text-muted-foreground">{tc('loading')}</p>
+        {variant === 'page' && (
+          <AdminPageHeader title={t('title')} backHref="/admin/orders" backLabel={tc('back')} />
+        )}
+        <p className={cn('text-sm text-muted-foreground', variant === 'inline' && 'p-4')}>{tc('loading')}</p>
       </>
     );
   }
@@ -140,8 +192,10 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
   if (!order) {
     return (
       <>
-        <AdminPageHeader title={t('title')} backHref="/admin/orders" backLabel={tc('back')} />
-        <p className="text-sm text-muted-foreground">{tc('empty')}</p>
+        {variant === 'page' && (
+          <AdminPageHeader title={t('title')} backHref="/admin/orders" backLabel={tc('back')} />
+        )}
+        <p className={cn('text-sm text-muted-foreground', variant === 'inline' && 'p-4')}>{tc('empty')}</p>
       </>
     );
   }
@@ -159,48 +213,117 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
 
   return (
     <>
-      <AdminPageHeader
-        title={order.orderNumber}
-        subtitle={`${order.customerName} · ${order.customerPhone}`}
-        backHref="/admin/orders"
-        backLabel={tc('back')}
-        action={
-          <>
-            {order.type === 'MEAL_PLAN_DAILY' && (
-              <span className="rounded-full bg-tint-green px-2.5 py-1 text-xs font-semibold text-primary-dark">
-                {t('typeLabel.MEAL_PLAN_DAILY')}
+      {variant === 'page' ? (
+        <AdminPageHeader
+          title={order.orderNumber}
+          subtitle={`${order.customerName} · ${order.customerPhone}`}
+          backHref="/admin/orders"
+          backLabel={tc('back')}
+          action={
+            <>
+              {order.type === 'MEAL_PLAN_DAILY' && (
+                <span className="rounded-full bg-tint-green px-2.5 py-1 text-xs font-semibold text-primary-dark">
+                  {t('typeLabel.MEAL_PLAN_DAILY')}
+                </span>
+              )}
+              <span
+                className={cn(
+                  'rounded-full px-2.5 py-1 text-xs font-semibold',
+                  STATUS_TONE[order.status] ?? 'bg-secondary',
+                )}
+              >
+                {tStatus(order.status)}
               </span>
-            )}
+            </>
+          }
+        />
+      ) : (
+        // The compact header the dashboard's split-view panel needs
+        // (order#, status + placed date, then a customer identity card
+        // with a "View Profile" link) — the reference mockup's own right
+        // panel, built from real fields already on `order` rather than a
+        // second query.
+        <div className="p-4 pb-0">
+          <h2 className="mb-1.5 text-base font-bold">
+            {t('orderNumber')} #{order.orderNumber}
+          </h2>
+          <div className="mb-4 flex flex-wrap items-center gap-2">
             <span
               className={cn(
-                'rounded-full px-2.5 py-1 text-xs font-semibold',
+                'flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold',
                 STATUS_TONE[order.status] ?? 'bg-secondary',
               )}
             >
+              <CheckCircle2 className="size-3.5" aria-hidden />
               {tStatus(order.status)}
             </span>
-          </>
-        }
-      />
+            <span className="text-xs text-muted-foreground">
+              {format.dateTime(new Date(order.placedAt), {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </span>
+          </div>
 
-      {notice && (
-        <p className="mb-4 rounded-[var(--radius)] bg-danger/10 px-4 py-3 text-sm text-danger">{notice}</p>
+          <div className="card-3d mb-4 flex items-start justify-between gap-2 rounded-[var(--radius)] border border-border/60 bg-card p-3">
+            <div className="flex min-w-0 items-start gap-2.5">
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-secondary text-muted-foreground">
+                <User className="size-4" aria-hidden />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold">{order.customerName}</p>
+                <p className="text-xs text-muted-foreground">{order.customerPhone}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {[order.address.line1, order.address.line2, order.address.landmark]
+                    .filter(Boolean)
+                    .join(', ')}
+                  , {order.address.city}
+                </p>
+              </div>
+            </div>
+            <Link
+              href={`/admin/customers/${order.customerId}`}
+              className="shrink-0 text-xs font-semibold text-primary"
+            >
+              {te('viewProfile')}
+            </Link>
+          </div>
+        </div>
       )}
 
-      <div className="space-y-4">
-        <section className="card-3d rounded-[var(--radius)] border border-border/60 bg-card p-4">
-          <h2 className="mb-2 text-sm font-bold">{t('deliverTo')}</h2>
-          <p className="text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">{order.address.label}</span> —{' '}
-            {[order.address.line1, order.address.line2, order.address.landmark].filter(Boolean).join(', ')},{' '}
-            {order.address.city} {order.address.pincode}
-          </p>
-          {order.notes && (
-            <p className="mt-2 text-xs text-muted-foreground">
-              {t('notes')}: {order.notes}
-            </p>
+      {notice && (
+        <p
+          className={cn(
+            'rounded-[var(--radius)] px-4 py-3 text-sm',
+            noticeTone === 'error' ? 'bg-danger/10 text-danger' : 'bg-primary/5',
+            variant === 'inline' ? 'mx-4 mb-4' : 'mb-4',
           )}
-        </section>
+        >
+          {notice}
+        </p>
+      )}
+
+      <div className={cn('space-y-4', variant === 'inline' && 'p-4 pt-0')}>
+        {/* Inline variant's header card above already shows the address —
+            skipping this section there avoids showing it twice. */}
+        {variant === 'page' && (
+          <section className="card-3d rounded-[var(--radius)] border border-border/60 bg-card p-4">
+            <h2 className="mb-2 text-sm font-bold">{t('deliverTo')}</h2>
+            <p className="text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">{order.address.label}</span> —{' '}
+              {[order.address.line1, order.address.line2, order.address.landmark].filter(Boolean).join(', ')},{' '}
+              {order.address.city} {order.address.pincode}
+            </p>
+            {order.notes && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                {t('notes')}: {order.notes}
+              </p>
+            )}
+          </section>
+        )}
 
         <section>
           <h2 className="mb-2 text-sm font-bold">{t('items')}</h2>
@@ -390,6 +513,31 @@ export function AdminOrderDetailScreen({ orderId }: { orderId: string }) {
             </ul>
           )}
         </section>
+
+        {/* The split-view panel's action row (reference mockup) — "View
+            Details" is a real link to this same order's standalone page;
+            "Refill Customer's Cart" is the admin-safe re-scoping of the
+            mockup's "Reorder"/"Create Similar" (see refillCart mutation
+            above and the route it calls for why). */}
+        {variant === 'inline' && (
+          <div className="flex gap-2">
+            <Link
+              href={`/admin/orders/${order.id}`}
+              className="flex h-11 flex-1 items-center justify-center rounded-[var(--radius)] border border-border bg-card text-sm font-bold"
+            >
+              {te('viewDetails')}
+            </Link>
+            <button
+              type="button"
+              onClick={() => refillCart.mutate()}
+              disabled={refillCart.isPending}
+              className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+            >
+              {refillCart.isPending && <Loader2 className="size-4 animate-spin" aria-hidden />}
+              {te('refillCart')}
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

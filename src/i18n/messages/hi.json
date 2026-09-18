@@ -856,6 +856,37 @@
         "month": "इस महीने"
       }
     },
+    "explorer": {
+      "title": "डैशबोर्ड",
+      "subtitle": "आपके स्टोर की गतिविधि का अवलोकन",
+      "showing": "{total} में से {from}-{to} दिखा रहे हैं",
+      "prevPage": "पिछला पेज",
+      "nextPage": "अगला पेज",
+      "viewProfile": "प्रोफ़ाइल देखें",
+      "viewDetails": "विवरण देखें",
+      "refillCart": "ग्राहक की कार्ट फिर से भरें",
+      "refillCartDone": "{name} के लिए कार्ट भरी गई — {added} आइटम जोड़े गए",
+      "refillCartNone": "कुछ भी नहीं जोड़ा जा सका — सभी आइटम स्टॉक में नहीं हैं या हटा दिए गए हैं",
+      "comingSoon": "यह टैब जल्द ही आ रहा है",
+      "range": {
+        "today": "आज",
+        "yesterday": "कल",
+        "7d": "पिछले 7 दिन",
+        "14d": "पिछले 14 दिन",
+        "30d": "पिछले 30 दिन",
+        "month": "इस महीने"
+      },
+      "tabs": {
+        "orders": "ऑर्डर",
+        "revenue": "राजस्व",
+        "deliveries": "डिलीवरी",
+        "payments": "भुगतान",
+        "customers": "ग्राहक",
+        "plans": "प्लान",
+        "inventory": "इन्वेंटरी",
+        "complaints": "शिकायतें"
+      }
+    },
     "picklist": {
       "title": "खरीद की सूची",
       "subtitle": "{date} की डिलीवरी के लिए",

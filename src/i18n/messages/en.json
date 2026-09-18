@@ -856,6 +856,37 @@
         "month": "This month"
       }
     },
+    "explorer": {
+      "title": "Dashboard",
+      "subtitle": "Overview of your store activity",
+      "showing": "Showing {from}-{to} of {total}",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "viewProfile": "View Profile",
+      "viewDetails": "View Details",
+      "refillCart": "Refill Customer's Cart",
+      "refillCartDone": "Cart refilled for {name} — {added} item(s) added",
+      "refillCartNone": "Nothing could be added — every item is out of stock or delisted",
+      "comingSoon": "This tab is coming soon",
+      "range": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "7d": "Last 7 days",
+        "14d": "Last 14 days",
+        "30d": "Last 30 days",
+        "month": "This month"
+      },
+      "tabs": {
+        "orders": "Orders",
+        "revenue": "Revenue",
+        "deliveries": "Deliveries",
+        "payments": "Payments",
+        "customers": "Customers",
+        "plans": "Plans",
+        "inventory": "Inventory",
+        "complaints": "Complaints"
+      }
+    },
     "picklist": {
       "title": "Picklist",
       "subtitle": "For delivery on {date}",

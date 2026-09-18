@@ -178,6 +178,7 @@ export interface AdminOrderDetailView {
   placedAt: Date;
   deliveredAt: Date | null;
   cancelledAt: Date | null;
+  customerId: string;
   customerName: string;
   customerPhone: string;
   items: Array<{
@@ -234,6 +235,7 @@ export async function getAdminOrderDetail(orderId: string): Promise<AdminOrderDe
       placedAt: true,
       deliveredAt: true,
       cancelledAt: true,
+      userId: true,
       user: { select: { name: true, phone: true } },
       items: {
         select: {
@@ -286,6 +288,7 @@ export async function getAdminOrderDetail(orderId: string): Promise<AdminOrderDe
     placedAt: order.placedAt,
     deliveredAt: order.deliveredAt,
     cancelledAt: order.cancelledAt,
+    customerId: order.userId,
     customerName: order.user.name ?? order.user.phone,
     customerPhone: order.user.phone,
     items: order.items.map((item) => ({
