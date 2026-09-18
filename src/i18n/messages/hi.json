@@ -1008,7 +1008,9 @@
       "filterLow": "कम स्टॉक",
       "filterOut": "ख़त्म",
       "lowBadge": "कम",
-      "outBadge": "ख़त्म"
+      "outBadge": "ख़त्म",
+      "stockHistory": "स्टॉक इतिहास",
+      "noStockHistory": "अभी तक कोई बदलाव दर्ज नहीं हुआ"
     },
     "catalogue": {
       "title": "उत्पाद",

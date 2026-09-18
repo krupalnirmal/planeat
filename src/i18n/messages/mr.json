@@ -1008,7 +1008,9 @@
       "filterLow": "कमी साठा",
       "filterOut": "संपलेले",
       "lowBadge": "कमी",
-      "outBadge": "संपले"
+      "outBadge": "संपले",
+      "stockHistory": "साठ्याचा इतिहास",
+      "noStockHistory": "अजून कोणताही बदल नोंदवलेला नाही"
     },
     "catalogue": {
       "title": "उत्पादने",

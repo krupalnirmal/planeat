@@ -1008,7 +1008,9 @@
       "filterLow": "Low stock",
       "filterOut": "Out of stock",
       "lowBadge": "Low",
-      "outBadge": "Out"
+      "outBadge": "Out",
+      "stockHistory": "Stock history",
+      "noStockHistory": "No changes recorded yet"
     },
     "catalogue": {
       "title": "Catalogue",

@@ -117,6 +117,94 @@ export async function listInventory(
   return { rows: mapped, total };
 }
 
+export interface StockHistoryEntry {
+  id: string;
+  action: string;
+  /** Whatever `bulkUpdateStock` passed at the time — the full pre-update
+      row for `before`, only the fields actually sent for `after` (session
+      2026-09-19, Part N). Rendered as a plain key/value diff rather than a
+      fixed shape, since which fields changed varies per edit. */
+  before: unknown;
+  after: unknown;
+  actorName: string | null;
+  createdAt: Date;
+}
+
+/** Dashboard v2's Inventory tab detail panel (Part N) — the stock-movement
+    history nothing read back before this: `bulkUpdateStock` already writes
+    one real `AuditLog` row per variant on every change, this just queries
+    it back scoped to one variant instead of leaving those rows write-only. */
+export async function getVariantDetail(
+  variantId: string,
+  locale: Locale,
+): Promise<{ variant: InventoryRow; history: StockHistoryEntry[] } | null> {
+  const row = await db.productVariant.findUnique({
+    where: { id: variantId },
+    select: {
+      id: true,
+      label: true,
+      quantity: true,
+      unit: true,
+      stockQty: true,
+      lowStockThreshold: true,
+      pricePaise: true,
+      isActive: true,
+      product: {
+        select: {
+          id: true,
+          nameEn: true,
+          nameMr: true,
+          nameHi: true,
+          isMealPlanEligible: true,
+          category: { select: { slug: true } },
+        },
+      },
+    },
+  });
+  if (!row) return null;
+
+  const historyRows = await db.auditLog.findMany({
+    where: { entityType: 'ProductVariant', entityId: variantId },
+    orderBy: { createdAt: 'desc' },
+    take: 20,
+    select: {
+      id: true,
+      action: true,
+      before: true,
+      after: true,
+      createdAt: true,
+      actor: { select: { name: true, phone: true } },
+    },
+  });
+
+  return {
+    variant: {
+      variantId: row.id,
+      productId: row.product.id,
+      productName: pickName(row.product, locale),
+      categorySlug: row.product.category.slug,
+      label: row.label,
+      quantity: row.quantity,
+      unit: row.unit,
+      stockQty: row.stockQty,
+      lowStockThreshold: row.lowStockThreshold,
+      pricePaise: row.pricePaise,
+      isActive: row.isActive,
+      isLow: row.stockQty > 0 && row.stockQty <= row.lowStockThreshold,
+      isOut: row.stockQty <= 0,
+      isMealPlanEligible: row.product.isMealPlanEligible,
+    },
+    history: historyRows.map((h) => ({
+      id: h.id,
+      action: h.action,
+      before: h.before,
+      after: h.after,
+      actorName: h.actor?.name ?? h.actor?.phone ?? null,
+      createdAt: h.createdAt,
+    })),
+  };
+}
+
 export interface StockUpdate {
   variantId: string;
   stockQty?: number;
