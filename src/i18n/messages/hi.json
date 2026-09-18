@@ -862,6 +862,20 @@
         "month": "इस महीने"
       }
     },
+    "analytics": {
+      "subtitle": "आपके स्टोर के प्रदर्शन की एक नज़र में जानकारी",
+      "totalOrders": "कुल ऑर्डर",
+      "totalRevenue": "कुल राजस्व",
+      "deliveriesCompleted": "पूर्ण डिलीवरी",
+      "newCustomers": "नए ग्राहक",
+      "avgOrderValue": "औसत ऑर्डर मूल्य",
+      "vsLastPeriod": "पिछली अवधि की तुलना में",
+      "orderStatus": "ऑर्डर स्थिति",
+      "topCustomers": "टॉप ग्राहक",
+      "deliveryOutcomes": "डिलीवरी परिणाम",
+      "ordersCount": "{count} ऑर्डर",
+      "viewAll": "सभी देखें"
+    },
     "explorer": {
       "title": "डैशबोर्ड",
       "subtitle": "आपके स्टोर की गतिविधि का अवलोकन",
@@ -883,6 +897,7 @@
         "month": "इस महीने"
       },
       "tabs": {
+        "analytics": "विश्लेषण",
         "orders": "ऑर्डर",
         "revenue": "राजस्व",
         "deliveries": "डिलीवरी",

@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle,
+  BarChart3,
   CheckCircle2,
   CreditCard,
   IndianRupee,
@@ -19,6 +20,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AdminPageHeader } from '@/components/admin/admin-shell';
 import { ExplorerEmpty, ExplorerTabs, type ExplorerTab } from '@/components/admin/explorer';
+import { AnalyticsExplorerTab } from '@/components/admin/tabs/analytics-tab';
 import { CustomersExplorerTab } from '@/components/admin/tabs/customers-tab';
 import { DeliveriesExplorerTab } from '@/components/admin/tabs/deliveries-tab';
 import { InventoryExplorerTab } from '@/components/admin/tabs/inventory-tab';
@@ -64,6 +66,7 @@ interface CronMetrics {
 }
 
 const TABS: ExplorerTab[] = [
+  { key: 'analytics', label: '', icon: BarChart3 },
   { key: 'orders', label: '', icon: ShoppingBag },
   { key: 'revenue', label: '', icon: IndianRupee },
   { key: 'deliveries', label: '', icon: Truck },
@@ -81,7 +84,7 @@ export function AdminDashboard() {
   const locale = useLocale();
   const queryClient = useQueryClient();
   const [notice, setNotice] = useState<string | null>(null);
-  const [tab, setTab] = useState('orders');
+  const [tab, setTab] = useState('analytics');
 
   const metrics = useQuery({
     queryKey: ['admin-dashboard-cron', locale],
@@ -152,7 +155,9 @@ export function AdminDashboard() {
       <ExplorerTabs tabs={tabs} active={tab} onChange={setTab} />
 
       <div className="mt-4">
-        {tab === 'orders' ? (
+        {tab === 'analytics' ? (
+          <AnalyticsExplorerTab />
+        ) : tab === 'orders' ? (
           <OrdersExplorerTab />
         ) : tab === 'revenue' ? (
           <RevenueExplorerTab />

@@ -862,6 +862,20 @@
         "month": "या महिन्यात"
       }
     },
+    "analytics": {
+      "subtitle": "तुमच्या स्टोअरच्या कामगिरीचा एका नजरेत आढावा",
+      "totalOrders": "एकूण ऑर्डर्स",
+      "totalRevenue": "एकूण महसूल",
+      "deliveriesCompleted": "पूर्ण झालेल्या डिलिव्हरी",
+      "newCustomers": "नवीन ग्राहक",
+      "avgOrderValue": "सरासरी ऑर्डर किंमत",
+      "vsLastPeriod": "मागील कालावधीच्या तुलनेत",
+      "orderStatus": "ऑर्डर स्थिती",
+      "topCustomers": "टॉप ग्राहक",
+      "deliveryOutcomes": "डिलिव्हरी निकाल",
+      "ordersCount": "{count} ऑर्डर्स",
+      "viewAll": "सर्व पहा"
+    },
     "explorer": {
       "title": "डॅशबोर्ड",
       "subtitle": "तुमच्या स्टोअरच्या क्रियाकलापाचा आढावा",
@@ -883,6 +897,7 @@
         "month": "या महिन्यात"
       },
       "tabs": {
+        "analytics": "विश्लेषण",
         "orders": "ऑर्डर्स",
         "revenue": "महसूल",
         "deliveries": "डिलिव्हरी",

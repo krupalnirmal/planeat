@@ -862,6 +862,20 @@
         "month": "This month"
       }
     },
+    "analytics": {
+      "subtitle": "Your store performance at a glance",
+      "totalOrders": "Total Orders",
+      "totalRevenue": "Total Revenue",
+      "deliveriesCompleted": "Deliveries Completed",
+      "newCustomers": "New Customers",
+      "avgOrderValue": "Avg. Order Value",
+      "vsLastPeriod": "vs last period",
+      "orderStatus": "Order Status",
+      "topCustomers": "Top Customers",
+      "deliveryOutcomes": "Delivery Outcomes",
+      "ordersCount": "{count} orders",
+      "viewAll": "View All"
+    },
     "explorer": {
       "title": "Dashboard",
       "subtitle": "Overview of your store activity",
@@ -883,6 +897,7 @@
         "month": "This month"
       },
       "tabs": {
+        "analytics": "Analytics",
         "orders": "Orders",
         "revenue": "Revenue",
         "deliveries": "Deliveries",

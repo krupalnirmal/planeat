@@ -80,11 +80,32 @@ export interface DashboardAnalytics {
       today regardless of `range` (a "pipeline" only means anything for the
       day in progress). */
   orderStatusToday: Array<{ status: OrderStatus; count: number }>;
+  /** The Analytics tab's own "Order Status" donut (session 2026-09-19) —
+      every order placed within the selected range, not just today's
+      pipeline. A separate field from `orderStatusToday` rather than
+      replacing it, since the two answer different questions ("what's
+      happening right now" vs. "how did the range break down"). */
+  orderStatusRange: Array<{ status: OrderStatus; count: number }>;
   /** Revenue by category over the selected range, paid orders only, highest
       first, capped at 6 (the categorical-palette ceiling). */
   topCategories: Array<{ slug: string; name: string; revenuePaise: bigint }>;
   /** Orders by payment method over the selected range. */
   paymentMethodSplit: Array<{ method: PaymentMethod; count: number; revenuePaise: bigint }>;
+  /** New customer accounts created within the range (session 2026-09-19,
+      Analytics tab). */
+  newCustomers: number;
+  /** The 5 customers with the most revenue in the range, highest first. */
+  topCustomers: Array<{ customerId: string; customerName: string; orderCount: number; revenuePaise: bigint }>;
+  /** The same-length window immediately before `rangeStart` — what every
+      Analytics stat tile's "vs last period" delta is computed against,
+      the range-aware equivalent of `DashboardDeltas`'s fixed
+      today-vs-yesterday comparison. */
+  previousPeriod: {
+    orders: number;
+    revenuePaise: bigint;
+    delivered: number;
+    newCustomers: number;
+  };
 }
 
 async function getDashboardAnalytics(
@@ -96,8 +117,23 @@ async function getDashboardAnalytics(
   const dayStart = new Date(`${dateKey}T00:00:00.000Z`);
   const dayEnd = new Date(`${dateKey}T23:59:59.999Z`);
   const { start: rangeStart, days } = resolveRange(range, now);
+  // The Analytics tab's "vs last period" comparison window — the same
+  // length as the selected range, immediately before it.
+  const previousStart = new Date(rangeStart.getTime() - days * 86_400_000);
 
-  const [rangeOrders, todayStatusGroups, rangeItems, paymentGroups] = await Promise.all([
+  const [
+    rangeOrders,
+    todayStatusGroups,
+    rangeStatusGroups,
+    rangeItems,
+    paymentGroups,
+    newCustomers,
+    topCustomerGroups,
+    previousOrdersCount,
+    previousRevenue,
+    previousDeliveredCount,
+    previousNewCustomers,
+  ] = await Promise.all([
     // Bucketed in memory by IST date-key rather than a DB-side date-trunc
     // groupBy (Prisma has none for MySQL) — the same trade-off this file
     // already makes for low-stock filtering, and fine at this data volume.
@@ -109,6 +145,14 @@ async function getDashboardAnalytics(
     db.order.groupBy({
       by: ['status'],
       where: { placedAt: { gte: dayStart, lte: dayEnd } },
+      _count: { status: true },
+    }),
+
+    // Same shape, scoped to the whole selected range instead of just today
+    // — the Analytics tab's "Order Status" donut.
+    db.order.groupBy({
+      by: ['status'],
+      where: { placedAt: { gte: rangeStart } },
       _count: { status: true },
     }),
 
@@ -137,6 +181,28 @@ async function getDashboardAnalytics(
       _count: { paymentMethod: true },
       _sum: { totalPaise: true },
     }),
+
+    db.user.count({ where: { role: 'CUSTOMER', createdAt: { gte: rangeStart } } }),
+
+    // Top 5 by revenue in the range — paid orders only, same "what was
+    // actually paid" rule the rest of this file already uses for revenue.
+    db.order.groupBy({
+      by: ['userId'],
+      where: { placedAt: { gte: rangeStart }, paymentStatus: 'PAID' },
+      _sum: { totalPaise: true },
+      _count: { id: true },
+      orderBy: { _sum: { totalPaise: 'desc' } },
+      take: 5,
+    }),
+
+    // ── The previous period, same length, for every stat tile's delta.
+    db.order.count({ where: { placedAt: { gte: previousStart, lt: rangeStart } } }),
+    db.order.aggregate({
+      where: { placedAt: { gte: previousStart, lt: rangeStart }, paymentStatus: 'PAID' },
+      _sum: { totalPaise: true },
+    }),
+    db.order.count({ where: { deliveredAt: { gte: previousStart, lt: rangeStart } } }),
+    db.user.count({ where: { role: 'CUSTOMER', createdAt: { gte: previousStart, lt: rangeStart } } }),
   ]);
 
   const byDay = new Map<string, { orders: number; delivered: number; revenuePaise: bigint }>();
@@ -175,16 +241,39 @@ async function getDashboardAnalytics(
     .sort((a, b) => (b.revenuePaise > a.revenuePaise ? 1 : b.revenuePaise < a.revenuePaise ? -1 : 0))
     .slice(0, 6);
 
+  // `groupBy` has no join, so the top customers' names need a second,
+  // small lookup (at most 5 rows) rather than a raw userId in the UI.
+  const topCustomerIds = topCustomerGroups.map((g) => g.userId);
+  const topCustomerUsers =
+    topCustomerIds.length > 0
+      ? await db.user.findMany({ where: { id: { in: topCustomerIds } }, select: { id: true, name: true, phone: true } })
+      : [];
+  const topCustomerNameById = new Map(topCustomerUsers.map((u) => [u.id, u.name ?? u.phone]));
+
   return {
     range,
     dailySeries,
     orderStatusToday: todayStatusGroups.map((g) => ({ status: g.status, count: g._count.status })),
+    orderStatusRange: rangeStatusGroups.map((g) => ({ status: g.status, count: g._count.status })),
     topCategories,
     paymentMethodSplit: paymentGroups.map((g) => ({
       method: g.paymentMethod,
       count: g._count.paymentMethod,
       revenuePaise: g._sum.totalPaise ?? 0n,
     })),
+    newCustomers,
+    topCustomers: topCustomerGroups.map((g) => ({
+      customerId: g.userId,
+      customerName: topCustomerNameById.get(g.userId) ?? g.userId,
+      orderCount: g._count.id,
+      revenuePaise: g._sum.totalPaise ?? 0n,
+    })),
+    previousPeriod: {
+      orders: previousOrdersCount,
+      revenuePaise: previousRevenue._sum.totalPaise ?? 0n,
+      delivered: previousDeliveredCount,
+      newCustomers: previousNewCustomers,
+    },
   };
 }
 
