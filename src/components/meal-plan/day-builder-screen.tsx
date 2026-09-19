@@ -159,7 +159,10 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
                 active ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground',
               )}
             >
-              {t(`days.${day}`)}
+              {/* `daysShort` (session 2026-09-20, client screenshot) — the
+                  full day names crowded this row; the page header above it
+                  already spells the active day out in full. */}
+              {t(`daysShort.${day}`)}
               {count > 0 && (
                 <span
                   className={cn(
