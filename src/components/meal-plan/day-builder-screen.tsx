@@ -276,33 +276,44 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
         />
       )}
 
+      {/* `flex justify-center` + a content-width button, replacing a
+          `w-full` button inside a `px-32` wrapper (session 2026-09-20,
+          client request). That fixed 128px-a-side inset pinned the pill
+          to ~154px while "View Plan (11 items)" alone needs ~164px, so
+          the label was wedged flush into the rounded ends with nowhere
+          to put padding. Sizing the pill to its own content instead
+          means the padding is always real breathing room, and it holds
+          for the longer Marathi/Hindi strings too rather than only for
+          the English the magic number was tuned against. */}
       {!showSummary && dayCount > 0 && (
         <div
-          className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-32 py-4"
+          className="fixed inset-x-0 z-30 mx-auto flex max-w-[480px] justify-center px-4 py-4"
           style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
         >
+          {/* Yellow, matching the accent the bottom nav's active tab and
+              the storefront's own View Cart bar now use. */}
           <button
             type="button"
             onClick={() => setShowSummary(true)}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground"
+            className="flex h-12 max-w-full items-center justify-center gap-2 rounded-full bg-accent px-6 text-sm font-bold text-accent-foreground"
           >
-            {tw('viewDayPlan', { count: dayCount })}
-            <ChevronRight className="size-4" aria-hidden />
+            <span className="truncate">{tw('viewDayPlan', { count: dayCount })}</span>
+            <ChevronRight className="size-4 shrink-0" aria-hidden />
           </button>
         </div>
       )}
 
       {showSummary && (
         <div
-          className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-32 py-4"
+          className="fixed inset-x-0 z-30 mx-auto flex max-w-[480px] justify-center px-4 py-4"
           style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
         >
           <button
             type="button"
             onClick={() => router.push('/meal-plan/build')}
-            className="flex h-12 w-full items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground"
+            className="flex h-12 max-w-full items-center justify-center rounded-full bg-accent px-6 text-sm font-bold text-accent-foreground"
           >
-            {tw('saveForDay', { day: t(`days.${dayOfWeek}`) })}
+            <span className="truncate">{tw('saveForDay', { day: t(`days.${dayOfWeek}`) })}</span>
           </button>
         </div>
       )}
