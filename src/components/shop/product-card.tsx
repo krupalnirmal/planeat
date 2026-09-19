@@ -342,8 +342,18 @@ export function ProductCard({
             the English name first, the locale's own name alongside it in
             brackets, "Asian-format". `nameEn`/`localName` are optional on
             `ProductCardData` — a caller that hasn't been updated yet still
-            gets the single already-localised `name` it always had. */}
-        <h3 className="line-clamp-2 text-[13px] leading-tight font-semibold">
+            gets the single already-localised `name` it always had.
+
+            `compact` clamps to 1 line, not 2 (session 2026-09-20 follow-up):
+            dropping the `min-h-[3.4em]` reservation closed the dead-space
+            gap under a short name, but left the name block itself free to
+            be either 1 or 2 lines depending on length — with no reservation
+            and no row-stretch in a scroll rail, that made a short-named
+            card and a long-named card sitting side by side render at two
+            different heights, the exact thing being fixed here. A 1-line
+            clamp makes the block a fixed height for every card, so no
+            reservation is needed to keep the row even. */}
+        <h3 className={cn('text-[13px] leading-tight font-semibold', compact ? 'line-clamp-1' : 'line-clamp-2')}>
           {product.nameEn ?? product.name}
           {product.localName && (
             <span className="font-normal text-muted-foreground"> ({product.localName})</span>
