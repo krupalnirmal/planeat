@@ -57,6 +57,7 @@ interface PlanCurrentResponse {
   columns: DraftColumn[];
   dailyEssentials: DraftProduct[];
   sprouts: DraftProduct[];
+  choppedVegetables: DraftProduct[];
   hasActiveSubscription: boolean;
 }
 
@@ -119,22 +120,45 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
 
   const allColumns = useMemo<DraftColumn[]>(() => {
     if (!data) return [];
-    // Neither curated list is a real `Category` row, so neither has an
-    // admin-set `iconUrl` — reusing its own first product's photo as the
-    // rail icon is the same fallback a real category already gets when it
-    // has none set (`getPlanColumns`), so these two stop being the only
-    // bare glyph in a rail of otherwise real photos (client feedback,
-    // session 2026-09-17).
-    const curated: DraftColumn[] = [
+    // Rail order (client request, session 2026-09-19): Sprouts, Daily Use
+    // Vegetables, Vegetables, Chopped Vegetables, Fruits, Dairy, Bakery —
+    // the two always-curated columns now lead the rail instead of
+    // trailing it, and Chopped Vegetables is spliced in right after the
+    // real Vegetables column rather than appended at the very end like
+    // the other two. None of the three curated lists is a real `Category`
+    // row, so none has an admin-set `iconUrl` — reusing its own first
+    // product's photo as the rail icon is the same fallback a real
+    // category already gets when it has none set (`getPlanColumns`).
+    const curatedLeading: DraftColumn[] = [
+      { slug: '__sprouts__', name: '', iconUrl: data.sprouts[0]?.imageUrl ?? null, products: data.sprouts },
       {
         slug: '__daily_essentials__',
         name: '',
         iconUrl: data.dailyEssentials[0]?.imageUrl ?? null,
         products: data.dailyEssentials,
       },
-      { slug: '__sprouts__', name: '', iconUrl: data.sprouts[0]?.imageUrl ?? null, products: data.sprouts },
     ].filter((c) => c.products.length > 0);
-    return [...data.columns, ...curated];
+
+    const choppedColumn: DraftColumn[] =
+      data.choppedVegetables.length > 0
+        ? [
+            {
+              slug: '__chopped_vegetables__',
+              name: '',
+              iconUrl: data.choppedVegetables[0]?.imageUrl ?? null,
+              products: data.choppedVegetables,
+            },
+          ]
+        : [];
+
+    const vegetablesIndex = data.columns.findIndex((c) => c.slug === 'vegetables');
+    const realColumns = [
+      ...data.columns.slice(0, vegetablesIndex + 1),
+      ...choppedColumn,
+      ...data.columns.slice(vegetablesIndex + 1),
+    ];
+
+    return [...curatedLeading, ...realColumns];
   }, [data]);
 
   const productIndex = useMemo(() => {

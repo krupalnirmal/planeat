@@ -436,7 +436,8 @@
       "summaryEmpty": "ऊपर से चीज़ें चुनें, यहां दिखेंगी।",
       "dailyEssentialsTitle": "रोज़मर्रा की सब्ज़ियां",
       "dailyEssentialsHint": "एक बार चुनें, पूरे हफ़्ते वही इस्तेमाल होंगी",
-      "sproutsTitle": "स्प्राउट्स"
+      "sproutsTitle": "स्प्राउट्स",
+      "choppedVegetablesTitle": "कटी हुई सब्ज़ियां"
     },
     "wizard": {
       "selectDayHint": "आइटम जोड़ने के लिए कोई भी दिन चुनें",

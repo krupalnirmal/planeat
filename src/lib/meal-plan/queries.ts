@@ -2,7 +2,13 @@ import { db } from '@/lib/db';
 import { firstImage, pickName } from '@/lib/catalog/text';
 import { ID_PREFIX, newId } from '@/lib/ids';
 import type { Locale } from '@/generated/prisma/enums';
-import { DAILY_ESSENTIAL_VEGETABLE_SKUS, PLAN_CATEGORY_SLUGS, SPROUT_SKUS, type PlanCategorySlug } from './plan-categories';
+import {
+  CHOPPED_VEGETABLE_SKUS,
+  DAILY_ESSENTIAL_VEGETABLE_SKUS,
+  PLAN_CATEGORY_SLUGS,
+  SPROUT_SKUS,
+  type PlanCategorySlug,
+} from './plan-categories';
 
 /**
  * Reads and writes for the manual weekly plan picker (session 2026-08-30).
@@ -311,6 +317,9 @@ export interface PlanColumnsView {
   /** "Sprouts" — same treatment as `dailyEssentials`. Empty until real
       products exist for the curated SKU list (SPROUT_SKUS). */
   sprouts: PlanColumnProduct[];
+  /** "Chopped Vegetables" (session 2026-09-19) — same treatment, keyed off
+      CHOPPED_VEGETABLE_SKUS. */
+  choppedVegetables: PlanColumnProduct[];
 }
 
 /** The 4 category columns and their pickable products, in display order,
@@ -352,6 +361,7 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
   const curatedLists: Array<{ skus: readonly string[]; bySku: Map<string, PlanColumnProduct> }> = [
     { skus: DAILY_ESSENTIAL_VEGETABLE_SKUS, bySku: new Map() },
     { skus: SPROUT_SKUS, bySku: new Map() },
+    { skus: CHOPPED_VEGETABLE_SKUS, bySku: new Map() },
   ];
 
   const columns = PLAN_CATEGORY_SLUGS.map((slug) => {
@@ -392,9 +402,9 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
 
   // Display order follows each curated list's own ordering, not whatever
   // order the query happened to return them in.
-  const [dailyEssentials, sprouts] = curatedLists.map(({ skus, bySku }) =>
+  const [dailyEssentials, sprouts, choppedVegetables] = curatedLists.map(({ skus, bySku }) =>
     skus.map((sku) => bySku.get(sku)).filter((product): product is PlanColumnProduct => product !== undefined),
   );
 
-  return { columns, dailyEssentials, sprouts };
+  return { columns, dailyEssentials, sprouts, choppedVegetables };
 }

@@ -436,7 +436,8 @@
       "summaryEmpty": "वरून वस्तू निवडा, इथे दिसतील.",
       "dailyEssentialsTitle": "रोजच्या वापरातील भाज्या",
       "dailyEssentialsHint": "एकदा निवडा, आठवड्याभर तेच वापरले जाईल",
-      "sproutsTitle": "स्प्राऊट्स"
+      "sproutsTitle": "स्प्राऊट्स",
+      "choppedVegetablesTitle": "चिरलेल्या भाज्या"
     },
     "wizard": {
       "selectDayHint": "आयटम्स जोडण्यासाठी कोणताही दिवस निवडा",

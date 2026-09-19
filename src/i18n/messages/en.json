@@ -436,7 +436,8 @@
       "summaryEmpty": "Pick items above to see them here.",
       "dailyEssentialsTitle": "Daily Use Vegetables",
       "dailyEssentialsHint": "Picked once, used every day of the week",
-      "sproutsTitle": "Sprouts"
+      "sproutsTitle": "Sprouts",
+      "choppedVegetablesTitle": "Chopped Vegetables"
     },
     "wizard": {
       "selectDayHint": "Choose any day to add items",

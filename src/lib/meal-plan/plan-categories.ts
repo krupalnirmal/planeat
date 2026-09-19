@@ -52,3 +52,22 @@ export const SPROUT_SKUS = [
   'VEG-SPROUT-BLACK-CHANA',
   'VEG-SPROUT-GREEN-PEA',
 ] as const;
+
+/**
+ * "Chopped Vegetables" (session 2026-09-19, client request) — same
+ * treatment as DAILY_ESSENTIAL_VEGETABLE_SKUS/SPROUT_SKUS: pulled into its
+ * own column so a ready-to-cook pre-chopped pack isn't mixed into the
+ * regular Vegetables browsing grid.
+ */
+export const CHOPPED_VEGETABLE_SKUS = [
+  'VEG-CHOP-MIXED',
+  'VEG-CHOP-CARROT',
+  'VEG-CHOP-BEANS',
+  'VEG-CHOP-CABBAGE',
+  'VEG-CHOP-CAULIFLOWER',
+  'VEG-CHOP-CAPSICUM',
+  'VEG-CHOP-ONION',
+  'VEG-CHOP-TOMATO',
+  'VEG-CHOP-POTATO',
+  'VEG-CHOP-SPINACH',
+] as const;

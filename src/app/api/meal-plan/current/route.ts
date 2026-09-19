@@ -22,7 +22,7 @@ export const GET = route(async (request: Request) => {
   const session = await requireUser();
   const { locale } = parseQuery(request, querySchema);
 
-  const [plan, { columns, dailyEssentials, sprouts }, activeSubscription] = await Promise.all([
+  const [plan, { columns, dailyEssentials, sprouts, choppedVegetables }, activeSubscription] = await Promise.all([
     getCustomerPlan(session.userId, locale),
     getPlanColumns(locale),
     // Cheap existence check — drives the meal-plan screen's "Start my
@@ -38,6 +38,7 @@ export const GET = route(async (request: Request) => {
     columns,
     dailyEssentials,
     sprouts,
+    choppedVegetables,
     hasActiveSubscription: activeSubscription !== null,
     // The home screen's "Your Savings" card — real, computed from the
     // saved plan's own MRP-vs-price gap, never a decorative number.

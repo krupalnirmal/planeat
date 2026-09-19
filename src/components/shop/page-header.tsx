@@ -4,10 +4,11 @@ import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
 /**
- * The sticky header every non-home screen shares: a faint-yellow band
- * echoing the home header and the PWA status bar, a title, and an optional
- * back link. Consolidates what used to be six near-identical `<header>`
- * blocks (category, product, checkout, subscription…) and gives the tab-root
+ * The sticky header every non-home screen shares: white with a raised
+ * `.card-3d` shadow (session 2026-09-19, client feedback — the previous
+ * faint-yellow band read as too washed out), a title, and an optional back
+ * link. Consolidates what used to be six near-identical `<header>` blocks
+ * (category, product, checkout, subscription…) and gives the tab-root
  * screens (wallet, profile, orders…) a header they never had — the gap that
  * made the app feel unfinished next to a reference like Blinkit, where every
  * screen carries the same chrome.
@@ -26,7 +27,7 @@ export function PageHeader({
   trailing?: ReactNode;
 }) {
   return (
-    <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-accent-faint px-3 py-3">
+    <header className="card-3d sticky top-0 z-30 flex items-center gap-2 bg-card px-3 py-3">
       {backHref && (
         <Link
           href={backHref}

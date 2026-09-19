@@ -32,6 +32,7 @@ const CATEGORY_ICONS: Record<string, typeof Leaf> = {
   'bakery-biscuits': Cookie,
   __daily_essentials__: Leaf,
   __sprouts__: Leaf,
+  __chopped_vegetables__: Leaf,
 };
 
 // Roughly this screen's own sticky `PageHeader`'s height (title + subtitle
@@ -79,6 +80,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
   function categoryLabel(column: DraftColumn) {
     if (column.slug === '__daily_essentials__') return t('builder.dailyEssentialsTitle');
     if (column.slug === '__sprouts__') return t('builder.sproutsTitle');
+    if (column.slug === '__chopped_vegetables__') return t('builder.choppedVegetablesTitle');
     return column.name;
   }
 
