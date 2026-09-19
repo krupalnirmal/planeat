@@ -169,7 +169,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
       <nav
         ref={dayTabsRef}
         aria-label={tw('daysLabel')}
-        className="sticky z-20 flex gap-1.5 overflow-x-auto border-b border-border bg-card px-3 py-2"
+        className="sticky z-20 flex gap-1.5 overflow-x-auto border-b border-border bg-card px-3 py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ top: PAGE_HEADER_HEIGHT_PX }}
       >
         {DAYS.map((day) => {
