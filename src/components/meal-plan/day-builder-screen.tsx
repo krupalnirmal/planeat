@@ -7,7 +7,7 @@ import { useRouter } from '@/i18n/navigation';
 import { PageHeader } from '@/components/shop/page-header';
 import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
-import { type DraftColumn, type DraftProduct, type DraftVariant, usePlanDraft } from './plan-draft-context';
+import { DAYS, type DraftColumn, type DraftProduct, type DraftVariant, usePlanDraft } from './plan-draft-context';
 
 /**
  * Wizard screens 3–8 for one day: browse a category (search + photo grid),
@@ -38,7 +38,12 @@ const CATEGORY_ICONS: Record<string, typeof Leaf> = {
 // Roughly this screen's own sticky `PageHeader`'s height (title + subtitle
 // line, `py-3` padding) — same approach as `category-product-list.tsx`'s own
 // `HEADER_OFFSET_PX`, which the left rail below is otherwise a copy of.
-const HEADER_OFFSET_PX = 78;
+const PAGE_HEADER_HEIGHT_PX = 78;
+// The day-switcher row's own height (session 2026-09-19 — lets the customer
+// jump between days without leaving the picker and losing their place),
+// stacked directly under the page header.
+const DAY_TABS_HEIGHT_PX = 52;
+const HEADER_OFFSET_PX = PAGE_HEADER_HEIGHT_PX + DAY_TABS_HEIGHT_PX;
 
 export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
   const t = useTranslations('mealPlan');
@@ -102,6 +107,52 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
           </span>
         }
       />
+
+      {/* ── Day switcher (session 2026-09-19, client request) — jump
+          straight to another day from inside the picker instead of having
+          to tap back to the day list first. `PlanDraftProvider` is mounted
+          once at the wizard layout and survives this client-side
+          navigation, so every day's picks stay exactly as left — each
+          tab's own live count badge is the confirmation nothing was lost,
+          rather than a one-off "saved" toast that would imply a server
+          round trip nothing here actually makes (the whole week only ever
+          saves once, from the summary screen's "Confirm & Save Plan"). */}
+      <nav
+        aria-label={tw('daysLabel')}
+        className="sticky z-20 flex gap-1.5 overflow-x-auto border-b border-border bg-card px-3 py-2"
+        style={{ top: PAGE_HEADER_HEIGHT_PX }}
+      >
+        {DAYS.map((day) => {
+          const count = draft.itemCount(day);
+          const active = day === dayOfWeek;
+          return (
+            <button
+              key={day}
+              type="button"
+              onClick={() => {
+                if (day !== dayOfWeek) router.push(`/meal-plan/build/${day}`);
+              }}
+              aria-current={active}
+              className={cn(
+                'flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+                active ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground',
+              )}
+            >
+              {t(`days.${day}`)}
+              {count > 0 && (
+                <span
+                  className={cn(
+                    'grid min-w-4 place-items-center rounded-full px-1 text-[10px] font-bold',
+                    active ? 'bg-white/25' : 'bg-card text-foreground',
+                  )}
+                >
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </nav>
 
       {showSummary ? (
         <DaySummaryView

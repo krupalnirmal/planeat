@@ -447,6 +447,7 @@
       "addItemsHint": "Add items for your meal plan",
       "reviewHint": "Review selected items",
       "categoriesLabel": "Categories",
+      "daysLabel": "Days",
       "searchPlaceholder": "Search {category}…",
       "viewDayPlan": "View Plan ({count} items)",
       "saveForDay": "Save for {day}",

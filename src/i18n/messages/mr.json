@@ -447,6 +447,7 @@
       "addItemsHint": "तुमच्या मील प्लॅनसाठी आयटम्स जोडा",
       "reviewHint": "निवडलेले आयटम्स बघा",
       "categoriesLabel": "विभाग",
+      "daysLabel": "दिवस",
       "searchPlaceholder": "{category} शोधा…",
       "viewDayPlan": "प्लॅन बघा ({count} आयटम्स)",
       "saveForDay": "{day} साठी सेव्ह करा",
