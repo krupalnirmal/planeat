@@ -31,9 +31,12 @@ export const CATEGORY_TILE_IMAGES: Record<string, string[] | undefined> = {
   vegetables: imagesFor('vegetables'),
   fruits: imagesFor('fruits'),
   dairy: imagesFor('dairy'),
-  // No curated set for Bakery & Biscuits — it falls back to its own
-  // product photos. Grocery's curated set is left in the JSON but no
-  // longer wired up: the category is switched off in the storefront
-  // (session 2026-08-27, client asked for Bakery in its place).
   'bakery-biscuits': imagesFor('bakery'),
+  // Aata/Masala (session 2026-09-19) — one curated hero photo each,
+  // cropped from the client's own reference mockup rather than a product
+  // photo, since the home tile now shows a single big image per category
+  // (CategoryCollageTile only ever reads `images[0]`, same as every
+  // category above).
+  aata: imagesFor('aata'),
+  masala: imagesFor('masala'),
 };

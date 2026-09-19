@@ -92,9 +92,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           card
         >
           {categories.length > 0 ? (
-            <ul className="grid grid-cols-4 gap-3">
+            // A horizontally-scrollable row, not a wrapping grid (session
+            // 2026-09-19, client request) — a growing category list (Aata/
+            // Masala's own addition is what surfaced this) no longer
+            // spills onto a second row; it scrolls in one row instead,
+            // snapping one tile at a time on mobile.
+            <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {collages.map((collage) => (
-                <li key={collage.categorySlug}>
+                <li key={collage.categorySlug} className="shrink-0">
                   <CategoryCollageTile
                     slug={collage.categorySlug}
                     name={collage.categoryName}
