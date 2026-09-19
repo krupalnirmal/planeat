@@ -68,7 +68,14 @@ export function BottomNav() {
                 href={tab.href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-full py-1.5 transition-colors',
+                  // `px-1.5` (session 2026-09-20, client screenshot: the
+                  // active pill had zero horizontal padding, so "My Meal
+                  // Plan" — the widest label — ran flush against the
+                  // rounded pill's curved edges on both sides) — the icon
+                  // stays visually centered since it's narrower than the
+                  // pill either way; this only gives the text breathing
+                  // room.
+                  'flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-full px-1.5 py-1.5 transition-colors',
                   active && 'bg-accent',
                 )}
               >
