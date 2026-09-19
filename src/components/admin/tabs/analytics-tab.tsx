@@ -250,12 +250,16 @@ export function AnalyticsExplorerTab() {
   );
 }
 
+// Darker than the first cut (session 2026-09-19 client feedback: "too
+// faint") — these tints now sit roughly halfway between the original pale
+// wash and the icon's own saturated color, instead of barely tinting
+// white.
 const STAT_HUES = {
-  green: { bg: '#E8F5EA', icon: '#2fa355' },
-  violet: { bg: '#F1EEFC', icon: '#4a3aa7' },
-  orange: { bg: '#FDEEE3', icon: '#eb6834' },
-  blue: { bg: '#EAF2FE', icon: '#2a78d6' },
-  pink: { bg: '#FCEEF3', icon: '#e87ba4' },
+  green: { bg: '#CFEED9', icon: '#2fa355' },
+  violet: { bg: '#DDD1F6', icon: '#4a3aa7' },
+  orange: { bg: '#FBD9BC', icon: '#eb6834' },
+  blue: { bg: '#CBE0FC', icon: '#2a78d6' },
+  pink: { bg: '#F8CFE0', icon: '#e87ba4' },
 } as const;
 type StatHue = keyof typeof STAT_HUES;
 

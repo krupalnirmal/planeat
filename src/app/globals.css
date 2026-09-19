@@ -182,6 +182,15 @@
   --accent-faint: #3d3212;
 }
 
+/* Admin-only: the shared `--text-muted` gray (#6b7280) reads as too faint
+   across the admin panel's dense tables/labels (session 2026-09-19 client
+   feedback) — scoped to `.admin-shell` (the admin route group's own root)
+   rather than changed globally, since the customer-facing app still wants
+   that lighter secondary-text weight. */
+.admin-shell {
+  --text-muted: #000000;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -24,6 +24,11 @@ export const VEGETABLE_TYPES: VegetableType[] = [
   { id: 'pod', emoji: '🫘', labelEn: 'Pod & Legume Vegetables', labelMr: 'शेंगावर्गीय', labelHi: 'फली वाली सब्ज़ियाँ' },
   { id: 'flower', emoji: '🥦', labelEn: 'Flower Vegetables', labelMr: 'फुलभाज्या', labelHi: 'फूल वाली सब्ज़ियाँ' },
   { id: 'seed', emoji: '🌽', labelEn: 'Seed & Grain Vegetables', labelMr: 'बीजभाज्या', labelHi: 'बीज वाली सब्ज़ियाँ' },
+  // Ready-to-cook pre-chopped vegetables (session 2026-09-19) — its own
+  // group rather than falling into "Other", since it's a real, distinct
+  // shopping intent (someone buying a chopped carrot isn't browsing root
+  // vegetables, they're skipping prep work).
+  { id: 'chopped', emoji: '🔪', labelEn: 'Chopped Vegetables', labelMr: 'चिरलेल्या भाज्या', labelHi: 'कटी हुई सब्ज़ियाँ' },
 ];
 
 export function vegetableTypeLabel(type: VegetableType, locale: AppLocale): string {

@@ -255,7 +255,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     // White page background (client feedback, session 2026-09-17) — cards
     // now read as raised via `.card-3d`'s shadow rather than sitting on a
     // tinted page to separate them.
-    <div className="flex min-h-dvh bg-background">
+    <div className="admin-shell flex min-h-dvh bg-background">
       {/* The sidebar is hidden when printing — the picklist is printed on
           paper and carried to the market, and a nav column would waste a
           third of the page. */}
