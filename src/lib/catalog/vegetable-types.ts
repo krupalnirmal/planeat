@@ -14,21 +14,19 @@ export interface VegetableType {
   labelHi: string;
 }
 
+// Replaced (session 2026-09-19, client request, confirmed twice after being
+// shown the consequence) from the earlier 10-way Leafy/Root/Tuber/Bulb/
+// Stem/Fruit/Pod/Flower/Seed/Chopped split down to just these 2. Every
+// existing product that isn't literally chopped now has no subgroup and
+// falls into the page's existing "Other" bucket — accepted deliberately,
+// not a bug. `organic` ships empty: nothing in the catalogue has real
+// organic-certification data, so nothing gets tagged into it until a real
+// organic SKU exists. `chopped` keeps its id from last session's 10 real
+// chopped-vegetable products — only the label changed, so none of them
+// needed re-tagging.
 export const VEGETABLE_TYPES: VegetableType[] = [
-  { id: 'leafy', emoji: '🥬', labelEn: 'Leafy Vegetables', labelMr: 'पालेभाज्या', labelHi: 'पत्तेदार सब्ज़ियाँ' },
-  { id: 'root', emoji: '🥕', labelEn: 'Root Vegetables', labelMr: 'कंदमुळे', labelHi: 'जड़ वाली सब्ज़ियाँ' },
-  { id: 'tuber', emoji: '🥔', labelEn: 'Tuber Vegetables', labelMr: 'कंद', labelHi: 'कंद वाली सब्ज़ियाँ' },
-  { id: 'bulb', emoji: '🧅', labelEn: 'Bulb Vegetables', labelMr: 'कांदावर्गीय', labelHi: 'बल्ब वाली सब्ज़ियाँ' },
-  { id: 'stem', emoji: '🌱', labelEn: 'Stem Vegetables', labelMr: 'खोडभाज्या', labelHi: 'तने वाली सब्ज़ियाँ' },
-  { id: 'fruit', emoji: '🍅', labelEn: 'Fruit Vegetables', labelMr: 'फळभाज्या', labelHi: 'फल वाली सब्ज़ियाँ' },
-  { id: 'pod', emoji: '🫘', labelEn: 'Pod & Legume Vegetables', labelMr: 'शेंगावर्गीय', labelHi: 'फली वाली सब्ज़ियाँ' },
-  { id: 'flower', emoji: '🥦', labelEn: 'Flower Vegetables', labelMr: 'फुलभाज्या', labelHi: 'फूल वाली सब्ज़ियाँ' },
-  { id: 'seed', emoji: '🌽', labelEn: 'Seed & Grain Vegetables', labelMr: 'बीजभाज्या', labelHi: 'बीज वाली सब्ज़ियाँ' },
-  // Ready-to-cook pre-chopped vegetables (session 2026-09-19) — its own
-  // group rather than falling into "Other", since it's a real, distinct
-  // shopping intent (someone buying a chopped carrot isn't browsing root
-  // vegetables, they're skipping prep work).
-  { id: 'chopped', emoji: '🔪', labelEn: 'Chopped Vegetables', labelMr: 'चिरलेल्या भाज्या', labelHi: 'कटी हुई सब्ज़ियाँ' },
+  { id: 'organic', emoji: '🌿', labelEn: 'Organic Vegetable', labelMr: 'ऑरगॅनिक भाजी', labelHi: 'जैविक सब्ज़ी' },
+  { id: 'chopped', emoji: '🔪', labelEn: 'Chopping Vegetable', labelMr: 'चिरलेली भाजी', labelHi: 'कटी हुई सब्ज़ी' },
 ];
 
 export function vegetableTypeLabel(type: VegetableType, locale: AppLocale): string {
@@ -65,17 +63,16 @@ export const DAIRY_TYPES: VegetableType[] = [
   { id: 'ghee', emoji: '🧈', labelEn: 'Ghee & Butter', labelMr: 'तूप व लोणी', labelHi: 'घी और मक्खन' },
 ];
 
-// Fruits' own sub-grouping (session 2026-08-25) — client-specified groups
-// and examples (Citrus: Orange/Mosambi/Lemon, Seasonal: Mango/Watermelon/
-// Jamun, Exotic: Kiwi/Dragon Fruit/Avocado/Blueberry, Dry Fruits: Almond/
-// Cashew/Walnut/Raisins). The catalogue only had Citrus and Seasonal
-// products before this — Exotic and Dry Fruits SKUs were added to the seed
-// alongside this so the rail has real breadth in every group.
+// Replaced (session 2026-09-19, client request, same treatment/confirmation
+// as VEGETABLE_TYPES above) from the earlier Citrus/Seasonal/Exotic/Dry
+// Fruits split down to these 3. No existing fruit product gets proactively
+// remapped into them — nothing in the catalogue has real import-sourcing
+// or organic-certification data, so all 3 ship empty until real SKUs exist
+// for each; every existing fruit falls into "Other" until then.
 export const FRUIT_TYPES: VegetableType[] = [
-  { id: 'citrus', emoji: '🍊', labelEn: 'Citrus Fruits', labelMr: 'लिंबूवर्गीय फळे', labelHi: 'खट्टे फल' },
-  { id: 'seasonal', emoji: '🥭', labelEn: 'Seasonal Fruits', labelMr: 'हंगामी फळे', labelHi: 'मौसमी फल' },
-  { id: 'exotic', emoji: '🥝', labelEn: 'Exotic Fruits', labelMr: 'विदेशी फळे', labelHi: 'विदेशी फल' },
-  { id: 'dryfruits', emoji: '🌰', labelEn: 'Dry Fruits', labelMr: 'सुका मेवा', labelHi: 'सूखे मेवे' },
+  { id: 'fresh', emoji: '🍎', labelEn: 'Fresh Fruits', labelMr: 'ताजी फळे', labelHi: 'ताज़े फल' },
+  { id: 'import', emoji: '🌍', labelEn: 'Import Fruits', labelMr: 'आयात केलेली फळे', labelHi: 'आयातित फल' },
+  { id: 'organic', emoji: '🌿', labelEn: 'Organic Fruits', labelMr: 'ऑरगॅनिक फळे', labelHi: 'जैविक फल' },
 ];
 
 // Bakery & Biscuits' own sub-grouping (session 2026-08-29) — the category
@@ -89,10 +86,42 @@ export const BAKERY_TYPES: VegetableType[] = [
   { id: 'cakes', emoji: '🍰', labelEn: 'Cakes & Rusk', labelMr: 'केक व रस्क', labelHi: 'केक और रस्क' },
 ];
 
+// Aata's own sub-grouping (session 2026-09-19, new category, client's own
+// list). `gahu` is populated immediately — the existing "Whole Wheat Atta"
+// product moved here from the (storefront-inactive) Grocery category
+// rather than being duplicated. `multigrain`/`jwari` are real new products
+// with no existing photo to reuse, so they ship without one.
+export const AATA_TYPES: VegetableType[] = [
+  { id: 'multigrain', emoji: '🌾', labelEn: 'Multi Grain Aata', labelMr: 'मल्टी ग्रेन आटा', labelHi: 'मल्टी ग्रेन आटा' },
+  { id: 'jwari', emoji: '🌾', labelEn: 'Jwari Aata', labelMr: 'ज्वारी आटा', labelHi: 'ज्वार आटा' },
+  { id: 'gahu', emoji: '🌾', labelEn: 'Gahu Aata', labelMr: 'गहू आटा', labelHi: 'गेहूं आटा' },
+];
+
+// Masala's own sub-grouping (session 2026-09-19, new category, client's own
+// list, "Trusted home-made" naming brands like Rajdevi/Udyogwardhini/
+// Khandesi as examples). Ships with the real category + real subgroups but
+// zero products — no legitimate source for those specific branded
+// products' real prices/pack sizes/photos exists yet; inventing them would
+// misrepresent real third-party commercial goods, not just a generic
+// pricing judgment call. Populate once the client provides the actual
+// product list, or via the admin catalogue directly.
+export const MASALA_TYPES: VegetableType[] = [
+  { id: 'packed', emoji: '🧂', labelEn: 'Packed Masala', labelMr: 'पॅक्ड मसाला', labelHi: 'पैक्ड मसाला' },
+  {
+    id: 'homemade',
+    emoji: '🏺',
+    labelEn: 'Trusted Home-made Masala',
+    labelMr: 'विश्वासू घरगुती मसाला',
+    labelHi: 'भरोसेमंद घर का मसाला',
+  },
+];
+
 export const CATEGORY_SUBGROUPS: Record<string, VegetableType[]> = {
   vegetables: VEGETABLE_TYPES,
   fruits: FRUIT_TYPES,
   grocery: GROCERY_TYPES,
   dairy: DAIRY_TYPES,
   'bakery-biscuits': BAKERY_TYPES,
+  aata: AATA_TYPES,
+  masala: MASALA_TYPES,
 };

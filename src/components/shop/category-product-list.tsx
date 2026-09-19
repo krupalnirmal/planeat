@@ -207,7 +207,15 @@ export function CategoryProductList({
           }))
           .filter((group) => group.products.length > 0)
       : null;
-  const rest = groups ? sorted.filter((p) => !p.vegetableType) : sorted;
+  // Anything whose `vegetableType` doesn't match a *currently defined*
+  // subgroup id falls into "Other" — not just products with no tag at all.
+  // A product tagged with an id CATEGORY_SUBGROUPS no longer lists (session
+  // 2026-09-19: Vegetables/Fruits' old finer-grained subgroups were
+  // replaced with a shorter list) would otherwise match neither a group
+  // above nor a bare `!vegetableType` check, and silently vanish from the
+  // page entirely instead of showing up ungrouped.
+  const definedTypeIds = new Set(subgroupTypes?.map((type) => type.id) ?? []);
+  const rest = groups ? sorted.filter((p) => !p.vegetableType || !definedTypeIds.has(p.vegetableType)) : sorted;
 
   // Default the rail's active item to the first group the moment groups
   // become available — done during render (React's documented pattern for
