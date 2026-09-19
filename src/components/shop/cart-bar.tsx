@@ -122,7 +122,12 @@ export function CartBar() {
 
       <Link
         href="/cart"
-        className="animate-in slide-in-from-bottom-4 fade-in relative flex min-h-14 items-center gap-3 rounded-full bg-primary py-2 pr-4 pl-16 text-primary-foreground duration-300"
+        // `bg-tint-yellow` (session 2026-09-20, client request) — a faint
+        // version of the same accent family the bottom nav's active pill
+        // and the header's cart badge now use, not the full-strength
+        // `--accent` itself (too loud filling a whole bar) and not the old
+        // `bg-primary` green.
+        className="animate-in slide-in-from-bottom-4 fade-in relative flex min-h-14 items-center gap-3 rounded-full bg-tint-yellow py-2 pr-4 pl-16 text-foreground duration-300"
       >
         {/* Pops half out of the pill's top-left corner, a white ring
             separating it from the green — the reference's "product peeking
@@ -142,7 +147,7 @@ export function CartBar() {
 
         <span className="min-w-0 flex-1">
           <span className="block text-[15px] leading-tight font-bold">{t('viewCart')}</span>
-          <span className="block text-[11px] leading-tight text-primary-foreground/80">
+          <span className="block text-[11px] leading-tight text-muted-foreground">
             {t('itemCount', { count: cart.itemCount })}
           </span>
         </span>
