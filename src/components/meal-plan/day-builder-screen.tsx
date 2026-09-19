@@ -185,7 +185,10 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
               }}
               aria-current={active}
               className={cn(
-                'flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+                // `rounded-[var(--radius)]` (session 2026-09-20, client
+                // request) — squared-off corners instead of a full pill,
+                // matching the app's standard card radius.
+                'flex shrink-0 items-center gap-1.5 rounded-[var(--radius)] px-3 py-1.5 text-xs font-semibold transition-colors',
                 active ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground',
               )}
             >
