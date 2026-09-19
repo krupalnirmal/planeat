@@ -1,6 +1,22 @@
 'use client';
 
-import { Apple, Check, ChevronRight, Cookie, ImageIcon, Leaf, Milk, Search, Trash2, X } from 'lucide-react';
+import {
+  Apple,
+  Carrot,
+  Check,
+  ChevronRight,
+  Cookie,
+  ImageIcon,
+  Leaf,
+  Milk,
+  Salad,
+  Search,
+  ShoppingBasket,
+  SlidersHorizontal,
+  Sprout,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
@@ -25,19 +41,23 @@ import { DAYS, type DraftColumn, type DraftProduct, type DraftVariant, usePlanDr
  * stepper — matching what the backend can actually represent.
  */
 
+// Distinct icons per category (session 2026-09-20, client reference mockup)
+// — `vegetables` and `__sprouts__` previously both rendered as a plain
+// `Leaf`, indistinguishable in the rail; the reference gives each column its
+// own icon, so the chip row is actually scannable at a glance.
 const CATEGORY_ICONS: Record<string, typeof Leaf> = {
   vegetables: Leaf,
   fruits: Apple,
   dairy: Milk,
   'bakery-biscuits': Cookie,
-  __daily_essentials__: Leaf,
-  __sprouts__: Leaf,
-  __chopped_vegetables__: Leaf,
+  __daily_essentials__: Carrot,
+  __sprouts__: Sprout,
+  __chopped_vegetables__: Salad,
 };
 
 // Roughly this screen's own sticky `PageHeader`'s height (title + subtitle
 // line, `py-3` padding) — same approach as `category-product-list.tsx`'s own
-// `HEADER_OFFSET_PX`, which the left rail below is otherwise a copy of.
+// `HEADER_OFFSET_PX`.
 const PAGE_HEADER_HEIGHT_PX = 78;
 // The day-switcher row's own height (session 2026-09-19 — lets the customer
 // jump between days without leaving the picker and losing their place),
@@ -102,8 +122,9 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
         backHref={showSummary ? undefined : '/meal-plan/build'}
         backLabel={tc('back')}
         trailing={
-          <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-bold text-muted-foreground">
+          <span className="flex items-center gap-1.5 rounded-full bg-tint-green px-2.5 py-1 text-xs font-bold text-primary">
             {tw('itemCount', { count: dayCount })}
+            <ShoppingBasket className="size-3.5 shrink-0" aria-hidden />
           </span>
         }
       />
@@ -161,96 +182,83 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
           onEdit={(product) => setPicker(product)}
         />
       ) : (
-        <main className="flex items-start gap-0 pb-28">
-          {/* ── Category rail — matches the storefront's own left-rail
-              category browser (`category-product-list.tsx`) the client
-              pointed at as the reference: round photo tiles, a sticky
-              column, a right-edge accent bar and bold label on whichever
-              one is active (session 2026-09-17, replacing the earlier
-              horizontal scrolling tab row). Selecting a tab still swaps the
-              whole grid on the right rather than jump-scrolling to an
-              anchor — this screen shows one category at a time, it never
-              renders all of them on one combined page the way the
-              storefront's rail does. */}
-          <nav
-            aria-label={tw('categoriesLabel')}
-            className="sticky w-[76px] shrink-0 self-start overflow-y-auto bg-card"
-            style={{ top: HEADER_OFFSET_PX, maxHeight: `calc(100dvh - ${HEADER_OFFSET_PX}px)` }}
+        <main className="pb-28">
+          {/* ── Search + category row, stacked and sticky under the day
+              tabs (session 2026-09-20, client reference mockup) — replaces
+              the earlier vertical left rail (session 2026-09-17's own
+              design) with a single full-width column: a search bar, then a
+              horizontally-scrollable row of icon-top/label-below chips,
+              exactly like the reference. Selecting a chip still swaps the
+              whole grid below rather than jump-scrolling to an anchor —
+              this screen shows one category at a time. */}
+          <div
+            className="sticky z-10 space-y-2.5 border-b border-border bg-card px-4 py-3"
+            style={{ top: HEADER_OFFSET_PX }}
           >
-            {columns.map((column) => {
-              const Icon = CATEGORY_ICONS[column.slug] ?? Leaf;
-              const active = (activeColumn?.slug ?? columns[0]?.slug) === column.slug;
-              return (
-                <button
-                  key={column.slug}
-                  type="button"
-                  onClick={() => {
-                    setActiveSlug(column.slug);
-                    setSearch('');
-                  }}
-                  aria-current={active}
-                  className={cn(
-                    'flex w-full flex-col items-center gap-1 border-r-4 px-1.5 py-3 text-center',
-                    active ? 'border-primary' : 'border-transparent',
-                  )}
-                >
-                  {/* The category's own real photo when one exists (admin-set
-                      icon, or its first product's) — a generic line icon
-                      only when no real image exists at all (the curated
-                      Daily Essentials/Sprouts columns). */}
-                  <span
-                    className={cn(
-                      'grid size-14 shrink-0 place-items-center overflow-hidden rounded-full p-1',
-                      active ? 'bg-tint-lime' : 'bg-background',
-                    )}
-                    aria-hidden
-                  >
-                    {column.iconUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={column.iconUrl} alt="" className="size-full rounded-full object-cover" />
-                    ) : (
-                      <Icon className={cn('size-5', active ? 'text-primary' : 'text-muted-foreground')} aria-hidden />
-                    )}
-                  </span>
-                  <span
-                    className={cn(
-                      'text-[11px] leading-tight',
-                      active ? 'font-bold text-foreground' : 'font-medium text-foreground',
-                    )}
-                  >
-                    {categoryLabel(column)}
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* ── Right pane — search + product grid, tinted like the
-              storefront's own category page reads as its own column next
-              to the white rail. */}
-          <div className="min-w-0 flex-1 bg-tint-lime">
-            <div className="px-4 py-3">
-              <div className="flex items-center gap-2 rounded-[var(--radius)] border border-border bg-card px-3 py-2.5">
-                <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-                <input
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder={tw('searchPlaceholder', { category: activeColumn ? categoryLabel(activeColumn) : '' })}
-                  className="w-full bg-transparent text-sm outline-none"
-                />
-              </div>
+            <div className="flex items-center gap-2 rounded-[var(--radius)] border border-border bg-background px-3 py-2.5">
+              <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder={tw('searchPlaceholder', { category: activeColumn ? categoryLabel(activeColumn) : '' })}
+                className="w-full bg-transparent text-sm outline-none"
+              />
+              {/* Decorative, matching the reference's filter affordance —
+                  not a real control since there's nothing to filter by yet
+                  (same "look, don't fake a handler" call as the ADD pill in
+                  `PlanProductCard` below). */}
+              <span aria-hidden className="h-4 w-px shrink-0 bg-border" />
+              <SlidersHorizontal className="size-4 shrink-0 text-muted-foreground" aria-hidden />
             </div>
 
-            <div className="grid grid-cols-2 gap-3 px-4 pb-4">
-              {filteredProducts.map((product) => (
-                <PlanProductCard
-                  key={product.id}
-                  product={product}
-                  selectedVariantId={daySelections[product.id]}
-                  onTap={() => setPicker(product)}
-                />
-              ))}
-            </div>
+            <nav
+              aria-label={tw('categoriesLabel')}
+              className="flex gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {columns.map((column) => {
+                const Icon = CATEGORY_ICONS[column.slug] ?? Leaf;
+                const active = (activeColumn?.slug ?? columns[0]?.slug) === column.slug;
+                return (
+                  <button
+                    key={column.slug}
+                    type="button"
+                    onClick={() => {
+                      setActiveSlug(column.slug);
+                      setSearch('');
+                    }}
+                    aria-current={active}
+                    className={cn(
+                      'flex w-[74px] shrink-0 flex-col items-center gap-1 rounded-[14px] border px-1.5 py-2.5 text-center transition-colors',
+                      active ? 'border-primary bg-tint-green' : 'border-border bg-card',
+                    )}
+                  >
+                    <Icon
+                      className={cn('size-5 shrink-0', active ? 'text-primary' : 'text-muted-foreground')}
+                      aria-hidden
+                    />
+                    <span
+                      className={cn(
+                        'line-clamp-2 text-[10.5px] leading-tight',
+                        active ? 'font-bold text-foreground' : 'font-medium text-foreground',
+                      )}
+                    >
+                      {categoryLabel(column)}
+                    </span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 bg-tint-lime px-4 py-3">
+            {filteredProducts.map((product) => (
+              <PlanProductCard
+                key={product.id}
+                product={product}
+                selectedVariantId={daySelections[product.id]}
+                onTap={() => setPicker(product)}
+              />
+            ))}
           </div>
         </main>
       )}
@@ -356,40 +364,48 @@ function PlanProductCard({
           worth of name height so the price row lines up across a grid row,
           but that left a large dead gap above a short one-line name here.
           A plain small gap plus real bottom padding (`pb-2.5`, previously
-          missing entirely) reads far tighter. */}
-      <div className="flex flex-col gap-1 px-2.5 pt-2 pb-2.5">
-        <h3 className="line-clamp-2 text-[13px] leading-tight font-semibold">
+          missing entirely) reads far tighter.
+
+          Name, local name, and weight each on their own line (session
+          2026-09-20, client reference mockup) — previously the local name
+          rode inline with the product name and the weight sat squeezed
+          under the price on the right; the reference stacks all three
+          above the price row instead. */}
+      <div className="flex flex-col gap-0.5 px-2.5 pt-2 pb-2.5">
+        <h3 className="line-clamp-1 text-[13px] leading-tight font-semibold">
           {product.nameEn ?? product.name}
-          {product.localName && (
-            <span className="font-normal text-muted-foreground"> ({product.localName})</span>
-          )}
         </h3>
+        {product.localName && (
+          <p className="line-clamp-1 text-[11.5px] text-muted-foreground">({product.localName})</p>
+        )}
         {displayVariant && (
-          <div className="mt-auto flex items-end justify-between gap-1.5 pt-1">
-            <div className="min-w-0">
-              <div className="flex items-baseline gap-1">
-                <span className="text-[14px] font-bold">{formatPaise(price, { hidePaise: true })}</span>
-                {hasDiscount && (
-                  <span className="text-[11px] text-muted-foreground line-through">
-                    {formatPaise(mrp, { hidePaise: true })}
+          <>
+            <p className="truncate text-[11px] text-muted-foreground">{displayVariant.label}</p>
+            <div className="mt-1 flex items-end justify-between gap-1.5">
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[14px] font-bold">{formatPaise(price, { hidePaise: true })}</span>
+                  {hasDiscount && (
+                    <span className="text-[11px] text-muted-foreground line-through">
+                      {formatPaise(mrp, { hidePaise: true })}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {/* Decorative, not a nested `<button>` — the whole card is
+                  already the tap target (it opens the quantity/weight
+                  modal), so this just mirrors the storefront's bordered
+                  pill visually instead of duplicating its click handler. */}
+              <span className="flex shrink-0 min-w-[44px] flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-1.5 py-1 text-[12px] font-bold text-primary">
+                {t('add')}
+                {multiVariant && (
+                  <span className="text-[8px] leading-none font-semibold text-muted-foreground">
+                    {t('nOptions', { count: product.variants.length })}
                   </span>
                 )}
-              </div>
-              <p className="truncate text-[11px] text-muted-foreground">{displayVariant.label}</p>
+              </span>
             </div>
-            {/* Decorative, not a nested `<button>` — the whole card is
-                already the tap target (it opens the quantity/weight
-                modal), so this just mirrors the storefront's bordered
-                pill visually instead of duplicating its click handler. */}
-            <span className="flex shrink-0 min-w-[44px] flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-1.5 py-1 text-[12px] font-bold text-primary">
-              {t('add')}
-              {multiVariant && (
-                <span className="text-[8px] leading-none font-semibold text-muted-foreground">
-                  {t('nOptions', { count: product.variants.length })}
-                </span>
-              )}
-            </span>
-          </div>
+          </>
         )}
       </div>
     </button>
