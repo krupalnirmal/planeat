@@ -122,12 +122,15 @@ export function CartBar() {
 
       <Link
         href="/cart"
-        // `bg-tint-yellow` (session 2026-09-20, client request) — a faint
-        // version of the same accent family the bottom nav's active pill
-        // and the header's cart badge now use, not the full-strength
-        // `--accent` itself (too loud filling a whole bar) and not the old
-        // `bg-primary` green.
-        className="animate-in slide-in-from-bottom-4 fade-in relative flex min-h-14 items-center gap-3 rounded-full bg-tint-yellow py-2 pr-4 pl-16 text-foreground duration-300"
+        // `bg-accent/20` (session 2026-09-20, client request — bumped up
+        // from an initial `bg-tint-yellow` that read as too faint) — the
+        // same accent family the bottom nav's active pill and the header's
+        // cart badge now use, and the same opacity-20 strength already
+        // established elsewhere in the app for a mid-strength accent tint
+        // (`order-status-badge.tsx`'s OUT_FOR_DELIVERY chip, etc.), not the
+        // full-strength `--accent` itself (too loud filling a whole bar)
+        // and not the old `bg-primary` green.
+        className="animate-in slide-in-from-bottom-4 fade-in relative flex min-h-14 items-center gap-3 rounded-full bg-accent/20 py-2 pr-4 pl-16 text-foreground duration-300"
       >
         {/* Pops half out of the pill's top-left corner, a white ring
             separating it from the green — the reference's "product peeking
