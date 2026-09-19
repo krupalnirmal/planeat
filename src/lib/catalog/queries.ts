@@ -279,7 +279,13 @@ export async function getHomePayload(locale: Locale): Promise<HomePayload> {
       name: pickName(c, locale),
       iconUrl: c.iconUrl,
       isMealPlanEligible: c.products.some((p) => p.isMealPlanEligible),
-      imageUrl: firstImageUrl(c.products[0]?.imageUrls),
+      // The curated tile photo (same source the home page's category
+      // slider uses) takes priority over the first product's own photo —
+      // session 2026-09-20: this list otherwise depended on which product
+      // happened to sort first, which showed a broken icon for Aata (its
+      // first-sorted product had no photo yet) and always would for
+      // Masala (zero products, nothing to fall back to at all).
+      imageUrl: CATEGORY_TILE_IMAGES[c.slug]?.[0] ?? firstImageUrl(c.products[0]?.imageUrls),
       productCount: c._count.products,
     })),
 
@@ -344,7 +350,11 @@ export async function getCategories(locale: Locale): Promise<CategoryView[]> {
     name: pickName(c, locale),
     iconUrl: c.iconUrl,
     isMealPlanEligible: c.products.some((p) => p.isMealPlanEligible),
-    imageUrl: firstImageUrl(c.products[0]?.imageUrls),
+    // Same priority as getHomePayload's `categories` field (session
+    // 2026-09-20 fix, same root cause: this page's own image depended on
+    // which product happened to sort first, breaking for Aata and always
+    // breaking for Masala, which has none at all).
+    imageUrl: CATEGORY_TILE_IMAGES[c.slug]?.[0] ?? firstImageUrl(c.products[0]?.imageUrls),
     productCount: c._count.products,
   }));
 }
