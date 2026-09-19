@@ -68,14 +68,16 @@ export function BottomNav() {
                 href={tab.href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  // `px-1.5` (session 2026-09-20, client screenshot: the
-                  // active pill had zero horizontal padding, so "My Meal
-                  // Plan" — the widest label — ran flush against the
-                  // rounded pill's curved edges on both sides) — the icon
-                  // stays visually centered since it's narrower than the
-                  // pill either way; this only gives the text breathing
-                  // room.
-                  'flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-full px-1.5 py-1.5 transition-colors',
+                  // `px-1` (session 2026-09-20 — trimmed down from an
+                  // earlier `px-1.5` that fixed the pill's edge-to-edge
+                  // text but, on a narrow 5-column cell, pushed "My Meal
+                  // Plan" past one line and wrapped it, growing the whole
+                  // bar's height). Paired with the label's own
+                  // `whitespace-nowrap` and a hair smaller font below —
+                  // together they keep the longest label on one line with
+                  // a little breathing room either side, instead of either
+                  // extreme.
+                  'flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-full px-1 py-1.5 transition-colors',
                   active && 'bg-accent',
                 )}
               >
@@ -86,7 +88,7 @@ export function BottomNav() {
                 />
                 <span
                   className={cn(
-                    'text-[10.5px] leading-none',
+                    'text-[9.5px] leading-none whitespace-nowrap',
                     active ? 'font-bold text-accent-foreground' : 'text-muted-foreground',
                   )}
                 >
