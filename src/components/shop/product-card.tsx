@@ -202,10 +202,23 @@ function CardImage({ images, alt }: { images: string[]; alt: string }) {
 export function ProductCard({
   product,
   variants,
+  compact = false,
 }: {
   product: ProductCardData;
   /** The full weight lineup — only the category grid passes this. */
   variants?: ProductRowVariant[];
+  /** `true` for a horizontal scroll rail (Top Picks, Order Again) — session
+      2026-09-20, client feedback: the gap between the name/quantity block
+      and the price row read as too large. That gap is the `h-full`/
+      `min-h-[3.4em]`/`mt-auto` row-height-matching trick further down this
+      file, which only earns its keep in a *wrapping* grid (`category-
+      product-list.tsx`'s `grid grid-cols-2`, still `compact={false}`,
+      unchanged) where two cards can land side by side in the same row and
+      need to match height. A single-row scroll rail never has that
+      problem — every card already sits at the same visual baseline, so
+      reserving space for a two-line name only leaves dead air under a
+      one-line one. */
+  compact?: boolean;
 }) {
   const t = useTranslations('product');
   const router = useRouter();
@@ -267,7 +280,12 @@ export function ProductCard({
     // gap small now, by making 1-line and 2-line bilingual names occupy the
     // same space to begin with — so there's little slack left for
     // `mt-auto` on the price row to absorb, with or without the stretch.
-    <article className="card-3d relative flex h-full flex-col overflow-hidden rounded-[var(--radius)] border border-border/50 bg-card">
+    <article
+      className={cn(
+        'card-3d relative flex flex-col overflow-hidden rounded-[var(--radius)] border border-border/50 bg-card',
+        !compact && 'h-full',
+      )}
+    >
       <Link href={`/product/${product.id}`} aria-label={product.name} tabIndex={-1}>
         <div
           className={cn(
@@ -317,7 +335,7 @@ export function ProductCard({
         // row-height slack, but as space below the quantity line — where
         // `mt-auto` on the price row already expects to find it — rather
         // than wedged between two lines that belong together.
-        className="flex min-h-[3.4em] flex-col px-2.5 pt-2"
+        className={cn('flex flex-col px-2.5 pt-2', !compact && 'min-h-[3.4em]')}
         aria-label={product.name}
       >
         {/* "English (local)" — client's reference (session 2026-09-01):
@@ -343,7 +361,7 @@ export function ProductCard({
           overlapping the photo, and no eta/stock line the reference
           doesn't show either. `mt-auto` pins this row to the bottom even
           when the name above it is a single short line. */}
-      <div className="mt-auto flex items-end justify-between gap-1.5 px-2.5 pt-1.5 pb-2">
+      <div className={cn('flex items-end justify-between gap-1.5 px-2.5 pt-1.5 pb-2', !compact && 'mt-auto')}>
         <div className="min-w-0">
           <div className="flex items-baseline gap-1">
             <span className="text-[14px] font-bold">{formatPaise(price, { hidePaise: true })}</span>

@@ -1,13 +1,22 @@
-import { Apple, ChevronRight, Cookie, Flame, Leaf, Milk, Wheat } from 'lucide-react';
+import { Apple, Cookie, Flame, Leaf, Milk, Wheat } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 
 /**
  * The "Shop by Category" row (session 2026-09-19, client reference mockup):
  * one real photo per tile on a colour-tinted card, a small solid-colour
- * icon badge + label + chevron footer — replacing the earlier plain-mint
- * tile with a bare photo and a label underneath. Colours reuse the exact
- * 6-hue palette already validated for the admin dashboard's stat tiles
- * (`STAT_HUES` in `analytics-tab.tsx`) rather than inventing a new one.
+ * icon badge overlaid on the photo, and a label underneath — replacing the
+ * earlier plain-mint tile with a bare photo and a label underneath.
+ * Colours reuse the exact 6-hue palette already validated for the admin
+ * dashboard's stat tiles (`STAT_HUES` in `analytics-tab.tsx`) rather than
+ * inventing a new one.
+ *
+ * Sized small on purpose (session 2026-09-20, client feedback: the first
+ * cut only fit ~2 tiles before needing to scroll) — 3 full tiles plus a
+ * peek of the 4th fit on a standard ~390px phone width before any
+ * scrolling, so the slider reads as a row to browse, not a wall you have
+ * to swipe through blind. The chevron from the first cut is dropped here:
+ * with a card this narrow there's no room for it next to a 2-line label,
+ * and the whole card is already the tap target.
  */
 
 const CATEGORY_STYLE: Record<string, { bg: string; icon: string; Icon: typeof Leaf }> = {
@@ -35,10 +44,10 @@ export function CategoryCollageTile({
   return (
     <Link
       href={`/category/${slug}`}
-      className="card-3d flex w-[168px] shrink-0 snap-start flex-col overflow-hidden rounded-[var(--radius)] transition-transform active:scale-[0.97]"
+      className="card-3d flex w-[104px] shrink-0 snap-start flex-col overflow-hidden rounded-[var(--radius)] transition-transform active:scale-[0.97]"
       style={{ backgroundColor: style.bg }}
     >
-      <div className="grid h-[120px] w-full place-items-center overflow-hidden p-3">
+      <div className="relative grid h-[78px] w-full place-items-center overflow-hidden p-1.5">
         {images[0] ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -49,17 +58,14 @@ export function CategoryCollageTile({
             className="size-full rounded-[calc(var(--radius)-4px)] object-cover"
           />
         ) : null}
-      </div>
-      <div className="flex items-center gap-1.5 px-2.5 pb-2.5">
         <span
-          className="grid size-7 shrink-0 place-items-center rounded-full text-white"
+          className="absolute top-1.5 left-1.5 grid size-5 shrink-0 place-items-center rounded-full text-white ring-2 ring-white/80"
           style={{ backgroundColor: style.icon }}
         >
-          <Icon className="size-3.5" aria-hidden />
+          <Icon className="size-2.5" aria-hidden />
         </span>
-        <p className="min-w-0 flex-1 truncate text-xs font-semibold">{name}</p>
-        <ChevronRight className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
       </div>
+      <p className="line-clamp-2 px-1.5 pb-2 text-center text-[10.5px] leading-tight font-semibold">{name}</p>
     </Link>
   );
 }

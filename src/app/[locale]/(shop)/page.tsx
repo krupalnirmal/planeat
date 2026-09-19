@@ -97,7 +97,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             // Masala's own addition is what surfaced this) no longer
             // spills onto a second row; it scrolls in one row instead,
             // snapping one tile at a time on mobile.
-            <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <ul className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {collages.map((collage) => (
                 <li key={collage.categorySlug} className="shrink-0">
                   <CategoryCollageTile
@@ -154,6 +154,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                           }
                         : null,
                     }}
+                    compact
                   />
                 </li>
               ))}
