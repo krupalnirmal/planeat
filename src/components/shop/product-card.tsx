@@ -391,7 +391,23 @@ export function ProductCard({
               // trimmed further 2026-08-29) from a fixed 64px min-width —
               // that crowded into the price on the narrower Top Picks card
               // and any 3-digit price wrapped right up against it.
-              className="flex min-w-[44px] flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-1.5 py-1 text-[12px] font-bold text-primary transition-transform active:scale-90"
+              //
+              // `min-h-0` (session 2026-09-20) — the app's global rule
+              // (R10, globals.css) sets `min-height: 44px` on every
+              // `<button>`, same as `QtyStepper`'s own inner buttons
+              // already override. Without it, this single-line "ADD"
+              // button was forced to 44px while the sibling QtyStepper it
+              // swaps places with (once something's in the cart) sits at
+              // only 28px (`size="sm"`'s `h-7`) — the two states of the
+              // exact same corner rendering at different heights, which
+              // is what made otherwise-identical `compact` cards in the
+              // same scroll rail look uneven. `h-7` (single variant only —
+              // the two-line "N options" case still needs its natural,
+              // taller height) makes it match the stepper exactly.
+              className={cn(
+                'flex min-w-[44px] min-h-0 flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-1.5 py-1 text-[12px] font-bold text-primary transition-transform active:scale-90',
+                !multiVariant && 'h-7',
+              )}
             >
               {t('add')}
               {/* "N options" sits inside the same bordered button as a
