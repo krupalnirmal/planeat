@@ -122,15 +122,13 @@ export function CartBar() {
 
       <Link
         href="/cart"
-        // `bg-accent/20` (session 2026-09-20, client request — bumped up
-        // from an initial `bg-tint-yellow` that read as too faint) — the
-        // same accent family the bottom nav's active pill and the header's
-        // cart badge now use, and the same opacity-20 strength already
-        // established elsewhere in the app for a mid-strength accent tint
-        // (`order-status-badge.tsx`'s OUT_FOR_DELIVERY chip, etc.), not the
-        // full-strength `--accent` itself (too loud filling a whole bar)
-        // and not the old `bg-primary` green.
-        className="animate-in slide-in-from-bottom-4 fade-in relative flex min-h-14 items-center gap-3 rounded-full bg-accent/20 py-2 pr-4 pl-16 text-foreground duration-300"
+        // Solid `bg-accent` (session 2026-09-20, client request) — both
+        // faint attempts before this (`bg-tint-yellow`, then `bg-accent/20`)
+        // read as barely-there against the page's own near-white background
+        // on a real device, to the point the bar was hard to spot at all.
+        // Full-strength, with `--accent-fg` for contrast, same pairing the
+        // header's cart badge already uses.
+        className="animate-in slide-in-from-bottom-4 fade-in relative flex min-h-14 items-center gap-3 rounded-full bg-accent py-2 pr-4 pl-16 text-accent-foreground duration-300"
       >
         {/* Pops half out of the pill's top-left corner, a white ring
             separating it from the green — the reference's "product peeking
@@ -150,7 +148,7 @@ export function CartBar() {
 
         <span className="min-w-0 flex-1">
           <span className="block text-[15px] leading-tight font-bold">{t('viewCart')}</span>
-          <span className="block text-[11px] leading-tight text-muted-foreground">
+          <span className="block text-[11px] leading-tight text-accent-foreground/70">
             {t('itemCount', { count: cart.itemCount })}
           </span>
         </span>
