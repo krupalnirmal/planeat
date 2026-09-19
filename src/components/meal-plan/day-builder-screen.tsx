@@ -18,7 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { PageHeader } from '@/components/shop/page-header';
 import { formatPaise, paise } from '@/lib/money';
@@ -76,6 +76,34 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
   const [search, setSearch] = useState('');
   const [picker, setPicker] = useState<DraftProduct | null>(null);
   const [showSummary, setShowSummary] = useState(false);
+
+  const dayTabsRef = useRef<HTMLElement>(null);
+  const activeDayRef = useRef<HTMLButtonElement>(null);
+
+  // Tapping a day pushes a new route, which remounts this screen with the
+  // tab strip back at scroll 0 — so picking one of the later days (Sunday
+  // worst of all) left the tab you had just chosen off-screen to the
+  // right, with no sign it had been selected (client report, session
+  // 2026-09-20). Centre it on mount instead.
+  //
+  // `scrollLeft` on the strip itself, not `scrollIntoView`: the latter
+  // walks up every scrollable ancestor, so it would also scroll the page
+  // vertically to bring the sticky strip into view — moving the product
+  // grid the customer is actually looking at.
+  //
+  // `draft.loading` is in the deps because the strip isn't mounted yet on
+  // the loading render below; without it the effect would run once
+  // against null refs and never again.
+  useEffect(() => {
+    const container = dayTabsRef.current;
+    const active = activeDayRef.current;
+    if (!container || !active) return;
+
+    const containerBox = container.getBoundingClientRect();
+    const activeBox = active.getBoundingClientRect();
+    container.scrollLeft +=
+      activeBox.left - containerBox.left - (containerBox.width - activeBox.width) / 2;
+  }, [dayOfWeek, draft.loading]);
 
   const columns = draft.allColumns;
   const activeColumn: DraftColumn | undefined = activeSlug
@@ -139,6 +167,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
           round trip nothing here actually makes (the whole week only ever
           saves once, from the summary screen's "Confirm & Save Plan"). */}
       <nav
+        ref={dayTabsRef}
         aria-label={tw('daysLabel')}
         className="sticky z-20 flex gap-1.5 overflow-x-auto border-b border-border bg-card px-3 py-2"
         style={{ top: PAGE_HEADER_HEIGHT_PX }}
@@ -149,6 +178,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
           return (
             <button
               key={day}
+              ref={active ? activeDayRef : undefined}
               type="button"
               onClick={() => {
                 if (day !== dayOfWeek) router.push(`/meal-plan/build/${day}`);
