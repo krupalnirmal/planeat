@@ -45,6 +45,7 @@ panel. Licences are recorded here because several require credit.
 | `ICE-KULFI-4` | [Matkakulfi.jpg](https://commons.wikimedia.org/wiki/File:Matkakulfi.jpg) | danchitnis | CC BY 2.0 |
 | `ICE-VANILLA-700` | [Ice Cream Dessert.JPG](https://commons.wikimedia.org/wiki/File:Ice_Cream_Dessert.JPG) | Unknown | CC BY-SA 3.0 |
 | `VEG-CAULIFLOWER` | [Chou-fleur 02.jpg](https://commons.wikimedia.org/wiki/File:Chou-fleur_02.jpg) | Coyau | CC BY-SA 3.0 |
+| `VEG-CHOP-BEANS` | [38 - CIMG1598.JPG](https://commons.wikimedia.org/wiki/File:38_-_CIMG1598.JPG) | Susan Slater | CC BY-SA 4.0 |
 | `VEG-GARLIC` | [Opened garlic bulb with garlic clove.jpg](https://commons.wikimedia.org/wiki/File:Opened_garlic_bulb_with_garlic_clove.jpg) | Dubravko Sorić SoraZG on Flickr | CC BY 2.0 |
 | `VEG-PUMPKIN` | [Cucurbita 2011 G1.jpg](https://commons.wikimedia.org/wiki/File:Cucurbita_2011_G1.jpg) | George Chernilevsky | Public domain |
 | `VEG-RIDGEGOURD` | [Luffa acutangula1.jpg](https://commons.wikimedia.org/wiki/File:Luffa_acutangula1.jpg) | No machine-readable author provided. Hans B.~commonswiki assumed (based on copyright claims). | Public domain |

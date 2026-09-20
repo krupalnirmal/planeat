@@ -92,6 +92,14 @@ const SEARCHES = {
   'GRC-SUGAR-1KG': 'white sugar crystals',
   'GRC-TEA-250': 'black tea leaves dried',
 
+  // Session 2026-09-20 — 3 SKUs that shipped without an image-fetch entry
+  // when they were first added (Chopped Vegetables / Aata batches), flagged
+  // as a known gap at the time, now getting the real fetch these other
+  // SKUs already have.
+  'VEG-CHOP-BEANS': 'green beans',
+  'AATA-JWARI-5KG': 'sorghum flour',
+  'AATA-MULTIGRAIN-5KG': 'multigrain flour',
+
   // Fruits sub-group rail (session 2026-08-26) — Citrus/Seasonal/Exotic/Dry
   // Fruits SKUs added alongside the sidebar grouping. Search terms lean on
   // "isolated white background" / "studio" since these render in a rail of
