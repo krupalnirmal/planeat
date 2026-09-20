@@ -324,36 +324,31 @@ export function ProductCard({
 
       <Link
         href={`/product/${product.id}`}
-        // `min-h` on the wrapper, not the heading (session 2026-09-01) —
-        // reserving 2 lines' worth of space on the `<h3>` itself (session
-        // 2026-08-29, to keep a short one-line name from leaving this
-        // card's own content shorter than a two-line sibling in the same
-        // grid row) pushed the quantity line down to sit under the
-        // RESERVED box instead of right under the actual text, opening a
-        // visible gap between name and quantity whenever the name was
-        // short. Reserving the space here instead still absorbs that same
-        // row-height slack, but as space below the quantity line — where
-        // `mt-auto` on the price row already expects to find it — rather
-        // than wedged between two lines that belong together.
-        className={cn('flex flex-col px-2.5 pt-2', !compact && 'min-h-[3.4em]')}
+        // No `min-h` reservation here at all any more (session 2026-09-20
+        // follow-up — client screenshot: too much white space between name
+        // and price in the category grid too, not just the compact rail).
+        // The `min-h-[3.4em]` this used to carry existed to pre-equalise
+        // 1-line vs 2-line names before the grid's own `h-full`/`mt-auto`
+        // row-stretch (still below, unchanged) had to absorb the
+        // difference — but it reserved MORE than even a genuine 2-line
+        // name needs, which is exactly the dead space being reported.
+        // Clamping the name to 1 line (next line) removes the source of
+        // the size difference instead: every card's name block is now the
+        // same height by construction, so there's nothing left for a
+        // reservation to pre-equalise, and `h-full`/`mt-auto` alone still
+        // keeps every card in a grid row the same height regardless — that
+        // mechanism was always what guaranteed equal heights, not this
+        // reservation.
+        className="flex flex-col px-2.5 pt-2"
         aria-label={product.name}
       >
         {/* "English (local)" — client's reference (session 2026-09-01):
             the English name first, the locale's own name alongside it in
             brackets, "Asian-format". `nameEn`/`localName` are optional on
             `ProductCardData` — a caller that hasn't been updated yet still
-            gets the single already-localised `name` it always had.
-
-            `compact` clamps to 1 line, not 2 (session 2026-09-20 follow-up):
-            dropping the `min-h-[3.4em]` reservation closed the dead-space
-            gap under a short name, but left the name block itself free to
-            be either 1 or 2 lines depending on length — with no reservation
-            and no row-stretch in a scroll rail, that made a short-named
-            card and a long-named card sitting side by side render at two
-            different heights, the exact thing being fixed here. A 1-line
-            clamp makes the block a fixed height for every card, so no
-            reservation is needed to keep the row even. */}
-        <h3 className={cn('text-[13px] leading-tight font-semibold', compact ? 'line-clamp-1' : 'line-clamp-2')}>
+            gets the single already-localised `name` it always had. Clamped
+            to 1 line in every mode (see the block comment above). */}
+        <h3 className="line-clamp-1 text-[13px] leading-tight font-semibold">
           {product.nameEn ?? product.name}
           {product.localName && (
             <span className="font-normal text-muted-foreground"> ({product.localName})</span>
