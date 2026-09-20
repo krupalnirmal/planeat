@@ -291,7 +291,10 @@ export function CheckoutScreen() {
         <h1 className="text-base font-bold">{t('title')}</h1>
       </header>
 
-      <main className="space-y-2 pb-2">
+      {/* `lg:grid` (session 2026-09-20, desktop layout plan Part E) — same
+          left-column/sticky-right-column shape as the cart screen. */}
+      <main className="space-y-2 pb-2 lg:grid lg:grid-cols-[1fr_380px] lg:items-start lg:gap-8 lg:space-y-0 lg:px-8 lg:py-6">
+      <div className="space-y-2">
       {/* ── Address */}
       <section className="bg-card px-4 py-4">
         <div className="flex items-start justify-between gap-3">
@@ -471,7 +474,11 @@ export function CheckoutScreen() {
           className="input-3d mt-2 w-full resize-none rounded-[var(--radius)] border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-primary"
         />
       </section>
+      </div>
 
+      {/* Right column at `lg:` — sticky, same trick as the cart screen's
+          own bill-summary column. */}
+      <div className="lg:sticky lg:top-24 lg:space-y-3">
       {bill && (
         <div className="bg-card px-4 py-4">
           <BillSummary bill={bill} />
@@ -487,7 +494,7 @@ export function CheckoutScreen() {
       )}
 
       <div
-        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card px-4 py-3"
+        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] border-t border-border bg-card px-4 py-3 lg:static lg:mx-0 lg:max-w-none lg:rounded-[var(--radius)] lg:border"
         style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
       >
         <button
@@ -503,8 +510,9 @@ export function CheckoutScreen() {
           <span>{place.isPending || payOrder.isPending ? t('placing') : t('placeOrder')}</span>
         </button>
       </div>
+      </div>
 
-      <div aria-hidden className="h-16" />
+      <div aria-hidden className="h-16 lg:hidden" />
       </main>
 
       {/* Online-payment overlay — same phase machine and visual language as

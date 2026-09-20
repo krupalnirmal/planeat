@@ -130,183 +130,198 @@ export function CartScreen() {
   const blocked = (quote.data?.unavailableLines.length ?? 0) > 0;
 
   return (
-    <main className="min-h-dvh space-y-4 bg-accent-faint px-4 pt-4 pb-2">
-      {/* Header — back arrow, big bold title + leaf-bulleted subtitle, a
-          white badged cart icon. */}
-      <header className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-1">
-          <Link
-            href="/"
-            aria-label={tc('back')}
-            className="mt-1 grid size-9 shrink-0 place-items-center rounded-full"
-          >
-            <ChevronLeft className="size-5" aria-hidden />
-          </Link>
-          <div className="min-w-0">
-            <h1 className="text-2xl font-black">{t('title')}</h1>
-            <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Leaf className="size-4 shrink-0 text-primary" aria-hidden />
-              <span className="truncate">
-                {t('itemCount', { count: cart.itemCount })} · {t('tagline')}
-              </span>
-            </p>
-          </div>
-        </div>
-
-        {/* Decorative, not a link — this screen already is the cart, so
-            there is nowhere for it to navigate to. */}
-        <div aria-hidden className="relative mt-1 shrink-0">
-          <span className="grid size-12 place-items-center rounded-full bg-card shadow-sm">
-            <ShoppingCart className="size-5" aria-hidden />
-          </span>
-          <span
-            key={cart.itemCount}
-            className="animate-in zoom-in absolute -top-1 -right-1 grid size-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground duration-200"
-          >
-            {cart.itemCount}
-          </span>
-        </div>
-      </header>
-
-      {defaultAddress && (
-        <div className="card-3d flex items-center gap-3 rounded-[var(--radius-2xl)] bg-card px-4 py-3">
-          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-tint-green">
-            <Leaf className="size-4 text-primary" aria-hidden />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs text-muted-foreground">{t('deliverTo')}</p>
-            <p className="truncate text-sm font-semibold">
-              {[defaultAddress.line1, defaultAddress.city].filter(Boolean).join(', ')}
-            </p>
-          </div>
-          <Link href="/addresses" className="shrink-0 text-xs font-bold text-primary">
-            {tc('edit')}
-          </Link>
-        </div>
-      )}
-
-      {blocked && (
-        <p className="flex items-start gap-2 rounded-[var(--radius-2xl)] bg-[#FDF3E3] px-3.5 py-3 text-xs text-warning">
-          <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
-          {t('unavailableItems')}
-        </p>
-      )}
-
-      <ul className="space-y-3">
-        {cart.lines.map((line) => {
-          const unavailable = !line.isActive || !line.inStock;
-
-          return (
-            <li
-              key={line.id}
-              className={cn(
-                'card-3d flex gap-3 rounded-[var(--radius-2xl)] bg-card p-3',
-                unavailable && 'opacity-70',
-              )}
+    // `lg:grid` (session 2026-09-20, desktop layout plan Part E): items
+    // stack in one column below `lg:`, split into a left items column and
+    // a sticky right bill-summary column above it — the standard cart/
+    // checkout shape once there's room for it.
+    <main className="min-h-dvh space-y-4 bg-accent-faint px-4 pt-4 pb-2 lg:grid lg:grid-cols-[1fr_380px] lg:items-start lg:gap-8 lg:space-y-0 lg:px-8 lg:py-8">
+      <div className="space-y-4">
+        {/* Header — back arrow, big bold title + leaf-bulleted subtitle, a
+            white badged cart icon. */}
+        <header className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-1">
+            <Link
+              href="/"
+              aria-label={tc('back')}
+              className="mt-1 grid size-9 shrink-0 place-items-center rounded-full"
             >
-              <div className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-xl)] bg-secondary">
-                {line.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={line.imageUrl} alt="" aria-hidden className="size-full object-cover" />
-                ) : (
-                  <ImageIcon className="size-6 text-muted-foreground/40" aria-hidden />
+              <ChevronLeft className="size-5" aria-hidden />
+            </Link>
+            <div className="min-w-0">
+              <h1 className="text-2xl font-black">{t('title')}</h1>
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Leaf className="size-4 shrink-0 text-primary" aria-hidden />
+                <span className="truncate">
+                  {t('itemCount', { count: cart.itemCount })} · {t('tagline')}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          {/* Decorative, not a link — this screen already is the cart, so
+              there is nowhere for it to navigate to. */}
+          <div aria-hidden className="relative mt-1 shrink-0">
+            <span className="grid size-12 place-items-center rounded-full bg-card shadow-sm">
+              <ShoppingCart className="size-5" aria-hidden />
+            </span>
+            <span
+              key={cart.itemCount}
+              className="animate-in zoom-in absolute -top-1 -right-1 grid size-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground duration-200"
+            >
+              {cart.itemCount}
+            </span>
+          </div>
+        </header>
+
+        {defaultAddress && (
+          <div className="card-3d flex items-center gap-3 rounded-[var(--radius-2xl)] bg-card px-4 py-3">
+            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-tint-green">
+              <Leaf className="size-4 text-primary" aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-muted-foreground">{t('deliverTo')}</p>
+              <p className="truncate text-sm font-semibold">
+                {[defaultAddress.line1, defaultAddress.city].filter(Boolean).join(', ')}
+              </p>
+            </div>
+            <Link href="/addresses" className="shrink-0 text-xs font-bold text-primary">
+              {tc('edit')}
+            </Link>
+          </div>
+        )}
+
+        {blocked && (
+          <p className="flex items-start gap-2 rounded-[var(--radius-2xl)] bg-[#FDF3E3] px-3.5 py-3 text-xs text-warning">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
+            {t('unavailableItems')}
+          </p>
+        )}
+
+        <ul className="space-y-3">
+          {cart.lines.map((line) => {
+            const unavailable = !line.isActive || !line.inStock;
+
+            return (
+              <li
+                key={line.id}
+                className={cn(
+                  'card-3d flex gap-3 rounded-[var(--radius-2xl)] bg-card p-3',
+                  unavailable && 'opacity-70',
                 )}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <div className="flex items-baseline justify-between gap-2">
-                  <p className="line-clamp-2 min-w-0 text-sm font-bold">
-                    {line.nameEn}
-                    {line.localName && (
-                      <span className="font-normal text-muted-foreground"> ({line.localName})</span>
-                    )}
-                  </p>
-                  <span className="shrink-0 text-base font-bold">
-                    {formatPaise(paise(line.linePaise), { hidePaise: true })}
-                  </span>
-                </div>
-                <p className="mt-0.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                  <Leaf className="size-3.5 shrink-0 text-primary" aria-hidden />
-                  {formatQuantity(line.unitQuantity, line.unit as QuantityUnit)} ·{' '}
-                  {formatPaise(paise(line.unitPricePaise), { hidePaise: true })}
-                </p>
-
-                {unavailable && (
-                  <p className="mt-1 text-[11px] font-medium text-warning">
-                    {line.isActive
-                      ? t('outOfStockLine', { count: line.availableQty })
-                      : t('unavailableItems')}
-                  </p>
-                )}
-
-                <div className="mt-1.5 flex justify-end">
-                  {unavailable ? (
-                    <button
-                      type="button"
-                      onClick={() => cart.remove(line.variantId)}
-                      className="flex h-11 items-center gap-1.5 rounded-xl border border-border px-3 text-xs font-medium"
-                    >
-                      <Trash2 className="size-3.5" aria-hidden />
-                      {tc('remove')}
-                    </button>
+              >
+                <div className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-xl)] bg-secondary">
+                  {line.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={line.imageUrl} alt="" aria-hidden className="size-full object-cover" />
                   ) : (
-                    <QtyStepper
-                      quantity={line.quantity}
-                      onIncrement={() => cart.increment(line.variantId)}
-                      onDecrement={() => cart.decrement(line.variantId)}
-                      disabled={cart.isMutating}
-                      max={line.availableQty}
-                      label={line.name}
-                      size="sm"
-                      tone="tint"
-                    />
+                    <ImageIcon className="size-6 text-muted-foreground/40" aria-hidden />
                   )}
                 </div>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
 
-      <p className="flex items-center justify-center gap-2 rounded-full bg-tint-green px-4 py-2.5 text-center text-xs font-bold text-primary-dark">
-        <Leaf className="size-4 shrink-0" aria-hidden />
-        {t('handpickedBanner')}
-      </p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="line-clamp-2 min-w-0 text-sm font-bold">
+                      {line.nameEn}
+                      {line.localName && (
+                        <span className="font-normal text-muted-foreground"> ({line.localName})</span>
+                      )}
+                    </p>
+                    <span className="shrink-0 text-base font-bold">
+                      {formatPaise(paise(line.linePaise), { hidePaise: true })}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                    <Leaf className="size-3.5 shrink-0 text-primary" aria-hidden />
+                    {formatQuantity(line.unitQuantity, line.unit as QuantityUnit)} ·{' '}
+                    {formatPaise(paise(line.unitPricePaise), { hidePaise: true })}
+                  </p>
 
-      {quote.data && <BillSummary bill={quote.data.bill} savedPaise={savedPaise} />}
+                  {unavailable && (
+                    <p className="mt-1 text-[11px] font-medium text-warning">
+                      {line.isActive
+                        ? t('outOfStockLine', { count: line.availableQty })
+                        : t('unavailableItems')}
+                    </p>
+                  )}
 
-      {/* Sticky above the bottom nav so the total and the next step are always
-          on screen, however long the cart gets. Dashed border + bag
-          illustration per the client's reference. */}
-      <div
-        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-4"
-        style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 0.75rem)' }}
-      >
-        <div className="flex items-center gap-3 rounded-[var(--radius-2xl)] border-2 border-dashed border-primary-foreground/30 bg-primary-dark px-4 py-3 shadow-lg">
-          {/* eslint-disable-next-line @next/next/no-img-element -- small static decorative asset, not worth next/image's setup */}
-          <img src="/decor/cart-bag.png" alt="" aria-hidden className="size-10 shrink-0 object-contain" />
-          <div className="min-w-0 flex-1">
-            <p className="text-lg leading-tight font-black text-primary-foreground">
-              {quote.data ? formatPaise(paise(quote.data.bill.totalPaise)) : '—'}
-            </p>
-            <p className="text-xs text-primary-foreground/80">{t('totalAmount')}</p>
+                  <div className="mt-1.5 flex justify-end">
+                    {unavailable ? (
+                      <button
+                        type="button"
+                        onClick={() => cart.remove(line.variantId)}
+                        className="flex h-11 items-center gap-1.5 rounded-xl border border-border px-3 text-xs font-medium"
+                      >
+                        <Trash2 className="size-3.5" aria-hidden />
+                        {tc('remove')}
+                      </button>
+                    ) : (
+                      <QtyStepper
+                        quantity={line.quantity}
+                        onIncrement={() => cart.increment(line.variantId)}
+                        onDecrement={() => cart.decrement(line.variantId)}
+                        disabled={cart.isMutating}
+                        max={line.availableQty}
+                        label={line.name}
+                        size="sm"
+                        tone="tint"
+                      />
+                    )}
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+
+        <p className="flex items-center justify-center gap-2 rounded-full bg-tint-green px-4 py-2.5 text-center text-xs font-bold text-primary-dark">
+          <Leaf className="size-4 shrink-0" aria-hidden />
+          {t('handpickedBanner')}
+        </p>
+      </div>
+
+      {/* Right column at `lg:` — `lg:sticky` so the total and next step
+          stay on screen while the left column's item list scrolls past,
+          the desktop equivalent of the fixed bottom bar below `lg:`. */}
+      <div className="lg:sticky lg:top-24 lg:space-y-4">
+        {quote.data && <BillSummary bill={quote.data.bill} savedPaise={savedPaise} />}
+
+        {/* Sticky above the bottom nav so the total and the next step are
+            always on screen, however long the cart gets, below `lg:`.
+            Dashed border + bag illustration per the client's reference.
+            `lg:static` (Part E, same trick as VariantPicker's add bar in
+            Part D): inline at the bottom of the sticky right column
+            instead of fixed to the viewport once there's a column for it
+            to sit in. */}
+        <div
+          className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-4 lg:static lg:mx-0 lg:max-w-none lg:px-0"
+          style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 0.75rem)' }}
+        >
+          <div className="flex items-center gap-3 rounded-[var(--radius-2xl)] border-2 border-dashed border-primary-foreground/30 bg-primary-dark px-4 py-3 shadow-lg">
+            {/* eslint-disable-next-line @next/next/no-img-element -- small static decorative asset, not worth next/image's setup */}
+            <img src="/decor/cart-bag.png" alt="" aria-hidden className="size-10 shrink-0 object-contain" />
+            <div className="min-w-0 flex-1">
+              <p className="text-lg leading-tight font-black text-primary-foreground">
+                {quote.data ? formatPaise(paise(quote.data.bill.totalPaise)) : '—'}
+              </p>
+              <p className="text-xs text-primary-foreground/80">{t('totalAmount')}</p>
+            </div>
+            <span aria-hidden className="h-8 w-px shrink-0 bg-primary-foreground/25" />
+            <Link
+              href="/checkout"
+              aria-disabled={!quote.data?.canPlaceOrder}
+              className={cn(
+                'flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-card px-5 text-sm font-bold text-primary-dark',
+                !quote.data?.canPlaceOrder && 'pointer-events-none opacity-50',
+              )}
+            >
+              {t('proceed')}
+              <ArrowRight className="size-4" aria-hidden />
+            </Link>
           </div>
-          <span aria-hidden className="h-8 w-px shrink-0 bg-primary-foreground/25" />
-          <Link
-            href="/checkout"
-            aria-disabled={!quote.data?.canPlaceOrder}
-            className={cn(
-              'flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-card px-5 text-sm font-bold text-primary-dark',
-              !quote.data?.canPlaceOrder && 'pointer-events-none opacity-50',
-            )}
-          >
-            {t('proceed')}
-            <ArrowRight className="size-4" aria-hidden />
-          </Link>
         </div>
       </div>
 
-      <div aria-hidden className="h-24" />
+      <div aria-hidden className="h-24 lg:hidden" />
     </main>
   );
 }
