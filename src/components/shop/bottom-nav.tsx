@@ -49,9 +49,11 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
+    // `lg:hidden` (session 2026-09-20) — `DesktopHeader` is the nav at
+    // `lg:` and up.
     <nav
       aria-label={t('home')}
-      className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] px-3"
+      className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] px-3 lg:hidden"
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)' }}
     >
       <ul className="card-3d grid grid-cols-5 gap-1 rounded-[24px] bg-card px-1.5 py-2">

@@ -230,7 +230,11 @@
 }
 
 @layer components {
-  /* The app is designed at 390px and simply centres on anything wider. */
+  /* The app is designed at 390px and simply centres on anything wider.
+     Shared by (shop)/(intro)/(staff-login) — the `lg:` desktop width
+     (session 2026-09-20) is applied as extra utility classes on the
+     `(shop)` layout's own element instead of here, since intro/staff-login
+     aren't part of that redesign and shouldn't stretch to 1280px too. */
   .app-shell {
     @apply mx-auto w-full max-w-[480px] min-h-dvh bg-background;
   }
@@ -265,6 +269,16 @@
       var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + var(--cart-bar-reserve)
     );
     transition: padding-bottom 0.15s ease-out;
+  }
+
+  /* Neither BottomNav nor CartBar render past `lg:` (session 2026-09-20,
+     DesktopHeader takes over) — this reservation would otherwise be dead
+     space under every page's content on desktop. `1024px` matches
+     Tailwind's own `lg:` breakpoint. */
+  @media (min-width: 1024px) {
+    .app-scroll {
+      padding-bottom: 0;
+    }
   }
 
   /* A soft, "pressed-in" field rather than a flat outlined box — a faint

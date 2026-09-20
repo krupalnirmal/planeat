@@ -55,7 +55,9 @@ export function AppHeader() {
   const initial = user?.name?.trim().charAt(0);
 
   return (
-    <header className="sticky top-0 z-30 bg-card px-4 pt-3 pb-3 shadow-sm">
+    // `lg:hidden` (session 2026-09-20) — `DesktopHeader` takes over at
+    // `lg:` and up; this stays exactly as it was below that.
+    <header className="sticky top-0 z-30 bg-card px-4 pt-3 pb-3 shadow-sm lg:hidden">
       <div className="flex items-start justify-between gap-3">
         {/* The wordmark itself carries the brand colour — a leaf mark and a
             two-tone "Get" / "Fresh", exactly as the client's logo sheet

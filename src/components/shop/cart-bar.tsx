@@ -100,8 +100,9 @@ export function CartBar() {
       // narrowed again (session 2026-09-17, client feedback: still too
       // wide) — still one stacked unit with the free-delivery nudge above
       // it, just a compact floating pill instead of a bar spanning the
-      // screen.
-      className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-32"
+      // screen. `lg:hidden` (session 2026-09-20) — DesktopHeader's cart
+      // icon is the desktop equivalent.
+      className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-32 lg:hidden"
       style={{
         // BottomNav is always visible now (session 2026-09-16), so this
         // always sits above its fixed height — same pattern every other
