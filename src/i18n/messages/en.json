@@ -3,6 +3,13 @@
     "name": "Get Fresh",
     "tagline": "Fresh Vegetables\nDelivered to Your Home"
   },
+  "install": {
+    "title": "Install Get Fresh on this phone",
+    "action": "Install",
+    "iosHint": "Share → Add to Home Screen",
+    "androidHint": "Chrome menu → Install app",
+    "dismiss": "Not now"
+  },
   "common": {
     "loading": "Loading…",
     "retry": "Try again",

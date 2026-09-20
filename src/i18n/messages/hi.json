@@ -3,6 +3,13 @@
     "name": "Get Fresh",
     "tagline": "ताज़ी सब्ज़ियाँ,\nसीधे आपके घर तक"
   },
+  "install": {
+    "title": "Get Fresh ऐप इस फ़ोन पर इंस्टॉल करें",
+    "action": "इंस्टॉल करें",
+    "iosHint": "Share → Add to Home Screen चुनें",
+    "androidHint": "Chrome के ⋮ मेनू → Install app चुनें",
+    "dismiss": "अभी नहीं"
+  },
   "common": {
     "loading": "लोड हो रहा है…",
     "retry": "फिर से कोशिश करें",
