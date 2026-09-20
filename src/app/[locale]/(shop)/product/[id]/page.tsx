@@ -54,45 +54,55 @@ export default async function ProductPage({
           bar (71px tall). That reservation used to be a `h-16` spacer
           inside VariantPicker itself, which sits mid-page — so it punched
           a 64px hole under the price instead of protecting the last
-          section, the thing it was there for. */}
-      <main className="space-y-2 pb-24">
-        <div className="bg-card px-4 pt-2 pb-4">
+          section, the thing it was there for. `lg:pb-2` (session
+          2026-09-20): the add bar stops being fixed at `lg:` (see
+          VariantPicker), so there's nothing left to reserve room for. */}
+      <main className="space-y-2 pb-24 lg:pb-2">
+        {/* `lg:flex` (session 2026-09-20, desktop layout plan Part D):
+            gallery-then-info stacks below `lg:`, sits side by side above
+            it — the standard PDP shape once there's room for it. */}
+        <div className="bg-card px-4 pt-2 pb-4 lg:flex lg:gap-8 lg:px-8 lg:py-8">
           {/* The photo is a product shot, not a hero image: a full-width
               square ran ~390px tall on a phone and pushed the price and the
               ADD button below the fold. Capped and centred, it stays the
               first thing you see without being the only thing. Swipeable
-              when the admin uploaded more than one (M9). */}
-          <ProductGallery images={product.images} alt={product.name} />
+              when the admin uploaded more than one (M9). At `lg:` it's a
+              fixed-width left column instead — no more need to cap its
+              height, the info column no longer sits underneath it. */}
+          <div className="lg:w-[420px] lg:shrink-0">
+            <ProductGallery images={product.images} alt={product.name} />
+          </div>
 
-          <p className="mt-4 text-xs text-muted-foreground">{product.categoryName}</p>
-          {/* "English (Marathi)" — same bilingual format as the product
-              cards (session 2026-09-01). The sticky header above stays
-              plain (`product.name`, single-locale) — it's a narrow,
-              truncated bar, and the bracketed name is more likely to get
-              cut off there than to add anything. */}
-          <h2 className="mt-0.5 text-lg leading-snug font-bold">
-            {product.nameEn}
-            {product.localName && (
-              <span className="font-normal text-muted-foreground"> ({product.localName})</span>
-            )}
-          </h2>
+          <div className="lg:min-w-0 lg:flex-1">
+            <p className="mt-4 text-xs text-muted-foreground lg:mt-0">{product.categoryName}</p>
+            {/* "English (Marathi)" — same bilingual format as the product
+                cards (session 2026-09-01). The sticky header above stays
+                plain (`product.name`, single-locale) — it's a narrow,
+                truncated bar, and the bracketed name is more likely to get
+                cut off there than to add anything. */}
+            <h2 className="mt-0.5 text-lg leading-snug font-bold">
+              {product.nameEn}
+              {product.localName && (
+                <span className="font-normal text-muted-foreground"> ({product.localName})</span>
+              )}
+            </h2>
 
-          <VariantPicker
-            productId={product.id}
-            productName={product.name}
-            variants={product.variants.map((v) => ({
-              id: v.id,
-              label: v.label,
-              quantity: v.quantity,
-              unit: v.unit,
-              pricePaise: v.pricePaise.toString(),
-              mrpPaise: v.mrpPaise.toString(),
-              stockQty: v.stockQty,
-              lowStockThreshold: v.lowStockThreshold,
-              isDefault: v.isDefault,
-            }))}
-          />
-
+            <VariantPicker
+              productId={product.id}
+              productName={product.name}
+              variants={product.variants.map((v) => ({
+                id: v.id,
+                label: v.label,
+                quantity: v.quantity,
+                unit: v.unit,
+                pricePaise: v.pricePaise.toString(),
+                mrpPaise: v.mrpPaise.toString(),
+                stockQty: v.stockQty,
+                lowStockThreshold: v.lowStockThreshold,
+                isDefault: v.isDefault,
+              }))}
+            />
+          </div>
         </div>
 
         {product.description && (
@@ -121,7 +131,7 @@ export default async function ProductPage({
         {product.similar.length > 0 && (
           <section className="bg-card px-4 py-4">
             <h3 className="mb-3 text-sm font-semibold">{t('similar')}</h3>
-            <ul className="grid grid-cols-2 gap-3">
+            <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               {product.similar.map((item) => (
                 <li key={item.id}>
                   <ProductCard

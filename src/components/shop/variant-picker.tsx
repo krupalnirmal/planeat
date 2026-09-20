@@ -191,9 +191,15 @@ export function VariantPicker({
       {/* Sticky above the bottom nav, Blinkit-matched (session 2026-08-25):
           weight + price sit on the left, the add control on the right —
           not a single full-width button — so the price stays visible next
-          to whichever action is available. */}
+          to whichever action is available.
+
+          `lg:static` (session 2026-09-20, desktop layout plan Part D): a
+          bar fixed to the viewport bottom makes no sense once the PDP is a
+          two-column layout with its own info column — at `lg:` this just
+          sits inline at the bottom of that column instead, same content
+          and handlers, no fixed positioning or width cap. */}
       <div
-        className="fixed inset-x-0 z-30 mx-auto flex max-w-[480px] items-center justify-between gap-3 border-t border-border bg-card px-4 py-3"
+        className="fixed inset-x-0 z-30 mx-auto flex max-w-[480px] items-center justify-between gap-3 border-t border-border bg-card px-4 py-3 lg:static lg:mt-6 lg:max-w-none lg:border-0 lg:px-0 lg:py-0"
         style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
       >
         <div className="min-w-0">
