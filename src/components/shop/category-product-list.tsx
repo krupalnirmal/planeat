@@ -513,9 +513,15 @@ export function CategoryProductList({
               Restyled (session 2026-08-26) to the client's reference: round
               photo tiles and a bold label for the active item, no left-edge
               colour bar or per-group count. */}
+          {/* `lg:w-56` (session 2026-09-20) — matches `admin-shell.tsx`'s
+              own sidebar width. Widening it alone would leave the icon
+              stacked awkwardly above a left-aligned label in a much wider
+              column, so `lg:` also switches each item from a centred
+              icon-over-label column to a left-aligned icon-beside-label
+              row, the normal shape for a wide sidebar. */}
           <nav
             aria-label={categoryName}
-            className="sticky w-[76px] shrink-0 self-start overflow-y-auto bg-card"
+            className="sticky w-[76px] shrink-0 self-start overflow-y-auto bg-card lg:w-56"
             style={{ top: HEADER_OFFSET_PX, maxHeight: `calc(100dvh - ${HEADER_OFFSET_PX}px)` }}
           >
             {/* The rail always leads with a non-photo "All" tab, active by
@@ -527,12 +533,13 @@ export function CategoryProductList({
               aria-current={activeTypeId === ALL_ID}
               className={cn(
                 'flex w-full flex-col items-center gap-1 border-r-4 px-1.5 py-3 text-center',
+                'lg:flex-row lg:justify-start lg:gap-3 lg:px-4 lg:text-left',
                 activeTypeId === ALL_ID ? 'border-primary' : 'border-transparent',
               )}
             >
               <span
                 className={cn(
-                  'grid size-14 shrink-0 place-items-center rounded-full',
+                  'grid size-14 shrink-0 place-items-center rounded-full lg:size-10',
                   activeTypeId === ALL_ID ? 'bg-tint-lime text-primary' : 'bg-background text-muted-foreground',
                 )}
                 aria-hidden
@@ -541,7 +548,7 @@ export function CategoryProductList({
               </span>
               <span
                 className={cn(
-                  'text-[11px] leading-tight',
+                  'text-[11px] leading-tight lg:text-sm',
                   activeTypeId === ALL_ID ? 'font-bold text-foreground' : 'font-medium text-foreground',
                 )}
               >
@@ -564,12 +571,13 @@ export function CategoryProductList({
                   aria-current={active}
                   className={cn(
                     'flex w-full flex-col items-center gap-1 border-r-4 px-1.5 py-3 text-center',
+                    'lg:flex-row lg:justify-start lg:gap-3 lg:px-4 lg:text-left',
                     active ? 'border-primary' : 'border-transparent',
                   )}
                 >
                   <span
                     className={cn(
-                      'grid size-14 shrink-0 place-items-center overflow-hidden rounded-full p-1',
+                      'grid size-14 shrink-0 place-items-center overflow-hidden rounded-full p-1 lg:size-10',
                       active ? 'bg-tint-lime' : 'bg-background',
                     )}
                     aria-hidden
@@ -583,7 +591,7 @@ export function CategoryProductList({
                   </span>
                   <span
                     className={cn(
-                      'text-[11px] leading-tight',
+                      'text-[11px] leading-tight lg:text-sm',
                       active ? 'font-bold text-foreground' : 'font-medium text-foreground',
                     )}
                   >
@@ -654,7 +662,7 @@ export function CategoryProductList({
                       </button>
                     )}
                   </h2>
-                  <div className="grid grid-cols-2 gap-3 px-4 pt-3 pb-3">
+                  <div className="grid grid-cols-2 gap-3 px-4 pt-3 pb-3 lg:grid-cols-4">
                     {visibleProducts.map((product) => (
                       <ProductCard key={product.id} product={product} variants={product.variants} />
                     ))}
@@ -675,7 +683,7 @@ export function CategoryProductList({
                       vegetable that isn't literally organic or pre-chopped. */}
                   {slug === 'vegetables' ? t('otherVegetables') : t('other')}
                 </h2>
-                <div className="grid grid-cols-2 gap-3 px-4 pt-3 pb-3">
+                <div className="grid grid-cols-2 gap-3 px-4 pt-3 pb-3 lg:grid-cols-4">
                   {rest.map((product) => (
                     <ProductCard key={product.id} product={product} variants={product.variants} />
                   ))}
@@ -686,7 +694,7 @@ export function CategoryProductList({
         </div>
       ) : (
         <div className="bg-tint-lime px-4 pt-3 pb-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {rest.map((product) => (
               <ProductCard key={product.id} product={product} variants={product.variants} />
             ))}
