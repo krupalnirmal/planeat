@@ -36,7 +36,10 @@ export function ExplorerTabs({
   onChange: (key: string) => void;
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1" role="tablist">
+    <div
+      className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      role="tablist"
+    >
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = tab.key === active;
