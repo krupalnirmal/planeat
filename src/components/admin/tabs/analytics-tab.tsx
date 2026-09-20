@@ -237,16 +237,16 @@ export function AnalyticsExplorerTab({ range }: { range: DashboardRange }) {
   );
 }
 
-// Darker than the first cut (session 2026-09-19 client feedback: "too
-// faint") — these tints now sit roughly halfway between the original pale
-// wash and the icon's own saturated color, instead of barely tinting
-// white.
+// One shared yellow for every tile (session 2026-09-20, client request —
+// "saglyana same [color] de", all 5 used to carry their own hue). Every
+// `hue` key still maps here, so none of the 5 `<StatTile>` call sites below
+// needed to change — only what each one resolves to.
 const STAT_HUES = {
-  green: { bg: '#CFEED9', icon: '#2fa355' },
-  violet: { bg: '#DDD1F6', icon: '#4a3aa7' },
-  orange: { bg: '#FBD9BC', icon: '#eb6834' },
-  blue: { bg: '#CBE0FC', icon: '#2a78d6' },
-  pink: { bg: '#F8CFE0', icon: '#e87ba4' },
+  green: { bg: '#FDE8A8', icon: '#B8860B' },
+  violet: { bg: '#FDE8A8', icon: '#B8860B' },
+  orange: { bg: '#FDE8A8', icon: '#B8860B' },
+  blue: { bg: '#FDE8A8', icon: '#B8860B' },
+  pink: { bg: '#FDE8A8', icon: '#B8860B' },
 } as const;
 type StatHue = keyof typeof STAT_HUES;
 
@@ -283,7 +283,7 @@ function StatTile({
           >
             <Icon className="size-4" aria-hidden />
           </span>
-          <p className="truncate text-xs text-muted-foreground">{label}</p>
+          <p className="truncate text-sm font-bold text-muted-foreground">{label}</p>
         </div>
         <p className="mt-1.5 text-2xl font-bold tabular-nums text-foreground">{value}</p>
         <p
