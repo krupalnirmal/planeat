@@ -804,6 +804,12 @@
   },
   "admin": {
     "title": "प्रशासन",
+    "appTitle": "Get Fresh अ‍ॅडमिन",
+    "installTitle": "अ‍ॅडमिन अ‍ॅप या डिव्हाइसवर इन्स्टॉल करा",
+    "installAction": "इन्स्टॉल करा",
+    "installIosHint": "Share → Add to Home Screen निवडा",
+    "installAndroidHint": "Chrome चे ⋮ मेनू → Install app निवडा",
+    "installDismiss": "आत्ता नको",
     "nav": {
       "dashboard": "मुख्य पान",
       "picklist": "आजची यादी",

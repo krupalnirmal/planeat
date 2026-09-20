@@ -25,6 +25,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useRouter, usePathname } from '@/i18n/navigation';
+import { AdminInstallPrompt } from '@/components/admin/install-prompt';
 import { NotificationBell } from '@/components/admin/notification-bell';
 import { useInvalidateSession, useSession } from '@/hooks/use-session';
 import { api } from '@/lib/api/client';
@@ -347,6 +348,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         )}
+
+        <AdminInstallPrompt />
 
         <main className="p-4 lg:p-6 print:p-0">{children}</main>
       </div>

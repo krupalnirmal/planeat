@@ -804,6 +804,12 @@
   },
   "admin": {
     "title": "Admin",
+    "appTitle": "Get Fresh Admin",
+    "installTitle": "Install the admin app on this device",
+    "installAction": "Install",
+    "installIosHint": "Share → Add to Home Screen",
+    "installAndroidHint": "Chrome menu → Install app",
+    "installDismiss": "Not now",
     "nav": {
       "dashboard": "Dashboard",
       "picklist": "Picklist",
