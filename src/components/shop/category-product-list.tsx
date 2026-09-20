@@ -668,7 +668,12 @@ export function CategoryProductList({
                   className="sticky z-10 border-b border-border bg-tint-lime px-4 py-2.5 text-[15px] font-black text-primary-dark"
                   style={{ top: HEADER_OFFSET_PX }}
                 >
-                  {t('other')}
+                  {/* Vegetables' own leftover bucket gets a real label
+                      (session 2026-09-20, client request) instead of the
+                      generic "Other" every other category still uses —
+                      it's not a mystery bucket here, it's every ordinary
+                      vegetable that isn't literally organic or pre-chopped. */}
+                  {slug === 'vegetables' ? t('otherVegetables') : t('other')}
                 </h2>
                 <div className="grid grid-cols-2 gap-3 px-4 pt-3 pb-3">
                   {rest.map((product) => (

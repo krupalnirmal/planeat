@@ -126,6 +126,7 @@
     "empty": "Nothing in this category yet",
     "productCount": "{count} items",
     "other": "Other",
+    "otherVegetables": "Fresh Vegetables (regular)",
     "all": "All",
     "title": "Categories",
     "searchPlaceholder": "Search {category}",
