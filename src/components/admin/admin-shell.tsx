@@ -313,8 +313,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           >
             <Menu className="size-5" aria-hidden />
           </button>
-          <p className="min-w-0 flex-1 truncate text-sm font-bold">
-            <span className="text-primary-dark">Get</span> <span className="text-primary">Fresh</span>
+          {/* `text-xl` (session 2026-09-20, client screenshot: too small)
+              — bumped up from `text-sm`. Also merged to one word
+              ("GetFresh", no space) per the same request. */}
+          <p className="min-w-0 flex-1 truncate text-xl font-black">
+            <span className="text-primary-dark">Get</span><span className="text-primary">Fresh</span>
           </p>
           <NotificationBell />
         </header>
