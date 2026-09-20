@@ -92,12 +92,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           card
         >
           {categories.length > 0 ? (
-            // A horizontally-scrollable row, not a wrapping grid (session
+            // A horizontally-scrollable row below `lg:` (session
             // 2026-09-19, client request) — a growing category list (Aata/
             // Masala's own addition is what surfaced this) no longer
             // spills onto a second row; it scrolls in one row instead,
-            // snapping one tile at a time on mobile.
-            <ul className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            // snapping one tile at a time on mobile. At `lg:` and up
+            // (session 2026-09-20) scrolling chips is a mobile-only
+            // affordance — it becomes a wrapping grid instead, sized to
+            // the tile's own real width (`repeat(auto-fill,104px)`, not a
+            // fixed column count) so it lays out evenly instead of
+            // stretching each tile across a huge column.
+            <ul className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[repeat(auto-fill,104px)] lg:justify-center lg:gap-3 lg:overflow-visible">
               {collages.map((collage) => (
                 <li key={collage.categorySlug} className="shrink-0">
                   <CategoryCollageTile
@@ -125,15 +130,22 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             seeAllHref="/category/vegetables"
             seeAllLabel={tc('seeAll')}
           >
-            {/* A horizontal rail, not a 2-column grid: the reference shows
-                four narrow cards side by side that scroll sideways, which
-                keeps "Top Picks" one glanceable row instead of a block that
-                pushes everything below it off the screen. */}
+            {/* A horizontal rail below `lg:`, not a 2-column grid: the
+                reference shows four narrow cards side by side that scroll
+                sideways, which keeps "Top Picks" one glanceable row
+                instead of a block that pushes everything below it off the
+                screen. */}
             {/* `scroll-px-4` matters: without it scroll-snap aligns the
                 first card to the scrollport's own edge, silently scrolling
                 past the `px-4` padding, so the rail started flush at x=0
                 while every other section on the page starts at 16px. */}
-            <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {/* `lg:` (session 2026-09-20): the card's own width is already
+                capped at 132px by `max-w-[132px]` on the `<li>` below
+                regardless of viewport, so the same "size the grid tracks
+                to the card's real width" trick as the category row above
+                applies here too — `repeat(auto-fill,132px)`, not a fixed
+                column count. */}
+            <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:mx-0 lg:grid lg:grid-cols-[repeat(auto-fill,132px)] lg:gap-3 lg:overflow-visible lg:px-0">
               {bestsellers.map((product) => (
                 <li key={product.id} className="w-[30vw] max-w-[132px] shrink-0 snap-start">
                   <ProductCard

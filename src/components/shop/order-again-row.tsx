@@ -61,8 +61,10 @@ export function OrderAgainRow() {
 
       {/* `scroll-px-4`: see the same rail on the home page — scroll-snap
           otherwise scrolls straight past this padding and the first card
-          lands flush against the screen edge. */}
-      <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          lands flush against the screen edge. `lg:` (session 2026-09-20):
+          same "wrap into a grid sized to the card's own 132px width"
+          treatment as the home page's bestseller rail. */}
+      <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:mx-0 lg:grid lg:grid-cols-[repeat(auto-fill,132px)] lg:gap-3 lg:overflow-visible lg:px-0">
         {products.map((product) => (
           <li key={product.id} className="w-[30vw] max-w-[132px] shrink-0 snap-start">
             <ProductCard product={product} compact />
