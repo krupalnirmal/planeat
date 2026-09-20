@@ -75,9 +75,15 @@ export type ExplorerRange = (typeof RANGE_KEYS)[number];
 export function DateRangeDropdown({
   value,
   onChange,
+  keys = RANGE_KEYS,
 }: {
   value: ExplorerRange;
   onChange: (value: ExplorerRange) => void;
+  /** Narrows the dropdown's own option list — the Analytics tab's header
+      dropdown only offers 14d/30d/month (session 2026-09-20), not the full
+      today/yesterday/7d/14d/30d/month set every other tab's own
+      `DateRangeDropdown` shows. Defaults to the full set. */
+  keys?: readonly ExplorerRange[];
 }) {
   const t = useTranslations('admin.explorer.range');
   const [open, setOpen] = useState(false);
@@ -105,7 +111,7 @@ export function DateRangeDropdown({
             onClick={() => setOpen(false)}
           />
           <div className="absolute top-full left-0 z-50 mt-1 w-44 rounded-[var(--radius)] border border-border bg-card py-1 shadow-lg">
-            {RANGE_KEYS.map((key) => (
+            {keys.map((key) => (
               <button
                 key={key}
                 type="button"

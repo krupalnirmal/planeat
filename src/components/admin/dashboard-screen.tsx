@@ -19,8 +19,12 @@ import {
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AdminPageHeader } from '@/components/admin/admin-shell';
-import { ExplorerEmpty, ExplorerTabs, type ExplorerTab } from '@/components/admin/explorer';
-import { AnalyticsExplorerTab } from '@/components/admin/tabs/analytics-tab';
+import { DateRangeDropdown, ExplorerEmpty, ExplorerTabs, type ExplorerTab } from '@/components/admin/explorer';
+import {
+  ANALYTICS_RANGE_OPTIONS,
+  AnalyticsExplorerTab,
+  type DashboardRange,
+} from '@/components/admin/tabs/analytics-tab';
 import { CustomersExplorerTab } from '@/components/admin/tabs/customers-tab';
 import { DeliveriesExplorerTab } from '@/components/admin/tabs/deliveries-tab';
 import { InventoryExplorerTab } from '@/components/admin/tabs/inventory-tab';
@@ -85,6 +89,7 @@ export function AdminDashboard() {
   const queryClient = useQueryClient();
   const [notice, setNotice] = useState<string | null>(null);
   const [tab, setTab] = useState('analytics');
+  const [range, setRange] = useState<DashboardRange>('30d');
 
   const metrics = useQuery({
     queryKey: ['admin-dashboard-cron', locale],
@@ -107,7 +112,24 @@ export function AdminDashboard() {
 
   return (
     <div>
-      <AdminPageHeader title={te('title')} subtitle={te('subtitle')} />
+      <AdminPageHeader
+        title={te('title')}
+        subtitle={te('subtitle')}
+        // Only the Analytics tab has a date range to show — client
+        // screenshot: the "Last 14 days / Last 30 days / This month" row
+        // used to sit below the tabs as a duplicate of this same control;
+        // it's been removed from analytics-tab.tsx (see that file) in
+        // favour of this one, header-level dropdown.
+        action={
+          tab === 'analytics' ? (
+            <DateRangeDropdown
+              value={range}
+              onChange={(next) => setRange(next as DashboardRange)}
+              keys={ANALYTICS_RANGE_OPTIONS}
+            />
+          ) : undefined
+        }
+      />
 
       {notice && (
         <p className="mb-4 rounded-[var(--radius)] bg-primary/5 px-4 py-3 text-sm">{notice}</p>
@@ -156,7 +178,7 @@ export function AdminDashboard() {
 
       <div className="mt-4">
         {tab === 'analytics' ? (
-          <AnalyticsExplorerTab />
+          <AnalyticsExplorerTab range={range} />
         ) : tab === 'orders' ? (
           <OrdersExplorerTab />
         ) : tab === 'revenue' ? (

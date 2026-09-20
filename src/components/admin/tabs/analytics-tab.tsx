@@ -3,7 +3,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { IndianRupee, ShoppingCart, Truck, TrendingUp, Users } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import {
   DonutChart,
@@ -13,6 +12,7 @@ import {
   RevenueTrendChart,
   Sparkline,
 } from '@/components/admin/charts';
+import type { ExplorerRange } from '@/components/admin/explorer';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -32,7 +32,7 @@ import { cn } from '@/lib/utils';
     on-time/late distinction to show. "Delivery Outcomes" below shows the
     real Delivered/Cancelled/Failed split instead. */
 
-type DashboardRange = '14d' | '30d' | 'month';
+export type DashboardRange = Extract<ExplorerRange, '14d' | '30d' | 'month'>;
 
 interface DailyPoint {
   dateKey: string;
@@ -52,7 +52,9 @@ interface DashboardResponse {
   };
 }
 
-const RANGE_OPTIONS: DashboardRange[] = ['14d', '30d', 'month'];
+/** Also passed as `DateRangeDropdown`'s `keys` prop from `dashboard-screen.tsx`,
+    so the header dropdown offers exactly the 3 ranges this tab understands. */
+export const ANALYTICS_RANGE_OPTIONS: DashboardRange[] = ['14d', '30d', 'month'];
 
 /** `null` when the previous period was zero and the current isn't — no
     meaningful percentage, same rule the backend's own `pctDelta` uses for
@@ -62,14 +64,12 @@ function pctDelta(current: number, previous: number): number | null {
   return Math.round(((current - previous) / previous) * 1000) / 10;
 }
 
-export function AnalyticsExplorerTab() {
+export function AnalyticsExplorerTab({ range }: { range: DashboardRange }) {
   const t = useTranslations('admin.analytics');
   const td = useTranslations('admin.dashboard');
   const tc = useTranslations('admin.common');
   const tStatus = useTranslations('orders.status');
   const locale = useLocale();
-
-  const [range, setRange] = useState<DashboardRange>('30d');
 
   const metrics = useQuery({
     queryKey: ['admin-analytics', locale, range],
@@ -99,22 +99,9 @@ export function AnalyticsExplorerTab() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-end gap-1.5">
-        {RANGE_OPTIONS.map((opt) => (
-          <button
-            key={opt}
-            type="button"
-            onClick={() => setRange(opt)}
-            className={cn(
-              'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
-              range === opt ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground',
-            )}
-          >
-            {td(`range.${opt}`)}
-          </button>
-        ))}
-      </div>
-
+      {/* The range control itself now lives in AdminPageHeader's action
+          slot (dashboard-screen.tsx), not here — session 2026-09-20, client
+          request. */}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <StatTile
           label={t('totalOrders')}
