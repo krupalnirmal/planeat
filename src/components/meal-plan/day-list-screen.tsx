@@ -36,7 +36,7 @@ export function DayListScreen() {
         backHref="/meal-plan"
         backLabel={tc('back')}
       />
-      <main className="space-y-3 p-4 pb-24">
+      <main className="space-y-3 p-4 pb-24 lg:mx-auto lg:max-w-2xl">
         <ul className="divide-y divide-border overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-card">
           {DAYS.map((day) => {
             const count = draft.itemCount(day);

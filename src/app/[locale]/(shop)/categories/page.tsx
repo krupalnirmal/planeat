@@ -30,7 +30,7 @@ export default async function CategoriesPage({
         backLabel={tc('back')}
         trailing={<HeaderCartLink />}
       />
-      <main className="pb-2">
+      <main className="pb-2 lg:mx-auto lg:max-w-2xl">
         <div className="bg-card px-4">
           {categories.length === 0 ? (
             <p className="py-10 text-center text-sm text-muted-foreground">{t('empty')}</p>

@@ -46,7 +46,7 @@ export function OrderConfirmedScreen({ orderId }: { orderId: string }) {
   const order = detail.data?.order;
 
   return (
-    <main className="flex min-h-dvh flex-col bg-tint-green px-6 pt-16 pb-8 text-center">
+    <main className="flex min-h-dvh flex-col bg-tint-green px-6 pt-16 pb-8 text-center lg:mx-auto lg:max-w-2xl">
       <div className="flex flex-1 flex-col items-center">
         <span className="grid size-20 place-items-center rounded-full bg-primary shadow-lg">
           <Check className="size-10 text-primary-foreground" strokeWidth={3} aria-hidden />

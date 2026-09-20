@@ -206,7 +206,7 @@ export function SubscriptionManageScreen() {
         </div>
       </header>
 
-      <main className="space-y-2 pb-2">
+      <main className="space-y-2 pb-2 lg:mx-auto lg:max-w-2xl">
       {/* ── Screen 9: "During Plan" — progress, wallet, quick links.
           Replaces the bare "N days left" the header used to be the only
           place showing. */}

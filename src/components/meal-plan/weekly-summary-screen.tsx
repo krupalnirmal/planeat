@@ -59,7 +59,7 @@ export function WeeklySummaryScreen() {
   return (
     <>
       <PageHeader title={t('title')} backHref="/meal-plan/build" backLabel={tc('back')} />
-      <main className="space-y-4 p-4 pb-28">
+      <main className="space-y-4 p-4 pb-28 lg:mx-auto lg:max-w-2xl">
         <div className="flex rounded-[var(--radius)] border border-border bg-card p-1">
           <button
             type="button"

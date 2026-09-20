@@ -107,7 +107,7 @@ export function WalletScreen() {
   return (
     <>
       <PageHeader title={t('title')} />
-      <main className="space-y-2 bg-background pb-2">
+      <main className="space-y-2 bg-background pb-2 lg:mx-auto lg:max-w-2xl">
       <div className="bg-card px-4 py-4">
       <section className="relative overflow-hidden rounded-3xl bg-primary px-5 py-6 text-primary-foreground">
         {/* "Subtle pattern" (client's reference) as two oversized, low-opacity

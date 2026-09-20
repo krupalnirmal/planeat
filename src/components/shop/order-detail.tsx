@@ -173,7 +173,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressText)}`;
 
   return (
-    <main className="min-h-dvh space-y-3 bg-accent-faint px-4 pt-4 pb-4">
+    <main className="min-h-dvh space-y-3 bg-accent-faint px-4 pt-4 pb-4 lg:mx-auto lg:max-w-2xl">
       <header className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-1">
           <Link

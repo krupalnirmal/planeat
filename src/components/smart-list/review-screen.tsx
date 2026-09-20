@@ -125,7 +125,7 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
     return (
       <>
         <PageHeader title={t('reviewTitle')} backHref="/smart-list" backLabel={tc('back')} />
-        <main className="pb-2">
+        <main className="pb-2 lg:mx-auto lg:max-w-2xl">
           <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
         </main>
       </>
@@ -141,7 +141,7 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
     return (
       <>
         <PageHeader title={t('reviewTitle')} backHref="/smart-list" backLabel={tc('back')} />
-        <main className="pb-2">
+        <main className="pb-2 lg:mx-auto lg:max-w-2xl">
           <div className="bg-card">
             <CenteredState>
               <AlertCircle className="size-10 text-muted-foreground/40" aria-hidden />
@@ -164,7 +164,7 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
   return (
     <>
       <PageHeader title={t('reviewTitle')} subtitle={t('reviewHint')} backHref="/smart-list" backLabel={tc('back')} />
-      <main className="pb-2">
+      <main className="pb-2 lg:mx-auto lg:max-w-2xl">
       <div className="bg-card px-4 py-4">
       {notice && (
         <p className="mb-4 rounded-[var(--radius)] bg-secondary px-3 py-2.5 text-sm">{notice}</p>

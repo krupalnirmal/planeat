@@ -218,7 +218,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
           onEdit={(product) => setPicker(product)}
         />
       ) : (
-        <main className="pb-28">
+        <main className="pb-28 lg:mx-auto lg:max-w-2xl">
           {/* ── Search + category row, stacked and sticky under the day
               tabs (session 2026-09-20, client reference mockup) — replaces
               the earlier vertical left rail (session 2026-09-17's own
@@ -580,7 +580,7 @@ function DaySummaryView({
   );
 
   return (
-    <main className="space-y-4 p-4 pb-28">
+    <main className="space-y-4 p-4 pb-28 lg:mx-auto lg:max-w-2xl">
       <button type="button" onClick={onBack} className="text-xs font-semibold text-primary">
         {tw('backToItems')}
       </button>

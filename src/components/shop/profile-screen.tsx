@@ -80,7 +80,7 @@ export function ProfileScreen() {
   return (
     <>
       <PageHeader title={t('title')} />
-      <main className="space-y-2 pb-2">
+      <main className="space-y-2 pb-2 lg:mx-auto lg:max-w-2xl">
       <div className="bg-card px-4 py-4">
       <section className="flex items-center gap-3 rounded-[var(--radius)] border border-border/60 bg-background p-4">
         <span className="grid size-12 shrink-0 place-items-center rounded-full bg-primary/10 text-lg font-bold text-primary">

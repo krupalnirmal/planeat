@@ -94,7 +94,7 @@ export function AddressManager() {
   return (
     <>
       <PageHeader title={t('title')} backHref="/profile" backLabel={tc('back')} />
-      <main className="space-y-2 pb-2">
+      <main className="space-y-2 pb-2 lg:mx-auto lg:max-w-2xl">
       <div className="bg-card px-5 py-6">
       {adding ? (
         <AddressForm

@@ -64,7 +64,7 @@ export function SearchScreen() {
   return (
     <>
       <PageHeader title={tc('search')} backHref="/" backLabel={tc('back')} />
-      <main className="pb-2">
+      <main className="pb-2 lg:mx-auto lg:max-w-4xl">
       <div className="bg-card px-4 py-4">
       <SearchBar defaultValue={input} autoFocus onChange={setInput} className="mb-4" />
 
@@ -125,7 +125,7 @@ export function SearchScreen() {
               <h2 className="mb-3 text-sm font-semibold">
                 {t('resultsFor', { query: debounced })}
               </h2>
-              <ul className="grid grid-cols-2 gap-3">
+              <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                 {products.map((product) => (
                   <li key={product.id}>
                     <ProductCard product={product} />

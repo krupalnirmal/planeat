@@ -281,7 +281,7 @@ export function SubscribeScreen() {
         }
       />
 
-      <main className="space-y-2 pb-24">
+      <main className="space-y-2 pb-24 lg:mx-auto lg:max-w-2xl">
         {error && step !== 'topup' && (
           <p className="mx-4 mt-3 rounded-[var(--radius)] bg-danger/10 px-3 py-2.5 text-sm text-danger">{error}</p>
         )}

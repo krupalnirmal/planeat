@@ -91,7 +91,7 @@ export function ServiceabilityCheck() {
   return (
     <>
       <PageHeader title={t('title')} backHref="/" backLabel={tc('back')} />
-      <main className="pb-2">
+      <main className="pb-2 lg:mx-auto lg:max-w-2xl">
       <div className="bg-card px-5 py-8">
       <form
         className="mt-6"

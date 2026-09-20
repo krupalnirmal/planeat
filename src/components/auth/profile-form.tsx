@@ -66,7 +66,7 @@ export function ProfileForm() {
   return (
     <>
       <PageHeader title={t('completeTitle')} />
-      <main className="pb-2">
+      <main className="pb-2 lg:mx-auto lg:max-w-2xl">
       <div className="bg-card px-5 py-8">
       <p className="text-sm text-muted-foreground">{t('completeSubtitle')}</p>
 

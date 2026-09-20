@@ -88,7 +88,7 @@ export function MealPlanScreen() {
   const savings = paise(data?.weeklySavingsPaise ?? '0');
 
   return (
-    <main className="pb-6">
+    <main className="pb-6 lg:mx-auto lg:max-w-2xl">
       {/* Left-aligned, not centered (session 2026-09-20, client reference)
           — a leaf mark top-left and a bell top-right, the same pairing the
           storefront's own AppHeader wordmark and icon row use. The bell is

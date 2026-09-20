@@ -122,7 +122,7 @@ export function SmartListScreen() {
     return (
       <>
         <PageHeader title={t('title')} />
-        <main className="pb-2">
+        <main className="pb-2 lg:mx-auto lg:max-w-2xl">
           <div className="bg-card px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</div>
         </main>
       </>
@@ -147,7 +147,7 @@ export function SmartListScreen() {
   return (
     <>
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
-      <main className="pb-2">
+      <main className="pb-2 lg:mx-auto lg:max-w-2xl">
       <div className="bg-card px-4 py-4">
       {error && (
         <p className="mb-4 rounded-[var(--radius)] bg-danger/10 px-3 py-2.5 text-sm text-danger">
