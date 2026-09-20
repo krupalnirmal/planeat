@@ -175,8 +175,8 @@ export function TopupSheet({
   const belowMinimum = amountPaise < minimum;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
-      <div className="w-full max-w-[480px] rounded-t-[calc(var(--radius)*1.6)] bg-background p-5 pb-8">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center">
+      <div className="w-full max-w-[480px] rounded-t-[calc(var(--radius)*1.6)] bg-background p-5 pb-8 sm:max-w-md sm:rounded-[calc(var(--radius)*1.6)]">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-bold">{t('addMoney')}</h2>
           <button

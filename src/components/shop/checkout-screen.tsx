@@ -520,8 +520,8 @@ export function CheckoutScreen() {
           checkout screen rather than navigating away, since nothing is
           confirmed yet at this point (P2). */}
       {paymentPhase !== 'idle' && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
-          <div className="w-full max-w-[480px] rounded-t-[calc(var(--radius)*1.6)] bg-background p-5 pb-8">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center">
+          <div className="w-full max-w-[480px] rounded-t-[calc(var(--radius)*1.6)] bg-background p-5 pb-8 sm:max-w-md sm:rounded-[calc(var(--radius)*1.6)]">
             {(paymentPhase === 'initiating' ||
               paymentPhase === 'awaiting-gateway' ||
               paymentPhase === 'polling') && (
