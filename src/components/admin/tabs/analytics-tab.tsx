@@ -16,16 +16,9 @@ import {
   Warehouse,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
-import {
-  DonutChart,
-  ORDER_STATUS_COLORS,
-  OrdersTrendChart,
-  RevenueTrendChart,
-  Sparkline,
-} from '@/components/admin/charts';
-import { DateRangeDropdown, type ExplorerRange } from '@/components/admin/explorer';
+import { DonutChart, ORDER_STATUS_COLORS, Sparkline, TrendAreaChart } from '@/components/admin/charts';
+import { type ExplorerRange } from '@/components/admin/explorer';
 import { api, qs } from '@/lib/api/client';
 import { CATEGORY_TILE_IMAGES } from '@/lib/catalog/category-tile-images';
 import { formatPaise, paise } from '@/lib/money';
@@ -48,14 +41,6 @@ import { cn } from '@/lib/utils';
 
 export type DashboardRange = Extract<ExplorerRange, '14d' | '30d' | 'month'>;
 
-/** The two trend charts' own range (session 2026-09-21, client reference)
-    — deliberately narrower than `DashboardRange` above: it only re-slices
-    the already-fetched daily series client-side, so it never needs to
-    exceed what the top-level range already covers. */
-type TrendRange = Extract<ExplorerRange, '7d' | '14d' | '30d'>;
-const TREND_KEYS: TrendRange[] = ['7d', '14d', '30d'];
-const TREND_DAYS: Record<TrendRange, number> = { '7d': 7, '14d': 14, '30d': 30 };
-
 interface DailyPoint {
   dateKey: string;
   orders: number;
@@ -68,6 +53,8 @@ interface RecentOrder {
   orderNumber: string;
   status: string;
   totalPaise: string;
+  placedAt: string;
+  photoUrl: string | null;
 }
 
 interface DashboardResponse {
@@ -95,20 +82,35 @@ interface DashboardResponse {
     so the header dropdown offers exactly the 3 ranges this tab understands. */
 export const ANALYTICS_RANGE_OPTIONS: DashboardRange[] = ['14d', '30d', 'month'];
 
-/** Same colour-per-status convention already used for the order-status dot
-    in `customer-detail-screen.tsx`'s own Recent Orders section — reused for
-    visual consistency rather than a third invention of this mapping. */
-const STATUS_DOT: Record<string, string> = {
-  PLACED: 'bg-muted-foreground',
-  CONFIRMED: 'bg-primary',
-  PACKED: 'bg-primary',
-  OUT_FOR_DELIVERY: 'bg-warning',
-  DELIVERED: 'bg-success',
-  CANCELLED: 'bg-danger',
-  FAILED_DELIVERY: 'bg-danger',
-  REFUNDED: 'bg-muted-foreground',
-  PAYMENT_PENDING: 'bg-warning',
+/** A colored status pill (session 2026-09-21, new client reference)
+    replacing the old plain status dot — same status-to-color mapping,
+    just a background+text pair instead of a single dot fill. */
+const STATUS_BADGE: Record<string, string> = {
+  PLACED: 'bg-secondary text-muted-foreground',
+  CONFIRMED: 'bg-primary/10 text-primary',
+  PACKED: 'bg-primary/10 text-primary',
+  OUT_FOR_DELIVERY: 'bg-warning/15 text-warning',
+  DELIVERED: 'bg-success/15 text-success',
+  CANCELLED: 'bg-danger/15 text-danger',
+  FAILED_DELIVERY: 'bg-danger/15 text-danger',
+  REFUNDED: 'bg-secondary text-muted-foreground',
+  PAYMENT_PENDING: 'bg-warning/15 text-warning',
 };
+
+/** "Today, 10:24 AM" when `placedAt` falls on the admin's own calendar
+    today, a short date otherwise — session 2026-09-21, new client
+    reference (Recent Orders previously showed no timestamp at all). */
+function formatOrderTimestamp(placedAt: string, locale: string, todayLabel: string): string {
+  const date = new Date(placedAt);
+  const now = new Date();
+  const isToday =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+  const time = date.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
+  if (isToday) return `${todayLabel}, ${time}`;
+  return `${date.toLocaleDateString(locale, { day: 'numeric', month: 'short' })}, ${time}`;
+}
 
 /** `null` when the previous period was zero and the current isn't — no
     meaningful percentage, same rule the backend's own `pctDelta` uses for
@@ -140,23 +142,12 @@ export function AnalyticsExplorerTab({
     placeholderData: (previous) => previous,
   });
 
-  // Real per-chart range (session 2026-09-21, client reference) — no
-  // second API call: the top-level Analytics range (14d/30d/month) already
-  // covers the widest of these 3, so switching this just re-slices the
-  // already-fetched `dailySeries` client-side. Shared by both trend charts
-  // rather than independent state, matching the reference (both show the
-  // same "Last 7 days" value).
-  const [trendRange, setTrendRange] = useState<TrendRange>('7d');
-
   if (metrics.isLoading) return <p className="text-sm text-muted-foreground">{tc('loading')}</p>;
   const analytics = metrics.data?.analytics;
   if (!analytics) return <p className="text-sm text-danger">{tc('failed')}</p>;
   const recentOrders = metrics.data?.recentOrders ?? [];
   const lowStockCount = metrics.data?.lowStockCount ?? 0;
   const lowStockProducts = metrics.data?.lowStockProducts ?? [];
-
-  const trendDays = TREND_DAYS[trendRange];
-  const trendSeries = analytics.dailySeries.slice(-trendDays);
 
   const totalOrders = analytics.dailySeries.reduce((sum, d) => sum + d.orders, 0);
   const totalDelivered = analytics.dailySeries.reduce((sum, d) => sum + d.delivered, 0);
@@ -179,7 +170,11 @@ export function AnalyticsExplorerTab({
       {/* The range control itself now lives in AdminPageHeader's action
           slot (dashboard-screen.tsx), not here — session 2026-09-20, client
           request. */}
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      {/* `grid-cols-2` as the base class (session 2026-09-21, new client
+          reference) — without it, every real phone (<640px) fell through
+          to a single implicit column and the 5 tiles stacked one-per-row
+          instead of the reference's true 2-column grid. */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <StatTile
           label={t('totalOrders')}
           value={String(totalOrders)}
@@ -224,24 +219,35 @@ export function AnalyticsExplorerTab({
         />
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+      {/* Store Performance (session 2026-09-21, new client reference) —
+          replaces what used to be two side-by-side charts (Orders trend,
+          Revenue trend) with the one combined chart the new reference
+          shows, per the client's explicit choice. Order count for the
+          selected top-level range (`analytics.dailySeries`, already
+          fetched — no new query, no second per-chart range control any
+          more either). Revenue's own trend line is intentionally gone as a
+          chart; the Total Revenue stat tile above and its own sparkline
+          still carry a real revenue signal. */}
+      <div className="mt-4">
         <ChartCard
-          title={td('ordersTrend')}
-          subtitle={td('ordersTrendSubtitle', { days: trendDays })}
+          title={td('storePerformance')}
           icon={ShoppingCart}
           hue="green"
-          action={<DateRangeDropdown value={trendRange} onChange={(v) => setTrendRange(v as TrendRange)} keys={TREND_KEYS} />}
+          action={
+            <button
+              type="button"
+              onClick={() => onOpenTab('orders')}
+              className="text-xs font-semibold text-primary"
+            >
+              {t('viewAll')} →
+            </button>
+          }
         >
-          <OrdersTrendChart data={trendSeries} />
-        </ChartCard>
-        <ChartCard
-          title={td('revenueTrend')}
-          subtitle={td('revenueTrendSubtitle', { days: trendDays })}
-          icon={IndianRupee}
-          hue="violet"
-          action={<DateRangeDropdown value={trendRange} onChange={(v) => setTrendRange(v as TrendRange)} keys={TREND_KEYS} />}
-        >
-          <RevenueTrendChart data={trendSeries} />
+          <TrendAreaChart
+            data={analytics.dailySeries.map((d) => ({ dateKey: d.dateKey, value: d.orders }))}
+            formatTooltipValue={(value) => t('ordersCount', { count: value })}
+            ariaLabel={td('storePerformance')}
+          />
         </ChartCard>
       </div>
 
@@ -353,8 +359,12 @@ export function AnalyticsExplorerTab({
             reusing listAdminOrders (src/lib/admin/dashboard.ts wires it in
             via getDashboardMetrics), the same query the Orders tab itself
             calls, rather than a second "list some orders" implementation.
-            Same status-dot + order# + amount + chevron row shape as
-            customer-detail-screen.tsx's own Recent Orders section. */}
+            Thumbnail, status pill and timestamp (session 2026-09-21, new
+            client reference) — the thumbnail is each order's own first
+            real item photo (`photoUrl`, added to `listAdminOrders`), not a
+            repeated decorative stock photo; the order number keeps its
+            real value with a cosmetic "#" rather than being rewritten to
+            match the reference's fictional format. */}
         <ChartCard
           title={td('recentOrders')}
           action={
@@ -373,14 +383,28 @@ export function AnalyticsExplorerTab({
                   href={`/admin/orders/${order.id}`}
                   className="flex items-center gap-2.5 py-2.5 first:pt-0 last:pb-0 hover:opacity-80"
                 >
-                  <span
-                    className={cn('size-2 shrink-0 rounded-full', STATUS_DOT[order.status] ?? 'bg-muted-foreground')}
-                    aria-hidden
-                  />
+                  <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg bg-secondary">
+                    {order.photoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={order.photoUrl} alt="" className="size-full object-cover" />
+                    ) : (
+                      <ImageIcon className="size-4 text-muted-foreground/40" aria-hidden />
+                    )}
+                  </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-mono text-xs font-medium">{order.orderNumber}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{tStatus(order.status as never)}</p>
+                    <p className="truncate text-sm font-medium">#{order.orderNumber}</p>
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                      {formatOrderTimestamp(order.placedAt, locale, tc('today'))}
+                    </p>
                   </div>
+                  <span
+                    className={cn(
+                      'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap',
+                      STATUS_BADGE[order.status] ?? 'bg-secondary text-muted-foreground',
+                    )}
+                  >
+                    {tStatus(order.status as never)}
+                  </span>
                   <p className="shrink-0 text-sm font-semibold">
                     {formatPaise(paise(order.totalPaise), { hidePaise: true })}
                   </p>

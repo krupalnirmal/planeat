@@ -1,4 +1,5 @@
 import { db } from '@/lib/db';
+import { firstImage } from '@/lib/catalog/text';
 import { ID_PREFIX, newId } from '@/lib/ids';
 import { formatPaise, paise } from '@/lib/money';
 import { parseDateKey } from '@/lib/meal-plan/pricing';
@@ -60,6 +61,11 @@ export interface AdminOrderRow {
   scheduledDate: Date | null;
   riderName: string | null;
   pincode: string;
+  /** The order's first real item photo, or `null` when that item has none
+      (session 2026-09-21, dashboard's Recent Orders widget, new client
+      reference) — a real per-order thumbnail, not a repeated decorative
+      stock photo. */
+  photoUrl: string | null;
 }
 
 export async function listAdminOrders(
@@ -116,6 +122,12 @@ export async function listAdminOrders(
         assignment: {
           select: { partner: { select: { user: { select: { name: true } } } } },
         },
+        // Bounded to 1 row — just enough for a real thumbnail, not a full
+        // item list (that's the order-detail query's job).
+        items: {
+          take: 1,
+          select: { variant: { select: { product: { select: { imageUrls: true } } } } },
+        },
       },
     }),
     db.order.count({ where }),
@@ -140,6 +152,7 @@ export async function listAdminOrders(
         scheduledDate: row.scheduledDate,
         riderName: row.assignment?.partner.user.name ?? null,
         pincode: typeof address.pincode === 'string' ? address.pincode : '',
+        photoUrl: firstImage(row.items[0]?.variant.product.imageUrls),
       };
     }),
   };

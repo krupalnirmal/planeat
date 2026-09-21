@@ -1,7 +1,6 @@
 'use client';
 
 import { useId, useState } from 'react';
-import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
 /**
@@ -80,23 +79,39 @@ function ChartTooltip({
   );
 }
 
-/* ── Revenue trend — area + line, single hue, crosshair tooltip. ────────── */
+/* ── Trend area chart — area + line + always-visible point markers, single
+   hue, crosshair tooltip. Generalized (session 2026-09-21, new client
+   reference) from what used to be two separate charts — a revenue-only
+   area chart and an orders-only bar chart — into one value-generic
+   component, since the dashboard's "Store Performance" card is now the
+   only caller and shows order counts, not revenue. `RevenueTrendChart`/
+   `OrdersTrendChart` are gone; nothing else in the codebase imported
+   either (confirmed via grep before removing them). ────────────────── */
 
-export function RevenueTrendChart({
+export function TrendAreaChart({
   data,
+  formatTooltipValue,
+  ariaLabel,
 }: {
-  data: Array<{ dateKey: string; revenuePaise: string }>;
+  data: Array<{ dateKey: string; value: number }>;
+  /** Used for the hover tooltip's headline number. */
+  formatTooltipValue: (value: number) => string;
+  ariaLabel: string;
 }) {
   const width = 600;
   const height = 180;
-  const padding = { top: 12, right: 8, bottom: 22, left: 8 };
+  const padding = { top: 12, right: 30, bottom: 22, left: 8 };
   const plotW = width - padding.left - padding.right;
   const plotH = height - padding.top - padding.bottom;
   const gradientId = useId();
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
-  const values = data.map((d) => Number(paise(d.revenuePaise)) / 100);
-  const max = Math.max(...values, 1);
+  const values = data.map((d) => d.value);
+  const rawMax = Math.max(...values, 1);
+  // A "nice" round max (session 2026-09-21, new client reference: y-axis
+  // grid lines) — 15 orders rounds up to a 20 ceiling, not an oddly precise
+  // 15, so the 0/mid/max labels read like a real axis.
+  const max = niceCeiling(rawMax);
 
   const points = data.map((d, i) => {
     const x = padding.left + (data.length === 1 ? plotW / 2 : (i / (data.length - 1)) * plotW);
@@ -108,6 +123,15 @@ export function RevenueTrendChart({
   const areaPath = `${linePath} L ${points[points.length - 1]?.x ?? 0} ${padding.top + plotH} L ${points[0]?.x ?? 0} ${padding.top + plotH} Z`;
 
   const hovered = hoverIndex !== null ? points[hoverIndex] : null;
+
+  // A handful of evenly-spaced date labels along the axis (session
+  // 2026-09-21, new client reference) rather than just the two endpoints —
+  // capped at 5, never more than one per point.
+  const tickCount = Math.min(5, data.length);
+  const tickIndices =
+    tickCount <= 1
+      ? [0]
+      : Array.from({ length: tickCount }, (_, i) => Math.round((i * (data.length - 1)) / (tickCount - 1)));
 
   function handleMove(event: React.PointerEvent<SVGRectElement>) {
     const svg = event.currentTarget.ownerSVGElement;
@@ -128,12 +152,7 @@ export function RevenueTrendChart({
 
   return (
     <div className="relative">
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        className="w-full"
-        role="img"
-        aria-label="Revenue by day"
-      >
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full" role="img" aria-label={ariaLabel}>
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={SEQUENTIAL_HUE} stopOpacity={0.12} />
@@ -141,40 +160,69 @@ export function RevenueTrendChart({
           </linearGradient>
         </defs>
 
-        {/* Hairline baseline only — no full gridline field, kept recessive. */}
-        <line
-          x1={padding.left}
-          y1={padding.top + plotH}
-          x2={padding.left + plotW}
-          y2={padding.top + plotH}
-          stroke="var(--border)"
-          strokeWidth={1}
-        />
+        {/* Baseline + two more faint gridlines with right-edge value labels
+            (session 2026-09-21, new client reference: a real 0/mid/max
+            y-axis, not just a bare baseline). */}
+        {[0, max / 2, max].map((value) => {
+          const y = padding.top + plotH - (value / max) * plotH;
+          return (
+            <g key={value}>
+              <line
+                x1={padding.left}
+                y1={y}
+                x2={padding.left + plotW}
+                y2={y}
+                stroke="var(--border)"
+                strokeWidth={1}
+                opacity={value === 0 ? 1 : 0.5}
+              />
+              <text x={width - padding.right + 4} y={y + 3} fontSize={9} fill="var(--text-muted)">
+                {Math.round(value)}
+              </text>
+            </g>
+          );
+        })}
 
         <path d={areaPath} fill={`url(#${gradientId})`} />
         <path d={linePath} fill="none" stroke={SEQUENTIAL_HUE} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
 
-        {/* First/last date as the only direct labels — endpoints, not every
-            point, per the skill's "label selectively" rule. */}
-        <text x={padding.left} y={height - 6} fontSize={10} fill="var(--text-muted)">
-          {formatShortDate(data[0]?.dateKey)}
-        </text>
-        <text x={padding.left + plotW} y={height - 6} fontSize={10} fill="var(--text-muted)" textAnchor="end">
-          {formatShortDate(data[data.length - 1]?.dateKey)}
-        </text>
+        {/* Always-visible point markers (session 2026-09-21, new client
+            reference) — the old chart only drew a dot on hover; the
+            reference shows every point marked. */}
+        {points.map((p, i) => (
+          <circle
+            key={p.d.dateKey}
+            cx={p.x}
+            cy={p.y}
+            r={hoverIndex === i ? 4 : 3}
+            fill={SEQUENTIAL_HUE}
+            stroke="var(--card)"
+            strokeWidth={1.5}
+          />
+        ))}
+
+        {tickIndices.map((i) => (
+          <text
+            key={data[i]?.dateKey ?? i}
+            x={points[i]?.x ?? padding.left}
+            y={height - 6}
+            fontSize={10}
+            fill="var(--text-muted)"
+            textAnchor={i === 0 ? 'start' : i === data.length - 1 ? 'end' : 'middle'}
+          >
+            {formatShortDate(data[i]?.dateKey)}
+          </text>
+        ))}
 
         {hovered && (
-          <>
-            <line
-              x1={hovered.x}
-              y1={padding.top}
-              x2={hovered.x}
-              y2={padding.top + plotH}
-              stroke="var(--border)"
-              strokeWidth={1}
-            />
-            <circle cx={hovered.x} cy={hovered.y} r={4} fill={SEQUENTIAL_HUE} stroke="var(--card)" strokeWidth={2} />
-          </>
+          <line
+            x1={hovered.x}
+            y1={padding.top}
+            x2={hovered.x}
+            y2={padding.top + plotH}
+            stroke="var(--border)"
+            strokeWidth={1}
+          />
         )}
 
         {/* The hit target — the crosshair finds X, so one full-width rect
@@ -195,80 +243,8 @@ export function RevenueTrendChart({
 
       {hovered && (
         <ChartTooltip xPct={(hovered.x / width) * 100} yPct={(hovered.y / height) * 100}>
-          <p className="font-semibold">{formatPaise(paise(hovered.d.revenuePaise), { hidePaise: true })}</p>
+          <p className="font-semibold">{formatTooltipValue(hovered.d.value)}</p>
           <p className="text-background/70">{formatShortDate(hovered.d.dateKey)}</p>
-        </ChartTooltip>
-      )}
-    </div>
-  );
-}
-
-/* ── Orders trend — thin bars, single hue, per-bar tooltip. ─────────────── */
-
-export function OrdersTrendChart({ data }: { data: Array<{ dateKey: string; orders: number }> }) {
-  const width = 600;
-  const height = 180;
-  const padding = { top: 12, right: 8, bottom: 22, left: 8 };
-  const plotW = width - padding.left - padding.right;
-  const plotH = height - padding.top - padding.bottom;
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-
-  const max = Math.max(...data.map((d) => d.orders), 1);
-  const gap = 3;
-  const barW = Math.min(24, plotW / data.length - gap);
-
-  return (
-    <div className="relative">
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full" role="img" aria-label="Orders by day">
-        <line
-          x1={padding.left}
-          y1={padding.top + plotH}
-          x2={padding.left + plotW}
-          y2={padding.top + plotH}
-          stroke="var(--border)"
-          strokeWidth={1}
-        />
-
-        {data.map((d, i) => {
-          const slot = plotW / data.length;
-          const x = padding.left + i * slot + (slot - barW) / 2;
-          const barH = (d.orders / max) * plotH;
-          const y = padding.top + plotH - barH;
-          const active = hoverIndex === i;
-          return (
-            <rect
-              key={d.dateKey}
-              x={x}
-              y={y}
-              width={barW}
-              height={Math.max(barH, d.orders > 0 ? 2 : 0)}
-              rx={4}
-              fill={SEQUENTIAL_HUE}
-              opacity={active ? 1 : 0.85}
-              onPointerEnter={() => setHoverIndex(i)}
-              onPointerLeave={() => setHoverIndex(null)}
-              onFocus={() => setHoverIndex(i)}
-              onBlur={() => setHoverIndex(null)}
-              tabIndex={0}
-            />
-          );
-        })}
-
-        <text x={padding.left} y={height - 6} fontSize={10} fill="var(--text-muted)">
-          {formatShortDate(data[0]?.dateKey)}
-        </text>
-        <text x={padding.left + plotW} y={height - 6} fontSize={10} fill="var(--text-muted)" textAnchor="end">
-          {formatShortDate(data[data.length - 1]?.dateKey)}
-        </text>
-      </svg>
-
-      {hoverIndex !== null && (
-        <ChartTooltip
-          xPct={((padding.left + hoverIndex * (plotW / data.length) + (plotW / data.length) / 2) / width) * 100}
-          yPct={(padding.top / height) * 100}
-        >
-          <p className="font-semibold">{data[hoverIndex].orders} orders</p>
-          <p className="text-background/70">{formatShortDate(data[hoverIndex].dateKey)}</p>
         </ChartTooltip>
       )}
     </div>
@@ -460,4 +436,15 @@ function formatShortDate(dateKey: string | undefined): string {
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const idx = Number(month) - 1;
   return `${Number(day)} ${monthNames[idx] ?? ''}`;
+}
+
+/** Rounds a chart's max value up to a "nice" axis ceiling (10/20/50/100/…)
+    so 0/mid/max y-axis labels read like a real scale instead of an
+    arbitrary data max. */
+function niceCeiling(value: number): number {
+  if (value <= 10) return 10;
+  const magnitude = 10 ** Math.floor(Math.log10(value));
+  const normalized = value / magnitude;
+  const step = normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
+  return step * magnitude;
 }

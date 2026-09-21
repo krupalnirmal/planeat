@@ -51,7 +51,10 @@ export function ExplorerTabs({
             aria-selected={isActive}
             onClick={() => onChange(tab.key)}
             className={cn(
-              'flex shrink-0 items-center gap-2 rounded-[var(--radius)] border px-4 py-2.5 text-sm font-semibold transition-colors',
+              // `rounded-full` (session 2026-09-21, new client reference) —
+              // was `rounded-[var(--radius)]`, the app's standard medium
+              // radius; the reference shows full capsule pills.
+              'flex shrink-0 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition-colors',
               isActive
                 ? 'border-primary bg-tint-green text-primary-dark'
                 : 'border-border bg-card text-muted-foreground hover:bg-secondary',

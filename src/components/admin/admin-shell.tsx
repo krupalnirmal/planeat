@@ -9,6 +9,7 @@ import {
   FileClock,
   Home,
   LayoutDashboard,
+  Leaf,
   LogOut,
   MapPinned,
   Menu,
@@ -262,10 +263,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           third of the page. */}
       <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-card lg:flex print:hidden">
         <div className="border-b border-border px-5 py-4">
-          <p className="text-sm font-bold">
+          <p className="flex items-center gap-1 text-sm font-bold">
             <span className="text-primary-dark">Get</span> <span className="text-primary">Freesh</span>
+            <Leaf className="size-3.5 shrink-0 text-primary" aria-hidden />
           </p>
-          <p className="text-[11px] text-muted-foreground">{tAdmin('nav.tagline')}</p>
+          <p className="text-[11px] text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
         </div>
 
         <div className="flex flex-1 flex-col justify-between overflow-y-auto">
@@ -315,11 +317,21 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </button>
           {/* `text-xl` (session 2026-09-20, client screenshot: too small)
               — bumped up from `text-sm`. Also merged to one word
-              ("GetFresh", no space) per the same request. */}
-          <p className="min-w-0 flex-1 truncate text-xl font-black">
-            <span className="text-primary-dark">Get</span><span className="text-primary">Freesh</span>
-          </p>
-          <NotificationBell />
+              ("GetFresh", no space) per the same request. A "Store
+              Dashboard" subtitle + leaf mark join it here (session
+              2026-09-21, new client reference) — this bar previously had
+              no subtitle at all. */}
+          <div className="min-w-0 flex-1">
+            <p className="flex items-center gap-1 truncate text-xl font-black">
+              <span className="text-primary-dark">Get</span><span className="text-primary">Freesh</span>
+              <Leaf className="size-4 shrink-0 text-primary" aria-hidden />
+            </p>
+            <p className="truncate text-[11px] text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
+            <NotificationBell />
+            <ProfileMenu />
+          </div>
         </header>
 
         {menuOpen && (
@@ -333,10 +345,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-card shadow-xl">
               <div className="flex items-center justify-between border-b border-border px-5 py-4">
                 <div>
-                  <p className="text-sm font-bold">
-            <span className="text-primary-dark">Get</span> <span className="text-primary">Freesh</span>
-          </p>
-                  <p className="text-xs text-muted-foreground">{tAdmin('title')}</p>
+                  <p className="flex items-center gap-1 text-sm font-bold">
+                    <span className="text-primary-dark">Get</span> <span className="text-primary">Freesh</span>
+                    <Leaf className="size-3.5 shrink-0 text-primary" aria-hidden />
+                  </p>
+                  <p className="text-xs text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
                 </div>
                 <button
                   type="button"
