@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { IndianRupee, ShoppingCart, Truck, TrendingUp, Users } from 'lucide-react';
+import { ArrowRight, IndianRupee, ShoppingCart, Truck, TrendingUp, Users } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import {
@@ -64,7 +64,16 @@ function pctDelta(current: number, previous: number): number | null {
   return Math.round(((current - previous) / previous) * 1000) / 10;
 }
 
-export function AnalyticsExplorerTab({ range }: { range: DashboardRange }) {
+export function AnalyticsExplorerTab({
+  range,
+  onOpenTab,
+}: {
+  range: DashboardRange;
+  /** Lets a stat tile's corner arrow switch the dashboard's own Explorer
+      tab (session 2026-09-21) — owned by `AdminDashboard`, since `tab` is
+      that component's state, not this one's. */
+  onOpenTab: (tab: string) => void;
+}) {
   const t = useTranslations('admin.analytics');
   const td = useTranslations('admin.dashboard');
   const tc = useTranslations('admin.common');
@@ -110,6 +119,7 @@ export function AnalyticsExplorerTab({ range }: { range: DashboardRange }) {
           delta={pctDelta(totalOrders, previous.orders)}
           sparklineData={sparklineOrders}
           hue="green"
+          onOpenTab={() => onOpenTab('orders')}
         />
         <StatTile
           label={t('totalRevenue')}
@@ -118,6 +128,7 @@ export function AnalyticsExplorerTab({ range }: { range: DashboardRange }) {
           delta={pctDelta(totalRevenuePaise, previousRevenuePaise)}
           sparklineData={sparklineRevenue}
           hue="violet"
+          onOpenTab={() => onOpenTab('revenue')}
         />
         <StatTile
           label={t('deliveriesCompleted')}
@@ -126,6 +137,7 @@ export function AnalyticsExplorerTab({ range }: { range: DashboardRange }) {
           delta={pctDelta(totalDelivered, previous.delivered)}
           sparklineData={sparklineDelivered}
           hue="orange"
+          onOpenTab={() => onOpenTab('deliveries')}
         />
         <StatTile
           label={t('newCustomers')}
@@ -133,6 +145,7 @@ export function AnalyticsExplorerTab({ range }: { range: DashboardRange }) {
           icon={Users}
           delta={pctDelta(analytics.newCustomers, previous.newCustomers)}
           hue="blue"
+          onOpenTab={() => onOpenTab('customers')}
         />
         <StatTile
           label={t('avgOrderValue')}
@@ -257,6 +270,7 @@ function StatTile({
   delta,
   sparklineData,
   hue,
+  onOpenTab,
 }: {
   label: string;
   value: string;
@@ -266,15 +280,32 @@ function StatTile({
   delta: number | null;
   sparklineData?: number[];
   hue: StatHue;
+  /** Switches the *dashboard's own* Explorer tab (session 2026-09-21,
+      client reference) — not a `Link` to a standalone page, since Revenue
+      and Deliveries have no standalone `/admin/*` route of their own, only
+      a tab right here on this same page. Omitted (no arrow shown) for Avg
+      Order Value, which has no matching tab at all — a real, working
+      shortcut or nothing, never a decorative no-op. */
+  onOpenTab?: () => void;
 }) {
   const t = useTranslations('admin.analytics');
   const { bg, icon } = STAT_HUES[hue];
 
   return (
     <div
-      className="card-3d flex items-start justify-between gap-2 rounded-[var(--radius)] border border-transparent px-4 py-3"
+      className="card-3d relative flex items-start justify-between gap-2 rounded-[var(--radius)] border border-transparent px-4 py-3"
       style={{ backgroundColor: bg }}
     >
+      {onOpenTab && (
+        <button
+          type="button"
+          onClick={onOpenTab}
+          aria-label={label}
+          className="absolute top-2.5 right-2.5 grid size-7 shrink-0 place-items-center rounded-full bg-card/70 text-foreground transition-transform hover:scale-105"
+        >
+          <ArrowRight className="size-3.5" aria-hidden />
+        </button>
+      )}
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <span

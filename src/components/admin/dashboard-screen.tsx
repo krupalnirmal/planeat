@@ -246,7 +246,7 @@ export function AdminDashboard() {
 
       <div className="mt-4">
         {tab === 'analytics' ? (
-          <AnalyticsExplorerTab range={range} />
+          <AnalyticsExplorerTab range={range} onOpenTab={setTab} />
         ) : tab === 'orders' ? (
           <OrdersExplorerTab />
         ) : tab === 'revenue' ? (
