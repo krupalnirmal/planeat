@@ -48,6 +48,11 @@ export interface DashboardMetrics {
 
   lowStockCount: number;
   outOfStockCount: number;
+  /** The dashboard's own "Quick Info" widget (session 2026-09-21, client
+      reference) — the first few low-stock product names, so the owner sees
+      *what* to reorder without opening the Inventory tab first. Same
+      variants `lowStockCount` already counts, just carrying names too. */
+  lowStockProducts: string[];
 
   waitlistTotal: number;
   /** B11 — where the demand is, so the owner knows where to expand. */
@@ -367,7 +372,11 @@ export async function getDashboardMetrics(
     // in memory over the small set of variants that are low by any measure.
     db.productVariant.findMany({
       where: { isActive: true, stockQty: { gt: 0, lte: 50 } },
-      select: { stockQty: true, lowStockThreshold: true },
+      select: {
+        stockQty: true,
+        lowStockThreshold: true,
+        product: { select: { nameEn: true, nameMr: true, nameHi: true } },
+      },
     }),
     db.productVariant.count({ where: { isActive: true, stockQty: { lte: 0 } } }),
 
@@ -397,6 +406,10 @@ export async function getDashboardMetrics(
     lowStockCount: lowStockVariants.filter(
       (variant) => variant.stockQty <= variant.lowStockThreshold,
     ).length,
+    lowStockProducts: lowStockVariants
+      .filter((variant) => variant.stockQty <= variant.lowStockThreshold)
+      .slice(0, 3)
+      .map((variant) => pickName(variant.product, locale)),
     outOfStockCount,
     waitlistTotal,
     waitlistTopPincodes: waitlistGroups.map((group) => ({

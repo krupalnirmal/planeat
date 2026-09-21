@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import {
+  AlertTriangle,
   ArrowRight,
   BarChart3,
   ChevronRight,
@@ -82,6 +83,12 @@ interface DashboardResponse {
       reference) — sibling to `analytics`, not nested inside it, matching
       `DashboardMetrics`'s own real shape (`src/lib/admin/dashboard.ts`). */
   recentOrders: RecentOrder[];
+  /** The dashboard's "Quick Info" / low-stock widget (session 2026-09-21,
+      client reference) — also a sibling of `analytics`, matching
+      `DashboardMetrics`'s real, already-existing `lowStockCount` field plus
+      the new `lowStockProducts` names added alongside it. */
+  lowStockCount: number;
+  lowStockProducts: string[];
 }
 
 /** Also passed as `DateRangeDropdown`'s `keys` prop from `dashboard-screen.tsx`,
@@ -145,6 +152,8 @@ export function AnalyticsExplorerTab({
   const analytics = metrics.data?.analytics;
   if (!analytics) return <p className="text-sm text-danger">{tc('failed')}</p>;
   const recentOrders = metrics.data?.recentOrders ?? [];
+  const lowStockCount = metrics.data?.lowStockCount ?? 0;
+  const lowStockProducts = metrics.data?.lowStockProducts ?? [];
 
   const trendDays = TREND_DAYS[trendRange];
   const trendSeries = analytics.dailySeries.slice(-trendDays);
@@ -402,6 +411,42 @@ export function AnalyticsExplorerTab({
               label={t('quickActionViewReports')}
             />
           </ul>
+        </ChartCard>
+
+        {/* Quick Info / low-stock (session 2026-09-21, client reference) —
+            reuses the same bounded variant fetch `getDashboardMetrics`
+            already ran for `lowStockCount` (src/lib/admin/dashboard.ts),
+            now also carrying the first few product names so the owner
+            knows *what* to reorder without opening Inventory first. */}
+        <ChartCard
+          title={td('lowStock')}
+          action={
+            <Link href="/admin/inventory" className="text-xs font-semibold text-primary">
+              {t('viewAll')} →
+            </Link>
+          }
+        >
+          {lowStockProducts.length === 0 ? (
+            <EmptyChart label={t('noLowStock')} />
+          ) : (
+            <>
+              <ul className="divide-y divide-border">
+                {lowStockProducts.map((name) => (
+                  <li key={name} className="flex items-center gap-2.5 py-2.5 first:pt-0 last:pb-0">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-danger/10 text-danger">
+                      <AlertTriangle className="size-4" aria-hidden />
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium">{name}</span>
+                  </li>
+                ))}
+              </ul>
+              {lowStockCount > lowStockProducts.length && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {t('lowStockMore', { count: lowStockCount - lowStockProducts.length })}
+                </p>
+              )}
+            </>
+          )}
         </ChartCard>
       </div>
     </div>

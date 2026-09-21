@@ -902,6 +902,8 @@
       "quickActionManageInventory": "Manage Inventory",
       "quickActionViewCustomers": "View Customers",
       "quickActionViewReports": "View Reports",
+      "noLowStock": "All products are well stocked",
+      "lowStockMore": "+{count} more",
       "viewAll": "View All"
     },
     "explorer": {

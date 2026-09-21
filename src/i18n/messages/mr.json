@@ -902,6 +902,8 @@
       "quickActionManageInventory": "साठा व्यवस्थापित करा",
       "quickActionViewCustomers": "ग्राहक पहा",
       "quickActionViewReports": "अहवाल पहा",
+      "noLowStock": "सर्व उत्पादनांचा पुरेसा साठा आहे",
+      "lowStockMore": "+{count} अधिक",
       "viewAll": "सर्व पहा"
     },
     "explorer": {

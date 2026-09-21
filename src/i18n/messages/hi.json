@@ -902,6 +902,8 @@
       "quickActionManageInventory": "स्टॉक प्रबंधित करें",
       "quickActionViewCustomers": "ग्राहक देखें",
       "quickActionViewReports": "रिपोर्ट देखें",
+      "noLowStock": "सभी उत्पादों का पर्याप्त स्टॉक है",
+      "lowStockMore": "+{count} और",
       "viewAll": "सभी देखें"
     },
     "explorer": {
