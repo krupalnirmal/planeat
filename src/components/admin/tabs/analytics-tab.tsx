@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, IndianRupee, ShoppingCart, Truck, TrendingUp, Users } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import {
   DonutChart,
@@ -12,7 +13,7 @@ import {
   RevenueTrendChart,
   Sparkline,
 } from '@/components/admin/charts';
-import type { ExplorerRange } from '@/components/admin/explorer';
+import { DateRangeDropdown, type ExplorerRange } from '@/components/admin/explorer';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -33,6 +34,14 @@ import { cn } from '@/lib/utils';
     real Delivered/Cancelled/Failed split instead. */
 
 export type DashboardRange = Extract<ExplorerRange, '14d' | '30d' | 'month'>;
+
+/** The two trend charts' own range (session 2026-09-21, client reference)
+    — deliberately narrower than `DashboardRange` above: it only re-slices
+    the already-fetched daily series client-side, so it never needs to
+    exceed what the top-level range already covers. */
+type TrendRange = Extract<ExplorerRange, '7d' | '14d' | '30d'>;
+const TREND_KEYS: TrendRange[] = ['7d', '14d', '30d'];
+const TREND_DAYS: Record<TrendRange, number> = { '7d': 7, '14d': 14, '30d': 30 };
 
 interface DailyPoint {
   dateKey: string;
@@ -86,9 +95,20 @@ export function AnalyticsExplorerTab({
     placeholderData: (previous) => previous,
   });
 
+  // Real per-chart range (session 2026-09-21, client reference) — no
+  // second API call: the top-level Analytics range (14d/30d/month) already
+  // covers the widest of these 3, so switching this just re-slices the
+  // already-fetched `dailySeries` client-side. Shared by both trend charts
+  // rather than independent state, matching the reference (both show the
+  // same "Last 7 days" value).
+  const [trendRange, setTrendRange] = useState<TrendRange>('7d');
+
   if (metrics.isLoading) return <p className="text-sm text-muted-foreground">{tc('loading')}</p>;
   const analytics = metrics.data?.analytics;
   if (!analytics) return <p className="text-sm text-danger">{tc('failed')}</p>;
+
+  const trendDays = TREND_DAYS[trendRange];
+  const trendSeries = analytics.dailySeries.slice(-trendDays);
 
   const totalOrders = analytics.dailySeries.reduce((sum, d) => sum + d.orders, 0);
   const totalDelivered = analytics.dailySeries.reduce((sum, d) => sum + d.delivered, 0);
@@ -157,11 +177,23 @@ export function AnalyticsExplorerTab({
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <ChartCard title={td('ordersTrend')}>
-          <OrdersTrendChart data={analytics.dailySeries} />
+        <ChartCard
+          title={td('ordersTrend')}
+          subtitle={td('ordersTrendSubtitle', { days: trendDays })}
+          icon={ShoppingCart}
+          hue="green"
+          action={<DateRangeDropdown value={trendRange} onChange={(v) => setTrendRange(v as TrendRange)} keys={TREND_KEYS} />}
+        >
+          <OrdersTrendChart data={trendSeries} />
         </ChartCard>
-        <ChartCard title={td('revenueTrend')}>
-          <RevenueTrendChart data={analytics.dailySeries} />
+        <ChartCard
+          title={td('revenueTrend')}
+          subtitle={td('revenueTrendSubtitle', { days: trendDays })}
+          icon={IndianRupee}
+          hue="violet"
+          action={<DateRangeDropdown value={trendRange} onChange={(v) => setTrendRange(v as TrendRange)} keys={TREND_KEYS} />}
+        >
+          <RevenueTrendChart data={trendSeries} />
         </ChartCard>
       </div>
 
@@ -333,17 +365,41 @@ function StatTile({
 
 function ChartCard({
   title,
+  subtitle,
+  icon: Icon,
+  hue,
   action,
   children,
 }: {
   title: string;
+  /** Session 2026-09-21, client reference — e.g. "Total orders placed in
+      the last 7 days". Optional since only the two trend charts have one
+      in the mockup; the donut/bar/list cards below them don't. */
+  subtitle?: string;
+  icon?: typeof ShoppingCart;
+  hue?: StatHue;
   action?: React.ReactNode;
   children: React.ReactNode;
 }) {
+  const iconColor = hue ? STAT_HUES[hue].icon : undefined;
+
   return (
     <section className="card-3d rounded-[var(--radius)] border border-border/60 bg-card p-4">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold">{title}</h2>
+      <div className="mb-3 flex items-start justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2.5">
+          {Icon && (
+            <span
+              className="grid size-8 shrink-0 place-items-center rounded-full"
+              style={{ backgroundColor: `${iconColor}26`, color: iconColor }}
+            >
+              <Icon className="size-4" aria-hidden />
+            </span>
+          )}
+          <div className="min-w-0">
+            <h2 className="text-sm font-semibold">{title}</h2>
+            {subtitle && <p className="truncate text-xs text-muted-foreground">{subtitle}</p>}
+          </div>
+        </div>
         {action}
       </div>
       {children}
