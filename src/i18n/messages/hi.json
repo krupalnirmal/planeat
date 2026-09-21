@@ -843,6 +843,10 @@
     },
     "dashboard": {
       "title": "आज की स्थिति",
+      "welcomeBack": "वापस स्वागत है,",
+      "welcomeSubtitle": "आज आपके स्टोर में क्या हो रहा है, देखें.",
+      "welcomeTagline": "ताज़ा खाना\nखुशहाल घर",
+      "storePerformanceGlance": "स्टोर का प्रदर्शन एक नज़र में",
       "todayOrders": "आज के ऑर्डर",
       "todayRevenue": "आज की आमदनी",
       "delivered": "पहुँचाए",

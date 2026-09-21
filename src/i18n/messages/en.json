@@ -843,6 +843,10 @@
     },
     "dashboard": {
       "title": "Today",
+      "welcomeBack": "Welcome back,",
+      "welcomeSubtitle": "Here's what's happening with your store today.",
+      "welcomeTagline": "Fresh Food\nHappier Homes",
+      "storePerformanceGlance": "Store performance at a glance",
       "todayOrders": "Orders today",
       "todayRevenue": "Revenue today",
       "delivered": "Delivered",

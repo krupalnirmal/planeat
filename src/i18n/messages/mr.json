@@ -843,6 +843,10 @@
     },
     "dashboard": {
       "title": "आजची स्थिती",
+      "welcomeBack": "पुन्हा स्वागत आहे,",
+      "welcomeSubtitle": "आज तुमच्या स्टोअरमध्ये काय चालू आहे ते पहा.",
+      "welcomeTagline": "ताजे अन्न\nआनंदी घर",
+      "storePerformanceGlance": "स्टोअरची कामगिरी एका दृष्टीक्षेपात",
       "todayOrders": "आजच्या ऑर्डर",
       "todayRevenue": "आजची जमा",
       "delivered": "पोहोचवल्या",
