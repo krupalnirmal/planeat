@@ -1352,11 +1352,11 @@ async function seedUsers(): Promise<void> {
     create: {
       id: newId(ID_PREFIX.user),
       phone: '9999900001',
-      name: 'Planeat Admin',
+      name: 'Get Freesh',
       role: UserRole.SUPER_ADMIN,
       preferredLanguage: Locale.mr,
     },
-    update: { role: UserRole.SUPER_ADMIN },
+    update: { role: UserRole.SUPER_ADMIN, name: 'Get Freesh' },
   });
 
   await db.user.upsert({

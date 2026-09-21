@@ -134,7 +134,7 @@ export function TopupSheet({
           publicKey: data.publicKey,
           amountPaise: data.amountPaise,
           currency: data.currency,
-          appName: 'Get Fresh',
+          appName: 'Get Freesh',
           description: t('addMoney'),
           prefill: { name: user?.name ?? undefined, contact: user?.phone },
           onSuccess: () => void pollUntilSettled(data.paymentId),

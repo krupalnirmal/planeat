@@ -24,7 +24,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
  */
 const config: CapacitorConfig = {
   appId: 'com.getfresh.app',
-  appName: 'Get Fresh',
+  appName: 'Get Freesh',
   webDir: 'public',
   server: {
     // Swap for the production URL before a real release build; kept as

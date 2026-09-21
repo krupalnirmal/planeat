@@ -1,10 +1,10 @@
 {
   "app": {
-    "name": "Get Fresh",
+    "name": "Get Freesh",
     "tagline": "ताज्या भाज्या,\nतुमच्या घरपोच"
   },
   "install": {
-    "title": "Get Fresh हे अ‍ॅप या फोनवर इन्स्टॉल करा",
+    "title": "Get Freesh हे अ‍ॅप या फोनवर इन्स्टॉल करा",
     "action": "इन्स्टॉल करा",
     "iosHint": "Share → Add to Home Screen निवडा",
     "androidHint": "Chrome चे ⋮ मेनू → Install app निवडा",
@@ -57,7 +57,7 @@
     "continue": "पुढे चला",
     "skipLogin": "आत्ता नको",
     "staffHeading": "स्टाफ लॉगिन",
-    "staffSubtitle": "फक्त Get Fresh अ‍ॅडमिन आणि डिलिव्हरी पार्टनरसाठी",
+    "staffSubtitle": "फक्त Get Freesh अ‍ॅडमिन आणि डिलिव्हरी पार्टनरसाठी",
     "termsNote": "पुढे जाऊन तुम्ही आमच्या अटी व शर्ती आणि गोपनीयता धोरण मान्य करता",
     "phoneLabel": "मोबाइल नंबर",
     "phonePlaceholder": "मोबाइल नंबर टाका",
@@ -804,7 +804,7 @@
   },
   "admin": {
     "title": "प्रशासन",
-    "appTitle": "Get Fresh अ‍ॅडमिन",
+    "appTitle": "Get Freesh अ‍ॅडमिन",
     "installTitle": "अ‍ॅडमिन अ‍ॅप या डिव्हाइसवर इन्स्टॉल करा",
     "installAction": "इन्स्टॉल करा",
     "installIosHint": "Share → Add to Home Screen निवडा",
@@ -1182,7 +1182,7 @@
     }
   },
   "delivery": {
-    "appTitle": "Get Fresh डिलिव्हरी",
+    "appTitle": "Get Freesh डिलिव्हरी",
     "available": "उपलब्ध",
     "logout": "बाहेर पडा",
     "enableAlerts": "नवीन ऑर्डरची सूचना सुरू करा",

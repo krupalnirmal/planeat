@@ -45,7 +45,7 @@ export class MockSmsProvider implements SmsProvider {
     return this.record({
       kind: 'otp',
       phone: opts.phone,
-      body: `Get Fresh OTP: ${opts.code} (valid ${Math.round(opts.ttlSeconds / 60)} min)`,
+      body: `Get Freesh OTP: ${opts.code} (valid ${Math.round(opts.ttlSeconds / 60)} min)`,
       at: new Date(),
     });
   }

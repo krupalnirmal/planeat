@@ -70,7 +70,7 @@ export function AppHeader() {
             <Leaf className="size-6 shrink-0 -rotate-12 text-primary" aria-hidden />
             <p className="truncate text-2xl font-black tracking-tight">
               <span className="text-primary-dark">Get</span>{' '}
-              <span className="text-primary">Fresh</span>
+              <span className="text-primary">Freesh</span>
             </p>
           </div>
           <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{t('tagline')}</p>

@@ -263,7 +263,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-card lg:flex print:hidden">
         <div className="border-b border-border px-5 py-4">
           <p className="text-sm font-bold">
-            <span className="text-primary-dark">Get</span> <span className="text-primary">Fresh</span>
+            <span className="text-primary-dark">Get</span> <span className="text-primary">Freesh</span>
           </p>
           <p className="text-[11px] text-muted-foreground">{tAdmin('nav.tagline')}</p>
         </div>
@@ -317,7 +317,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               — bumped up from `text-sm`. Also merged to one word
               ("GetFresh", no space) per the same request. */}
           <p className="min-w-0 flex-1 truncate text-xl font-black">
-            <span className="text-primary-dark">Get</span><span className="text-primary">Fresh</span>
+            <span className="text-primary-dark">Get</span><span className="text-primary">Freesh</span>
           </p>
           <NotificationBell />
         </header>
@@ -334,7 +334,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <div className="flex items-center justify-between border-b border-border px-5 py-4">
                 <div>
                   <p className="text-sm font-bold">
-            <span className="text-primary-dark">Get</span> <span className="text-primary">Fresh</span>
+            <span className="text-primary-dark">Get</span> <span className="text-primary">Freesh</span>
           </p>
                   <p className="text-xs text-muted-foreground">{tAdmin('title')}</p>
                 </div>

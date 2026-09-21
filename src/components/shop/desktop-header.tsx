@@ -53,7 +53,7 @@ export function DesktopHeader({ categories }: { categories: { slug: string; name
         <Link href="/" className="flex shrink-0 items-center gap-1">
           <Leaf className="size-6 shrink-0 -rotate-12 text-primary" aria-hidden />
           <span className="text-xl font-black tracking-tight">
-            <span className="text-primary-dark">Get</span> <span className="text-primary">Fresh</span>
+            <span className="text-primary-dark">Get</span> <span className="text-primary">Freesh</span>
           </span>
         </Link>
 

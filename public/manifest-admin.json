@@ -1,8 +1,8 @@
 {
   "id": "/admin",
-  "name": "Get Fresh Admin",
+  "name": "Get Freesh Admin",
   "short_name": "GF Admin",
-  "description": "ऑर्डर्स, इन्व्हेंटरी आणि डॅशबोर्ड — Get Fresh स्टोअर अ‍ॅडमिनसाठी.",
+  "description": "ऑर्डर्स, इन्व्हेंटरी आणि डॅशबोर्ड — Get Freesh स्टोअर अ‍ॅडमिनसाठी.",
   "start_url": "/mr/admin",
   "scope": "/",
   "display": "standalone",
