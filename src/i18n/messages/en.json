@@ -897,6 +897,11 @@
       "topCustomers": "Top Customers",
       "deliveryOutcomes": "Delivery Outcomes",
       "ordersCount": "{count} orders",
+      "quickActions": "Quick Actions",
+      "quickActionAddProduct": "Add Product",
+      "quickActionManageInventory": "Manage Inventory",
+      "quickActionViewCustomers": "View Customers",
+      "quickActionViewReports": "View Reports",
       "viewAll": "View All"
     },
     "explorer": {

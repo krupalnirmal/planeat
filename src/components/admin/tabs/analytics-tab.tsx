@@ -1,7 +1,19 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, ChevronRight, ImageIcon, IndianRupee, ShoppingCart, Truck, TrendingUp, Users } from 'lucide-react';
+import {
+  ArrowRight,
+  BarChart3,
+  ChevronRight,
+  ImageIcon,
+  IndianRupee,
+  Package,
+  ShoppingCart,
+  Truck,
+  TrendingUp,
+  Users,
+  Warehouse,
+} from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -370,7 +382,69 @@ export function AnalyticsExplorerTab({
           )}
         </ChartCard>
       </div>
+
+      {/* New widget (session 2026-09-21, client reference) — only real,
+          working destinations. The mockup's "Create Order" is dropped
+          entirely rather than linked to a page that doesn't exist: there's
+          no admin order-creation flow in this app. "View Reports" reuses
+          the same onOpenTab mechanism the stat tiles' corner arrows use
+          (Part B) to jump to the Revenue tab, rather than a standalone
+          page that also doesn't exist. */}
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <ChartCard title={t('quickActions')}>
+          <ul className="divide-y divide-border">
+            <QuickActionRow href="/admin/catalogue/new" icon={Package} label={t('quickActionAddProduct')} />
+            <QuickActionRow href="/admin/inventory" icon={Warehouse} label={t('quickActionManageInventory')} />
+            <QuickActionRow href="/admin/customers" icon={Users} label={t('quickActionViewCustomers')} />
+            <QuickActionRow
+              onClick={() => onOpenTab('revenue')}
+              icon={BarChart3}
+              label={t('quickActionViewReports')}
+            />
+          </ul>
+        </ChartCard>
+      </div>
     </div>
+  );
+}
+
+/** One row of the Quick Actions list — either a real `Link` to a standalone
+    admin page, or a tab-switch `button` (same shape either way) when the
+    destination is a tab on this same dashboard rather than its own route. */
+function QuickActionRow({
+  icon: Icon,
+  label,
+  href,
+  onClick,
+}: {
+  icon: typeof Package;
+  label: string;
+  href?: string;
+  onClick?: () => void;
+}) {
+  const content = (
+    <>
+      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
+        <Icon className="size-4" aria-hidden />
+      </span>
+      <span className="min-w-0 flex-1 text-sm font-medium">{label}</span>
+      <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+    </>
+  );
+  const className = 'flex items-center gap-3 py-2.5 first:pt-0 last:pb-0 hover:opacity-80';
+
+  return (
+    <li>
+      {href ? (
+        <Link href={href} className={className}>
+          {content}
+        </Link>
+      ) : (
+        <button type="button" onClick={onClick} className={cn('w-full text-left', className)}>
+          {content}
+        </button>
+      )}
+    </li>
   );
 }
 

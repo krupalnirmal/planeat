@@ -897,6 +897,11 @@
       "topCustomers": "टॉप ग्राहक",
       "deliveryOutcomes": "डिलिव्हरी निकाल",
       "ordersCount": "{count} ऑर्डर्स",
+      "quickActions": "क्विक अ‍ॅक्शन्स",
+      "quickActionAddProduct": "उत्पादन जोडा",
+      "quickActionManageInventory": "साठा व्यवस्थापित करा",
+      "quickActionViewCustomers": "ग्राहक पहा",
+      "quickActionViewReports": "अहवाल पहा",
       "viewAll": "सर्व पहा"
     },
     "explorer": {
