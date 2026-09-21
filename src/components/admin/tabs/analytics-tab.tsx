@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, ImageIcon, IndianRupee, ShoppingCart, Truck, TrendingUp, Users } from 'lucide-react';
+import { ArrowRight, ChevronRight, ImageIcon, IndianRupee, ShoppingCart, Truck, TrendingUp, Users } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -50,6 +50,13 @@ interface DailyPoint {
   revenuePaise: string;
 }
 
+interface RecentOrder {
+  id: string;
+  orderNumber: string;
+  status: string;
+  totalPaise: string;
+}
+
 interface DashboardResponse {
   analytics: {
     dailySeries: DailyPoint[];
@@ -59,11 +66,30 @@ interface DashboardResponse {
     topCustomers: Array<{ customerId: string; customerName: string; orderCount: number; revenuePaise: string }>;
     previousPeriod: { orders: number; revenuePaise: string; delivered: number; newCustomers: number };
   };
+  /** The dashboard's "Recent Orders" widget (session 2026-09-21, client
+      reference) — sibling to `analytics`, not nested inside it, matching
+      `DashboardMetrics`'s own real shape (`src/lib/admin/dashboard.ts`). */
+  recentOrders: RecentOrder[];
 }
 
 /** Also passed as `DateRangeDropdown`'s `keys` prop from `dashboard-screen.tsx`,
     so the header dropdown offers exactly the 3 ranges this tab understands. */
 export const ANALYTICS_RANGE_OPTIONS: DashboardRange[] = ['14d', '30d', 'month'];
+
+/** Same colour-per-status convention already used for the order-status dot
+    in `customer-detail-screen.tsx`'s own Recent Orders section — reused for
+    visual consistency rather than a third invention of this mapping. */
+const STATUS_DOT: Record<string, string> = {
+  PLACED: 'bg-muted-foreground',
+  CONFIRMED: 'bg-primary',
+  PACKED: 'bg-primary',
+  OUT_FOR_DELIVERY: 'bg-warning',
+  DELIVERED: 'bg-success',
+  CANCELLED: 'bg-danger',
+  FAILED_DELIVERY: 'bg-danger',
+  REFUNDED: 'bg-muted-foreground',
+  PAYMENT_PENDING: 'bg-warning',
+};
 
 /** `null` when the previous period was zero and the current isn't — no
     meaningful percentage, same rule the backend's own `pctDelta` uses for
@@ -106,6 +132,7 @@ export function AnalyticsExplorerTab({
   if (metrics.isLoading) return <p className="text-sm text-muted-foreground">{tc('loading')}</p>;
   const analytics = metrics.data?.analytics;
   if (!analytics) return <p className="text-sm text-danger">{tc('failed')}</p>;
+  const recentOrders = metrics.data?.recentOrders ?? [];
 
   const trendDays = TREND_DAYS[trendRange];
   const trendSeries = analytics.dailySeries.slice(-trendDays);
@@ -270,7 +297,7 @@ export function AnalyticsExplorerTab({
         </ChartCard>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <ChartCard
           title={t('topCustomers')}
           action={
@@ -296,6 +323,48 @@ export function AnalyticsExplorerTab({
                     {formatPaise(paise(customer.revenuePaise), { hidePaise: true })}
                   </p>
                 </li>
+              ))}
+            </ul>
+          )}
+        </ChartCard>
+
+        {/* New widget (session 2026-09-21, client reference) — real data,
+            reusing listAdminOrders (src/lib/admin/dashboard.ts wires it in
+            via getDashboardMetrics), the same query the Orders tab itself
+            calls, rather than a second "list some orders" implementation.
+            Same status-dot + order# + amount + chevron row shape as
+            customer-detail-screen.tsx's own Recent Orders section. */}
+        <ChartCard
+          title={td('recentOrders')}
+          action={
+            <Link href="/admin/orders" className="text-xs font-semibold text-primary">
+              {td('viewAllOrders')} →
+            </Link>
+          }
+        >
+          {recentOrders.length === 0 ? (
+            <EmptyChart label={td('noOrdersToday')} />
+          ) : (
+            <ul className="divide-y divide-border">
+              {recentOrders.map((order) => (
+                <Link
+                  key={order.id}
+                  href={`/admin/orders/${order.id}`}
+                  className="flex items-center gap-2.5 py-2.5 first:pt-0 last:pb-0 hover:opacity-80"
+                >
+                  <span
+                    className={cn('size-2 shrink-0 rounded-full', STATUS_DOT[order.status] ?? 'bg-muted-foreground')}
+                    aria-hidden
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-mono text-xs font-medium">{order.orderNumber}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{tStatus(order.status as never)}</p>
+                  </div>
+                  <p className="shrink-0 text-sm font-semibold">
+                    {formatPaise(paise(order.totalPaise), { hidePaise: true })}
+                  </p>
+                  <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                </Link>
               ))}
             </ul>
           )}

@@ -1,6 +1,7 @@
 import type { Locale, OrderStatus, PaymentMethod } from '@/generated/prisma/enums';
 import { db } from '@/lib/db';
 import { pickName } from '@/lib/catalog/text';
+import { listAdminOrders, type AdminOrderRow } from '@/lib/admin/orders';
 import { parseDateKey } from '@/lib/meal-plan/pricing';
 import { getCronHealth, type CronHealth } from '@/lib/subscription/daily-jobs';
 import { istDateKeyOf } from '@/lib/subscription/schedule';
@@ -61,6 +62,12 @@ export interface DashboardMetrics {
   deltas: DashboardDeltas;
 
   analytics: DashboardAnalytics;
+
+  /** The dashboard's own "Recent Orders" widget (session 2026-09-21, client
+      reference) — the last 5 orders, reusing `listAdminOrders` (the same
+      query the Orders tab itself calls) rather than a second
+      implementation of "list some orders." */
+  recentOrders: AdminOrderRow[];
 }
 
 /**
@@ -324,6 +331,7 @@ export async function getDashboardMetrics(
     waitlistGroups,
     cron,
     analytics,
+    recent,
   ] = await Promise.all([
     db.order.count({ where: { placedAt: { gte: dayStart, lte: dayEnd } } }),
 
@@ -373,6 +381,7 @@ export async function getDashboardMetrics(
 
     getCronHealth(now),
     getDashboardAnalytics(now, locale, range),
+    listAdminOrders({}, { skip: 0, take: 5 }),
   ]);
 
   return {
@@ -401,6 +410,7 @@ export async function getDashboardMetrics(
       delivered: pctDelta(todayDelivered, yesterdayDelivered),
     },
     analytics,
+    recentOrders: recent.orders,
   };
 }
 
