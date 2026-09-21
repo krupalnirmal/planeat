@@ -1,13 +1,12 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, IndianRupee, ShoppingCart, Truck, TrendingUp, Users } from 'lucide-react';
+import { ArrowRight, ImageIcon, IndianRupee, ShoppingCart, Truck, TrendingUp, Users } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import {
   DonutChart,
-  HorizontalBarChart,
   ORDER_STATUS_COLORS,
   OrdersTrendChart,
   RevenueTrendChart,
@@ -15,6 +14,7 @@ import {
 } from '@/components/admin/charts';
 import { DateRangeDropdown, type ExplorerRange } from '@/components/admin/explorer';
 import { api, qs } from '@/lib/api/client';
+import { CATEGORY_TILE_IMAGES } from '@/lib/catalog/category-tile-images';
 import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
@@ -214,17 +214,40 @@ export function AnalyticsExplorerTab({
           )}
         </ChartCard>
 
+        {/* Photo-thumbnail cards, not a bar chart any more (session
+            2026-09-21, client reference) — real data throughout
+            (analytics.topCategories, unchanged), real photos too, but NOT
+            cropped from the reference mockup itself: its thumbnail labels
+            ("Leafy Vegetables"/"Root Vegetables") are stale subgroup names
+            from before this session's own catalogue restructuring and
+            don't exist in the real taxonomy any more. CATEGORY_TILE_IMAGES
+            is the same real, already-curated photo set the storefront's
+            own category tiles use, keyed by the real slug each category
+            row already carries — a real label next to the wrong photo
+            would be worse than no photo. */}
         <ChartCard title={td('topCategories')}>
           {analytics.topCategories.length > 0 ? (
-            <HorizontalBarChart
-              items={analytics.topCategories.map((c) => ({
-                key: c.slug,
-                label: c.name,
-                value: Number(paise(c.revenuePaise)) / 100,
-                color: '#2fa355',
-              }))}
-              valueFormat={(v) => formatPaise(paise(BigInt(Math.round(v * 100))), { hidePaise: true })}
-            />
+            <ul className="space-y-2.5">
+              {analytics.topCategories.map((c) => {
+                const photo = CATEGORY_TILE_IMAGES[c.slug]?.[0];
+                return (
+                  <li key={c.slug} className="flex items-center gap-2.5">
+                    <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg bg-secondary">
+                      {photo ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={photo} alt="" className="size-full object-cover" />
+                      ) : (
+                        <ImageIcon className="size-4 text-muted-foreground/40" aria-hidden />
+                      )}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium">{c.name}</span>
+                    <span className="shrink-0 text-sm font-semibold text-primary">
+                      {formatPaise(paise(c.revenuePaise), { hidePaise: true })}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
           ) : (
             <EmptyChart label={td('noRecentSales')} />
           )}
