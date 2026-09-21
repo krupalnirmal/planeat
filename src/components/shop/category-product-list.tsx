@@ -59,6 +59,14 @@ const GROUP_PREVIEW_COUNT = 4;
 // collide with.
 const ALL_ID = '__all__';
 
+// The rail's synthetic entry for the leftover/"rest" bucket (session
+// 2026-09-21, owner report: "Fresh Vegetables (regular)" wasn't in the
+// left rail at all — it only ever rendered as a section in the right
+// pane, with no way to jump to it or have it highlight via scroll-spy).
+// Same synthetic-id treatment as ALL_ID: not a real VegetableType, just a
+// rail/scroll-spy target for whatever `rest` (below) computes to.
+const REST_ID = '__rest__';
+
 /**
  * One of the toolbar's pill triggers (session 2026-08-26, client's
  * reference: Filters / Sort / Type / Price, not a text search field). Just
@@ -249,10 +257,13 @@ export function CategoryProductList({
       const el = sectionRefs.current[group.type.id];
       if (el) observer.observe(el);
     }
+    const restEl = sectionRefs.current[REST_ID];
+    if (restEl) observer.observe(restEl);
     return () => observer.disconnect();
-    // Re-observe whenever the set of visible groups changes (sort/filter).
+    // Re-observe whenever the set of visible groups (or the rest bucket's
+    // presence) changes (sort/filter).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groups?.map((g) => g.type.id).join(',')]);
+  }, [groups?.map((g) => g.type.id).join(','), rest.length > 0]);
 
   function closeSearch() {
     setSearchOpen(false);
@@ -600,6 +611,46 @@ export function CategoryProductList({
                 </button>
               );
             })}
+
+            {/* The leftover/"rest" bucket's own rail button (fix: it used to
+                render only in the right-hand list with no way to jump to it
+                from here) — same treatment as a real subgroup button above,
+                just keyed off REST_ID instead of a CATEGORY_SUBGROUPS entry. */}
+            {rest.length > 0 && (
+              <button
+                type="button"
+                onClick={() => jumpTo(REST_ID)}
+                aria-current={activeTypeId === REST_ID}
+                className={cn(
+                  'flex w-full flex-col items-center gap-1 border-r-4 px-1.5 py-3 text-center',
+                  'lg:flex-row lg:justify-start lg:gap-3 lg:px-4 lg:text-left',
+                  activeTypeId === REST_ID ? 'border-primary' : 'border-transparent',
+                )}
+              >
+                <span
+                  className={cn(
+                    'grid size-14 shrink-0 place-items-center overflow-hidden rounded-full p-1 lg:size-10',
+                    activeTypeId === REST_ID ? 'bg-tint-lime' : 'bg-background',
+                  )}
+                  aria-hidden
+                >
+                  {rest[0]?.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={rest[0].imageUrl} alt="" className="size-full rounded-full object-cover" />
+                  ) : (
+                    <Leaf className="size-5 text-primary" aria-hidden />
+                  )}
+                </span>
+                <span
+                  className={cn(
+                    'text-[11px] leading-tight lg:text-sm',
+                    activeTypeId === REST_ID ? 'font-bold text-foreground' : 'font-medium text-foreground',
+                  )}
+                >
+                  {slug === 'vegetables' ? t('otherVegetables') : t('other')}
+                </span>
+              </button>
+            )}
           </nav>
 
           {/* Right pane — the actual scrolling list; the rail above just
@@ -671,7 +722,14 @@ export function CategoryProductList({
               );
             })}
             {rest.length > 0 && (
-              <section className="pb-2">
+              <section
+                ref={(el) => {
+                  sectionRefs.current[REST_ID] = el;
+                }}
+                data-type-id={REST_ID}
+                style={{ scrollMarginTop: HEADER_OFFSET_PX + 8 }}
+                className="pb-2"
+              >
                 <h2
                   className="sticky z-10 border-b border-border bg-tint-lime px-4 py-2.5 text-[15px] font-black text-primary-dark"
                   style={{ top: HEADER_OFFSET_PX }}
