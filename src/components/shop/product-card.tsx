@@ -2,10 +2,11 @@
 
 import { Heart, ImageIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useCart } from '@/hooks/use-cart';
 import { useSession } from '@/hooks/use-session';
+import { useWishlisted } from '@/hooks/use-wishlist';
 import { formatPaise, paise } from '@/lib/money';
 import { formatQuantity, type QuantityUnit } from '@/lib/quantity';
 import { cn } from '@/lib/utils';
@@ -68,53 +69,6 @@ export interface ProductCardData {
     stockQty: number;
     lowStockThreshold: number;
   } | null;
-}
-
-// Same shape as `useRecentSearches` (src/hooks/use-recent-searches.ts):
-// localStorage read through `useSyncExternalStore`, not an effect + setState
-// — that would cascade an extra render on every card's mount and mismatch
-// the empty server render against the populated client one.
-const wishlistListeners = new Set<() => void>();
-
-function wishlistKey(productId: string) {
-  return `getfresh.wishlist.${productId}`;
-}
-
-function readWishlisted(productId: string): boolean {
-  try {
-    return window.localStorage.getItem(wishlistKey(productId)) === '1';
-  } catch {
-    return false; // Private mode — behave as if nothing is wishlisted.
-  }
-}
-
-function writeWishlisted(productId: string, value: boolean): void {
-  try {
-    if (value) window.localStorage.setItem(wishlistKey(productId), '1');
-    else window.localStorage.removeItem(wishlistKey(productId));
-  } catch {
-    // Quota or private mode — the toggle still works for this render.
-  }
-  for (const listener of wishlistListeners) listener();
-}
-
-function subscribeWishlist(onChange: () => void): () => void {
-  wishlistListeners.add(onChange);
-  return () => wishlistListeners.delete(onChange);
-}
-
-function getServerWishlisted(): boolean {
-  return false;
-}
-
-function useWishlisted(productId: string) {
-  const wishlisted = useSyncExternalStore(
-    subscribeWishlist,
-    () => readWishlisted(productId),
-    getServerWishlisted,
-  );
-  const toggle = useCallback(() => writeWishlisted(productId, !readWishlisted(productId)), [productId]);
-  return [wishlisted, toggle] as const;
 }
 
 /**

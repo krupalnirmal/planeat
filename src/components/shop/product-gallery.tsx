@@ -10,6 +10,15 @@ import { cn } from '@/lib/utils';
  * swipe-plus-dot-indicator pattern as the home banner carousel
  * (banner-carousel.tsx) so a shopper can flip through every angle the admin
  * uploaded (M9's multi-image support) instead of only ever seeing the first.
+ *
+ * Full-bleed square (session 2026-09-21, client reference) — was capped at
+ * 240px, which read as a small product shot rather than the reference's
+ * large hero photo. The dot indicators moved from a row below the image to
+ * an overlay on the image itself (bottom-right, on a translucent pill),
+ * matching the reference; `page.tsx` layers its own overlays (the
+ * conditional Organic badge, the wishlist heart) on top of this same
+ * `relative` image box from outside, since those are product-specific
+ * concerns this gallery component doesn't own.
  */
 export function ProductGallery({ images, alt }: { images: string[]; alt: string }) {
   const trackRef = useRef<HTMLUListElement>(null);
@@ -42,17 +51,17 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
 
   if (images.length === 0) {
     return (
-      <div className="mx-auto grid aspect-square w-full max-w-[240px] place-items-center overflow-hidden rounded-[var(--radius)] bg-white">
+      <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-[var(--radius-2xl)] bg-white">
         <ImageIcon className="size-16 text-muted-foreground/30" aria-hidden />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-[240px]">
+    <div className="relative w-full">
       <ul
         ref={trackRef}
-        className="flex aspect-square snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-[var(--radius)] bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex aspect-square snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-[var(--radius-2xl)] bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {images.map((url, index) => (
           <li
@@ -68,8 +77,11 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
         ))}
       </ul>
 
+      {/* Overlaid on the photo's own bottom-right corner (session
+          2026-09-21, client reference) — was a row of dots below the
+          image. */}
       {images.length > 1 && (
-        <div className="mt-2 flex h-4 items-center justify-center gap-1 overflow-visible">
+        <div className="absolute right-3 bottom-3 flex h-5 items-center gap-1 rounded-full bg-foreground/40 px-2 backdrop-blur-sm">
           {images.map((url, index) => (
             <button
               key={url}
@@ -77,13 +89,13 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
               aria-label={`${alt} ${index + 1}`}
               aria-current={index === active}
               onClick={() => goTo(index)}
-              className="-my-3 grid place-items-center px-1.5"
+              className="grid place-items-center p-0.5"
             >
               <span
                 aria-hidden
                 className={cn(
-                  'block h-1.5 rounded-full transition-all',
-                  index === active ? 'w-5 bg-primary' : 'w-1.5 bg-border',
+                  'block size-1.5 rounded-full transition-all',
+                  index === active ? 'w-4 bg-white' : 'bg-white/60',
                 )}
               />
             </button>
