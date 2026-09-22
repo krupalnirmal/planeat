@@ -35,3 +35,30 @@ await sharp(trimmedBuffer)
   .png()
   .toFile('public/brand/logo-compact.png');
 console.info(`wrote public/brand/logo-compact.png (${TARGET_WIDTH}x${compactTargetHeight})`);
+
+// Wordmark-only mark — no arc, no leaves, no caption, just "getFreesh"
+// (session 2026-09-23, client report — the 'g' looked cut off/illegible in
+// small headers). Root cause: `logo-compact.png` still carries the arc+
+// leaves above the text, so at a ~28-32px CSS header height the actual
+// letters were squeezed into only a sliver of that box, crushing the 'g'
+// loop's thin stroke to sub-pixel. Cropping to just the text row (found via
+// the same row-density scan: near-flat ~180px/row "floor" from the arc's
+// bottom chord ends and density jumps past 400 around y=460 of the 774px
+// full trim, up to the same 86%-height caption cutoff above) gives the
+// letters the full height budget instead. This is what every
+// header-height logo instance should use from now on — `logo-compact.png`
+// stays only for contexts with real room to show the arc+leaves too.
+const wordmarkTop = Math.round((460 / 774) * meta.height);
+const wordmarkBottom = compactHeight;
+const wordmarkTrimmed = await sharp(trimmedBuffer)
+  .extract({ left: 0, top: wordmarkTop, width: meta.width, height: wordmarkBottom - wordmarkTop })
+  .trim()
+  .png()
+  .toBuffer();
+const wordmarkMeta = await sharp(wordmarkTrimmed).metadata();
+const wordmarkTargetHeight = Math.round((wordmarkMeta.height / wordmarkMeta.width) * TARGET_WIDTH);
+await sharp(wordmarkTrimmed)
+  .resize(TARGET_WIDTH, wordmarkTargetHeight)
+  .png()
+  .toFile('public/brand/logo-wordmark.png');
+console.info(`wrote public/brand/logo-wordmark.png (${TARGET_WIDTH}x${wordmarkTargetHeight})`);

@@ -2,7 +2,6 @@ import { Bike, ChevronRight } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { AppHeader } from '@/components/shop/app-header';
-import { BannerCarousel } from '@/components/shop/banner-carousel';
 import { CategoryCollageTile } from '@/components/shop/category-collage-tile';
 import { HomeSection } from '@/components/shop/home-section';
 import { OrderAgainRow } from '@/components/shop/order-again-row';
@@ -43,7 +42,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const categories = payload?.categories ?? [];
   const collages = payload?.collages ?? [];
   const bestsellers = payload?.bestsellers ?? [];
-  const banners = payload?.banners ?? [];
 
   return (
     <>
@@ -63,14 +61,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             `scripts/seed-banners.ts`), which was silently hiding the
             client's own new hero entirely — a real bug this fix corrects,
             not a hypothetical one. The client's reference shows this exact
-            hero as THE brand moment, not a placeholder to be preempted by
-            whatever promotional creative happens to be uploaded. Real
-            admin banners are still real, useful content, so they don't
-            just disappear — they move to a secondary strip right below
-            the fixed hero instead of competing for its slot. */}
+            hero as THE brand moment. A secondary `BannerCarousel` strip
+            used to render right below it, but the client asked for a
+            single banner only (session 2026-09-23) — admin-uploaded
+            promo banners no longer render on this page. */}
         <div className="space-y-2 px-4 pt-2">
           <HeroBanner />
-          {banners.length > 0 && <BannerCarousel banners={banners.slice(0, 1)} />}
         </div>
 
         <HomeSection
@@ -187,8 +183,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
  * PNG, so mr/hi locales will see this one banner in English regardless of
  * locale (the client's own reference art has no translated variant).
  *
- * Always renders (see the call site's own comment) — real admin-uploaded
- * banners (`BannerCarousel`) still show as a secondary strip below it.
+ * Always renders (see the call site's own comment) — this is the page's
+ * only banner now; admin-uploaded promo banners no longer render here.
  */
 async function HeroBanner() {
   const t = await getTranslations('home');
