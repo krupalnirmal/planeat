@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Leaf, ShoppingCart, UserRound, Wallet } from 'lucide-react';
+import { ShoppingCart, UserRound, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { SearchBar } from '@/components/shop/search-bar';
@@ -50,11 +50,11 @@ export function DesktopHeader({ categories }: { categories: { slug: string; name
   return (
     <header className="sticky top-0 z-30 hidden border-b border-border bg-card lg:block">
       <div className="mx-auto flex max-w-[1280px] items-center gap-6 px-8 py-3">
-        <Link href="/" className="flex shrink-0 items-center gap-1">
-          <Leaf className="size-6 shrink-0 -rotate-12 text-primary" aria-hidden />
-          <span className="text-xl font-black tracking-tight">
-            <span className="text-primary-dark">Get</span> <span className="text-primary">Freesh</span>
-          </span>
+        {/* Real logo (session 2026-09-22) — see `app-header.tsx`'s own
+            comment on the same swap. */}
+        <Link href="/" className="flex shrink-0 items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/logo-compact.png" alt="getFresh" className="h-9 w-auto" />
         </Link>
 
         <nav aria-label={t('categories')} className="flex shrink-0 items-center gap-5">

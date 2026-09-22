@@ -34,13 +34,10 @@ export function SplashScreen() {
       <span aria-hidden />
 
       <div className="flex flex-col items-center">
-        <div className="flex items-center gap-1.5">
-          <Leaf className="size-9 -rotate-12 text-primary" aria-hidden />
-          <p className="text-4xl font-black tracking-tight">
-            <span className="text-primary-dark">Get</span>{' '}
-            <span className="text-primary">Freesh</span>
-          </p>
-        </div>
+        {/* Real logo (session 2026-09-22) — full mark, caption included:
+            this screen has the room the header's compact crop doesn't. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/logo.png" alt="getFresh" className="h-24 w-auto" />
 
         <h1 className="mt-3 text-2xl leading-snug font-bold whitespace-pre-line">{ta('tagline')}</h1>
 

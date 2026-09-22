@@ -5,7 +5,6 @@ import {
   ArrowRight,
   Check,
   Code2,
-  Leaf,
   Lock,
   MessageCircle,
   MessageSquareText,
@@ -255,14 +254,12 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
       <main className="flex min-h-dvh flex-col bg-background px-6 pt-7 pb-6">
         <div className="flex items-center justify-between gap-2">
           {/* Left-aligned, not centred in the full row — on a narrow phone
-              a centred "Get Fresh" at this size runs directly under the
-              Skip pill's right-aligned position and the two collide. */}
-          <div className="flex min-w-0 items-center gap-2">
-            <Leaf className="size-9 shrink-0 -rotate-12 text-primary" aria-hidden />
-            <p className="truncate text-4xl font-black tracking-tight">
-              <span className="text-primary-dark">Get</span>{' '}
-              <span className="text-primary">Freesh</span>
-            </p>
+              a centred logo at this size runs directly under the Skip
+              pill's right-aligned position and the two collide. Real logo
+              (session 2026-09-22) — was a text wordmark. */}
+          <div className="min-w-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/logo-compact.png" alt="getFresh" className="h-11 w-auto" />
           </div>
 
           {/* B17 — the catalogue is public, so a customer who lands here by

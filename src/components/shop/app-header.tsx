@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, Leaf, MapPin, ShoppingCart, UserRound, Wallet, Zap } from 'lucide-react';
+import { ChevronDown, MapPin, ShoppingCart, UserRound, Wallet, Zap } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { SearchBar } from '@/components/shop/search-bar';
@@ -59,20 +59,17 @@ export function AppHeader() {
     // `lg:` and up; this stays exactly as it was below that.
     <header className="sticky top-0 z-30 bg-card px-4 pt-3 pb-3 shadow-sm lg:hidden">
       <div className="flex items-start justify-between gap-3">
-        {/* The wordmark itself carries the brand colour — a leaf mark and a
-            two-tone "Get" / "Fresh", exactly as the client's logo sheet
-            does. "Get" and "Fresh" are brand-name fragments, not content
-            (R7 governs translatable text, not a wordmark that is identical
-            in mr/hi/en — see D-196/`app.name`'s SHARED_LATIN_KEYS
+        {/* The real client-provided logo (session 2026-09-22) — was a
+            styled text wordmark ("Get"/"Freesh" spans + a Leaf icon)
+            standing in for the brand's actual logo file, which didn't
+            exist in the app yet. "getFresh" is a brand-name image, not
+            translatable content (R7 governs translatable text, not a
+            wordmark — same reasoning the old text version's own comment
+            already established, see D-196/`app.name`'s SHARED_LATIN_KEYS
             exemption). */}
         <div className="min-w-0">
-          <div className="flex min-w-0 items-center gap-1">
-            <Leaf className="size-6 shrink-0 -rotate-12 text-primary" aria-hidden />
-            <p className="truncate text-2xl font-black tracking-tight">
-              <span className="text-primary-dark">Get</span>{' '}
-              <span className="text-primary">Freesh</span>
-            </p>
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/logo-compact.png" alt="getFresh" className="h-8 w-auto" />
           <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{t('tagline')}</p>
         </div>
 

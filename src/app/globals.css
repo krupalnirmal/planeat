@@ -53,6 +53,11 @@
   --color-page-grey: var(--brand-page-grey);
   --color-accent-faint: var(--accent-faint);
 
+  /* Brand refresh (session 2026-09-22) — see the `:root` block's own
+     comments for where these come from. */
+  --color-accent-orange: var(--accent-orange);
+  --color-navy: var(--navy);
+
   --font-sans: var(--font-app);
   --font-heading: var(--font-app);
   --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
@@ -106,6 +111,20 @@
   --primary-fg: #ffffff;
   --accent: #ffd400; /* small badges/flags only — never a background field */
   --accent-fg: #111111;
+  /* Sampled directly from the client's real logo file (session 2026-09-22,
+     `public/brand/logo.png`'s own arc pixels) — additive, not a
+     replacement for `--accent` above, which already carries real UI (cart
+     badges, the bottom nav's active pill) unrelated to this brand refresh.
+     Per the client's own brief: "use orange only as a subtle supporting/
+     accent color" — small flourishes only, never a background field,
+     same discipline `--accent` itself already follows. */
+  --accent-orange: #fc7c00;
+  /* The logo's own dark "get" charcoal (sampled the same way) — this app
+     had no dedicated dark-navy token before; `--text` is a near-black
+     neutral, not a brand colour. Used where the brand's own logo uses it:
+     the dark half of the wordmark image and any headline text that wants
+     to echo it, not as a replacement for `--text`. */
+  --navy: #131b20;
   /* The client wants a plain white page, not a tinted one — no grey/cream
      showing anywhere behind the white section panels. */
   --surface: #ffffff;
@@ -180,6 +199,9 @@
   --brand-page-grey: #0f0f0f;
   --brand-tint-yellow: #332a12;
   --accent-faint: #3d3212;
+
+  --accent-orange: #fc7c00;
+  --navy: #e8ecef;
 }
 
 /* Admin-only: the shared `--text-muted` gray (#6b7280) reads as too faint

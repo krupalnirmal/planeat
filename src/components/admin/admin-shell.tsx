@@ -9,7 +9,6 @@ import {
   FileClock,
   Home,
   LayoutDashboard,
-  Leaf,
   LogOut,
   MapPinned,
   Menu,
@@ -262,12 +261,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           paper and carried to the market, and a nav column would waste a
           third of the page. */}
       <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-card lg:flex print:hidden">
+        {/* Real logo (session 2026-09-22) — was a text wordmark + Leaf
+            icon. */}
         <div className="border-b border-border px-5 py-4">
-          <p className="flex items-center gap-1 text-sm font-bold">
-            <span className="text-primary-dark">Get</span> <span className="text-primary">Freesh</span>
-            <Leaf className="size-3.5 shrink-0 text-primary" aria-hidden />
-          </p>
-          <p className="text-[11px] text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/logo-compact.png" alt="getFresh" className="h-7 w-auto" />
+          <p className="mt-1 text-[11px] text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
         </div>
 
         <div className="flex flex-1 flex-col justify-between overflow-y-auto">
@@ -305,30 +304,25 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             desktop sidebar opening as a slide-over drawer — not the
             horizontally-scrolling pill row this replaces, which read as a
             broken/custom scrollbar rather than a recognisable nav. */}
-        <header className="flex h-14 items-center gap-1 border-b border-border bg-card px-2 lg:hidden print:hidden">
+        {/* `grid-cols-3` (session 2026-09-22, new client reference) — the
+            logo is centred in this reference, not left-aligned next to the
+            hamburger; a 3-column grid centres it regardless of how wide
+            the hamburger/bell+avatar sides end up. Real logo image, no
+            subtitle here any more (the reference's mobile header doesn't
+            show one — it still shows in the drawer/sidebar). */}
+        <header className="grid h-14 grid-cols-3 items-center border-b border-border bg-card px-2 lg:hidden print:hidden">
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label={tAdmin('nav.openMenu')}
             aria-expanded={menuOpen}
-            className="grid size-10 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary"
+            className="grid size-10 shrink-0 place-items-center justify-self-start rounded-full text-muted-foreground hover:bg-secondary"
           >
             <Menu className="size-5" aria-hidden />
           </button>
-          {/* `text-xl` (session 2026-09-20, client screenshot: too small)
-              — bumped up from `text-sm`. Also merged to one word
-              ("GetFresh", no space) per the same request. A "Store
-              Dashboard" subtitle + leaf mark join it here (session
-              2026-09-21, new client reference) — this bar previously had
-              no subtitle at all. */}
-          <div className="min-w-0 flex-1">
-            <p className="flex items-center gap-1 truncate text-xl font-black">
-              <span className="text-primary-dark">Get</span><span className="text-primary">Freesh</span>
-              <Leaf className="size-4 shrink-0 text-primary" aria-hidden />
-            </p>
-            <p className="truncate text-[11px] text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
-          </div>
-          <div className="flex shrink-0 items-center gap-1">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/logo-compact.png" alt="getFresh" className="h-7 w-auto justify-self-center" />
+          <div className="flex shrink-0 items-center justify-self-end gap-1">
             <NotificationBell />
             <ProfileMenu />
           </div>
@@ -345,11 +339,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-card shadow-xl">
               <div className="flex items-center justify-between border-b border-border px-5 py-4">
                 <div>
-                  <p className="flex items-center gap-1 text-sm font-bold">
-                    <span className="text-primary-dark">Get</span> <span className="text-primary">Freesh</span>
-                    <Leaf className="size-3.5 shrink-0 text-primary" aria-hidden />
-                  </p>
-                  <p className="text-xs text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/brand/logo-compact.png" alt="getFresh" className="h-6 w-auto" />
+                  <p className="mt-1 text-xs text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
                 </div>
                 <button
                   type="button"
