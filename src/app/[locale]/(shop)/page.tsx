@@ -1,4 +1,4 @@
-import { ArrowRight, Bike, ChevronRight, Heart, Leaf, ShieldCheck, Truck } from 'lucide-react';
+import { Bike, ChevronRight } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { AppHeader } from '@/components/shop/app-header';
@@ -172,113 +172,53 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 }
 
 /**
- * The welcome banner (session 2026-09-22, new client reference) — the
- * catalogue-photo collage this used to show is gone in favour of the
- * client's own real hero photo, cropped from their reference image
- * (`public/brand/hero-photo.png` — the veggie-filled paper bag + the
- * decorative "Good Food Brighter Days" script and "Fresh From Farm to
- * Home" badge, all baked into that one real photo, same "crop the real
- * asset" technique this session has used for every other reference-image
- * asset). Two real CTA buttons (→ /categories) and the feature-icon strip
- * that used to be its own separate white card further down the page now
- * live inside the hero itself, matching the reference's layout — one hero
- * section doing the full job instead of two.
+ * The welcome banner (session 2026-09-23, client feedback — the rebuilt
+ * headline/photo split "didn't match the design"). Renders the client's
+ * own reference banner PNGs as-is (`public/brand/hero-banner-desktop.png`
+ * / `-mobile.png`, straight copies of their `getfresh_customer_*_hero_
+ * banner.png` files — no crop/recompose this time) instead of recreating
+ * the layout in HTML. The banner art has its own headline/CTA copy and
+ * feature-icon row baked in, so two real `Link`s are laid over the "Shop
+ * Fresh"/"Explore Categories" buttons (transparent, positioned by
+ * percentage over their baked-in position) to keep real navigation working
+ * — everything else in the image is non-interactive decoration.
  *
- * Always renders now (see the call site's own comment on why this
- * stopped being conditional on whether an admin banner exists) — real
- * admin-uploaded banners (`BannerCarousel`) still show, just as a
- * secondary strip below this fixed hero rather than competing for its
- * slot.
+ * Trade-off worth knowing: the baked-in copy is English-only text inside a
+ * PNG, so mr/hi locales will see this one banner in English regardless of
+ * locale (the client's own reference art has no translated variant).
+ *
+ * Always renders (see the call site's own comment) — real admin-uploaded
+ * banners (`BannerCarousel`) still show as a secondary strip below it.
  */
 async function HeroBanner() {
   const t = await getTranslations('home');
-
-  const features = [
-    { icon: Leaf, titleKey: 'benefitsFreshTitle', bodyKey: 'benefitsFreshBody' },
-    { icon: Truck, titleKey: 'benefitsDeliveryTitle', bodyKey: 'benefitsDeliveryBody' },
-    { icon: ShieldCheck, titleKey: 'benefitsFarmTitle', bodyKey: 'benefitsFarmBody' },
-    { icon: Heart, titleKey: 'benefitsHealthyTitle', bodyKey: 'benefitsHealthyBody' },
-  ] as const;
+  const alt = `${t('heroHeadline').replace(/\n/g, ' ')} — ${t('heroSubtitle')}`;
 
   return (
-    <div
-      className="relative overflow-hidden rounded-[var(--radius-xl)] border border-primary/10 px-5 py-5 lg:flex lg:items-center lg:gap-8 lg:px-10 lg:py-8"
-      style={{
-        background: 'linear-gradient(120deg, var(--brand-tint-green) 0%, var(--brand-tint-yellow) 100%)',
-      }}
-    >
-      <Leaf
-        aria-hidden
-        className="pointer-events-none absolute -top-4 -left-4 size-20 -rotate-12 text-primary/15"
-      />
-
-      <div className="relative z-10 min-w-0 flex-1">
-        <p className="text-xl leading-[1.15] font-black whitespace-pre-line text-navy lg:text-4xl">
-          {t('heroHeadline')}
-        </p>
-        <p className="mt-2 text-xs text-muted-foreground lg:mt-3 lg:max-w-md lg:text-sm">
-          {t('heroSubtitle')}
-        </p>
-
-        <div className="mt-4 flex flex-wrap items-center gap-2.5">
-          <Link
-            href="/category/vegetables"
-            className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground lg:text-sm"
-          >
-            {t('shopFresh')}
-            <ArrowRight className="size-3.5" aria-hidden />
-          </Link>
-          <Link
-            href="/categories"
-            className="rounded-full border border-primary bg-card px-4 py-2.5 text-xs font-bold text-primary lg:text-sm"
-          >
-            {t('exploreCategories')}
-          </Link>
-        </div>
-
-        {/* The feature-icon strip used to be its own separate white card
-            further down the page — merged into the hero here to match the
-            reference, which shows it directly under the CTA buttons. */}
-        <div className="mt-5 hidden gap-5 sm:flex">
-          {features.map((feature) => (
-            <div key={feature.titleKey} className="flex items-center gap-2">
-              <feature.icon className="size-4 shrink-0 text-primary" aria-hidden />
-              <p className="text-[11px] leading-tight font-bold whitespace-nowrap">
-                {t(feature.titleKey)}
-                <br />
-                {t(feature.bodyKey)}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* The client's own real hero photo (see this function's doc
-          comment) — hidden below `sm:` rather than shrunk illegibly small;
-          the headline/subtitle/CTAs above already carry the hero's job on
-          a narrow phone. */}
+    <div className="relative overflow-hidden rounded-[var(--radius-xl)] border border-primary/10">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/brand/hero-photo.png"
-        alt=""
-        aria-hidden
-        className="relative z-10 mt-4 hidden w-full rounded-[var(--radius-lg)] object-cover sm:block lg:mt-0 lg:h-72 lg:w-auto lg:shrink-0"
+        src="/brand/hero-banner-mobile.png"
+        alt={alt}
+        className="block w-full sm:hidden"
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/brand/hero-banner-desktop.png"
+        alt={alt}
+        className="hidden w-full sm:block"
       />
 
-      {/* Mobile-only compact feature row (below the hero, not inside it —
-          the hero above is already tight at phone width). */}
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:hidden">
-        {features.map((feature) => (
-          <div key={feature.titleKey} className="flex items-center gap-2">
-            <feature.icon className="size-4 shrink-0 text-primary" aria-hidden />
-            <p className="text-[10px] leading-tight font-bold">
-              {t(feature.titleKey)}
-              <br />
-              {t(feature.bodyKey)}
-            </p>
-          </div>
-        ))}
-      </div>
+      <Link
+        href="/category/vegetables"
+        aria-label={t('shopFresh')}
+        className="absolute top-[56%] left-[2.5%] h-[19%] w-[19%] sm:left-[3%] sm:w-[17%]"
+      />
+      <Link
+        href="/categories"
+        aria-label={t('exploreCategories')}
+        className="absolute top-[56%] left-[22.5%] h-[19%] w-[26%] sm:left-[21%]"
+      />
     </div>
   );
 }
