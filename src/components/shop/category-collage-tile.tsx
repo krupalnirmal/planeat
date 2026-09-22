@@ -17,6 +17,11 @@ import { Link } from '@/i18n/navigation';
  * to swipe through blind. The chevron from the first cut is dropped here:
  * with a card this narrow there's no room for it next to a 2-line label,
  * and the whole card is already the tap target.
+ *
+ * Grows at `lg:` (session 2026-09-22, new client reference) — the
+ * reference's desktop "Shop by Category" cards are noticeably bigger than
+ * this tile's mobile size; `page.tsx`'s own grid template widens its
+ * tracks to match (`repeat(auto-fill,180px)` at `lg:`).
  */
 
 const CATEGORY_STYLE: Record<string, { bg: string; icon: string; Icon: typeof Leaf }> = {
@@ -44,10 +49,10 @@ export function CategoryCollageTile({
   return (
     <Link
       href={`/category/${slug}`}
-      className="card-3d flex w-[104px] shrink-0 snap-start flex-col overflow-hidden rounded-[var(--radius)] transition-transform active:scale-[0.97]"
+      className="card-3d flex w-[104px] shrink-0 snap-start flex-col overflow-hidden rounded-[var(--radius)] transition-transform active:scale-[0.97] lg:w-[180px]"
       style={{ backgroundColor: style.bg }}
     >
-      <div className="relative grid h-[78px] w-full place-items-center overflow-hidden p-1.5">
+      <div className="relative grid h-[78px] w-full place-items-center overflow-hidden p-1.5 lg:h-[140px] lg:p-2.5">
         {images[0] ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -59,13 +64,15 @@ export function CategoryCollageTile({
           />
         ) : null}
         <span
-          className="absolute top-1.5 left-1.5 grid size-5 shrink-0 place-items-center rounded-full text-white ring-2 ring-white/80"
+          className="absolute top-1.5 left-1.5 grid size-5 shrink-0 place-items-center rounded-full text-white ring-2 ring-white/80 lg:top-2.5 lg:left-2.5 lg:size-7"
           style={{ backgroundColor: style.icon }}
         >
-          <Icon className="size-2.5" aria-hidden />
+          <Icon className="size-2.5 lg:size-3.5" aria-hidden />
         </span>
       </div>
-      <p className="line-clamp-2 px-1.5 pb-2 text-center text-[10.5px] leading-tight font-semibold">{name}</p>
+      <p className="line-clamp-2 px-1.5 pb-2 text-center text-[10.5px] leading-tight font-semibold lg:px-2.5 lg:pb-3 lg:text-sm">
+        {name}
+      </p>
     </Link>
   );
 }

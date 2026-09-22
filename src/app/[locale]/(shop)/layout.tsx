@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { BottomNav } from '@/components/shop/bottom-nav';
 import { CartBar } from '@/components/shop/cart-bar';
 import { DesktopHeader } from '@/components/shop/desktop-header';
+import { Footer } from '@/components/shop/footer';
 import { InstallPrompt } from '@/components/shop/install-prompt';
 import { FirstVisitGate } from '@/components/auth/first-visit-gate';
 import { getCategories } from '@/lib/catalog/queries';
@@ -56,7 +57,12 @@ export default async function ShopLayout({
       <DesktopHeader categories={categories.map((c) => ({ slug: c.slug, name: c.name }))} />
       <FirstVisitGate />
       <InstallPrompt />
-      <div className="app-scroll">{children}</div>
+      <div className="app-scroll">
+        {children}
+        {/* Desktop-only (see Footer's own doc comment) — sits inside the
+            scrolling column, after the page content, not fixed. */}
+        <Footer categories={categories.map((c) => ({ slug: c.slug, name: c.name }))} />
+      </div>
       <CartBar />
       <BottomNav />
     </div>

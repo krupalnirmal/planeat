@@ -98,6 +98,7 @@
   },
   "home": {
     "tagline": "Fresh choices, delivered fast",
+    "trackOrder": "Track Order",
     "deliveryIn": "Delivery in {minutes} min",
     "deliverTo": "Deliver to",
     "selectAddress": "Select address",
@@ -106,16 +107,18 @@
     "orderAgain": "Order again",
     "moreCount": "+{count} more",
     "emptyCatalogue": "No products yet. Run the seed script.",
-    "heroHeadline": "Fresh Vegetables,\nFresh Health!",
-    "heroSubtitle": "Fresh Produce • Delivered to Your Home",
-    "benefitsFreshTitle": "No Minimum",
-    "benefitsFreshBody": "Order",
-    "benefitsDeliveryTitle": "Best Quality",
-    "benefitsDeliveryBody": "Farm Fresh",
-    "benefitsFarmTitle": "On-Time",
-    "benefitsFarmBody": "Delivery",
-    "benefitsHealthyTitle": "Safe",
-    "benefitsHealthyBody": "Packaging",
+    "heroHeadline": "Fresh choices,\ndelivered daily.",
+    "heroSubtitle": "Farm fresh fruits, vegetables, dairy, groceries and more at your doorstep. Natural choices for a healthier, happier you.",
+    "shopFresh": "Shop Fresh",
+    "exploreCategories": "Explore Categories",
+    "benefitsFreshTitle": "Fresh & Quality",
+    "benefitsFreshBody": "Products",
+    "benefitsDeliveryTitle": "Fast & Reliable",
+    "benefitsDeliveryBody": "Delivery",
+    "benefitsFarmTitle": "Safe & Secure",
+    "benefitsFarmBody": "Payments",
+    "benefitsHealthyTitle": "A Healthier",
+    "benefitsHealthyBody": "Happier You",
     "vegetablesSubtitle": "Fresh & Handpicked",
     "fruitsSubtitle": "Juicy & Fresh",
     "fastDeliveryTitle": "Fast Delivery",
@@ -176,6 +179,11 @@
         "sub": "Grains, oil & more, delivered fast"
       }
     }
+  },
+  "footer": {
+    "categoriesHeading": "Shop by Category",
+    "legalHeading": "Legal",
+    "copyright": "© {year} getFresh. All rights reserved."
   },
   "product": {
     "add": "ADD",

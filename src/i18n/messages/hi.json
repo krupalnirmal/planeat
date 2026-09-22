@@ -98,6 +98,7 @@
   },
   "home": {
     "tagline": "ताज़ी पसंद, झटपट डिलीवरी",
+    "trackOrder": "ऑर्डर ट्रैक करें",
     "deliveryIn": "{minutes} मिनट में डिलीवरी",
     "deliverTo": "यहाँ पहुँचाएँ",
     "selectAddress": "पता चुनें",
@@ -106,16 +107,18 @@
     "orderAgain": "फिर से मँगाएँ",
     "moreCount": "+{count} और",
     "emptyCatalogue": "अभी कोई उत्पाद नहीं है। seed script चलाएँ।",
-    "heroHeadline": "ताज़ी सब्ज़ियां,\nताज़ी सेहत!",
-    "heroSubtitle": "ताज़ी उपज • आपके घर तक",
-    "benefitsFreshTitle": "न्यूनतम ऑर्डर",
-    "benefitsFreshBody": "की शर्त नहीं",
-    "benefitsDeliveryTitle": "बेहतरीन क्वालिटी,",
-    "benefitsDeliveryBody": "खेत से ताज़ा",
-    "benefitsFarmTitle": "समय पर",
-    "benefitsFarmBody": "डिलीवरी",
-    "benefitsHealthyTitle": "सुरक्षित",
-    "benefitsHealthyBody": "पैकेजिंग",
+    "heroHeadline": "ताज़ा चुनाव,\nरोज़ाना घर पहुँच.",
+    "heroSubtitle": "खेत की ताज़ी सब्ज़ियाँ, फल, डेयरी और किराना आपके दरवाज़े तक। सेहतमंद और खुशहाल ज़िंदगी के लिए प्राकृतिक चुनाव।",
+    "shopFresh": "अभी खरीदें",
+    "exploreCategories": "श्रेणियाँ देखें",
+    "benefitsFreshTitle": "ताज़ा और गुणवत्तापूर्ण",
+    "benefitsFreshBody": "उत्पाद",
+    "benefitsDeliveryTitle": "तेज़ और भरोसेमंद",
+    "benefitsDeliveryBody": "डिलीवरी",
+    "benefitsFarmTitle": "सुरक्षित",
+    "benefitsFarmBody": "भुगतान",
+    "benefitsHealthyTitle": "सेहतमंद,",
+    "benefitsHealthyBody": "खुशहाल आप",
     "vegetablesSubtitle": "ताज़ी व चुनिंदा",
     "fruitsSubtitle": "रसीले व ताज़े",
     "fastDeliveryTitle": "तेज़ डिलीवरी",
@@ -176,6 +179,11 @@
         "sub": "अनाज, तेल और भी बहुत कुछ झटपट घर पहुँच"
       }
     }
+  },
+  "footer": {
+    "categoriesHeading": "श्रेणी के अनुसार खरीदें",
+    "legalHeading": "कानूनी",
+    "copyright": "© {year} getFresh. सर्वाधिकार सुरक्षित।"
   },
   "product": {
     "add": "जोड़ें",

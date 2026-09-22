@@ -1,4 +1,4 @@
-import { Bike, ChevronRight, Clock, Leaf, PackageCheck, ShieldCheck, ShoppingBag } from 'lucide-react';
+import { ArrowRight, Bike, ChevronRight, Heart, Leaf, ShieldCheck, Truck } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { AppHeader } from '@/components/shop/app-header';
@@ -45,14 +45,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const bestsellers = payload?.bestsellers ?? [];
   const banners = payload?.banners ?? [];
 
-  // A handful of real vegetable photos for the fallback hero's collage,
-  // rather than one hero image nobody uploaded yet — the catalogue itself is
-  // the source, so the cluster is never a placeholder.
-  const heroImages = (collages.find((c) => c.categorySlug === 'vegetables')?.images ?? []).slice(
-    0,
-    3,
-  );
-
   return (
     <>
       <AppHeader />
@@ -63,25 +55,22 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           green background at all — near-white, with the white cards on top
           carrying the structure. */}
       <main className="bg-page-grey pb-2">
-        {/* The promo banner sits right under the search bar.
-            One banner, not a carousel (session 2026-08-27, client's
-            reference shows a single static hero) — `slice(0, 1)` rather
-            than deleting the others, so the remaining creatives stay
-            seeded and switching back is a one-line change. BannerCarousel
-            already skips its dots and auto-advance at length 1.
-            Inset with the same px-4 gutter as every other section, and
-            rounded, matching the reference. */}
-        <div className="px-4 pt-2">
-          {banners.length > 0 ? (
-            <BannerCarousel banners={banners.slice(0, 1)} />
-          ) : (
-            <HeroBanner
-              headline={t('heroHeadline')}
-              subtitle={t('heroSubtitle')}
-              badge={t('deliveryIn', { minutes: 30 })}
-              images={heroImages}
-            />
-          )}
+        {/* `HeroBanner` is unconditional now (session 2026-09-22, new
+            client reference) — it used to be the fallback shown only
+            while no admin banner existed, with `BannerCarousel` taking
+            the same slot whenever a real one did. This live database
+            actually has real seeded banners (an earlier session's
+            `scripts/seed-banners.ts`), which was silently hiding the
+            client's own new hero entirely — a real bug this fix corrects,
+            not a hypothetical one. The client's reference shows this exact
+            hero as THE brand moment, not a placeholder to be preempted by
+            whatever promotional creative happens to be uploaded. Real
+            admin banners are still real, useful content, so they don't
+            just disappear — they move to a secondary strip right below
+            the fixed hero instead of competing for its slot. */}
+        <div className="space-y-2 px-4 pt-2">
+          <HeroBanner />
+          {banners.length > 0 && <BannerCarousel banners={banners.slice(0, 1)} />}
         </div>
 
         <HomeSection
@@ -102,7 +91,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             // the tile's own real width (`repeat(auto-fill,104px)`, not a
             // fixed column count) so it lays out evenly instead of
             // stretching each tile across a huge column.
-            <ul className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[repeat(auto-fill,104px)] lg:justify-center lg:gap-3 lg:overflow-visible">
+            <ul className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-[repeat(auto-fill,180px)] lg:justify-center lg:gap-4 lg:overflow-visible">
               {collages.map((collage) => (
                 <li key={collage.categorySlug} className="shrink-0">
                   <CategoryCollageTile
@@ -174,14 +163,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </HomeSection>
         )}
 
-        {/* Both sit in their own white rounded card on the page grey,
-            matching the reference's benefits strip. */}
-        <div className="px-4 py-2">
-          <div className="rounded-[var(--radius)] bg-card p-3 shadow-sm">
-            <BenefitsRow />
-          </div>
-        </div>
-
         <div className="px-4 py-2">
           <FastDeliveryBanner />
         </div>
@@ -191,28 +172,37 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 }
 
 /**
- * The welcome banner: a real, non-hard-coded product-photo cluster (the
- * catalogue's own vegetable photos, not a stock hero image) on a soft
- * green-to-yellow field, matching the client's own reference exactly — the
- * Marathi headline and delivery badge on the left, photos on the right.
+ * The welcome banner (session 2026-09-22, new client reference) — the
+ * catalogue-photo collage this used to show is gone in favour of the
+ * client's own real hero photo, cropped from their reference image
+ * (`public/brand/hero-photo.png` — the veggie-filled paper bag + the
+ * decorative "Good Food Brighter Days" script and "Fresh From Farm to
+ * Home" badge, all baked into that one real photo, same "crop the real
+ * asset" technique this session has used for every other reference-image
+ * asset). Two real CTA buttons (→ /categories) and the feature-icon strip
+ * that used to be its own separate white card further down the page now
+ * live inside the hero itself, matching the reference's layout — one hero
+ * section doing the full job instead of two.
  *
- * This is the FALLBACK, shown only while the admin has not uploaded a real
- * promotional banner yet (`ImageBanner` below is what renders once they do).
+ * Always renders now (see the call site's own comment on why this
+ * stopped being conditional on whether an admin banner exists) — real
+ * admin-uploaded banners (`BannerCarousel`) still show, just as a
+ * secondary strip below this fixed hero rather than competing for its
+ * slot.
  */
-function HeroBanner({
-  headline,
-  subtitle,
-  badge,
-  images,
-}: {
-  headline: string;
-  subtitle: string;
-  badge: string;
-  images: string[];
-}) {
+async function HeroBanner() {
+  const t = await getTranslations('home');
+
+  const features = [
+    { icon: Leaf, titleKey: 'benefitsFreshTitle', bodyKey: 'benefitsFreshBody' },
+    { icon: Truck, titleKey: 'benefitsDeliveryTitle', bodyKey: 'benefitsDeliveryBody' },
+    { icon: ShieldCheck, titleKey: 'benefitsFarmTitle', bodyKey: 'benefitsFarmBody' },
+    { icon: Heart, titleKey: 'benefitsHealthyTitle', bodyKey: 'benefitsHealthyBody' },
+  ] as const;
+
   return (
     <div
-      className="relative flex h-40 items-center overflow-hidden rounded-[var(--radius)] border border-primary/10 px-5"
+      className="relative overflow-hidden rounded-[var(--radius-xl)] border border-primary/10 px-5 py-5 lg:flex lg:items-center lg:gap-8 lg:px-10 lg:py-8"
       style={{
         background: 'linear-gradient(120deg, var(--brand-tint-green) 0%, var(--brand-tint-yellow) 100%)',
       }}
@@ -223,70 +213,72 @@ function HeroBanner({
       />
 
       <div className="relative z-10 min-w-0 flex-1">
-        <p className="text-xl leading-[1.15] font-black whitespace-pre-line text-primary-dark">
-          {headline}
+        <p className="text-xl leading-[1.15] font-black whitespace-pre-line text-navy lg:text-4xl">
+          {t('heroHeadline')}
         </p>
-        <p className="mt-1.5 text-[11px] font-semibold text-muted-foreground">{subtitle}</p>
-        <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary-dark px-2.5 py-1.5 text-[11px] font-bold text-white">
-          <Bike className="size-3.5" aria-hidden />
-          {badge}
-        </span>
-      </div>
+        <p className="mt-2 text-xs text-muted-foreground lg:mt-3 lg:max-w-md lg:text-sm">
+          {t('heroSubtitle')}
+        </p>
 
-      {images.length > 0 && (
-        <div className="relative ml-2 flex h-full shrink-0 items-center" style={{ width: '38%' }}>
-          {images.map((src, index) => (
-            <div
-              key={src}
-              className="absolute size-[88px] overflow-hidden rounded-2xl border-2 border-background shadow-md"
-              style={{
-                right: `${index * 26}px`,
-                top: `${index % 2 === 0 ? 4 : 22}px`,
-                zIndex: images.length - index,
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="" className="size-full object-cover" />
+        <div className="mt-4 flex flex-wrap items-center gap-2.5">
+          <Link
+            href="/category/vegetables"
+            className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground lg:text-sm"
+          >
+            {t('shopFresh')}
+            <ArrowRight className="size-3.5" aria-hidden />
+          </Link>
+          <Link
+            href="/categories"
+            className="rounded-full border border-primary bg-card px-4 py-2.5 text-xs font-bold text-primary lg:text-sm"
+          >
+            {t('exploreCategories')}
+          </Link>
+        </div>
+
+        {/* The feature-icon strip used to be its own separate white card
+            further down the page — merged into the hero here to match the
+            reference, which shows it directly under the CTA buttons. */}
+        <div className="mt-5 hidden gap-5 sm:flex">
+          {features.map((feature) => (
+            <div key={feature.titleKey} className="flex items-center gap-2">
+              <feature.icon className="size-4 shrink-0 text-primary" aria-hidden />
+              <p className="text-[11px] leading-tight font-bold whitespace-nowrap">
+                {t(feature.titleKey)}
+                <br />
+                {t(feature.bodyKey)}
+              </p>
             </div>
           ))}
         </div>
-      )}
-    </div>
-  );
-}
+      </div>
 
-/**
- * The four-up trust strip: 100% Fresh & Natural / Home Delivery / Farm to
- * Home / Healthy Choice, one card with dividers, matching the reference.
- * Static copy, not catalogue data — these are brand claims, not facts a
- * database query produces.
- */
-async function BenefitsRow() {
-  const t = await getTranslations('home');
+      {/* The client's own real hero photo (see this function's doc
+          comment) — hidden below `sm:` rather than shrunk illegibly small;
+          the headline/subtitle/CTAs above already carry the hero's job on
+          a narrow phone. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/brand/hero-photo.png"
+        alt=""
+        aria-hidden
+        className="relative z-10 mt-4 hidden w-full rounded-[var(--radius-lg)] object-cover sm:block lg:mt-0 lg:h-72 lg:w-auto lg:shrink-0"
+      />
 
-  const items = [
-    { icon: ShoppingBag, titleKey: 'benefitsFreshTitle', bodyKey: 'benefitsFreshBody' },
-    { icon: ShieldCheck, titleKey: 'benefitsDeliveryTitle', bodyKey: 'benefitsDeliveryBody' },
-    { icon: Clock, titleKey: 'benefitsFarmTitle', bodyKey: 'benefitsFarmBody' },
-    { icon: PackageCheck, titleKey: 'benefitsHealthyTitle', bodyKey: 'benefitsHealthyBody' },
-  ] as const;
-
-  return (
-    // In its own white panel now (session 2026-08-26 — the banner above it
-    // moved up to sit right under the search bar), so no top rule needed.
-    <div className="grid grid-cols-4 divide-x divide-border">
-      {items.map(({ icon: Icon, titleKey, bodyKey }) => (
-        <div key={titleKey} className="flex flex-col items-center gap-1.5 px-1 text-center">
-          <span className="grid size-9 place-items-center rounded-full bg-tint-green text-primary">
-            <Icon className="size-4.5" aria-hidden />
-          </span>
-          <p className="text-[11px] leading-tight font-bold">
-            {t(titleKey)}
-            <br />
-            {t(bodyKey)}
-          </p>
-        </div>
-      ))}
+      {/* Mobile-only compact feature row (below the hero, not inside it —
+          the hero above is already tight at phone width). */}
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:hidden">
+        {features.map((feature) => (
+          <div key={feature.titleKey} className="flex items-center gap-2">
+            <feature.icon className="size-4 shrink-0 text-primary" aria-hidden />
+            <p className="text-[10px] leading-tight font-bold">
+              {t(feature.titleKey)}
+              <br />
+              {t(feature.bodyKey)}
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

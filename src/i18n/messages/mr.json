@@ -98,6 +98,7 @@
   },
   "home": {
     "tagline": "ताजी निवड, झटपट घरपोच",
+    "trackOrder": "ऑर्डर ट्रॅक करा",
     "deliveryIn": "{minutes} मिनिटांत डिलिव्हरी",
     "deliverTo": "इथे पोहोचवा",
     "selectAddress": "पत्ता निवडा",
@@ -106,16 +107,18 @@
     "orderAgain": "पुन्हा मागवा",
     "moreCount": "+{count} अजून",
     "emptyCatalogue": "अजून एकही उत्पादन नाही. seed script चालवा.",
-    "heroHeadline": "ताज्या भाज्या,\nताजं आरोग्य!",
-    "heroSubtitle": "ताजी उत्पादने • तुमच्या दारात",
-    "benefitsFreshTitle": "किमान ऑर्डरची",
-    "benefitsFreshBody": "अट नाही",
-    "benefitsDeliveryTitle": "उत्तम दर्जा,",
-    "benefitsDeliveryBody": "शेतापासून ताजं",
-    "benefitsFarmTitle": "वेळेवर",
-    "benefitsFarmBody": "डिलिव्हरी",
-    "benefitsHealthyTitle": "सुरक्षित",
-    "benefitsHealthyBody": "पॅकेजिंग",
+    "heroHeadline": "ताजी निवड,\nदररोज घरपोच.",
+    "heroSubtitle": "शेतातील ताजी फळे, भाज्या, दुग्धजन्य पदार्थ व किराणा तुमच्या दारात. आरोग्यदायी व आनंदी आयुष्यासाठी नैसर्गिक निवड.",
+    "shopFresh": "आता खरेदी करा",
+    "exploreCategories": "श्रेणी पहा",
+    "benefitsFreshTitle": "ताजी व दर्जेदार",
+    "benefitsFreshBody": "उत्पादने",
+    "benefitsDeliveryTitle": "जलद व विश्वासू",
+    "benefitsDeliveryBody": "डिलिव्हरी",
+    "benefitsFarmTitle": "सुरक्षित",
+    "benefitsFarmBody": "पेमेंट्स",
+    "benefitsHealthyTitle": "आरोग्यदायी,",
+    "benefitsHealthyBody": "आनंदी तुम्ही",
     "vegetablesSubtitle": "ताज्या व निवडक",
     "fruitsSubtitle": "रसाळ व ताजी",
     "fastDeliveryTitle": "जलद डिलिव्हरी",
@@ -176,6 +179,11 @@
         "sub": "धान्य, तेल व बरंच काही झटपट घरपोच"
       }
     }
+  },
+  "footer": {
+    "categoriesHeading": "श्रेणीनुसार खरेदी करा",
+    "legalHeading": "कायदेशीर",
+    "copyright": "© {year} getFresh. सर्व हक्क राखीव."
   },
   "product": {
     "add": "घाला",

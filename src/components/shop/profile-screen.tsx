@@ -67,14 +67,16 @@ export function ProfileScreen() {
   const liveRows = [
     { key: 'myOrders', icon: Package, href: '/orders' },
     { key: 'addresses', icon: MapPin, href: '/addresses' },
+    // Real pages now (session 2026-09-22, new client reference) — were
+    // disabled "coming soon" rows below with no page behind them.
+    { key: 'terms', icon: FileText, href: '/terms' },
+    { key: 'privacy', icon: ShieldCheck, href: '/privacy' },
   ] as const;
 
   const laterRows = [
     { key: 'healthProfile', icon: HeartPulse },
     { key: 'notifications', icon: Bell },
     { key: 'medicalDisclaimer', icon: Stethoscope },
-    { key: 'terms', icon: FileText },
-    { key: 'privacy', icon: ShieldCheck },
   ] as const;
 
   return (
