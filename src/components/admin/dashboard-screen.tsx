@@ -2,21 +2,26 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  ArrowRight,
   BarChart3,
   CreditCard,
+  Heart,
   IndianRupee,
   Leaf,
   Loader2,
   MessageCircle,
+  Package,
   RefreshCw,
   Salad,
   ShoppingBag,
+  TrendingUp,
   Truck,
   Users,
   Warehouse,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, useSyncExternalStore } from 'react';
+import { Link } from '@/i18n/navigation';
 import { AdminPageHeader } from '@/components/admin/admin-shell';
 import { DateRangeDropdown, ExplorerEmpty, ExplorerTabs, type ExplorerTab } from '@/components/admin/explorer';
 import {
@@ -101,6 +106,29 @@ interface CronMetrics {
   };
 }
 
+/** The hero's decorative feature-icon row (session 2026-09-22, new client
+    reference) — no real metric behind any of these, same "generic,
+    non-measurable marketing copy" treatment this session has used
+    elsewhere (e.g. the storefront PDP's "Freshly picked"/"Quality
+    checked"), not a fabricated stat. */
+const HERO_FEATURES = [
+  { key: 'heroFeatureProducts', icon: Leaf },
+  { key: 'heroFeatureDelivery', icon: Truck },
+  { key: 'heroFeatureCustomers', icon: Heart },
+  { key: 'heroFeatureGrowth', icon: TrendingUp },
+] as const;
+
+/** The mobile dashboard's quick-nav row (session 2026-09-22, new client
+    reference) — same 4 real routes `AdminBottomNav` (admin-shell.tsx)
+    links to, deliberately kept identical rather than picking a second,
+    different set of "top 4" destinations. */
+const QUICK_NAV_SECTIONS = [
+  { key: 'orders', href: '/admin/orders', icon: ShoppingBag },
+  { key: 'catalogue', href: '/admin/catalogue', icon: Package },
+  { key: 'inventory', href: '/admin/inventory', icon: Warehouse },
+  { key: 'customers', href: '/admin/customers', icon: Users },
+] as const;
+
 const TABS: ExplorerTab[] = [
   { key: 'analytics', label: '', icon: BarChart3 },
   { key: 'orders', label: '', icon: ShoppingBag },
@@ -117,6 +145,7 @@ export function AdminDashboard() {
   const t = useTranslations('admin.dashboard');
   const te = useTranslations('admin.explorer');
   const tc = useTranslations('admin.common');
+  const tNav = useTranslations('admin.nav');
   const locale = useLocale();
   const queryClient = useQueryClient();
   const { user } = useSession();
@@ -173,13 +202,54 @@ export function AdminDashboard() {
           />
 
           <div className="relative z-10 min-w-0 flex-1">
-            <p className="text-[11px] font-bold tracking-wide text-muted-foreground uppercase">
-              {t(greetingKey(hour))}
+            {/* Greeting + real admin name on one smaller line (session
+                2026-09-22, new client reference) — used to be a small
+                uppercase label with the name as its own big bold line;
+                the reference instead gives that big-bold treatment to a
+                new headline below, so the greeting+name demote to one
+                line together. `greetingMorning`/etc already end in a
+                comma ("Good Morning,"), which is exactly what reads right
+                immediately before the name here. */}
+            <p className="truncate text-xs font-semibold text-muted-foreground sm:text-sm">
+              {t(greetingKey(hour))} <span className="font-bold text-foreground">{adminName}</span>{' '}
+              <span aria-hidden>👋</span>
             </p>
-            <p className="mt-0.5 truncate text-xl font-black text-primary-dark sm:text-2xl">
-              {adminName} <span aria-hidden>👋</span>
+            {/* New two-tone headline (session 2026-09-22, new client
+                reference) — echoes the logo's own dark/green split, first
+                real use of the new `--navy` token. */}
+            <p className="mt-0.5 truncate text-xl leading-tight font-black sm:text-2xl">
+              <span className="text-navy">{t('heroTaglineDark')}</span>{' '}
+              <span className="text-primary">{t('heroTaglineGreen')}</span>
             </p>
             <p className="mt-1 truncate text-xs text-muted-foreground sm:text-sm">{t('welcomeSubtitle')}</p>
+
+            {/* Feature-icon row + quote/CTA card (session 2026-09-22, new
+                client reference) — desktop only: the reference's own
+                mobile crop doesn't show either, and a phone-width hero
+                already has its hands full with the photo/tagline it
+                already carries. Both are decorative except the "View
+                Store" link, which is real (→ the actual storefront). */}
+            <div className="mt-5 hidden flex-wrap items-center gap-5 lg:flex">
+              {HERO_FEATURES.map((feature) => (
+                <div key={feature.key} className="flex flex-col items-center gap-1 text-center">
+                  <feature.icon className="size-5 text-primary" aria-hidden />
+                  <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap">
+                    {t(feature.key)}
+                  </span>
+                </div>
+              ))}
+
+              <div className="ml-auto max-w-[220px] shrink-0 rounded-[var(--radius)] bg-card/80 px-3 py-2.5">
+                <p className="text-xs font-semibold text-primary-dark italic">&ldquo;{t('heroQuote')}&rdquo;</p>
+                <Link
+                  href="/"
+                  className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-[11px] font-bold text-primary-foreground"
+                >
+                  {t('viewStore')}
+                  <ArrowRight className="size-3" aria-hidden />
+                </Link>
+              </div>
+            </div>
           </div>
 
           {/* Decorative handwritten-style tagline, matching the reference —
@@ -237,6 +307,25 @@ export function AdminDashboard() {
             {regenerate.isPending ? t('regenerating') : t('regenerate')}
           </button>
         )}
+      </div>
+
+      {/* Mobile quick-nav row (session 2026-09-22, new client reference) —
+          4 real routes (the same ones the new AdminBottomNav bar links
+          to), desktop-hidden since the sidebar already covers this there.
+          Mirrors the exact icon/route pairing admin-shell.tsx's own
+          bottom-nav sections use, for one consistent set of "the 4 most
+          common admin destinations" rather than two different picks. */}
+      <div className="mb-4 grid grid-cols-4 gap-2 lg:hidden">
+        {QUICK_NAV_SECTIONS.map((section) => (
+          <Link
+            key={section.key}
+            href={section.href}
+            className="flex flex-col items-center gap-1.5 rounded-[var(--radius)] bg-tint-green px-1 py-3"
+          >
+            <section.icon className="size-5 text-primary" aria-hidden />
+            <span className="text-[11px] font-semibold text-primary-dark">{tNav(section.key)}</span>
+          </Link>
+        ))}
       </div>
 
       <ExplorerTabs tabs={tabs} active={tab} onChange={setTab} />

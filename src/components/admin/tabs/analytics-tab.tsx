@@ -22,6 +22,7 @@ import { type ExplorerRange } from '@/components/admin/explorer';
 import { api, qs } from '@/lib/api/client';
 import { CATEGORY_TILE_IMAGES } from '@/lib/catalog/category-tile-images';
 import { formatPaise, paise } from '@/lib/money';
+import { formatQuantity, type QuantityUnit } from '@/lib/quantity';
 import { cn } from '@/lib/utils';
 
 /** Dashboard v2's Analytics tab (session 2026-09-19) — the default/first
@@ -73,9 +74,11 @@ interface DashboardResponse {
   /** The dashboard's "Quick Info" / low-stock widget (session 2026-09-21,
       client reference) — also a sibling of `analytics`, matching
       `DashboardMetrics`'s real, already-existing `lowStockCount` field plus
-      the new `lowStockProducts` names added alongside it. */
+      the new `lowStockProducts` names added alongside it. `stockQty`/
+      `quantity`/`unit` (session 2026-09-22) let the row show a real
+      "Tomato 5 kg — 3 left" instead of just a bare name. */
   lowStockCount: number;
-  lowStockProducts: string[];
+  lowStockProducts: Array<{ name: string; stockQty: number; quantity: number; unit: string }>;
 }
 
 /** Also passed as `DateRangeDropdown`'s `keys` prop from `dashboard-screen.tsx`,
@@ -455,12 +458,25 @@ export function AnalyticsExplorerTab({
           ) : (
             <>
               <ul className="divide-y divide-border">
-                {lowStockProducts.map((name) => (
-                  <li key={name} className="flex items-center gap-2.5 py-2.5 first:pt-0 last:pb-0">
+                {/* Real per-item stock quantity now (session 2026-09-22,
+                    new client reference: "Tomato 5 kg — 3 left") — was a
+                    bare name; `stockQty`/`quantity`/`unit` were already
+                    fetched for the count above, just not carried this far
+                    until now (src/lib/admin/dashboard.ts). */}
+                {lowStockProducts.map((product) => (
+                  <li key={product.name} className="flex items-center gap-2.5 py-2.5 first:pt-0 last:pb-0">
                     <span className="grid size-8 shrink-0 place-items-center rounded-full bg-danger/10 text-danger">
                       <AlertTriangle className="size-4" aria-hidden />
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-sm font-medium">{name}</span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                      {product.name}{' '}
+                      <span className="text-xs font-normal text-muted-foreground">
+                        {formatQuantity(product.quantity, product.unit as QuantityUnit)}
+                      </span>
+                    </span>
+                    <span className="shrink-0 rounded-full bg-danger/10 px-2 py-0.5 text-[11px] font-semibold text-danger">
+                      {t('stockLeft', { count: product.stockQty })}
+                    </span>
                   </li>
                 ))}
               </ul>

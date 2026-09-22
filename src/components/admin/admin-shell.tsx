@@ -12,6 +12,7 @@ import {
   LogOut,
   MapPinned,
   Menu,
+  MoreHorizontal,
   Package,
   Salad,
   Search,
@@ -237,6 +238,58 @@ function ProfileMenu() {
   );
 }
 
+/** A persistent mobile bottom nav (session 2026-09-22, new client
+    reference) — admin mobile nav used to be hamburger-drawer only, with
+    nothing pinned to the bottom the way the customer app's own `BottomNav`
+    (src/components/shop/bottom-nav.tsx) already has. Only 4 real routes
+    fit a 5-item bar with "More"; the other 7 sidebar sections (Picklist,
+    Customers, Meal Plans, Delivery Partners, Waitlist, Settings, Audit
+    Log) stay reachable exactly where they already are — "More" just opens
+    the same drawer the hamburger button does, not a second nav surface. */
+const BOTTOM_NAV_SECTIONS = [
+  { href: '/admin', key: 'dashboard', icon: LayoutDashboard, exact: true },
+  { href: '/admin/orders', key: 'orders', icon: ShoppingBag },
+  { href: '/admin/catalogue', key: 'catalogue', icon: Package },
+  { href: '/admin/inventory', key: 'inventory', icon: Warehouse },
+] as const;
+
+function AdminBottomNav({ onMore }: { onMore: () => void }) {
+  const t = useTranslations('admin.nav');
+  const pathname = usePathname();
+
+  return (
+    <nav
+      aria-label={t('dashboard')}
+      className="fixed inset-x-0 bottom-0 z-30 flex items-stretch border-t border-border bg-card lg:hidden print:hidden"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+    >
+      {BOTTOM_NAV_SECTIONS.map((section) => {
+        const active =
+          'exact' in section && section.exact ? pathname === section.href : pathname.startsWith(section.href);
+        const Icon = section.icon;
+        return (
+          <Link
+            key={section.key}
+            href={section.href}
+            aria-current={active ? 'page' : undefined}
+            className="flex flex-1 flex-col items-center gap-0.5 py-2"
+          >
+            <Icon className={cn('size-5', active ? 'text-primary' : 'text-muted-foreground')} aria-hidden />
+            <span className={cn('text-[10px]', active ? 'font-bold text-primary' : 'text-muted-foreground')}>
+              {t(section.key)}
+            </span>
+            {active && <span className="mt-0.5 h-0.5 w-5 rounded-full bg-primary" aria-hidden />}
+          </Link>
+        );
+      })}
+      <button type="button" onClick={onMore} className="flex flex-1 flex-col items-center gap-0.5 py-2">
+        <MoreHorizontal className="size-5 text-muted-foreground" aria-hidden />
+        <span className="text-[10px] text-muted-foreground">{t('more')}</span>
+      </button>
+    </nav>
+  );
+}
+
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const tAdmin = useTranslations('admin');
   const pathname = usePathname();
@@ -272,11 +325,20 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="flex flex-1 flex-col justify-between overflow-y-auto">
           <NavList />
 
-          {/* Cosmetic branding, matching the client's reference — not tied
-              to any data. */}
+          {/* Cosmetic branding card, restyled (session 2026-09-22, new
+              client reference: a "Need Help" style card) — visual
+              treatment only, real copy unchanged. No "Contact Support"
+              button was added even though the reference shows one: no
+              real support phone/email/chat channel exists anywhere in
+              this app to point it at (confirmed — `report-issue-form.tsx`
+              is a per-order customer flow, not an admin support line), and
+              this session's own rule is never link to something that
+              isn't real. */}
           <div className="px-2 pb-2">
-            <div className="flex items-center gap-2.5 rounded-[var(--radius)] bg-tint-green px-3 py-3">
-              <Sprout className="size-6 shrink-0 text-primary" aria-hidden />
+            <div className="flex flex-col items-center gap-2 rounded-[var(--radius)] bg-tint-green px-3 py-4 text-center">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-card text-primary shadow-sm">
+                <Sprout className="size-5" aria-hidden />
+              </span>
               <p className="text-xs leading-tight font-semibold text-primary-dark">
                 {tAdmin('nav.promoTitle')}
               </p>
@@ -359,7 +421,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
         <AdminInstallPrompt />
 
-        <main className="p-4 lg:p-6 print:p-0">{children}</main>
+        {/* `pb-20` (session 2026-09-22) reserves room for the new mobile
+            bottom nav below — a fixed bar, same reasoning the customer
+            app's own bottom-nav content reservation already uses. */}
+        <main className="p-4 pb-20 lg:p-6 lg:pb-6 print:p-0">{children}</main>
+
+        <AdminBottomNav onMore={() => setMenuOpen(true)} />
       </div>
     </div>
   );

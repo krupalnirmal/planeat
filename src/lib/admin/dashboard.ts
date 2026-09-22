@@ -51,8 +51,11 @@ export interface DashboardMetrics {
   /** The dashboard's own "Quick Info" widget (session 2026-09-21, client
       reference) — the first few low-stock product names, so the owner sees
       *what* to reorder without opening the Inventory tab first. Same
-      variants `lowStockCount` already counts, just carrying names too. */
-  lowStockProducts: string[];
+      variants `lowStockCount` already counts. `stockQty`/`quantity`/`unit`
+      (session 2026-09-22, new client reference: "Tomato 5 kg — 3 left"
+      style rows) were already being fetched for the filter above — just
+      not carried through to this shape until now. */
+  lowStockProducts: Array<{ name: string; stockQty: number; quantity: number; unit: string }>;
 
   waitlistTotal: number;
   /** B11 — where the demand is, so the owner knows where to expand. */
@@ -375,6 +378,8 @@ export async function getDashboardMetrics(
       select: {
         stockQty: true,
         lowStockThreshold: true,
+        quantity: true,
+        unit: true,
         product: { select: { nameEn: true, nameMr: true, nameHi: true } },
       },
     }),
@@ -409,7 +414,12 @@ export async function getDashboardMetrics(
     lowStockProducts: lowStockVariants
       .filter((variant) => variant.stockQty <= variant.lowStockThreshold)
       .slice(0, 3)
-      .map((variant) => pickName(variant.product, locale)),
+      .map((variant) => ({
+        name: pickName(variant.product, locale),
+        stockQty: variant.stockQty,
+        quantity: variant.quantity,
+        unit: variant.unit,
+      })),
     outOfStockCount,
     waitlistTotal,
     waitlistTopPincodes: waitlistGroups.map((group) => ({
