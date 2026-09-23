@@ -135,3 +135,85 @@ export function toProductQuantity(
 
   return { quantity: Math.max(1, Math.round(amount * 1000)), unit: 'G' };
 }
+
+/**
+ * Review-screen pricing (session 2026-09-23, client reference screenshot)
+ * — everything here is derived straight from the matched `ProductVariant`'s
+ * own real `pricePaise`/`quantity`/`unit`, never invented. Two different
+ * numbers share the same underlying data on purpose: `unitRate` is the
+ * normalised "per kg / per litre / per bunch" figure a customer uses to
+ * compare pack sizes (real e-commerce convention); `packCount` × the
+ * variant's own flat price is the actual line total for however many packs
+ * the requested quantity works out to.
+ */
+
+const BASE_FACTOR: Record<UnitType, number> = {
+  G: 1,
+  KG: 1000,
+  ML: 1,
+  L: 1000,
+  PIECE: 1,
+  BUNCH: 1,
+  PACK: 1,
+};
+
+const UNIT_FAMILY: Record<UnitType, 'weight' | 'volume' | 'count'> = {
+  G: 'weight',
+  KG: 'weight',
+  ML: 'volume',
+  L: 'volume',
+  PIECE: 'count',
+  BUNCH: 'count',
+  PACK: 'count',
+};
+
+/** Converts to the smallest base scale within a unit's own family — grams,
+    millilitres, or a raw count. `toProductQuantity` above only ever
+    persists `SmartListItem.unit` already in one of these base forms
+    (G/ML/PIECE/BUNCH/PACK, never KG/L), so this is the one place KG/L
+    conversion needs to happen at all. */
+export function toBaseQuantity(quantity: number, unit: UnitType): number {
+  return quantity * BASE_FACTOR[unit];
+}
+
+/** How many packs of the matched variant the requested quantity works out
+    to. 1 whenever the two aren't in the same family (e.g. a BUNCH request
+    somehow matched a PIECE-priced variant) — scaling across unrelated
+    units would produce a number that looks precise but isn't real. */
+export function packCountFor(
+  requestedQuantity: number,
+  requestedUnit: UnitType,
+  variantQuantity: number,
+  variantUnit: UnitType,
+): number {
+  if (UNIT_FAMILY[requestedUnit] !== UNIT_FAMILY[variantUnit] || variantQuantity <= 0) return 1;
+  const requestedBase = toBaseQuantity(requestedQuantity, requestedUnit);
+  const variantBase = toBaseQuantity(variantQuantity, variantUnit);
+  return Math.max(1, Math.round(requestedBase / variantBase));
+}
+
+/** The variant's own price, normalised to a per-kg/per-litre/per-count
+    rate, plus the unit word to label it with ("kg", "l", "bunch", …). Weight
+    and volume always normalise to the kg/l scale (standard grocery unit
+    pricing); counted units show the rate per however many the pack itself
+    holds (a "6-piece" pack shows price ÷ 6, not price ÷ 1). */
+export function unitRate(
+  variantQuantity: number,
+  variantUnit: UnitType,
+  pricePaise: bigint,
+): { ratePaise: bigint; suffix: string } | null {
+  if (variantQuantity <= 0) return null;
+
+  const family = UNIT_FAMILY[variantUnit];
+  if (family === 'weight') {
+    const grams = variantQuantity * BASE_FACTOR[variantUnit];
+    return { ratePaise: (pricePaise * 1000n) / BigInt(grams), suffix: 'kg' };
+  }
+  if (family === 'volume') {
+    const ml = variantQuantity * BASE_FACTOR[variantUnit];
+    return { ratePaise: (pricePaise * 1000n) / BigInt(ml), suffix: 'l' };
+  }
+  const countSuffixes: Partial<Record<UnitType, string>> = { PIECE: 'pc', BUNCH: 'bunch', PACK: 'pack' };
+  const suffix = countSuffixes[variantUnit] ?? 'unit';
+  return { ratePaise: pricePaise / BigInt(variantQuantity), suffix };
+}

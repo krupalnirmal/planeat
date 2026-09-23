@@ -1,9 +1,11 @@
+import { firstImageUrl } from '@/lib/catalog/queries';
 import { pickName } from '@/lib/catalog/text';
 import { db } from '@/lib/db';
-import type { Locale } from '@/generated/prisma/enums';
+import type { Locale, UnitType } from '@/generated/prisma/enums';
 import { buildMatchIndex } from './index-builder';
 import { matchItem } from './match';
 import type { SmartListView } from './pipeline';
+import { packCountFor, toBaseQuantity, unitRate } from './units';
 
 /**
  * Reads for the Smart List review screen (M4).
@@ -66,11 +68,12 @@ export async function getSmartList(
             nameEn: true,
             nameMr: true,
             nameHi: true,
+            imageUrls: true,
             variants: {
               where: { isActive: true },
               orderBy: [{ isDefault: 'desc' }, { quantity: 'asc' }],
               take: 1,
-              select: { pricePaise: true, stockQty: true },
+              select: { label: true, quantity: true, unit: true, pricePaise: true, stockQty: true },
             },
           },
         })
@@ -103,6 +106,15 @@ export async function getSmartList(
             }))
           : [];
 
+      // Real e-commerce unit pricing (session 2026-09-23, client reference
+      // screenshot) — both derived straight from the matched variant's own
+      // `pricePaise`/`quantity`/`unit`, see `units.ts`'s own doc comment.
+      const packCount =
+        variant && item.quantity && item.unit
+          ? packCountFor(item.quantity, item.unit as UnitType, variant.quantity, variant.unit)
+          : 1;
+      const rate = variant ? unitRate(variant.quantity, variant.unit, variant.pricePaise) : null;
+
       return {
         id: item.id,
         rawText: item.rawText,
@@ -112,7 +124,14 @@ export async function getSmartList(
         matchedProductId: item.matchedProductId,
         matchedVariantId: item.matchedVariantId,
         matchedName: product ? pickName(product, locale) : null,
+        imageUrl: product ? firstImageUrl(product.imageUrls) : null,
+        variantLabel: variant?.label ?? null,
+        variantBaseQuantity: variant ? toBaseQuantity(variant.quantity, variant.unit) : null,
         pricePaise: variant?.pricePaise ?? null,
+        packCount,
+        linePricePaise: variant ? variant.pricePaise * BigInt(packCount) : null,
+        unitRatePaise: rate?.ratePaise ?? null,
+        unitRateSuffix: rate?.suffix ?? null,
         inStock: (variant?.stockQty ?? 0) > 0,
         confidence: item.confidence,
         status: item.status,

@@ -1,11 +1,12 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertCircle, Check, HelpCircle, Loader2, Pencil, Trash2 } from 'lucide-react';
+import { AlertCircle, Check, HelpCircle, ImageIcon, Loader2, Pencil, ShoppingCart, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { CenteredState, PageHeader } from '@/components/shop/page-header';
+import { QtyStepper } from '@/components/shop/qty-stepper';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
 import { formatQuantity, type QuantityUnit } from '@/lib/quantity';
@@ -40,7 +41,14 @@ interface ReviewItem {
   unit: string | null;
   matchedProductId: string | null;
   matchedName: string | null;
+  imageUrl: string | null;
+  variantLabel: string | null;
+  variantBaseQuantity: number | null;
   pricePaise: string | null;
+  packCount: number;
+  linePricePaise: string | null;
+  unitRatePaise: string | null;
+  unitRateSuffix: string | null;
   inStock: boolean;
   confidence: number;
   status: 'MATCHED' | 'AMBIGUOUS' | 'UNMATCHED' | 'USER_CONFIRMED';
@@ -101,6 +109,19 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
     onError: () => setError(te('generic')),
   });
 
+  // The stepper counts packs of the matched variant, not raw grams — see
+  // `units.ts`'s own doc comment. `variantBaseQuantity` is the variant's
+  // pack size already expressed in the item's own base unit, so the new
+  // quantity to PATCH is just `packCount × that`, no unit conversion here.
+  const setPackCount = useMutation({
+    mutationFn: (input: { itemId: string; quantity: number }) =>
+      api.patch(`/api/smart-list/${smartListId}/items/${input.itemId}`, {
+        quantity: input.quantity,
+      }),
+    onSuccess: refresh,
+    onError: () => setError(te('generic')),
+  });
+
   const toCart = useMutation({
     mutationFn: () =>
       api.post<{ added: number; skipped: Array<{ name: string }> }>(
@@ -133,9 +154,14 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
   }
 
   const items = list.data?.list.items ?? [];
-  const usable = items.filter(
+  const usableItems = items.filter(
     (item) => item.status === 'MATCHED' || item.status === 'USER_CONFIRMED',
-  ).length;
+  );
+  const usable = usableItems.length;
+  const estimatedTotalPaise = usableItems.reduce(
+    (sum, item) => sum + paise(item.linePricePaise ?? '0'),
+    0n,
+  );
 
   if (items.length === 0) {
     return (
@@ -177,77 +203,153 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
       )}
 
       <ul className="space-y-3">
-        {items.map((item) => (
-          <li
-            key={item.id}
-            className={cn('rounded-[var(--radius)] border p-3', TONE[item.status])}
-          >
-            <div className="flex items-start gap-2">
-              <StatusIcon status={item.status} />
+        {items.map((item) => {
+          const matched = item.status === 'MATCHED' || item.status === 'USER_CONFIRMED';
+          return (
+            <li key={item.id} className={cn('rounded-[var(--radius)] border p-3', TONE[item.status])}>
+              <div className="flex items-start gap-3">
+                {/* Real product photo (session 2026-09-23, client reference
+                    screenshot) — the matched product's own first image,
+                    same source `ProductCard` reads. A plain icon for an
+                    unmatched row, which has no real product to show. */}
+                <div className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] bg-white">
+                  {item.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={item.imageUrl} alt="" className="size-full object-cover" />
+                  ) : (
+                    <ImageIcon className="size-6 text-muted-foreground/40" aria-hidden />
+                  )}
+                </div>
 
-              <div className="min-w-0 flex-1">
-                {/* What they actually said, always visible — it is how they
-                    recognise the row. */}
-                <p className="text-[11px] text-muted-foreground">“{item.rawText}”</p>
+                <div className="min-w-0 flex-1">
+                  {/* What they actually said stays the headline — it is how
+                      they recognise the row; the real matched product name
+                      rides underneath as confirmation. */}
+                  <p className="truncate text-sm font-bold">
+                    {item.parsedName ?? item.rawText}
+                  </p>
+                  {item.matchedName ? (
+                    <p className="truncate text-xs text-muted-foreground">{item.matchedName}</p>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground">“{item.rawText}”</p>
+                  )}
 
-                <p className="mt-0.5 text-sm font-semibold">
-                  {item.matchedName ?? item.parsedName ?? item.rawText}
-                </p>
+                  {/* Real per-kg/per-litre/per-count unit pricing, derived
+                      from the matched variant's own price and pack size
+                      (units.ts) — not fabricated. */}
+                  {item.variantLabel && item.unitRatePaise && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {item.variantLabel} ·{' '}
+                      {formatPaise(paise(item.unitRatePaise), { hidePaise: true })}/
+                      {item.unitRateSuffix}
+                    </p>
+                  )}
 
-                <p className="text-xs text-muted-foreground">
-                  {item.quantity && item.unit
-                    ? formatQuantity(item.quantity, item.unit as QuantityUnit)
-                    : null}
-                  {item.pricePaise &&
-                    ` · ${formatPaise(paise(item.pricePaise), { hidePaise: true })}`}
-                  {/* M4 — a confidence score per item. */}
-                  {item.status !== 'UNMATCHED' && ` · ${Math.round(item.confidence * 100)}%`}
-                </p>
+                  <StatusBadge status={item.status} confidence={item.confidence} />
+                </div>
 
-                <StatusLabel status={item.status} />
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  <button
+                    type="button"
+                    onClick={() => remove.mutate(item.id)}
+                    aria-label={t('removeItem')}
+                    className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-muted-foreground"
+                  >
+                    <Trash2 className="size-4" aria-hidden />
+                  </button>
+
+                  {matched && item.linePricePaise && (
+                    <>
+                      <p className="text-sm font-bold">
+                        {formatPaise(paise(item.linePricePaise), { hidePaise: true })}
+                      </p>
+                      {item.quantity && item.unit && (
+                        <p className="text-[11px] text-muted-foreground">
+                          ({formatQuantity(item.quantity, item.unit as QuantityUnit)})
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => remove.mutate(item.id)}
-                aria-label={t('removeItem')}
-                className="grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground"
-              >
-                <Trash2 className="size-4" aria-hidden />
-              </button>
-            </div>
+              {/* Pack-count stepper — real quantity editing, PATCHing the
+                  same endpoint the alternatives picker below already uses. */}
+              {matched && item.variantBaseQuantity && (
+                <div className="mt-2 flex justify-end">
+                  <QtyStepper
+                    size="sm"
+                    tone="tint"
+                    quantity={item.packCount}
+                    label={item.matchedName ?? undefined}
+                    disabled={setPackCount.isPending}
+                    onDecrement={() =>
+                      item.packCount > 1 &&
+                      setPackCount.mutate({
+                        itemId: item.id,
+                        quantity: (item.packCount - 1) * item.variantBaseQuantity!,
+                      })
+                    }
+                    onIncrement={() =>
+                      setPackCount.mutate({
+                        itemId: item.id,
+                        quantity: (item.packCount + 1) * item.variantBaseQuantity!,
+                      })
+                    }
+                  />
+                </div>
+              )}
 
-            {/* M4 — ambiguous rows offer the top 3. */}
-            {item.status === 'AMBIGUOUS' && item.alternatives.length > 0 && (
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {item.alternatives.map((alternative) => (
-                  <li key={alternative.productId}>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        choose.mutate({
-                          itemId: item.id,
-                          productId: alternative.productId,
-                          variantId: alternative.variantId,
-                        })
-                      }
-                      disabled={!alternative.inStock || choose.isPending}
-                      className="min-h-11 rounded-full border border-border bg-background px-3 text-xs font-medium disabled:opacity-50"
-                    >
-                      {alternative.name}
-                      {alternative.pricePaise && (
-                        <span className="ml-1.5 text-muted-foreground">
-                          {formatPaise(paise(alternative.pricePaise), { hidePaise: true })}
-                        </span>
-                      )}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
+              {/* M4 — ambiguous rows offer the top 3. */}
+              {item.status === 'AMBIGUOUS' && item.alternatives.length > 0 && (
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {item.alternatives.map((alternative) => (
+                    <li key={alternative.productId}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          choose.mutate({
+                            itemId: item.id,
+                            productId: alternative.productId,
+                            variantId: alternative.variantId,
+                          })
+                        }
+                        disabled={!alternative.inStock || choose.isPending}
+                        className="min-h-11 rounded-full border border-border bg-background px-3 text-xs font-medium disabled:opacity-50"
+                      >
+                        {alternative.name}
+                        {alternative.pricePaise && (
+                          <span className="ml-1.5 text-muted-foreground">
+                            {formatPaise(paise(alternative.pricePaise), { hidePaise: true })}
+                          </span>
+                        )}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          );
+        })}
       </ul>
+
+      {/* Summary strip (session 2026-09-23, client reference) — a real
+          running total (sum of each matched row's own line price), not a
+          guess, shown above the confirm button. */}
+      {usable > 0 && (
+        <div className="mt-4 flex items-center gap-3 rounded-[var(--radius)] bg-tint-green px-4 py-3">
+          <ShoppingCart className="size-5 shrink-0 text-primary" aria-hidden />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-primary-dark">
+              {t('itemsSelected', { count: usable })}
+            </p>
+            <p className="text-xs text-primary-dark/70">{t('estimatedTotal')}</p>
+          </div>
+          <p className="text-base font-black text-primary-dark">
+            {formatPaise(estimatedTotalPaise, { hidePaise: true })}
+          </p>
+        </div>
+      )}
       </div>
 
       <div
@@ -340,33 +442,34 @@ function ListNameEditor({ smartListId, name }: { smartListId: string; name: stri
   );
 }
 
-function StatusIcon({ status }: { status: ReviewItem['status'] }) {
-  if (status === 'AMBIGUOUS') {
-    return <HelpCircle className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden />;
-  }
-  if (status === 'UNMATCHED') {
-    return <AlertCircle className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />;
-  }
-  return <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />;
-}
-
-/** Colour is never the only signal — every row says which state it is in. */
-function StatusLabel({ status }: { status: ReviewItem['status'] }) {
+/** Colour is never the only signal (M4) — every row carries an icon and a
+    word too, restyled (session 2026-09-23, client reference screenshot)
+    from a plain icon+text line into a pill badge, with the real confidence
+    score alongside it for matched rows. */
+function StatusBadge({ status, confidence }: { status: ReviewItem['status']; confidence: number }) {
   const t = useTranslations('smartList');
 
+  const Icon = status === 'AMBIGUOUS' ? HelpCircle : status === 'UNMATCHED' ? AlertCircle : Check;
   const label =
-    status === 'AMBIGUOUS'
-      ? t('ambiguous')
-      : status === 'UNMATCHED'
-        ? t('unmatched')
-        : t('matched');
-
+    status === 'AMBIGUOUS' ? t('ambiguous') : status === 'UNMATCHED' ? t('unmatched') : t('matched');
   const tone =
     status === 'AMBIGUOUS'
-      ? 'text-warning'
+      ? 'bg-warning/10 text-warning'
       : status === 'UNMATCHED'
-        ? 'text-muted-foreground'
-        : 'text-success';
+        ? 'bg-secondary text-muted-foreground'
+        : 'bg-success/10 text-success';
 
-  return <p className={cn('mt-1 text-[11px] font-semibold', tone)}>{label}</p>;
+  return (
+    <p className="mt-1 flex items-center gap-1.5">
+      <span className={cn('flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold', tone)}>
+        <Icon className="size-3 shrink-0" aria-hidden />
+        {label}
+      </span>
+      {status !== 'UNMATCHED' && (
+        <span className="text-[11px] text-muted-foreground">
+          {t('matchPercent', { percent: Math.round(confidence * 100) })}
+        </span>
+      )}
+    </p>
+  );
 }

@@ -85,7 +85,9 @@ function cardImages(imageUrls: unknown, limit = MAX_CARD_IMAGES): string[] {
     .map(resolveImageUrl);
 }
 
-function firstImageUrl(imageUrls: unknown): string | null {
+/** Exported for the Smart List review screen, which needs the same real
+    "first product photo" resolution — no reason to re-derive it there. */
+export function firstImageUrl(imageUrls: unknown): string | null {
   return cardImages(imageUrls, 1)[0] ?? null;
 }
 

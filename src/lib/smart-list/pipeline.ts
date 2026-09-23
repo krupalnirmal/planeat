@@ -48,7 +48,28 @@ export interface SmartListItemView {
   matchedProductId: string | null;
   matchedVariantId: string | null;
   matchedName: string | null;
+  /** Real product photo (session 2026-09-23, client reference screenshot)
+      — the matched product's own first image, same source `ProductCard`
+      reads (`Product.imageUrls`). Null for an unmatched row. */
+  imageUrl: string | null;
+  /** The matched variant's own pack-size label, e.g. "1 kg". */
+  variantLabel: string | null;
+  /** The variant's pack size expressed in `SmartListItem.unit`'s own base
+      scale (grams/ml/count) — e.g. a "1 kg" variant is `1000` here, so a
+      quantity-stepper client-side can compute `packCount × this` to PATCH
+      a new `quantity` without needing to know KG/L conversion itself. */
+  variantBaseQuantity: number | null;
+  /** Flat price of ONE pack of the matched variant. */
   pricePaise: bigint | null;
+  /** How many packs the requested quantity works out to (`units.ts`'s
+      `packCountFor`) — 1 for anything not cleanly a multiple. */
+  packCount: number;
+  /** `pricePaise * packCount` — the real line total. */
+  linePricePaise: bigint | null;
+  /** The variant's price normalised to a per-kg/per-litre/per-count rate,
+      for comparing pack sizes (`units.ts`'s `unitRate`). */
+  unitRatePaise: bigint | null;
+  unitRateSuffix: string | null;
   inStock: boolean;
   confidence: number;
   status: 'MATCHED' | 'AMBIGUOUS' | 'UNMATCHED' | 'USER_CONFIRMED';
