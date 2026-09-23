@@ -1,10 +1,9 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, MapPin, ShoppingCart, UserRound, Wallet, Zap } from 'lucide-react';
+import { ChevronDown, MapPin, Search, ShoppingCart, UserRound, Wallet, Zap } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { SearchBar } from '@/components/shop/search-bar';
 import { useCart } from '@/hooks/use-cart';
 import { useSession } from '@/hooks/use-session';
 import { api } from '@/lib/api/client';
@@ -12,9 +11,8 @@ import { formatPaise, paise } from '@/lib/money';
 import { useDeliveryArea } from '@/stores/delivery-area';
 
 /**
- * PART 5 — the sticky home header: wordmark + tagline, three labelled icon
- * buttons (wallet, cart, profile), a combined address/delivery-time row and
- * the search bar.
+ * PART 5 — the sticky home header: wordmark, three labelled icon buttons
+ * (wallet, cart, profile), and a combined address/delivery-time/search row.
  *
  * Restyled (session 2026-08-26, client's reference): white header instead
  * of the cream band, icon buttons carry a small label under them instead of
@@ -29,6 +27,7 @@ export function AppHeader() {
   const tp = useTranslations('profile');
   const tw = useTranslations('wallet');
   const tCart = useTranslations('cart');
+  const tSearch = useTranslations('search');
   const { user, defaultAddress, isLoggedIn } = useSession();
   const cart = useCart();
   const rememberedArea = useDeliveryArea((s) => s.areaName ?? s.pincode);
@@ -107,9 +106,12 @@ export function AppHeader() {
         </div>
       </div>
 
-      {/* The address and the delivery promise share one bordered card, as
-          in the client's reference — the address stacked as a quiet label
-          over a bold value, the promise as a tinted pill on the right. */}
+      {/* The address, the delivery promise, and search share one row
+          (session 2026-09-23, client request — was two stacked rows) — the
+          address stacked as a quiet label over a bold value, the promise as
+          a tinted pill, and search collapsed to a real icon-button link
+          into the dedicated `/search` screen (M2, autocomplete + real
+          results) rather than a second full-width input duplicating it. */}
       <div className="mt-3 flex items-center gap-2 rounded-[var(--radius)] border border-border bg-card px-3 py-2">
         <Link
           href={user ? '/addresses' : '/serviceability'}
@@ -131,9 +133,15 @@ export function AppHeader() {
           <Zap className="size-3.5 shrink-0 fill-primary-dark" aria-hidden />
           {t('deliveryIn', { minutes: 30 })}
         </span>
-      </div>
 
-      <SearchBar showMic className="mt-3" />
+        <Link
+          href="/search"
+          aria-label={tSearch('placeholder')}
+          className="grid size-8 shrink-0 place-items-center rounded-full border-l border-border pl-2 text-foreground"
+        >
+          <Search className="size-[18px]" strokeWidth={2.4} aria-hidden />
+        </Link>
+      </div>
     </header>
   );
 }
