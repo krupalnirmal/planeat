@@ -9,12 +9,14 @@ import {
   ImageIcon,
   Leaf,
   Milk,
+  Plus,
   Salad,
   Search,
   ShoppingBasket,
   SlidersHorizontal,
   Sprout,
   Trash2,
+  Weight,
   X,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -54,6 +56,24 @@ const CATEGORY_ICONS: Record<string, typeof Leaf> = {
   __sprouts__: Sprout,
   __chopped_vegetables__: Salad,
 };
+
+// Per-category chip colour (session 2026-09-23, client reference
+// screenshot) — a distinct pastel background + icon tint per category,
+// sampled from the reference image rather than guessed, same "colour per
+// category" idea the home page's own `CategoryCollageTile` already uses
+// (though not the same palette — that one's keyed to real category slugs
+// only, this row also has the builder's synthetic `__sprouts__`-style
+// slugs, which need their own colours).
+const CATEGORY_CHIP_STYLE: Record<string, { bg: string; icon: string }> = {
+  __sprouts__: { bg: '#DFF6E6', icon: '#2fa355' },
+  __daily_essentials__: { bg: '#FDEEDB', icon: '#f2811d' },
+  vegetables: { bg: '#EFF9F0', icon: '#2fa355' },
+  __chopped_vegetables__: { bg: '#E8F3F7', icon: '#1a4d33' },
+  fruits: { bg: '#FDEEF1', icon: '#e0518a' },
+  dairy: { bg: '#EAF2FE', icon: '#2a78d6' },
+  'bakery-biscuits': { bg: '#FCEEF3', icon: '#c9578e' },
+};
+const DEFAULT_CHIP_STYLE = { bg: '#F1F5F1', icon: '#2fa355' };
 
 // Roughly this screen's own sticky `PageHeader`'s height (title + subtitle
 // line, `py-3` padding) — same approach as `category-product-list.tsx`'s own
@@ -169,7 +189,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
       <nav
         ref={dayTabsRef}
         aria-label={tw('daysLabel')}
-        className="sticky z-20 flex gap-1.5 overflow-x-auto border-b border-border bg-card px-3 py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="sticky z-20 flex gap-2 overflow-x-auto border-b border-border bg-card px-3 py-2.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ top: PAGE_HEADER_HEIGHT_PX }}
       >
         {DAYS.map((day) => {
@@ -184,23 +204,29 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
                 if (day !== dayOfWeek) router.push(`/meal-plan/build/${day}`);
               }}
               aria-current={active}
+              // Rounded pill, day abbreviation over day-number-plus-leaf
+              // (session 2026-09-23, client reference screenshot) — was a
+              // single-line "Mon"/"Tue" pill; the reference stacks the
+              // short name over the day's own number with a small leaf
+              // mark next to it. The real per-day item count (not shown in
+              // the reference's own static mockup) stays as a badge in the
+              // corner rather than being dropped — it's real state the
+              // customer benefits from seeing at a glance.
               className={cn(
-                // `rounded-[var(--radius)]` (session 2026-09-20, client
-                // request) — squared-off corners instead of a full pill,
-                // matching the app's standard card radius.
-                'flex shrink-0 items-center gap-1.5 rounded-[var(--radius)] px-3 py-1.5 text-xs font-semibold transition-colors',
-                active ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground',
+                'relative flex shrink-0 flex-col items-center gap-0.5 rounded-2xl px-3.5 py-2 text-center transition-colors',
+                active ? 'bg-primary text-primary-foreground' : 'bg-tint-green text-primary-dark',
               )}
             >
-              {/* `daysShort` (session 2026-09-20, client screenshot) — the
-                  full day names crowded this row; the page header above it
-                  already spells the active day out in full. */}
-              {t(`daysShort.${day}`)}
+              <span className="text-xs font-bold">{t(`daysShort.${day}`)}</span>
+              <span className="flex items-center gap-0.5 text-sm font-black">
+                {day}
+                <Leaf className={cn('size-3 shrink-0', active ? 'text-white' : 'text-primary')} aria-hidden />
+              </span>
               {count > 0 && (
                 <span
                   className={cn(
-                    'grid min-w-4 place-items-center rounded-full px-1 text-[10px] font-bold',
-                    active ? 'bg-white/25' : 'bg-card text-foreground',
+                    'absolute -top-1.5 -right-1.5 grid min-w-4 place-items-center rounded-full px-1 text-[9px] font-bold ring-2 ring-card',
+                    active ? 'bg-white text-primary' : 'bg-primary text-primary-foreground',
                   )}
                 >
                   {count}
@@ -253,6 +279,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
             >
               {columns.map((column) => {
                 const Icon = CATEGORY_ICONS[column.slug] ?? Leaf;
+                const style = CATEGORY_CHIP_STYLE[column.slug] ?? DEFAULT_CHIP_STYLE;
                 const active = (activeColumn?.slug ?? columns[0]?.slug) === column.slug;
                 return (
                   <button
@@ -263,21 +290,20 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
                       setSearch('');
                     }}
                     aria-current={active}
+                    // Wider pastel-tinted card, bigger un-badged icon
+                    // (session 2026-09-23, client reference screenshot) —
+                    // was a narrow plain-bordered chip with a small
+                    // muted-grey icon; the reference gives every category
+                    // its own background tint and a full-colour icon, with
+                    // a green ring marking the active one.
                     className={cn(
-                      'flex w-[74px] shrink-0 flex-col items-center gap-1 rounded-[14px] border px-1.5 py-2.5 text-center transition-colors',
-                      active ? 'border-primary bg-tint-green' : 'border-border bg-card',
+                      'flex w-[84px] shrink-0 flex-col items-center gap-1.5 rounded-2xl border-2 px-2 py-3 text-center transition-colors',
+                      active ? 'border-primary' : 'border-transparent',
                     )}
+                    style={{ backgroundColor: style.bg }}
                   >
-                    <Icon
-                      className={cn('size-5 shrink-0', active ? 'text-primary' : 'text-muted-foreground')}
-                      aria-hidden
-                    />
-                    <span
-                      className={cn(
-                        'line-clamp-2 text-[10.5px] leading-tight',
-                        active ? 'font-bold text-foreground' : 'font-medium text-foreground',
-                      )}
-                    >
+                    <Icon className="size-6 shrink-0" style={{ color: style.icon }} aria-hidden />
+                    <span className="line-clamp-2 text-[10.5px] leading-tight font-bold text-foreground">
                       {categoryLabel(column)}
                     </span>
                   </button>
@@ -291,6 +317,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
               <PlanProductCard
                 key={product.id}
                 product={product}
+                categoryIcon={activeColumn ? (CATEGORY_ICONS[activeColumn.slug] ?? Leaf) : Leaf}
                 selectedVariantId={daySelections[product.id]}
                 onTap={() => setPicker(product)}
               />
@@ -356,10 +383,12 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
 
 function PlanProductCard({
   product,
+  categoryIcon: CategoryIcon,
   selectedVariantId,
   onTap,
 }: {
   product: DraftProduct;
+  categoryIcon: typeof Leaf;
   selectedVariantId: string | undefined;
   onTap: () => void;
 }) {
@@ -419,37 +448,49 @@ function PlanProductCard({
           under the price on the right; the reference stacks all three
           above the price row instead. */}
       <div className="flex flex-col gap-0.5 px-2.5 pt-2 pb-2.5">
-        <h3 className="line-clamp-1 text-[13px] leading-tight font-semibold">
-          {product.nameEn ?? product.name}
+        {/* Small category-icon prefix on the name, filled "+ ADD" pill
+            (session 2026-09-23, client reference screenshot) — was a plain
+            name line and an outlined text-only "ADD" label; the reference
+            leads the name with the category's own icon and gives the CTA
+            real button weight (filled green, a leading plus). */}
+        <h3 className="flex items-center gap-1 text-[13px] leading-tight font-semibold">
+          <CategoryIcon className="size-3.5 shrink-0 text-primary" aria-hidden />
+          <span className="line-clamp-1">{product.nameEn ?? product.name}</span>
         </h3>
         {product.localName && (
           <p className="line-clamp-1 text-[11.5px] text-muted-foreground">({product.localName})</p>
         )}
         {displayVariant && (
           <>
-            <p className="truncate text-[11px] text-muted-foreground">{displayVariant.label}</p>
+            <p className="flex items-center gap-1 truncate text-[11px] text-muted-foreground">
+              <Weight className="size-3 shrink-0" aria-hidden />
+              {displayVariant.label}
+            </p>
             <div className="mt-1 flex items-end justify-between gap-1.5">
               <div className="min-w-0">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-[14px] font-bold">{formatPaise(price, { hidePaise: true })}</span>
+                  <span className="text-[14px] font-bold text-primary">
+                    {formatPaise(price, { hidePaise: true })}
+                  </span>
                   {hasDiscount && (
                     <span className="text-[11px] text-muted-foreground line-through">
                       {formatPaise(mrp, { hidePaise: true })}
                     </span>
                   )}
                 </div>
-              </div>
-              {/* Decorative, not a nested `<button>` — the whole card is
-                  already the tap target (it opens the quantity/weight
-                  modal), so this just mirrors the storefront's bordered
-                  pill visually instead of duplicating its click handler. */}
-              <span className="flex shrink-0 min-w-[44px] flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-1.5 py-1 text-[12px] font-bold text-primary">
-                {t('add')}
                 {multiVariant && (
-                  <span className="text-[8px] leading-none font-semibold text-muted-foreground">
+                  <span className="text-[9px] leading-none font-semibold text-muted-foreground">
                     {t('nOptions', { count: product.variants.length })}
                   </span>
                 )}
+              </div>
+              {/* Decorative, not a nested `<button>` — the whole card is
+                  already the tap target (it opens the quantity/weight
+                  modal), so this just mirrors the storefront's filled
+                  pill visually instead of duplicating its click handler. */}
+              <span className="flex shrink-0 items-center gap-0.5 rounded-full bg-primary px-2.5 py-1.5 text-[11px] font-bold text-primary-foreground">
+                <Plus className="size-3 shrink-0" aria-hidden />
+                {t('add')}
               </span>
             </div>
           </>
