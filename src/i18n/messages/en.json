@@ -460,8 +460,11 @@
     },
     "wizard": {
       "selectDayHint": "Choose any day to add items",
+      "dayRowHint": "Plan your healthy meals",
+      "dayListTagline": "Good Food\nGood Mood",
       "itemCount": "{count} items",
       "planWeekTip": "Plan your week, eat healthy!",
+      "planWeekTipSubtitle": "Better food · More energy · Happier you",
       "viewPlan": "View Plan ({count} items)",
       "addItemsHint": "Add items for your meal plan",
       "reviewHint": "Review selected items",

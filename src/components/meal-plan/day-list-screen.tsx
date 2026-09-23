@@ -1,28 +1,77 @@
 'use client';
 
-import { ChevronRight, Leaf } from 'lucide-react';
+import {
+  Apple,
+  Carrot,
+  CalendarCheck,
+  Cherry,
+  ChevronLeft,
+  ChevronRight,
+  Citrus,
+  Grape,
+  Leaf,
+  LeafyGreen,
+  Salad,
+  Sprout,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { PageHeader } from '@/components/shop/page-header';
 import { DAYS, usePlanDraft } from './plan-draft-context';
 
 /**
- * Wizard screen 2 — pick a day to add items for. The underlying plan is a
- * recurring weekly template (`MealPlanDay.dayOfWeek`, not a specific
- * calendar date — the same Monday repeats every week), so this deliberately
- * shows day names only, not calendar dates the reference mockup pairs them
- * with — showing "18 Aug" would misrepresent a plan that isn't tied to one
- * week.
+ * Wizard screen 2 — pick a day to add items for. Restyled (session
+ * 2026-09-23, client reference screenshot) from a plain bordered list to a
+ * green-tinted hero header + colour-badged day rows + an illustrated
+ * "plan your week" strip, matching the reference's warmer, more decorated
+ * look.
+ *
+ * The underlying plan is a recurring weekly template (`MealPlanDay.
+ * dayOfWeek`, not a specific calendar date — the same Monday repeats every
+ * week), so this deliberately shows day names only, not the calendar dates
+ * the reference mockup pairs them with — showing "18 Aug" would
+ * misrepresent a plan that isn't tied to one week.
+ *
+ * The reference's per-day badges pair a distinct colour with a distinct
+ * food photo per day (tomato/carrot/eggplant/…) — there's no real meaning
+ * behind which food goes with which day, so rather than fabricate seven
+ * new product photos for a purely decorative badge, each day gets a real
+ * lucide food icon instead, still colour-varied the same way. Same reason
+ * the bottom banner's illustrated salad bowl becomes an icon mark, not a
+ * sourced stock illustration.
  */
+
+const DAY_STYLE: Record<number, { bg: string; solid: string; icon: typeof Leaf }> = {
+  1: { bg: '#E3F5E9', solid: '#2fa355', icon: Sprout },
+  2: { bg: '#FDEEDB', solid: '#f2811d', icon: Carrot },
+  3: { bg: '#F1EEFC', solid: '#7c5cd6', icon: Grape },
+  4: { bg: '#FCEEF3', solid: '#e0518a', icon: Cherry },
+  5: { bg: '#E3F6F5', solid: '#14919b', icon: LeafyGreen },
+  6: { bg: '#FDF3DE', solid: '#d98c0a', icon: Citrus },
+  7: { bg: '#EFEBFB', solid: '#6a4fc7', icon: Apple },
+};
+
+// The client's own real hero photo, already cropped for this same wizard's
+// screen 1 (`meal-plan-screen.tsx`'s own `HERO_IMAGE`) — reused here rather
+// than sourcing a second stock photo, so the flow's two entry screens carry
+// the same real image instead of two different ones.
+const HERO_IMAGE =
+  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1789846982/planeat/meal-plan-home/meal-plan-home-hero.png';
+
 export function DayListScreen() {
   const t = useTranslations('mealPlan');
+  const tw = useTranslations('mealPlan.wizard');
   const tc = useTranslations('common');
   const draft = usePlanDraft();
 
   if (draft.loading) {
     return (
       <>
-        <PageHeader title={t('title')} backHref="/meal-plan" backLabel={tc('back')} />
+        <header className="card-3d sticky top-0 z-30 flex items-center gap-2 bg-card px-3 py-3">
+          <Link href="/meal-plan" aria-label={tc('back')} className="grid size-11 shrink-0 place-items-center rounded-full">
+            <ChevronLeft className="size-5" aria-hidden />
+          </Link>
+          <h1 className="text-base font-bold">{t('title')}</h1>
+        </header>
         <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>
       </>
     );
@@ -30,24 +79,82 @@ export function DayListScreen() {
 
   return (
     <>
-      <PageHeader
-        title={t('title')}
-        subtitle={t('wizard.selectDayHint')}
-        backHref="/meal-plan"
-        backLabel={tc('back')}
-      />
+      {/* Green-tinted hero header (session 2026-09-23, client reference) —
+          replaces the shared plain `PageHeader` for this one screen: a
+          leaf-mark icon next to the title, a decorative handwritten-style
+          tagline, and the flow's own real hero photo, all on the same
+          gradient recipe the storefront/admin heroes already use. */}
+      <div
+        className="relative overflow-hidden px-4 pt-4 pb-5"
+        style={{ background: 'linear-gradient(120deg, var(--brand-tint-green) 0%, var(--brand-tint-yellow) 100%)' }}
+      >
+        <div className="flex items-center gap-3">
+          <Link
+            href="/meal-plan"
+            aria-label={tc('back')}
+            className="grid size-9 shrink-0 place-items-center rounded-full bg-card/70 text-foreground"
+          >
+            <ChevronLeft className="size-5" aria-hidden />
+          </Link>
+
+          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
+            <Salad className="size-4.5" aria-hidden />
+          </span>
+
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-xl leading-tight font-black text-foreground">{t('title')}</h1>
+            <p className="truncate text-xs text-muted-foreground">{tw('selectDayHint')}</p>
+          </div>
+
+          <p
+            aria-hidden
+            className="hidden shrink-0 -rotate-3 text-right font-serif text-xs leading-tight whitespace-pre-line text-primary-dark/60 italic sm:block"
+          >
+            {tw('dayListTagline')}
+          </p>
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={HERO_IMAGE}
+            alt=""
+            aria-hidden
+            className="hidden h-14 w-14 shrink-0 rounded-2xl object-cover shadow-md sm:block"
+          />
+        </div>
+      </div>
+
       <main className="space-y-3 p-4 pb-24 lg:mx-auto lg:max-w-2xl">
-        <ul className="divide-y divide-border overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-card">
+        <ul className="divide-y divide-border overflow-hidden rounded-[var(--radius-2xl)] border border-border">
           {DAYS.map((day) => {
             const count = draft.itemCount(day);
+            const style = DAY_STYLE[day];
+            const Icon = style.icon;
             return (
-              <li key={day}>
-                <Link
-                  href={`/meal-plan/build/${day}`}
-                  className="flex items-center justify-between gap-3 px-4 py-3.5"
-                >
-                  <span className="text-sm font-semibold">{t(`days.${day}`)}</span>
-                  <span className="flex items-center gap-2">
+              <li key={day} style={{ backgroundColor: `${style.bg}80` }}>
+                <Link href={`/meal-plan/build/${day}`} className="flex items-center gap-3 px-3 py-3">
+                  {/* Colour-badged day mark (session 2026-09-23, client
+                      reference) — a small "calendar" card: a solid-colour
+                      top band carrying the day's short name, a tinted
+                      bottom half carrying a real lucide food icon (see this
+                      file's own doc comment on why an icon, not a photo). */}
+                  <span className="grid w-14 shrink-0 overflow-hidden rounded-[14px] text-center shadow-sm">
+                    <span
+                      className="py-1 text-[9px] leading-tight font-bold text-white"
+                      style={{ backgroundColor: style.solid }}
+                    >
+                      {t(`daysShort.${day}`)}
+                    </span>
+                    <span className="grid place-items-center bg-card py-2">
+                      <Icon className="size-5 shrink-0" style={{ color: style.solid }} aria-hidden />
+                    </span>
+                  </span>
+
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-bold">{t(`days.${day}`)}</span>
+                    <span className="block truncate text-xs text-muted-foreground">{tw('dayRowHint')}</span>
+                  </span>
+
+                  <span className="flex shrink-0 items-center gap-2">
                     <span
                       className={
                         count > 0
@@ -55,7 +162,7 @@ export function DayListScreen() {
                           : 'text-xs text-muted-foreground'
                       }
                     >
-                      {t('wizard.itemCount', { count })}
+                      {tw('itemCount', { count })}
                     </span>
                     <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
                   </span>
@@ -65,9 +172,25 @@ export function DayListScreen() {
           })}
         </ul>
 
-        <div className="flex items-center gap-2.5 rounded-[var(--radius)] bg-tint-green px-4 py-3 text-sm text-primary-dark">
-          <Leaf className="size-4 shrink-0" aria-hidden />
-          {t('wizard.planWeekTip')}
+        {/* "Plan your week" strip (session 2026-09-23, client reference) —
+            grew from a single tinted line with a small inline leaf icon
+            into a fuller card: a solid leaf-mark badge, a real subtitle
+            line, and a bowl icon standing in for the reference's own
+            illustrated salad bowl. */}
+        <div
+          className="relative flex items-center gap-3 overflow-hidden rounded-[var(--radius-2xl)] px-4 py-4"
+          style={{ background: 'linear-gradient(120deg, var(--brand-tint-green) 0%, var(--brand-tint-yellow) 100%)' }}
+        >
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-dark text-white">
+            <Leaf className="size-5" aria-hidden />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-black text-primary-dark">{tw('planWeekTip')}</p>
+            <p className="mt-0.5 truncate text-xs text-primary-dark/70">{tw('planWeekTipSubtitle')}</p>
+          </div>
+          <span className="grid size-12 shrink-0 place-items-center rounded-full bg-card/70 text-primary-dark">
+            <Salad className="size-6" aria-hidden />
+          </span>
         </div>
       </main>
 
@@ -80,8 +203,9 @@ export function DayListScreen() {
             href="/meal-plan/build/summary"
             className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground"
           >
-            {t('wizard.viewPlan', { count: draft.weekItemCount() })}
-            <ChevronRight className="size-4" aria-hidden />
+            <CalendarCheck className="size-4 shrink-0" aria-hidden />
+            {tw('viewPlan', { count: draft.weekItemCount() })}
+            <ChevronRight className="size-4 shrink-0" aria-hidden />
           </Link>
         </div>
       )}

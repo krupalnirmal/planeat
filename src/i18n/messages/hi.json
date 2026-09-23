@@ -460,8 +460,11 @@
     },
     "wizard": {
       "selectDayHint": "आइटम जोड़ने के लिए कोई भी दिन चुनें",
+      "dayRowHint": "अपना सेहतमंद खाना प्लान करें",
+      "dayListTagline": "अच्छा खाना\nअच्छा मूड",
       "itemCount": "{count} आइटम",
       "planWeekTip": "अपना हफ्ता प्लान करें, सेहतमंद रहें!",
+      "planWeekTipSubtitle": "बेहतर खाना · ज़्यादा ऊर्जा · ख़ुशहाल आप",
       "viewPlan": "प्लान देखें ({count} आइटम)",
       "addItemsHint": "अपने मील प्लान के लिए आइटम जोड़ें",
       "reviewHint": "चुने हुए आइटम देखें",
