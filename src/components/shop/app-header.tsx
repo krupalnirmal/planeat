@@ -70,7 +70,6 @@ export function AppHeader() {
         <div className="min-w-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/logo.png" alt="getFresh" className="h-20 w-auto" />
-          <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{t('tagline')}</p>
         </div>
 
         <div className="flex shrink-0 items-start gap-3">
