@@ -318,7 +318,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             icon. */}
         <div className="border-b border-border px-5 py-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo-wordmark.png" alt="getFresh" className="h-auto w-28" />
+          <img src="/brand/logo.png" alt="getFresh" className="h-16 w-auto" />
           <p className="mt-1 text-[11px] text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
         </div>
 
@@ -372,7 +372,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             the hamburger/bell+avatar sides end up. Real logo image, no
             subtitle here any more (the reference's mobile header doesn't
             show one — it still shows in the drawer/sidebar). */}
-        <header className="grid h-14 grid-cols-3 items-center border-b border-border bg-card px-2 lg:hidden print:hidden">
+        <header className="grid grid-cols-3 items-center border-b border-border bg-card px-2 py-3 lg:hidden print:hidden">
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
@@ -383,7 +383,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Menu className="size-5" aria-hidden />
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo-wordmark.png" alt="getFresh" className="h-auto w-32 justify-self-center" />
+          <img src="/brand/logo.png" alt="getFresh" className="h-16 w-auto justify-self-center" />
           <div className="flex shrink-0 items-center justify-self-end gap-1">
             <NotificationBell />
             <ProfileMenu />
@@ -402,7 +402,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <div className="flex items-center justify-between border-b border-border px-5 py-4">
                 <div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/brand/logo-wordmark.png" alt="getFresh" className="h-auto w-28" />
+                  <img src="/brand/logo.png" alt="getFresh" className="h-14 w-auto" />
                   <p className="mt-1 text-xs text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
                 </div>
                 <button

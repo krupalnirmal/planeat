@@ -96,7 +96,7 @@ export function DesktopHeader({ categories }: { categories: { slug: string; name
               comment. */}
           <Link href="/" className="flex shrink-0 items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/logo-wordmark.png" alt="getFresh" className="h-auto w-36" />
+            <img src="/brand/logo.png" alt="getFresh" className="h-16 w-auto" />
           </Link>
 
           <nav aria-label={t('categories')} className="flex shrink-0 items-center gap-5">

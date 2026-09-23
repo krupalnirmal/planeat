@@ -259,7 +259,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
               (session 2026-09-22) — was a text wordmark. */}
           <div className="min-w-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/logo-wordmark.png" alt="getFresh" className="h-auto w-40" />
+            <img src="/brand/logo.png" alt="getFresh" className="h-16 w-auto" />
           </div>
 
           {/* B17 — the catalogue is public, so a customer who lands here by

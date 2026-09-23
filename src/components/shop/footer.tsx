@@ -36,7 +36,7 @@ export async function Footer({
         <div className="grid grid-cols-3 gap-8">
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/logo-wordmark.png" alt="getFresh" className="h-auto w-36" />
+            <img src="/brand/logo.png" alt="getFresh" className="h-16 w-auto" />
             <p className="mt-2 text-sm text-muted-foreground">{tHome('tagline')}</p>
           </div>
 

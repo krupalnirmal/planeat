@@ -69,7 +69,7 @@ export function AppHeader() {
             exemption). */}
         <div className="min-w-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo-wordmark.png" alt="getFresh" className="h-auto w-48" />
+          <img src="/brand/logo.png" alt="getFresh" className="h-20 w-auto" />
           <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{t('tagline')}</p>
         </div>
 
