@@ -1,29 +1,18 @@
 'use client';
 
-import {
-  Apple,
-  Carrot,
-  CalendarCheck,
-  Cherry,
-  ChevronLeft,
-  ChevronRight,
-  Citrus,
-  Grape,
-  Leaf,
-  LeafyGreen,
-  Salad,
-  Sprout,
-} from 'lucide-react';
+import { CalendarCheck, ChevronLeft, ChevronRight, Leaf, Salad } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { DAY_STYLE } from './day-style';
+import { MealPlanHero } from './meal-plan-hero';
 import { DAYS, usePlanDraft } from './plan-draft-context';
 
 /**
  * Wizard screen 2 — pick a day to add items for. Restyled (session
  * 2026-09-23, client reference screenshot) from a plain bordered list to a
- * green-tinted hero header + colour-badged day rows + an illustrated
- * "plan your week" strip, matching the reference's warmer, more decorated
- * look.
+ * green-tinted hero header (`MealPlanHero`, shared with the weekly-summary
+ * screen) + colour-badged day rows + an illustrated "plan your week" strip,
+ * matching the reference's warmer, more decorated look.
  *
  * The underlying plan is a recurring weekly template (`MealPlanDay.
  * dayOfWeek`, not a specific calendar date — the same Monday repeats every
@@ -31,31 +20,10 @@ import { DAYS, usePlanDraft } from './plan-draft-context';
  * the reference mockup pairs them with — showing "18 Aug" would
  * misrepresent a plan that isn't tied to one week.
  *
- * The reference's per-day badges pair a distinct colour with a distinct
- * food photo per day (tomato/carrot/eggplant/…) — there's no real meaning
- * behind which food goes with which day, so rather than fabricate seven
- * new product photos for a purely decorative badge, each day gets a real
- * lucide food icon instead, still colour-varied the same way. Same reason
- * the bottom banner's illustrated salad bowl becomes an icon mark, not a
- * sourced stock illustration.
+ * The per-day colour/icon badges come from the shared `DAY_STYLE` map
+ * (`day-style.ts`) — see that file's own doc comment on why they're real
+ * lucide icons, not the reference's own per-day food photos.
  */
-
-const DAY_STYLE: Record<number, { bg: string; solid: string; icon: typeof Leaf }> = {
-  1: { bg: '#E3F5E9', solid: '#2fa355', icon: Sprout },
-  2: { bg: '#FDEEDB', solid: '#f2811d', icon: Carrot },
-  3: { bg: '#F1EEFC', solid: '#7c5cd6', icon: Grape },
-  4: { bg: '#FCEEF3', solid: '#e0518a', icon: Cherry },
-  5: { bg: '#E3F6F5', solid: '#14919b', icon: LeafyGreen },
-  6: { bg: '#FDF3DE', solid: '#d98c0a', icon: Citrus },
-  7: { bg: '#EFEBFB', solid: '#6a4fc7', icon: Apple },
-};
-
-// The client's own real hero photo, already cropped for this same wizard's
-// screen 1 (`meal-plan-screen.tsx`'s own `HERO_IMAGE`) — reused here rather
-// than sourcing a second stock photo, so the flow's two entry screens carry
-// the same real image instead of two different ones.
-const HERO_IMAGE =
-  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1789846982/planeat/meal-plan-home/meal-plan-home-hero.png';
 
 export function DayListScreen() {
   const t = useTranslations('mealPlan');
@@ -79,49 +47,7 @@ export function DayListScreen() {
 
   return (
     <>
-      {/* Green-tinted hero header (session 2026-09-23, client reference) —
-          replaces the shared plain `PageHeader` for this one screen: a
-          leaf-mark icon next to the title, a decorative handwritten-style
-          tagline, and the flow's own real hero photo, all on the same
-          gradient recipe the storefront/admin heroes already use. */}
-      <div
-        className="relative overflow-hidden px-4 pt-4 pb-5"
-        style={{ background: 'linear-gradient(120deg, var(--brand-tint-green) 0%, var(--brand-tint-yellow) 100%)' }}
-      >
-        <div className="flex items-center gap-3">
-          <Link
-            href="/meal-plan"
-            aria-label={tc('back')}
-            className="grid size-9 shrink-0 place-items-center rounded-full bg-card/70 text-foreground"
-          >
-            <ChevronLeft className="size-5" aria-hidden />
-          </Link>
-
-          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
-            <Salad className="size-4.5" aria-hidden />
-          </span>
-
-          <div className="min-w-0 flex-1">
-            <h1 className="truncate text-xl leading-tight font-black text-foreground">{t('title')}</h1>
-            <p className="truncate text-xs text-muted-foreground">{tw('selectDayHint')}</p>
-          </div>
-
-          <p
-            aria-hidden
-            className="hidden shrink-0 -rotate-3 text-right font-serif text-xs leading-tight whitespace-pre-line text-primary-dark/60 italic sm:block"
-          >
-            {tw('dayListTagline')}
-          </p>
-
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={HERO_IMAGE}
-            alt=""
-            aria-hidden
-            className="hidden h-14 w-14 shrink-0 rounded-2xl object-cover shadow-md sm:block"
-          />
-        </div>
-      </div>
+      <MealPlanHero title={t('title')} subtitle={tw('selectDayHint')} backHref="/meal-plan" />
 
       <main className="space-y-3 p-4 pb-24 lg:mx-auto lg:max-w-2xl">
         <ul className="divide-y divide-border overflow-hidden rounded-[var(--radius-2xl)] border border-border">

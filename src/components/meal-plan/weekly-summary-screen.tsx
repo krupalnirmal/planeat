@@ -1,7 +1,16 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { CalendarDays, ChevronRight, List, PartyPopper, ShoppingBasket } from 'lucide-react';
+import {
+  CalendarDays,
+  ChevronRight,
+  Leaf,
+  List,
+  PartyPopper,
+  Save,
+  ShoppingBasket,
+  Wallet,
+} from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -9,11 +18,17 @@ import { PageHeader } from '@/components/shop/page-header';
 import { ApiClientError, api, qs } from '@/lib/api/client';
 import { formatPaise } from '@/lib/money';
 import { cn } from '@/lib/utils';
+import { DAY_STYLE } from './day-style';
+import { MealPlanHero } from './meal-plan-hero';
 import { DAYS, usePlanDraft } from './plan-draft-context';
 
 /** Wizard screens 9–10: the weekly review, then the real save (the only
     point in the whole wizard that actually writes to the server), then a
-    success confirmation. */
+    success confirmation.
+    Restyled (session 2026-09-23, client reference screenshot) — the same
+    green hero header as the day-list screen, colour-badged day tiles
+    reusing that screen's own `DAY_STYLE` palette, and an illustrated
+    total-cost strip + save button, matching the reference's warmer look. */
 export function WeeklySummaryScreen() {
   const t = useTranslations('mealPlan');
   const tw = useTranslations('mealPlan.wizard');
@@ -58,7 +73,7 @@ export function WeeklySummaryScreen() {
 
   return (
     <>
-      <PageHeader title={t('title')} backHref="/meal-plan/build" backLabel={tc('back')} />
+      <MealPlanHero title={t('title')} subtitle={tw('summaryHeroSubtitle')} backHref="/meal-plan/build" />
       <main className="space-y-4 p-4 pb-28 lg:mx-auto lg:max-w-2xl">
         <div className="flex rounded-[var(--radius)] border border-border bg-card p-1">
           <button
@@ -103,12 +118,29 @@ export function WeeklySummaryScreen() {
           <p className="rounded-[var(--radius)] bg-danger/10 px-3 py-2.5 text-sm text-danger">{saveError}</p>
         )}
 
-        <div className="flex items-center justify-between rounded-[var(--radius)] bg-secondary px-4 py-3 text-sm font-bold">
-          <span>
-            {tw('totalDays', { days: DAYS.filter((d) => draft.itemCount(d) > 0).length })} ·{' '}
-            {tw('itemCount', { count: weekItems })}
+        {/* Illustrated total strip (session 2026-09-23, client reference)
+            — was a plain grey bar with just the day/item count and total;
+            gained a leaf-mark badge, a real subtitle line, and a wallet
+            icon next to the total, matching the day-list screen's own
+            "plan your week" strip treatment. */}
+        <div
+          className="relative flex items-center gap-3 overflow-hidden rounded-[var(--radius-2xl)] px-4 py-3"
+          style={{ background: 'linear-gradient(120deg, var(--brand-tint-green) 0%, var(--brand-tint-yellow) 100%)' }}
+        >
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-dark text-white">
+            <Leaf className="size-5" aria-hidden />
           </span>
-          <span>{formatPaise(weekTotal)}</span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-black text-primary-dark">
+              {tw('totalDays', { days: DAYS.filter((d) => draft.itemCount(d) > 0).length })} ·{' '}
+              {tw('itemCount', { count: weekItems })}
+            </p>
+            <p className="truncate text-xs text-primary-dark/70">{tw('summaryStripHint')}</p>
+          </div>
+          <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-card/70 px-3 py-1.5 text-sm font-black text-primary-dark">
+            <Wallet className="size-4 shrink-0" aria-hidden />
+            {formatPaise(weekTotal)}
+          </span>
         </div>
       </main>
 
@@ -122,7 +154,9 @@ export function WeeklySummaryScreen() {
           onClick={() => save.mutate()}
           className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
+          <Save className="size-4 shrink-0" aria-hidden />
           {save.isPending ? tc('loading') : tw('confirmSave')}
+          {!save.isPending && <ChevronRight className="size-4 shrink-0" aria-hidden />}
         </button>
       </div>
     </>
@@ -134,18 +168,33 @@ function DayTile({ dayOfWeek }: { dayOfWeek: number }) {
   const tw = useTranslations('mealPlan.wizard');
   const draft = usePlanDraft();
   const count = draft.itemCount(dayOfWeek);
+  const style = DAY_STYLE[dayOfWeek];
+  const Icon = style.icon;
 
   return (
     <Link
       href={`/meal-plan/build/${dayOfWeek}`}
       className={cn(
-        'rounded-[var(--radius)] border p-3',
+        'flex items-center gap-2 rounded-[var(--radius)] border p-3',
         count > 0 ? 'border-primary bg-tint-green' : 'border-border bg-card',
       )}
     >
-      <p className="text-sm font-bold">{t(`daysShort.${dayOfWeek}`)}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{tw('itemCount', { count })}</p>
-      {count > 0 && <p className="mt-1 text-sm font-bold">{formatPaise(draft.dayTotalPaise(dayOfWeek))}</p>}
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-bold">{t(`daysShort.${dayOfWeek}`)}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{tw('itemCount', { count })}</p>
+        {count > 0 && <p className="mt-1 text-sm font-bold">{formatPaise(draft.dayTotalPaise(dayOfWeek))}</p>}
+      </div>
+      {/* Colour-badged icon (session 2026-09-23, client reference) — was a
+          plain text-only tile; reuses the day-list screen's own `DAY_STYLE`
+          palette so both screens read as one consistent system, standing
+          in for the reference's own per-day food photo (see `day-style.ts`
+          on why a real icon rather than a sourced stock photo). */}
+      <span
+        className="grid size-12 shrink-0 place-items-center rounded-full"
+        style={{ backgroundColor: style.bg }}
+      >
+        <Icon className="size-6 shrink-0" style={{ color: style.solid }} aria-hidden />
+      </span>
     </Link>
   );
 }

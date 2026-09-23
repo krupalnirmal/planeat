@@ -465,6 +465,8 @@
       "itemCount": "{count} आइटम",
       "planWeekTip": "अपना हफ्ता प्लान करें, सेहतमंद रहें!",
       "planWeekTipSubtitle": "बेहतर खाना · ज़्यादा ऊर्जा · ख़ुशहाल आप",
+      "summaryHeroSubtitle": "अपना प्लान चुनें और सेहतमंद रहें",
+      "summaryStripHint": "सेहतमंद रहने के लिए ताज़ा सामग्री",
       "viewPlan": "प्लान देखें ({count} आइटम)",
       "addItemsHint": "अपने मील प्लान के लिए आइटम जोड़ें",
       "reviewHint": "चुने हुए आइटम देखें",

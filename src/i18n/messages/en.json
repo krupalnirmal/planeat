@@ -465,6 +465,8 @@
       "itemCount": "{count} items",
       "planWeekTip": "Plan your week, eat healthy!",
       "planWeekTipSubtitle": "Better food · More energy · Happier you",
+      "summaryHeroSubtitle": "Choose your plan and stay healthy",
+      "summaryStripHint": "Fresh ingredients for a healthier you",
       "viewPlan": "View Plan ({count} items)",
       "addItemsHint": "Add items for your meal plan",
       "reviewHint": "Review selected items",
