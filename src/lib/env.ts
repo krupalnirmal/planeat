@@ -76,7 +76,7 @@ export const env = {
 
   ai: {
     geminiApiKey: str('GEMINI_API_KEY', ''),
-    geminiModel: str('GEMINI_MODEL', 'gemini-2.5-flash'),
+    geminiModel: str('GEMINI_MODEL', 'gemini-3.6-flash'),
     anthropicApiKey: str('ANTHROPIC_API_KEY', ''),
     anthropicModel: str('ANTHROPIC_MODEL', 'claude-sonnet-5'),
     groqApiKey: str('GROQ_API_KEY', ''),

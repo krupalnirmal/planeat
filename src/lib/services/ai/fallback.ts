@@ -61,7 +61,18 @@ export class FallbackAIProvider implements AIProvider {
       const result = await call(this.primary);
       this.active = this.primary;
       return result;
-    } catch {
+    } catch (error) {
+      // The bare `catch {}` this used to be made a real primary-provider
+      // failure (session 2026-09-23: `gemini-2.5-flash` had been retired by
+      // Google, a 404 on every call) invisible — `logAiCall`'s audit row
+      // only ever recorded whichever provider answered last, so debugging
+      // this meant bypassing the fallback in a throwaway script rather than
+      // just reading a log line. This doesn't change the fallback
+      // behaviour, only makes the primary's reason for failing visible.
+      console.warn(
+        `[AI] ${this.primary.name} failed, falling back to ${this.secondary.name}:`,
+        error instanceof Error ? error.message : error,
+      );
       this.active = this.secondary;
       return call(this.secondary);
     }

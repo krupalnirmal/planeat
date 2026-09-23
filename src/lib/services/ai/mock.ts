@@ -221,6 +221,42 @@ export class MockAIProvider implements AIProvider {
   }
 
   async extractFromImage<T>(opts: ExtractFromImageOptions<T>): Promise<T> {
+    const started = Date.now();
+
+    // Same reasoning as `transcribeAudio` above, but this bit needed its
+    // own fix (client report, session 2026-09-23): falling through to
+    // `generateJSON`'s generic schema-synthesiser produced literal debug
+    // strings like "mock-items[0].item-115" as the "grocery item" name —
+    // not just unrealistic, but guaranteed to match zero real products,
+    // so every row came back "Not available" no matter what the photo
+    // actually showed. A fixed, realistic demo list — still clearly not
+    // real OCR of the uploaded photo, but at least real grocery names that
+    // the product matcher can actually do something with — is what makes
+    // the mock provider usable to demo/test the rest of the pipeline.
+    const demoList = {
+      items: [
+        { item: 'Potato', quantity: 1, unit: 'kg' },
+        { item: 'Onion', quantity: 2, unit: 'kg' },
+        { item: 'Tomato', quantity: 0.5, unit: 'kg' },
+        { item: 'Coriander', quantity: 1, unit: 'bunch' },
+      ],
+    };
+
+    const parsed = opts.schema.safeParse(demoList);
+    const candidate = parsed.success ? parsed.data : demoList;
+
+    this.usage = {
+      inputTokens: 0,
+      outputTokens: Math.ceil(JSON.stringify(candidate).length / 4),
+      latencyMs: Date.now() - started,
+    };
+
+    if (parsed.success) return parsed.data;
+
+    // A caller with a differently-shaped schema (not the Smart List photo
+    // schema this demo list matches) falls back to the same generic
+    // synthesiser `generateJSON` already uses, rather than forcing a
+    // shape it did not ask for.
     return this.generateJSON({
       system: 'mock-vision',
       user: `${opts.prompt}:${opts.mimeType}:${opts.image.byteLength}`,
