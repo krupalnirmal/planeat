@@ -789,6 +789,9 @@
     "loginDescription": "Log in to speak or photograph your list — we'll match it to real products and add them to your cart.",
     "tileRecord": "Record",
     "tilePhoto": "Photo",
+    "choosePhotoSource": "Add a photo",
+    "takePhoto": "Take a photo",
+    "chooseFromGallery": "Choose from gallery",
     "tileType": "Type",
     "chooseMethodHint": "Pick how you'd like to add your list"
   },

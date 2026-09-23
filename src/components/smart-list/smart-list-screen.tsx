@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Camera, ClipboardList, Clock, Keyboard, Loader2, Mic, Trash2 } from 'lucide-react';
+import { Camera, ClipboardList, Clock, ImageIcon, Keyboard, Loader2, Mic, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -53,8 +53,15 @@ export function SmartListScreen() {
   const [typed, setTyped] = useState('');
   const [pendingListId, setPendingListId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Camera vs gallery choice (session 2026-09-23, client request) — a
+  // single `capture="environment"` input launches the camera app directly
+  // on most mobile browsers with no way back to the gallery, so the photo
+  // tile now opens a small sheet offering both, each backed by its own
+  // hidden input (only the camera one carries `capture`).
+  const [photoSheetOpen, setPhotoSheetOpen] = useState(false);
 
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const savedLists = useQuery({
     queryKey: ['smart-lists'],
@@ -270,7 +277,7 @@ export function SmartListScreen() {
 
             <button
               type="button"
-              onClick={() => photoInputRef.current?.click()}
+              onClick={() => setPhotoSheetOpen(true)}
               disabled={busy}
               className="flex aspect-square flex-col items-center justify-center gap-2 rounded-[var(--radius)] border border-border bg-background px-2 text-center disabled:opacity-50"
             >
@@ -280,11 +287,25 @@ export function SmartListScreen() {
               <span className="text-xs font-semibold">{t('tilePhoto')}</span>
             </button>
 
+            {/* Camera capture and gallery pick are two separate inputs —
+                only the first carries `capture`, which is what makes it
+                open the camera app instead of a file/gallery picker. */}
             <input
               ref={photoInputRef}
               type="file"
               accept="image/jpeg,image/png,image/webp"
               capture="environment"
+              className="hidden"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) uploadPhoto.mutate(file);
+                event.target.value = '';
+              }}
+            />
+            <input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
               className="hidden"
               onChange={(event) => {
                 const file = event.target.files?.[0];
@@ -363,6 +384,49 @@ export function SmartListScreen() {
       )}
       </div>
       </main>
+
+      {photoSheetOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center"
+          onClick={() => setPhotoSheetOpen(false)}
+        >
+          <div
+            className="w-full max-w-[420px] rounded-t-[calc(var(--radius)*1.6)] bg-background p-4 sm:rounded-[calc(var(--radius)*1.6)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <p className="mb-3 text-sm font-semibold">{t('choosePhotoSource')}</p>
+            <button
+              type="button"
+              onClick={() => {
+                setPhotoSheetOpen(false);
+                photoInputRef.current?.click();
+              }}
+              className="flex h-12 w-full items-center gap-3 rounded-[var(--radius)] border border-border px-4 text-sm font-medium"
+            >
+              <Camera className="size-4 shrink-0 text-primary" aria-hidden />
+              {t('takePhoto')}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setPhotoSheetOpen(false);
+                galleryInputRef.current?.click();
+              }}
+              className="mt-2 flex h-12 w-full items-center gap-3 rounded-[var(--radius)] border border-border px-4 text-sm font-medium"
+            >
+              <ImageIcon className="size-4 shrink-0 text-primary" aria-hidden />
+              {t('chooseFromGallery')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setPhotoSheetOpen(false)}
+              className="mt-3 h-11 w-full text-sm font-medium text-muted-foreground"
+            >
+              {tc('cancel')}
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
