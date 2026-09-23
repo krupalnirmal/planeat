@@ -781,6 +781,8 @@
     "listName": "सूची का नाम",
     "listNamePlaceholder": "जैसे हफ़्ते की सब्ज़ी",
     "noSavedLists": "अभी कोई सूची सहेजी नहीं गई",
+    "noSavedListsHint": "आवाज़, फ़ोटो या टाइप करके अपनी पहली सूची बनाएं।",
+    "deleteListConfirm": "यह सूची हटाएं?",
     "itemCount": "{count} चीज़ें",
     "usedFallback": "AI उपलब्ध नहीं था, इसलिए हमारे नियमों ने सूची पढ़ी।",
     "failed": "सूची नहीं पढ़ सके। फिर से कोशिश करें।",

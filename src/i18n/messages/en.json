@@ -781,6 +781,8 @@
     "listName": "List name",
     "listNamePlaceholder": "e.g. Weekly Sabzi",
     "noSavedLists": "No saved lists yet",
+    "noSavedListsHint": "Create your first grocery list using voice, photo or typing.",
+    "deleteListConfirm": "Delete this list?",
     "itemCount": "{count} items",
     "usedFallback": "AI wasn't available, so our own rules read the list.",
     "failed": "We couldn't read that list. Please try again.",

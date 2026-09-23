@@ -1,7 +1,7 @@
 'use client';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { Camera, Clock, Keyboard, Loader2, Mic } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Camera, ClipboardList, Clock, Keyboard, Loader2, Mic, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -45,6 +45,7 @@ export function SmartListScreen() {
   const tc = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { isLoggedIn, isLoading: sessionLoading } = useSession();
 
   const [mode, setMode] = useState<Mode>('choose');
@@ -64,6 +65,12 @@ export function SmartListScreen() {
   function handleError(err: unknown) {
     setError(err instanceof ApiClientError ? err.message : t('failed'));
   }
+
+  const deleteList = useMutation({
+    mutationFn: (id: string) => api.delete(`/api/smart-list/${id}`),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['smart-lists'] }),
+    onError: handleError,
+  });
 
   const uploadVoice = useMutation({
     mutationFn: async (input: { blob: Blob; mimeType: string }) => {
@@ -303,16 +310,16 @@ export function SmartListScreen() {
           </div>
 
           {/* M4 — saved lists, named and reusable. */}
-          {(savedLists.data?.lists.length ?? 0) > 0 && (
-            <section className="mt-8">
-              <h2 className="mb-3 text-sm font-semibold">{t('savedLists')}</h2>
+          <section className="mt-8">
+            <h2 className="mb-3 text-sm font-semibold">{t('savedLists')}</h2>
+            {(savedLists.data?.lists.length ?? 0) > 0 ? (
               <ul className="space-y-2">
                 {savedLists.data?.lists.map((saved) => (
-                  <li key={saved.id}>
-                    <Link
-                      href={`/smart-list/${saved.id}`}
-                      className="flex min-h-14 items-center gap-3 rounded-[var(--radius)] border border-border/60 bg-background px-4"
-                    >
+                  <li
+                    key={saved.id}
+                    className="flex min-h-14 items-center gap-1 rounded-[var(--radius)] border border-border/60 bg-background pr-2 pl-4"
+                  >
+                    <Link href={`/smart-list/${saved.id}`} className="flex min-w-0 flex-1 items-center gap-3 py-3">
                       <Clock className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-medium">
@@ -323,11 +330,35 @@ export function SmartListScreen() {
                         </span>
                       </span>
                     </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (confirm(t('deleteListConfirm'))) deleteList.mutate(saved.id);
+                      }}
+                      disabled={deleteList.isPending}
+                      aria-label={tc('delete')}
+                      className="grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground disabled:opacity-50"
+                    >
+                      <Trash2 className="size-4" aria-hidden />
+                    </button>
                   </li>
                 ))}
               </ul>
-            </section>
-          )}
+            ) : (
+              savedLists.isSuccess && (
+                // Not `CenteredState` here — that component's `min-h-[65dvh]`
+                // is sized for it being the whole screen's content (the
+                // review screen's own empty-items case), which would blow
+                // this section out to a near-full-height block sitting below
+                // three tiles that already fill the top of the page.
+                <div className="rounded-[var(--radius)] border border-dashed border-border px-4 py-8 text-center">
+                  <ClipboardList className="mx-auto size-8 text-muted-foreground/40" aria-hidden />
+                  <p className="mt-3 text-sm font-medium">{t('noSavedLists')}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t('noSavedListsHint')}</p>
+                </div>
+              )
+            )}
+          </section>
         </>
       )}
       </div>

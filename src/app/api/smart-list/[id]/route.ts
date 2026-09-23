@@ -44,3 +44,22 @@ export const PATCH = route(async (request: Request, context: Context) => {
 
   return ok({ renamed: true, name });
 });
+
+/** DELETE /api/smart-list/:id — remove a saved list the customer no longer
+    wants to keep. `SmartListItem.smartList` has `onDelete: NoAction`, so the
+    items are deleted explicitly before the list rather than relying on a
+    cascade the schema doesn't define. */
+export const DELETE = route(async (_request: Request, context: Context) => {
+  const session = await requireUser();
+  const { id } = await context.params;
+
+  const owned = await db.smartList.findUnique({ where: { id }, select: { userId: true } });
+  if (!owned || owned.userId !== session.userId) throw ApiError.notFound('That list was not found');
+
+  await db.$transaction([
+    db.smartListItem.deleteMany({ where: { smartListId: id } }),
+    db.smartList.delete({ where: { id } }),
+  ]);
+
+  return ok({ deleted: true });
+});

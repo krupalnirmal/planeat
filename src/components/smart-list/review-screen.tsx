@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertCircle, Check, HelpCircle, Loader2, Trash2 } from 'lucide-react';
+import { AlertCircle, Check, HelpCircle, Loader2, Pencil, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
@@ -166,6 +166,7 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
       <PageHeader title={t('reviewTitle')} subtitle={t('reviewHint')} backHref="/smart-list" backLabel={tc('back')} />
       <main className="pb-2 lg:mx-auto lg:max-w-2xl">
       <div className="bg-card px-4 py-4">
+      <ListNameEditor smartListId={smartListId} name={list.data?.list.name ?? null} />
       {notice && (
         <p className="mb-4 rounded-[var(--radius)] bg-secondary px-3 py-2.5 text-sm">{notice}</p>
       )}
@@ -270,6 +271,72 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
       <div aria-hidden className="h-16" />
       </main>
     </>
+  );
+}
+
+/** M4 — "Saved lists — name and reuse ('Weekly Sabzi')." Every list is
+    already saved and reusable the moment it's created (`smart-list-screen.
+    tsx`'s own saved-lists section reads real rows); this is just the
+    missing UI for the rename half of that — the `PATCH /api/smart-list/:id`
+    route and the `saveList`/`listName`/`listNamePlaceholder` strings it uses
+    already existed, unused, before this. */
+function ListNameEditor({ smartListId, name }: { smartListId: string; name: string | null }) {
+  const t = useTranslations('smartList');
+  const tc = useTranslations('common');
+  const queryClient = useQueryClient();
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(name ?? '');
+
+  const rename = useMutation({
+    mutationFn: (newName: string) => api.patch(`/api/smart-list/${smartListId}`, { name: newName }),
+    onSuccess: () => {
+      setEditing(false);
+      void queryClient.invalidateQueries({ queryKey: ['smart-list', smartListId] });
+      void queryClient.invalidateQueries({ queryKey: ['smart-lists'] });
+    },
+  });
+
+  if (editing) {
+    return (
+      <div className="mb-4 flex items-center gap-2">
+        <input
+          value={value}
+          onChange={(event) => setValue(event.target.value.slice(0, 120))}
+          placeholder={t('listNamePlaceholder')}
+          autoFocus
+          className="input-3d min-w-0 flex-1 rounded-[var(--radius)] border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+        />
+        <button
+          type="button"
+          onClick={() => {
+            setEditing(false);
+            setValue(name ?? '');
+          }}
+          className="h-10 shrink-0 rounded-[var(--radius)] border border-border px-3 text-xs font-semibold"
+        >
+          {tc('cancel')}
+        </button>
+        <button
+          type="button"
+          onClick={() => value.trim() && rename.mutate(value.trim())}
+          disabled={!value.trim() || rename.isPending}
+          className="h-10 shrink-0 rounded-[var(--radius)] bg-primary px-3 text-xs font-bold text-primary-foreground disabled:opacity-50"
+        >
+          {rename.isPending ? tc('saving') : tc('save')}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-primary"
+    >
+      <Pencil className="size-3.5 shrink-0" aria-hidden />
+      {name ?? t('saveList')}
+    </button>
   );
 }
 
