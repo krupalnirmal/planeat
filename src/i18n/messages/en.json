@@ -474,7 +474,7 @@
       "daysLabel": "Days",
       "searchPlaceholder": "Search {category}…",
       "viewDayPlan": "View Plan ({count} items)",
-      "saveForDay": "Save for {day}",
+      "saveForDay": "Done for {day}",
       "selectSize": "Select size",
       "addToPlan": "Add to Plan",
       "removeItem": "Remove item",
