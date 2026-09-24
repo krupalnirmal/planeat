@@ -61,14 +61,14 @@ export function AppHeader() {
         {/* The real client-provided logo (session 2026-09-22) — was a
             styled text wordmark ("Get"/"Freesh" spans + a Leaf icon)
             standing in for the brand's actual logo file, which didn't
-            exist in the app yet. "getFresh" is a brand-name image, not
+            exist in the app yet. "getFrresh" is a brand-name image, not
             translatable content (R7 governs translatable text, not a
             wordmark — same reasoning the old text version's own comment
             already established, see D-196/`app.name`'s SHARED_LATIN_KEYS
             exemption). */}
         <div className="min-w-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo.png" alt="getFresh" className="h-16 w-auto" />
+          <img src="/brand/logo.png" alt="getFrresh" className="h-16 w-auto" />
         </div>
 
         <div className="flex shrink-0 items-start gap-3">

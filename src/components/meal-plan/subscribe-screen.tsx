@@ -214,7 +214,7 @@ export function SubscribeScreen() {
           publicKey: data.publicKey,
           amountPaise: data.amountPaise,
           currency: data.currency,
-          appName: 'Get Freesh',
+          appName: 'Get Frresh',
           description: t('title'),
           prefill: { name: user?.name ?? undefined, contact: user?.phone },
           onSuccess: () => void pollUntilSettled(data.paymentId),

@@ -3,26 +3,27 @@
 import { CalendarCheck, ChevronLeft, ChevronRight, Leaf, Salad } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { formatPaise } from '@/lib/money';
+import { cn } from '@/lib/utils';
 import { DAY_STYLE } from './day-style';
 import { MealPlanHero } from './meal-plan-hero';
 import { DAYS, usePlanDraft } from './plan-draft-context';
 
 /**
- * Wizard screen 2 — pick a day to add items for. Restyled (session
- * 2026-09-23, client reference screenshot) from a plain bordered list to a
- * green-tinted hero header (`MealPlanHero`, shared with the weekly-summary
- * screen) + colour-badged day rows + an illustrated "plan your week" strip,
- * matching the reference's warmer, more decorated look.
+ * Wizard screen 2 — pick a day to add items for. Restyled again (session
+ * 2026-09-24, client reference screenshots) from a single-column list of
+ * colour-badged rows to a 2-column grid of day cards showing each day's own
+ * item count and running total, reusing the weekly-summary screen's own
+ * `DayTile` look (`weekly-summary-screen.tsx`) so both screens in the
+ * wizard read as one consistent "week at a glance" system — the reference's
+ * own "Week View" screen shows exactly this card shape as the very first
+ * thing after tapping into My Meal Plan, not just on the final review.
  *
  * The underlying plan is a recurring weekly template (`MealPlanDay.
  * dayOfWeek`, not a specific calendar date — the same Monday repeats every
  * week), so this deliberately shows day names only, not the calendar dates
  * the reference mockup pairs them with — showing "18 Aug" would
  * misrepresent a plan that isn't tied to one week.
- *
- * The per-day colour/icon badges come from the shared `DAY_STYLE` map
- * (`day-style.ts`) — see that file's own doc comment on why they're real
- * lucide icons, not the reference's own per-day food photos.
  */
 
 export function DayListScreen() {
@@ -50,53 +51,11 @@ export function DayListScreen() {
       <MealPlanHero title={t('title')} subtitle={tw('selectDayHint')} backHref="/meal-plan" />
 
       <main className="space-y-3 p-4 pb-24 lg:mx-auto lg:max-w-2xl">
-        <ul className="divide-y divide-border overflow-hidden rounded-[var(--radius-2xl)] border border-border">
-          {DAYS.map((day) => {
-            const count = draft.itemCount(day);
-            const style = DAY_STYLE[day];
-            const Icon = style.icon;
-            return (
-              <li key={day} style={{ backgroundColor: `${style.bg}80` }}>
-                <Link href={`/meal-plan/build/${day}`} className="flex items-center gap-3 px-3 py-3">
-                  {/* Colour-badged day mark (session 2026-09-23, client
-                      reference) — a small "calendar" card: a solid-colour
-                      top band carrying the day's short name, a tinted
-                      bottom half carrying a real lucide food icon (see this
-                      file's own doc comment on why an icon, not a photo). */}
-                  <span className="grid w-14 shrink-0 overflow-hidden rounded-[14px] text-center shadow-sm">
-                    <span
-                      className="py-1 text-[9px] leading-tight font-bold text-white"
-                      style={{ backgroundColor: style.solid }}
-                    >
-                      {t(`daysShort.${day}`)}
-                    </span>
-                    <span className="grid place-items-center bg-card py-2">
-                      <Icon className="size-5 shrink-0" style={{ color: style.solid }} aria-hidden />
-                    </span>
-                  </span>
-
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-bold">{t(`days.${day}`)}</span>
-                    <span className="block truncate text-xs text-muted-foreground">{tw('dayRowHint')}</span>
-                  </span>
-
-                  <span className="flex shrink-0 items-center gap-2">
-                    <span
-                      className={
-                        count > 0
-                          ? 'rounded-full bg-tint-green px-2.5 py-0.5 text-xs font-bold text-primary-dark'
-                          : 'text-xs text-muted-foreground'
-                      }
-                    >
-                      {tw('itemCount', { count })}
-                    </span>
-                    <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="grid grid-cols-2 gap-2.5">
+          {DAYS.map((day) => (
+            <DayTile key={day} dayOfWeek={day} />
+          ))}
+        </div>
 
         {/* "Plan your week" strip (session 2026-09-23, client reference) —
             grew from a single tinted line with a small inline leaf icon
@@ -136,5 +95,39 @@ export function DayListScreen() {
         </div>
       )}
     </>
+  );
+}
+
+// Same colour-badged card as `weekly-summary-screen.tsx`'s own `DayTile`
+// (kept local rather than imported/shared — this screen and the summary
+// screen are two different steps in the wizard that happen to want the
+// same look, not one component with two callers) — a tinted-when-picked
+// card with the day name, item count, running total, and a `DAY_STYLE`
+// icon badge, matching the reference's "Week View" card shape.
+function DayTile({ dayOfWeek }: { dayOfWeek: number }) {
+  const t = useTranslations('mealPlan');
+  const tw = useTranslations('mealPlan.wizard');
+  const draft = usePlanDraft();
+  const count = draft.itemCount(dayOfWeek);
+  const style = DAY_STYLE[dayOfWeek];
+  const Icon = style.icon;
+
+  return (
+    <Link
+      href={`/meal-plan/build/${dayOfWeek}`}
+      className={cn(
+        'flex items-center gap-2 rounded-[var(--radius)] border p-3',
+        count > 0 ? 'border-primary bg-tint-green' : 'border-border bg-card',
+      )}
+    >
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-bold">{t(`daysShort.${dayOfWeek}`)}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{tw('itemCount', { count })}</p>
+        {count > 0 && <p className="mt-1 text-sm font-bold">{formatPaise(draft.dayTotalPaise(dayOfWeek))}</p>}
+      </div>
+      <span className="grid size-12 shrink-0 place-items-center rounded-full" style={{ backgroundColor: style.bg }}>
+        <Icon className="size-6 shrink-0" style={{ color: style.solid }} aria-hidden />
+      </span>
+    </Link>
   );
 }

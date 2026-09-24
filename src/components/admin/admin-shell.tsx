@@ -318,7 +318,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             icon. */}
         <div className="border-b border-border px-5 py-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo.png" alt="getFresh" className="h-16 w-auto" />
+          <img src="/brand/logo.png" alt="getFrresh" className="h-16 w-auto" />
           <p className="mt-1 text-[11px] text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
         </div>
 
@@ -383,7 +383,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Menu className="size-5" aria-hidden />
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo.png" alt="getFresh" className="h-16 w-auto justify-self-center" />
+          <img src="/brand/logo.png" alt="getFrresh" className="h-16 w-auto justify-self-center" />
           <div className="flex shrink-0 items-center justify-self-end gap-1">
             <NotificationBell />
             <ProfileMenu />
@@ -402,7 +402,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <div className="flex items-center justify-between border-b border-border px-5 py-4">
                 <div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/brand/logo.png" alt="getFresh" className="h-14 w-auto" />
+                  <img src="/brand/logo.png" alt="getFrresh" className="h-14 w-auto" />
                   <p className="mt-1 text-xs text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
                 </div>
                 <button

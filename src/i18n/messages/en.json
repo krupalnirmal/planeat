@@ -1,10 +1,10 @@
 {
   "app": {
-    "name": "Get Freesh",
+    "name": "Get Frresh",
     "tagline": "Fresh Vegetables\nDelivered to Your Home"
   },
   "install": {
-    "title": "Install Get Freesh on this phone",
+    "title": "Install Get Frresh on this phone",
     "action": "Install",
     "iosHint": "Share → Add to Home Screen",
     "androidHint": "Chrome menu → Install app",
@@ -57,7 +57,7 @@
     "continue": "Continue",
     "skipLogin": "Skip for now",
     "staffHeading": "Staff sign in",
-    "staffSubtitle": "For Get Freesh admins and delivery partners only",
+    "staffSubtitle": "For Get Frresh admins and delivery partners only",
     "termsNote": "By continuing, you agree to our Terms of Service and Privacy Policy",
     "phoneLabel": "Mobile number",
     "phonePlaceholder": "Enter mobile number",
@@ -183,7 +183,7 @@
   "footer": {
     "categoriesHeading": "Shop by Category",
     "legalHeading": "Legal",
-    "copyright": "© {year} getFresh. All rights reserved."
+    "copyright": "© {year} getFrresh. All rights reserved."
   },
   "product": {
     "add": "ADD",
@@ -828,7 +828,7 @@
   },
   "admin": {
     "title": "Admin",
-    "appTitle": "Get Freesh Admin",
+    "appTitle": "Get Frresh Admin",
     "installTitle": "Install the admin app on this device",
     "installAction": "Install",
     "installIosHint": "Share → Add to Home Screen",
@@ -1212,7 +1212,7 @@
     }
   },
   "delivery": {
-    "appTitle": "Get Freesh Delivery",
+    "appTitle": "Get Frresh Delivery",
     "available": "Available",
     "logout": "Log out",
     "enableAlerts": "Turn on new-order alerts",

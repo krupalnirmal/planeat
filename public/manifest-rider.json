@@ -1,8 +1,8 @@
 {
   "id": "/rider",
-  "name": "Get Freesh Rider",
+  "name": "Get Frresh Rider",
   "short_name": "GF Rider",
-  "description": "आजच्या डिलिव्हरी, पत्ते आणि स्टेटस — Get Freesh डिलिव्हरी पार्टनरसाठी.",
+  "description": "आजच्या डिलिव्हरी, पत्ते आणि स्टेटस — Get Frresh डिलिव्हरी पार्टनरसाठी.",
   "start_url": "/mr/delivery",
   "scope": "/",
   "display": "standalone",

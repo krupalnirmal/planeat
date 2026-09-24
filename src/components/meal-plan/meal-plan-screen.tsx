@@ -33,8 +33,12 @@ import { formatPaise, paise } from '@/lib/money';
  * category) instead of nowhere.
  */
 
-const HERO_IMAGE =
-  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1789846982/planeat/meal-plan-home/meal-plan-home-hero.png';
+// The client's new reference hero banner (session 2026-09-24) — replaces the
+// earlier cropped-photo hero; this one already carries its own baked-in
+// "Your Intelligent Meal Plan" headline and copy, so it's served locally
+// from `public/brand` like the wordmark rather than re-uploaded to
+// Cloudinary as a product-style asset.
+const HERO_IMAGE = '/brand/meal-plan-hero.png';
 const ICON_FRESH =
   'https://res.cloudinary.com/kf9nvvpv/image/upload/v1789846983/planeat/meal-plan-home/meal-plan-home-icon-fresh.png';
 const ICON_CHOICE =
@@ -117,7 +121,7 @@ export function MealPlanScreen() {
         <img
           src={HERO_IMAGE}
           alt=""
-          className="aspect-[2.45/1] w-full rounded-[var(--radius-2xl)] object-cover"
+          className="aspect-[3/1] w-full rounded-[var(--radius-2xl)] object-cover"
         />
       </div>
 

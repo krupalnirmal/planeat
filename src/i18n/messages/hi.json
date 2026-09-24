@@ -1,10 +1,10 @@
 {
   "app": {
-    "name": "Get Freesh",
+    "name": "Get Frresh",
     "tagline": "ताज़ी सब्ज़ियाँ,\nसीधे आपके घर तक"
   },
   "install": {
-    "title": "Get Freesh ऐप इस फ़ोन पर इंस्टॉल करें",
+    "title": "Get Frresh ऐप इस फ़ोन पर इंस्टॉल करें",
     "action": "इंस्टॉल करें",
     "iosHint": "Share → Add to Home Screen चुनें",
     "androidHint": "Chrome के ⋮ मेनू → Install app चुनें",
@@ -57,7 +57,7 @@
     "continue": "आगे बढ़ें",
     "skipLogin": "अभी नहीं",
     "staffHeading": "स्टाफ लॉगिन",
-    "staffSubtitle": "सिर्फ़ Get Freesh एडमिन और डिलीवरी पार्टनर के लिए",
+    "staffSubtitle": "सिर्फ़ Get Frresh एडमिन और डिलीवरी पार्टनर के लिए",
     "termsNote": "आगे बढ़कर आप हमारी नियम व शर्तें और गोपनीयता नीति स्वीकार करते हैं",
     "phoneLabel": "मोबाइल नंबर",
     "phonePlaceholder": "मोबाइल नंबर डालें",
@@ -183,7 +183,7 @@
   "footer": {
     "categoriesHeading": "श्रेणी के अनुसार खरीदें",
     "legalHeading": "कानूनी",
-    "copyright": "© {year} getFresh. सर्वाधिकार सुरक्षित।"
+    "copyright": "© {year} getFrresh. सर्वाधिकार सुरक्षित।"
   },
   "product": {
     "add": "जोड़ें",
@@ -828,7 +828,7 @@
   },
   "admin": {
     "title": "प्रशासन",
-    "appTitle": "Get Freesh एडमिन",
+    "appTitle": "Get Frresh एडमिन",
     "installTitle": "एडमिन ऐप इस डिवाइस पर इंस्टॉल करें",
     "installAction": "इंस्टॉल करें",
     "installIosHint": "Share → Add to Home Screen चुनें",
@@ -1212,7 +1212,7 @@
     }
   },
   "delivery": {
-    "appTitle": "Get Freesh डिलीवरी",
+    "appTitle": "Get Frresh डिलीवरी",
     "available": "उपलब्ध",
     "logout": "बाहर निकलें",
     "enableAlerts": "नए ऑर्डर की सूचना चालू करें",

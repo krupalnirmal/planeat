@@ -6,6 +6,7 @@ import {
   Check,
   ChevronRight,
   Cookie,
+  Heart,
   ImageIcon,
   Leaf,
   Milk,
@@ -23,6 +24,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { PageHeader } from '@/components/shop/page-header';
+import { useWishlisted } from '@/hooks/use-wishlist';
 import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
 import { DAYS, type DraftColumn, type DraftProduct, type DraftVariant, usePlanDraft } from './plan-draft-context';
@@ -399,43 +401,53 @@ function PlanProductCard({
   const mrp = displayVariant ? paise(displayVariant.mrpPaise) : 0n;
   const hasDiscount = mrp > price;
   const multiVariant = product.variants.length > 1;
+  const [wishlisted, toggleWishlisted] = useWishlisted(product.id);
 
   return (
-    <button
-      type="button"
-      onClick={onTap}
-      disabled={product.variants.length === 0}
-      // Matches the storefront's own `ProductCard` (`src/components/shop/
-      // product-card.tsx`) — same `.card-3d` shadow, same rounded corners
-      // and faint border, same square photo, discount badge, MRP strike-
-      // through and bordered pill CTA — so the builder's cards look
-      // consistent with the rest of the app instead of a one-off style
-      // (client feedback, session 2026-09-17).
-      className="card-3d relative flex flex-col overflow-hidden rounded-[var(--radius)] border border-border/50 bg-card text-left disabled:opacity-50"
-    >
-      <div className="relative grid aspect-square place-items-center bg-white">
-        {product.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={product.imageUrl} alt={product.name} loading="lazy" className="size-full object-cover" />
-        ) : (
-          <ImageIcon className="size-8 text-muted-foreground/40" aria-hidden />
-        )}
-        {hasDiscount && (
-          <span className="absolute top-1.5 left-1.5 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
-            {Math.round((1 - Number(price) / Number(mrp)) * 100)}% {t('off')}
-          </span>
-        )}
-        {selected && (
-          // Bolder than the earlier faint white-on-card badge (client
-          // feedback, session 2026-09-17): a solid filled circle with a
-          // white ring to pop off the photo, not a translucent chip that
-          // read as barely-there against a busy image.
-          <span className="absolute top-2 right-2 grid size-7 place-items-center rounded-full bg-primary shadow-md ring-2 ring-white">
-            <Check className="size-4 text-primary-foreground" strokeWidth={3} aria-hidden />
-          </span>
-        )}
-      </div>
-      {/* No `min-h`/`mt-auto` gap-filler here (dropped, session 2026-09-17
+    // `<article>`, not the old single `<button>` (session 2026-09-24,
+    // client reference — the mockup's product photo carries its own heart
+    // toggle, same as the storefront's `ProductCard`). A `<button>` can't
+    // contain another interactive `<button>`, so the tappable area moved to
+    // an inner button and the heart sits beside it as a sibling, exactly
+    // `product-card.tsx`'s own "kept outside" structure.
+    <article className="card-3d relative flex flex-col overflow-hidden rounded-[var(--radius)] border border-border/50 bg-card">
+      <button
+        type="button"
+        onClick={onTap}
+        disabled={product.variants.length === 0}
+        // Matches the storefront's own `ProductCard` (`src/components/shop/
+        // product-card.tsx`) — same `.card-3d` shadow, same rounded corners
+        // and faint border, same square photo, discount badge, MRP strike-
+        // through and bordered pill CTA — so the builder's cards look
+        // consistent with the rest of the app instead of a one-off style
+        // (client feedback, session 2026-09-17).
+        className="flex flex-1 flex-col text-left disabled:opacity-50"
+      >
+        <div className="relative grid aspect-square place-items-center bg-white">
+          {product.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={product.imageUrl} alt={product.name} loading="lazy" className="size-full object-cover" />
+          ) : (
+            <ImageIcon className="size-8 text-muted-foreground/40" aria-hidden />
+          )}
+          {hasDiscount && (
+            <span className="absolute top-1.5 left-1.5 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+              {Math.round((1 - Number(price) / Number(mrp)) * 100)}% {t('off')}
+            </span>
+          )}
+          {selected && (
+            // Bolder than the earlier faint white-on-card badge (client
+            // feedback, session 2026-09-17): a solid filled circle with a
+            // white ring to pop off the photo, not a translucent chip that
+            // read as barely-there against a busy image. Bottom-right, not
+            // top-right (session 2026-09-24) — the heart toggle now owns
+            // that corner, matching the client reference screenshot.
+            <span className="absolute right-1.5 bottom-1.5 grid size-7 place-items-center rounded-full bg-primary shadow-md ring-2 ring-white">
+              <Check className="size-4 text-primary-foreground" strokeWidth={3} aria-hidden />
+            </span>
+          )}
+        </div>
+        {/* No `min-h`/`mt-auto` gap-filler here (dropped, session 2026-09-17
           — client feedback): the storefront's own card reserves 2 lines'
           worth of name height so the price row lines up across a grid row,
           but that left a large dead gap above a short one-line name here.
@@ -496,7 +508,23 @@ function PlanProductCard({
           </>
         )}
       </div>
-    </button>
+      </button>
+
+      {/* Sibling of the tap button, not nested inside it — same reasoning
+          `product-card.tsx` already documents on its own heart button. */}
+      <button
+        type="button"
+        onClick={toggleWishlisted}
+        aria-pressed={wishlisted}
+        aria-label={t(wishlisted ? 'wishlistRemove' : 'wishlistAdd', { name: product.name })}
+        className="absolute top-1.5 right-1.5 grid size-7 place-items-center rounded-full bg-card/95 shadow-sm"
+      >
+        <Heart
+          className={cn('size-3.5', wishlisted ? 'fill-primary text-primary' : 'text-muted-foreground')}
+          aria-hidden
+        />
+      </button>
+    </article>
   );
 }
 

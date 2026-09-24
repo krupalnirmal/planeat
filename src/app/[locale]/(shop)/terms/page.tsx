@@ -28,7 +28,7 @@ export default async function TermsPage({
         <section>
           <h2 className="font-semibold">Our service</h2>
           <p className="mt-1 text-muted-foreground">
-            getFresh delivers fresh groceries within our serviceable delivery area — check
+            getFrresh delivers fresh groceries within our serviceable delivery area — check
             serviceability for your address before placing an order. We&apos;re expanding
             carefully, not claiming to cover areas we don&apos;t actually deliver to yet.
           </p>
@@ -46,7 +46,7 @@ export default async function TermsPage({
           <h2 className="font-semibold">Orders &amp; payment</h2>
           <p className="mt-1 text-muted-foreground">
             Prices shown at checkout are final for that order. We accept the payment methods
-            offered at checkout, including your getFresh wallet. Once an order is placed, its
+            offered at checkout, including your getFrresh wallet. Once an order is placed, its
             status is visible under My Orders.
           </p>
         </section>
@@ -55,14 +55,14 @@ export default async function TermsPage({
           <h2 className="font-semibold">Delivery &amp; issues</h2>
           <p className="mt-1 text-muted-foreground">
             If an item arrives damaged, missing, or wrong, report it from that order — refunds
-            for approved issues are credited to your getFresh wallet.
+            for approved issues are credited to your getFrresh wallet.
           </p>
         </section>
 
         <section>
           <h2 className="font-semibold">Changes</h2>
           <p className="mt-1 text-muted-foreground">
-            We may update these terms as the service grows. Continuing to use getFresh after a
+            We may update these terms as the service grows. Continuing to use getFrresh after a
             change means you accept the updated terms.
           </p>
         </section>
