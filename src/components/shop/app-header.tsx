@@ -8,6 +8,7 @@ import { useCart } from '@/hooks/use-cart';
 import { useSession } from '@/hooks/use-session';
 import { api } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
+import { cn } from '@/lib/utils';
 import { useDeliveryArea } from '@/stores/delivery-area';
 
 /**
@@ -22,7 +23,7 @@ import { useDeliveryArea } from '@/stores/delivery-area';
  * so the third icon stays Wallet — a real destination — rather than a link
  * to nothing.
  */
-export function AppHeader() {
+export function AppHeader({ sticky = true }: { sticky?: boolean } = {}) {
   const t = useTranslations('home');
   const tp = useTranslations('profile');
   const tw = useTranslations('wallet');
@@ -55,8 +56,13 @@ export function AppHeader() {
 
   return (
     // `lg:hidden` (session 2026-09-20) — `DesktopHeader` takes over at
-    // `lg:` and up; this stays exactly as it was below that.
-    <header className="sticky top-0 z-30 bg-card px-4 pt-3 pb-3 shadow-sm lg:hidden">
+    // `lg:` and up; this stays exactly as it was below that. `sticky` opts
+    // out (session 2026-09-24) for screens that already carry their own
+    // sticky header below this one (the meal-plan day builder's `PageHeader`
+    // + day-tabs + search row) — two elements both pinned to `top: 0` would
+    // just paint over each other once scrolled, so those screens scroll
+    // this one away instead of stacking offsets against it.
+    <header className={cn('top-0 z-30 bg-card px-4 pt-3 pb-3 shadow-sm lg:hidden', sticky && 'sticky')}>
       <div className="flex items-start justify-between gap-3">
         {/* The real client-provided logo (session 2026-09-22) — was a
             styled text wordmark ("Get"/"Freesh" spans + a Leaf icon)

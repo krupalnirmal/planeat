@@ -23,6 +23,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
+import { AppHeader } from '@/components/shop/app-header';
 import { PageHeader } from '@/components/shop/page-header';
 import { useWishlisted } from '@/hooks/use-wishlist';
 import { formatPaise, paise } from '@/lib/money';
@@ -135,6 +136,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
   if (draft.loading) {
     return (
       <>
+        <AppHeader sticky={false} />
         <PageHeader title={t(`days.${dayOfWeek}`)} backHref="/meal-plan/build" backLabel={tc('back')} />
         <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>
       </>
@@ -166,6 +168,14 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
 
   return (
     <>
+      {/* Not sticky here (session 2026-09-24, client reference wants this
+          header on every meal-plan screen, but this one already has its own
+          sticky `PageHeader` + day-tabs + search row stacked right below —
+          see `AppHeader`'s own doc comment on why two `top: 0` stickies
+          can't coexist). Scrolls away with the page instead; the sticky
+          `PageHeader` below still pins at the real top once this one has
+          scrolled past. */}
+      <AppHeader sticky={false} />
       <PageHeader
         title={t(`days.${dayOfWeek}`)}
         subtitle={showSummary ? tw('reviewHint') : tw('addItemsHint')}

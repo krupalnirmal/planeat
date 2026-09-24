@@ -14,6 +14,7 @@ import {
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
+import { AppHeader } from '@/components/shop/app-header';
 import { PageHeader } from '@/components/shop/page-header';
 import { ApiClientError, api, qs } from '@/lib/api/client';
 import { formatPaise } from '@/lib/money';
@@ -58,6 +59,7 @@ export function WeeklySummaryScreen() {
   if (draft.loading) {
     return (
       <>
+        <AppHeader />
         <PageHeader title={t('title')} backHref="/meal-plan/build" backLabel={tc('back')} />
         <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>
       </>
@@ -65,7 +67,12 @@ export function WeeklySummaryScreen() {
   }
 
   if (saved) {
-    return <SavedScreen daysCount={DAYS.filter((d) => draft.itemCount(d) > 0).length} />;
+    return (
+      <>
+        <AppHeader />
+        <SavedScreen daysCount={DAYS.filter((d) => draft.itemCount(d) > 0).length} />
+      </>
+    );
   }
 
   const weekTotal = draft.weekTotalPaise();
@@ -73,6 +80,7 @@ export function WeeklySummaryScreen() {
 
   return (
     <>
+      <AppHeader />
       <MealPlanHero title={t('title')} subtitle={tw('summaryHeroSubtitle')} backHref="/meal-plan/build" />
       <main className="space-y-4 p-4 pb-28 lg:mx-auto lg:max-w-2xl">
         <div className="flex rounded-[var(--radius)] border border-border bg-card p-1">

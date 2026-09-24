@@ -2,6 +2,7 @@
 
 import { CalendarCheck, ChevronLeft, ChevronRight, Leaf, Salad } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { AppHeader } from '@/components/shop/app-header';
 import { Link } from '@/i18n/navigation';
 import { formatPaise } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -35,6 +36,7 @@ export function DayListScreen() {
   if (draft.loading) {
     return (
       <>
+        <AppHeader />
         <header className="card-3d sticky top-0 z-30 flex items-center gap-2 bg-card px-3 py-3">
           <Link href="/meal-plan" aria-label={tc('back')} className="grid size-11 shrink-0 place-items-center rounded-full">
             <ChevronLeft className="size-5" aria-hidden />
@@ -48,6 +50,11 @@ export function DayListScreen() {
 
   return (
     <>
+      {/* Same storefront header every wizard screen now carries (session
+          2026-09-24, client reference) — logo, wallet/cart/profile, the
+          deliver-to bar — sitting above the green wizard band rather than
+          replacing it. */}
+      <AppHeader />
       <MealPlanHero title={t('title')} subtitle={tw('selectDayHint')} backHref="/meal-plan" />
 
       <main className="space-y-3 p-4 pb-24 lg:mx-auto lg:max-w-2xl">

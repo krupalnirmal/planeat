@@ -1,8 +1,9 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Bell, ChevronRight, Leaf, Salad, ShoppingBasket, Truck } from 'lucide-react';
+import { ChevronRight, Salad, ShoppingBasket, Truck } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { AppHeader } from '@/components/shop/app-header';
 import { LoginPrompt } from '@/components/shop/login-prompt';
 import { Link } from '@/i18n/navigation';
 import { useSession } from '@/hooks/use-session';
@@ -70,19 +71,25 @@ export function MealPlanScreen() {
 
   if (sessionLoading || (isLoggedIn && current.isLoading)) {
     return (
-      <main className="px-4 py-8 text-sm text-muted-foreground">{t('title')}…</main>
+      <>
+        <AppHeader />
+        <main className="px-4 py-8 text-sm text-muted-foreground">{t('title')}…</main>
+      </>
     );
   }
 
   if (!isLoggedIn) {
     return (
-      <LoginPrompt
-        icon={Salad}
-        title={t('title')}
-        bandSubtitle={t('subtitle')}
-        description={t('loginDescription')}
-        loginHref="/login?next=/meal-plan"
-      />
+      <>
+        <AppHeader />
+        <LoginPrompt
+          icon={Salad}
+          title={t('title')}
+          bandSubtitle={t('subtitle')}
+          description={t('loginDescription')}
+          loginHref="/login?next=/meal-plan"
+        />
+      </>
     );
   }
 
@@ -92,30 +99,17 @@ export function MealPlanScreen() {
   const savings = paise(data?.weeklySavingsPaise ?? '0');
 
   return (
-    <main className="pb-6 lg:mx-auto lg:max-w-2xl">
-      {/* Left-aligned, not centered (session 2026-09-20, client reference)
-          — a leaf mark top-left and a bell top-right, the same pairing the
-          storefront's own AppHeader wordmark and icon row use. The bell is
-          decorative, same call as the filter icon added to the meal-plan
-          builder's search bar: there's no notification system behind it
-          yet, so it's not a real `<button>` with a handler that does
-          nothing. */}
-      <div className="px-5 pt-5 pb-2">
-        <div className="flex items-start justify-between">
-          <Leaf className="size-6 shrink-0 -rotate-12 text-primary" aria-hidden />
-          <Bell className="size-5 shrink-0 text-primary" aria-hidden />
-        </div>
-        {/* Two-tone like the wordmark ("Get"/"Fresh") — split into its own
-            prefix/accent translation keys per locale rather than a single
-            string sliced in code, since "where the accent starts" isn't the
-            same character offset in Marathi/Hindi. */}
-        <h1 className="mt-1 text-2xl leading-tight font-black">
-          <span className="text-foreground">{t('wizard.homeTitlePrefix')} </span>
-          <span className="text-primary">{t('wizard.homeTitleAccent')}</span>
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">{t('subtitle')}</p>
-      </div>
-
+    <>
+      {/* The real storefront header — logo, wallet/cart/profile, deliver-to
+          bar (session 2026-09-24, client reference) — replaces the earlier
+          standalone leaf-mark/bell row + separate title text this screen
+          used to draw for itself. The new hero banner below already carries
+          its own baked-in "Your Intelligent Meal Plan" headline, so a
+          second text title here would just repeat it; every reference
+          screenshot for this wizard (home, week view, day view) shows this
+          same header at the very top, not a per-screen substitute. */}
+      <AppHeader />
+      <main className="pb-6 lg:mx-auto lg:max-w-2xl">
       <div className="px-4 pt-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -218,7 +212,8 @@ export function MealPlanScreen() {
           </Link>
         )}
       </div>
-    </main>
+      </main>
+    </>
   );
 }
 
