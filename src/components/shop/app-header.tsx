@@ -74,7 +74,7 @@ export function AppHeader({ sticky = true }: { sticky?: boolean } = {}) {
             exemption). */}
         <div className="min-w-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo.png" alt="getFrresh" className="h-16 w-auto" />
+          <img src="/brand/logo.png" alt="getFrresh" className="h-12 w-auto" />
         </div>
 
         <div className="flex shrink-0 items-start gap-3">
