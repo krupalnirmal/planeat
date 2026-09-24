@@ -202,7 +202,6 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
         style={{ top: PAGE_HEADER_HEIGHT_PX }}
       >
         {DAYS.map((day) => {
-          const count = draft.itemCount(day);
           const active = day === dayOfWeek;
           return (
             <button
@@ -213,41 +212,15 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
                 if (day !== dayOfWeek) router.push(`/meal-plan/build/${day}`);
               }}
               aria-current={active}
-              // Day name over item count over a leaf-in-circle badge
-              // (session 2026-09-25, client reference screenshot) — was a
-              // day-number-plus-inline-leaf row; the reference shows the
-              // real item count as text instead of the day's own number,
-              // with the leaf mark moved into its own circular badge below
-              // rather than sitting inline next to it. The corner count
-              // badge stays too, matching the reference's own small
-              // top-right number.
+              // Day name only (session 2026-09-25, user request — dropped
+              // the item-count text, the leaf-in-circle badge, and the
+              // corner count badge this tab used to carry).
               className={cn(
-                'relative flex shrink-0 flex-col items-center gap-1 rounded-2xl px-3 py-2.5 text-center transition-colors',
+                'flex shrink-0 items-center rounded-2xl px-4 py-2.5 text-center text-xs font-bold transition-colors',
                 active ? 'bg-primary text-primary-foreground' : 'bg-tint-green text-primary-dark',
               )}
             >
-              <span className="text-xs font-bold">{t(`daysShort.${day}`)}</span>
-              <span className="text-[10px] font-semibold whitespace-nowrap opacity-80">
-                {tw('itemCount', { count })}
-              </span>
-              <span
-                className={cn(
-                  'grid size-6 shrink-0 place-items-center rounded-full',
-                  active ? 'bg-white/25' : 'bg-card',
-                )}
-              >
-                <Leaf className={cn('size-3.5 shrink-0', active ? 'text-white' : 'text-primary')} aria-hidden />
-              </span>
-              {count > 0 && (
-                <span
-                  className={cn(
-                    'absolute -top-1.5 -right-1.5 grid min-w-4 place-items-center rounded-full px-1 text-[9px] font-bold ring-2 ring-card',
-                    active ? 'bg-white text-primary' : 'bg-primary text-primary-foreground',
-                  )}
-                >
-                  {count}
-                </span>
-              )}
+              {t(`daysShort.${day}`)}
             </button>
           );
         })}
