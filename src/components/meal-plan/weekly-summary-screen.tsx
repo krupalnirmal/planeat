@@ -238,6 +238,15 @@ function SavedScreen({ daysCount }: { daysCount: number }) {
   // this is the moment they've just confirmed what they want delivered.
   // Dismissable: the choice isn't forced, and it's asked again (still
   // changeable) on the actual Subscribe screen either way.
+  //
+  // Only when there's no subscription yet (session 2026-09-25, user report)
+  // — a customer who already activated one and comes back to tweak items
+  // just re-saves the same plan the subscription already reads from every
+  // night (`generateDailyOrders` re-reads `MealPlanDay` fresh at generation
+  // time, not a snapshot from when they subscribed); asking Daily/Weekly
+  // again here is not just redundant, tapping either option would land on
+  // `/meal-plan/subscribe` and fail with "you already have an active
+  // subscription" (`activateSubscription`'s `ALREADY_ACTIVE` check).
   const [showDeliveryModePopup, setShowDeliveryModePopup] = useState(true);
 
   return (
@@ -268,7 +277,12 @@ function SavedScreen({ daysCount }: { daysCount: number }) {
         {tw('continueShopping')}
       </Link>
 
-      {showDeliveryModePopup && <DeliveryModePopup onDismiss={() => setShowDeliveryModePopup(false)} />}
+      {/* Re-checks `hasActiveSubscription` on every render rather than only
+          at the `useState` initializer, so it stays correct even if that
+          value resolves after this screen has already mounted. */}
+      {!draft.hasActiveSubscription && showDeliveryModePopup && (
+        <DeliveryModePopup onDismiss={() => setShowDeliveryModePopup(false)} />
+      )}
     </main>
   );
 }
