@@ -85,6 +85,16 @@ interface PlanDraftContextValue {
   weekItemCount: () => number;
   weekTotalPaise: () => bigint;
   hasActiveSubscription: boolean;
+  /** True once `setItem` has been called since the draft was last seeded
+      from (or saved to) the server — i.e. there's something a "Confirm &
+      Save Plan" tap would actually change. Starts false on load and after
+      `markSaved()`, so visiting the review screen without editing anything
+      doesn't demand a save it has no effect (session 2026-09-25, user
+      report — the button was always enabled, "save" or not). */
+  isDirty: boolean;
+  /** Called after a successful save — marks the current selections as the
+      new baseline, so `isDirty` goes back to false until the next edit. */
+  markSaved: () => void;
   /** `PUT /api/meal-plan/current`'s exact body shape — built fresh from the
       current draft, so the summary screen's save mutation never has to know
       the selections' internal representation. */
@@ -97,6 +107,7 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
   const locale = useLocale();
   const [selections, setSelections] = useState<Selections>(emptySelections);
   const [seededFor, setSeededFor] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
 
   const current = useQuery({
     queryKey: ['meal-plan-current', locale],
@@ -116,6 +127,7 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
     }
     setSelections(seeded);
     setSeededFor(planKey);
+    setIsDirty(false);
   }
 
   const allColumns = useMemo<DraftColumn[]>(() => {
@@ -184,6 +196,11 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
       else delete day[productId];
       return { ...prev, [dayOfWeek]: day };
     });
+    setIsDirty(true);
+  }
+
+  function markSaved() {
+    setIsDirty(false);
   }
 
   function itemCount(dayOfWeek: number): number {
@@ -226,6 +243,8 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
     weekItemCount,
     weekTotalPaise,
     hasActiveSubscription: data?.hasActiveSubscription ?? false,
+    isDirty,
+    markSaved,
     buildSavePayload,
   };
 

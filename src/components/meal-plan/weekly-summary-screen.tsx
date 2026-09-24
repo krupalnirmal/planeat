@@ -52,6 +52,7 @@ export function WeeklySummaryScreen() {
     onSuccess: () => {
       setSaveError(null);
       setSaved(true);
+      draft.markSaved();
       void queryClient.invalidateQueries({ queryKey: ['meal-plan-current'] });
     },
     onError: (err) => setSaveError(err instanceof ApiClientError ? err.message : te('generic')),
@@ -159,7 +160,11 @@ export function WeeklySummaryScreen() {
       >
         <button
           type="button"
-          disabled={weekItems === 0 || save.isPending}
+          // `!draft.isDirty` (session 2026-09-25, user report) — nothing to
+          // save if nothing was picked/changed since the last save, so the
+          // button stops demanding a tap it has no effect. Still enabled the
+          // very first time (isDirty flips true as soon as `setItem` runs).
+          disabled={weekItems === 0 || save.isPending || !draft.isDirty}
           onClick={() => save.mutate()}
           className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
