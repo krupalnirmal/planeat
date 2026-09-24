@@ -247,7 +247,12 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
               whole grid below rather than jump-scrolling to an anchor —
               this screen shows one category at a time. */}
           <div
-            className="sticky z-10 border-b border-border bg-card px-4 py-3"
+            // `card-3d` (session 2026-09-25, user request) — same fix as
+            // the day-tabs row above it: a pure box-shadow instead of a
+            // plain 1px `border-b`, so this row visually lifts off the
+            // product grid scrolling underneath instead of reading as
+            // stuck together, without changing its height.
+            className="card-3d sticky z-10 bg-card px-4 py-3"
             style={{ top: HEADER_OFFSET_PX }}
           >
             <nav
