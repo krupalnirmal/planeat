@@ -198,7 +198,13 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
       <nav
         ref={dayTabsRef}
         aria-label={tw('daysLabel')}
-        className="sticky z-20 flex gap-2 overflow-x-auto border-b border-border bg-card px-3 py-2.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        // `card-3d` (session 2026-09-25, user request) — a pure box-shadow,
+        // so it visually lifts this row off the category row stacked
+        // underneath without changing its actual height (which the sticky
+        // `HEADER_OFFSET_PX` math below depends on staying exact). The
+        // plain 1px `border-b` alone read as the two rows "stuck together"
+        // once both were sticky against each other while scrolling.
+        className="card-3d sticky z-20 flex gap-2 overflow-x-auto bg-card px-3 py-2.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ top: PAGE_HEADER_HEIGHT_PX }}
       >
         {DAYS.map((day) => {
