@@ -4,7 +4,7 @@ import { addDays, parseDateKey, toDateKey, weekdayNumber } from '@/lib/meal-plan
 import { TEMPLATE, notifyEvent } from '@/lib/notifications/notify';
 import { SETTING_KEYS, getSettingPaise } from '@/lib/settings';
 import { InsufficientBalanceError, LEDGER_REF, debit, getBalance } from '@/lib/wallet/ledger';
-import { istDateKeyOf } from './schedule';
+import { isDeliveryDueToday, istDateKeyOf } from './schedule';
 
 /**
  * The three jobs that run around the 00:30 generation (M6, B3).
@@ -331,16 +331,23 @@ export async function getCronHealth(now: Date = new Date()): Promise<CronHealth>
   const scheduledDate = parseDateKey(targetDate);
 
   const [activeSubscriptions, ordersGenerated, paymentPending] = await Promise.all([
-    db.subscription.count({
-      where: {
-        status: 'ACTIVE',
-        startDate: { lte: scheduledDate },
-        endDate: { gte: scheduledDate },
-      },
-    }),
-    db.order.count({ where: { type: 'MEAL_PLAN_DAILY', scheduledDate } }),
+    // Fetched then filtered in JS, not counted directly — a WEEKLY
+    // subscription only counts as "active today" on its own delivery day
+    // (`isDeliveryDueToday`), otherwise a quiet off-day would read as a
+    // cron failure ("subscriptions exist, nothing generated").
+    db.subscription
+      .findMany({
+        where: {
+          status: 'ACTIVE',
+          startDate: { lte: scheduledDate },
+          endDate: { gte: scheduledDate },
+        },
+        select: { deliveryMode: true, startDate: true },
+      })
+      .then((subs) => subs.filter((s) => isDeliveryDueToday(s.deliveryMode, s.startDate, scheduledDate)).length),
+    db.order.count({ where: { type: { in: ['MEAL_PLAN_DAILY', 'MEAL_PLAN_WEEKLY'] }, scheduledDate } }),
     db.order.count({
-      where: { type: 'MEAL_PLAN_DAILY', scheduledDate, status: 'PAYMENT_PENDING' },
+      where: { type: { in: ['MEAL_PLAN_DAILY', 'MEAL_PLAN_WEEKLY'] }, scheduledDate, status: 'PAYMENT_PENDING' },
     }),
   ]);
 

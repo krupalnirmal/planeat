@@ -71,7 +71,8 @@ export type DeliveryDayStatus =
   | 'PAUSED'
   | 'SKIPPED_UNPAID'
   | 'SCHEDULED'
-  | 'OUTSIDE_PERIOD';
+  | 'OUTSIDE_PERIOD'
+  | 'NOT_A_DELIVERY_DAY';
 
 export interface ScheduleDayInput {
   dateKey: string;
@@ -102,6 +103,7 @@ export function buildSchedule(
   period: { startDateKey: string; endDateKey: string },
   now: Date,
   cutoffHour: number,
+  deliveryMode: string = 'DAILY',
 ): ScheduleDay[] {
   return days.map((day) => {
     const dayOfWeek = weekdayNumber(parseDateKey(day.dateKey));
@@ -127,6 +129,13 @@ export function buildSchedule(
             ? 'SKIPPED_UNPAID'
             : 'SKIPPED';
       return { dateKey: day.dateKey, dayOfWeek, status, canSkip: false };
+    }
+
+    // A WEEKLY subscription only ever gets a real delivery every 7th day —
+    // an in-between day with no order and no exception isn't "scheduled but
+    // not generated yet", it simply isn't a delivery day at all.
+    if (!isDeliveryDueToday(deliveryMode, parseDateKey(period.startDateKey), parseDateKey(day.dateKey))) {
+      return { dateKey: day.dateKey, dayOfWeek, status: 'NOT_A_DELIVERY_DAY', canSkip: false };
     }
 
     return {
@@ -177,4 +186,17 @@ export function remainingDays(endDateKey: string, now: Date): number {
 export function totalDays(startDateKey: string, endDateKey: string): number {
   const diffMs = parseDateKey(endDateKey).getTime() - parseDateKey(startDateKey).getTime();
   return Math.floor(diffMs / 86_400_000) + 1;
+}
+
+/**
+ * WEEKLY subscriptions only generate a delivery every 7th day, aligned to
+ * their own `startDate` — the same weekday they first subscribed on. DAILY
+ * subscriptions are always due. Shared by the 00:30 generator
+ * (`generate-orders.ts`) and the cron health check (`daily-jobs.ts`) so
+ * "is this subscription due today" is defined in exactly one place.
+ */
+export function isDeliveryDueToday(deliveryMode: string, startDate: Date, scheduledDate: Date): boolean {
+  if (deliveryMode !== 'WEEKLY') return true;
+  const diffDays = Math.round((scheduledDate.getTime() - startDate.getTime()) / 86_400_000);
+  return diffDays % 7 === 0;
 }

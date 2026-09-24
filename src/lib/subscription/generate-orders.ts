@@ -10,7 +10,7 @@ import { notifyEventNow } from '@/lib/notifications/notify-now';
 import { InsufficientBalanceError, LEDGER_REF, debit } from '@/lib/wallet/ledger';
 import type { Locale } from '@/generated/prisma/enums';
 import { findSubstitute } from './substitute';
-import { generationTargetDate } from './schedule';
+import { generationTargetDate, isDeliveryDueToday } from './schedule';
 
 /**
  * M6 — the 00:30 IST cron.
@@ -53,6 +53,48 @@ function stringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
 }
 
+const MEAL_PLAN_ITEM_SELECT = {
+  orderBy: { sortOrder: 'asc' as const },
+  select: {
+    slot: true,
+    productId: true,
+    variantId: true,
+    quantity: true,
+    product: {
+      select: {
+        id: true,
+        nameEn: true,
+        nameMr: true,
+        nameHi: true,
+        imageUrls: true,
+        tags: true,
+        category: { select: { slug: true } },
+      },
+    },
+    variant: { select: { id: true, pricePaise: true, stockQty: true, isActive: true } },
+  },
+};
+
+/** DAILY: today's single `MealPlanDay`'s items, as always. WEEKLY: every
+    day's items combined into one flat list — the caller merges repeated
+    variants into a single line with a summed quantity, so a product picked
+    on more than one day becomes "N packs" rather than N duplicate lines. */
+async function fetchDayItems(mealPlanId: string, deliveryMode: string, weekday: number) {
+  if (deliveryMode === 'WEEKLY') {
+    const days = await db.mealPlanDay.findMany({
+      where: { mealPlanId },
+      select: { items: MEAL_PLAN_ITEM_SELECT },
+    });
+    return days.flatMap((d) => d.items);
+  }
+
+  const day = await db.mealPlanDay.findUnique({
+    where: { mealPlanId_dayOfWeek: { mealPlanId, dayOfWeek: weekday } },
+    select: { items: MEAL_PLAN_ITEM_SELECT },
+  });
+  return day?.items ?? [];
+}
+
 export async function generateDailyOrders(
   input: GenerateOrdersInput = {},
 ): Promise<GenerationResult> {
@@ -86,6 +128,8 @@ export async function generateDailyOrders(
       userId: true,
       mealPlanId: true,
       deliverySlot: true,
+      deliveryMode: true,
+      startDate: true,
       assignedPartnerId: true,
       address: {
         select: {
@@ -104,9 +148,14 @@ export async function generateDailyOrders(
     },
   });
 
-  result.eligible = subscriptions.length;
+  // WEEKLY subscriptions only generate on their own delivery day (every 7th
+  // day from their startDate) — excluded from `eligible` entirely on other
+  // days, not counted as a no-op skip, so `getCronHealth` doesn't read a
+  // quiet off-day as "nobody got their order".
+  const dueToday = subscriptions.filter((sub) => isDeliveryDueToday(sub.deliveryMode, sub.startDate, scheduledDate));
+  result.eligible = dueToday.length;
 
-  for (const subscription of subscriptions) {
+  for (const subscription of dueToday) {
     try {
       const outcome = await generateForSubscription({
         subscription,
@@ -152,6 +201,7 @@ interface PerSubscriptionInput {
     userId: string;
     mealPlanId: string;
     deliverySlot: string;
+    deliveryMode: string;
     assignedPartnerId: string | null;
     address: {
       id: string;
@@ -196,34 +246,9 @@ async function generateForSubscription(
   });
   if (existing) return { kind: 'DUPLICATE' };
 
-  const day = await db.mealPlanDay.findUnique({
-    where: { mealPlanId_dayOfWeek: { mealPlanId: subscription.mealPlanId, dayOfWeek: weekday } },
-    select: {
-      items: {
-        orderBy: { sortOrder: 'asc' },
-        select: {
-          slot: true,
-          productId: true,
-          variantId: true,
-          quantity: true,
-          product: {
-            select: {
-              id: true,
-              nameEn: true,
-              nameMr: true,
-              nameHi: true,
-              imageUrls: true,
-              tags: true,
-              category: { select: { slug: true } },
-            },
-          },
-          variant: { select: { id: true, pricePaise: true, stockQty: true, isActive: true } },
-        },
-      },
-    },
-  });
+  const dayItems = await fetchDayItems(subscription.mealPlanId, subscription.deliveryMode, weekday);
 
-  if (!day || day.items.length === 0) return { kind: 'SKIPPED', reason: 'NO_TEMPLATE_DAY' };
+  if (dayItems.length === 0) return { kind: 'SKIPPED', reason: 'NO_TEMPLATE_DAY' };
 
   const profile = await db.healthProfile.findUnique({
     where: { userId: subscription.userId },
@@ -256,7 +281,7 @@ async function generateForSubscription(
   const dropped: Array<{ name: string; slot: string }> = [];
   const chosenProductIds: string[] = [];
 
-  for (const item of day.items) {
+  for (const item of dayItems) {
     // `MealPlanItem.quantity` is the variant's own weight (e.g. 500 for a
     // "500 g" pack), not an order count — same field, same meaning
     // `getPlanDayCosts` already documents (src/lib/meal-plan/queries.ts).
@@ -333,10 +358,23 @@ async function generateForSubscription(
     return { kind: 'SKIPPED', reason: 'NOTHING_IN_STOCK' };
   }
 
+  // WEEKLY mode can resolve the same variant on more than one day (e.g.
+  // Tomato picked both Monday and Wednesday) — merge those into one
+  // OrderItem line with quantity = how many days it was picked on, instead
+  // of several duplicate lines. A no-op for DAILY mode, where a variant
+  // never repeats within a single day's own picks.
+  const mergedByVariant = new Map<string, (typeof resolved)[number]>();
+  for (const item of resolved) {
+    const existing = mergedByVariant.get(item.variantId);
+    if (existing) existing.quantity += item.quantity;
+    else mergedByVariant.set(item.variantId, { ...item });
+  }
+  const merged = [...mergedByVariant.values()];
+
   // B10 — delivery is always free on meal-plan days; the ₹99 plan fee covers
   // it. B7 — the price difference from a substitution settles honestly here,
   // because the order is priced from what is actually being sent.
-  const subtotalPaise = resolved.reduce(
+  const subtotalPaise = merged.reduce(
     (sum, item) => sum + item.unitPricePaise * BigInt(item.quantity),
     0n,
   );
@@ -350,7 +388,7 @@ async function generateForSubscription(
       // Atomic conditional decrement, same pattern as instant orders. Two
       // subscriptions racing for the last kilo: exactly one wins, and the other
       // is handled as out-of-stock on the next run.
-      for (const item of resolved) {
+      for (const item of merged) {
         const updated = await tx.productVariant.updateMany({
           where: { id: item.variantId, stockQty: { gte: item.quantity } },
           data: { stockQty: { decrement: item.quantity } },
@@ -366,7 +404,7 @@ async function generateForSubscription(
           orderNumber,
           userId: subscription.userId,
           addressSnapshot: subscription.address,
-          type: 'MEAL_PLAN_DAILY',
+          type: subscription.deliveryMode === 'WEEKLY' ? 'MEAL_PLAN_WEEKLY' : 'MEAL_PLAN_DAILY',
           status: 'PLACED',
           subtotalPaise,
           deliveryFeePaise: 0n,
@@ -382,7 +420,7 @@ async function generateForSubscription(
           // R5 — the natural idempotency key for this job.
           idempotencyKey: `sub:${subscription.id}:${targetDate}`,
           items: {
-            create: resolved.map((item) => ({
+            create: merged.map((item) => ({
               id: newId(ID_PREFIX.orderItem),
               productId: item.productId,
               variantId: item.variantId,
@@ -419,7 +457,7 @@ async function generateForSubscription(
             amountPaise: subtotalPaise,
             source: 'ORDER',
             ...LEDGER_REF.order(orderId),
-            note: `Daily delivery ${targetDate}`,
+            note: subscription.deliveryMode === 'WEEKLY' ? `Weekly delivery ${targetDate}` : `Daily delivery ${targetDate}`,
           },
           tx,
         );

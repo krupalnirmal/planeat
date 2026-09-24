@@ -504,7 +504,13 @@
       "seeOptions": "See Options",
       "dairyBakeryTitle": "Daily Dairy & Bakery",
       "savingsTitle": "Your Savings",
-      "savingsHint": "Saved on your plan"
+      "savingsHint": "Saved on your plan",
+      "deliveryModeTitle": "How would you like your deliveries?",
+      "deliveryModeDaily": "Daily",
+      "deliveryModeDailyHint": "Get fresh items delivered every day",
+      "deliveryModeWeekly": "Weekly",
+      "deliveryModeWeeklyHint": "Get the whole week's items in one delivery, once a week",
+      "deliveryModeDecideLater": "I'll decide later"
     },
     "subscribe": {
       "cta": "Start my deliveries",
@@ -628,7 +634,8 @@
       "SKIPPED": "Skipped",
       "PAUSED": "Paused",
       "SKIPPED_UNPAID": "Skipped — wallet was short",
-      "OUTSIDE_PERIOD": "Outside your plan"
+      "OUTSIDE_PERIOD": "Outside your plan",
+      "NOT_A_DELIVERY_DAY": "No delivery this day — weekly plan"
     }
   },
   "approval": {

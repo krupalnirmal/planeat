@@ -110,7 +110,7 @@ export async function getWeekSchedule(
 ): Promise<WeekView | null> {
   const subscription = await db.subscription.findUnique({
     where: { id: subscriptionId },
-    select: { id: true, userId: true, startDate: true, endDate: true },
+    select: { id: true, userId: true, startDate: true, endDate: true, deliveryMode: true },
   });
 
   // R9 — ownership is checked here, not by trusting the id.
@@ -169,6 +169,7 @@ export async function getWeekSchedule(
     },
     now,
     cutoffHour,
+    subscription.deliveryMode,
   );
 
   return {

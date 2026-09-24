@@ -80,6 +80,9 @@ export interface ActivateInput {
   addressId: string;
   durationDays: number;
   startDateKey: string;
+  /** DAILY (default): one delivery every day. WEEKLY: all 7 days' picks
+      combined into one delivery, recurring every 7 days. */
+  deliveryMode?: 'DAILY' | 'WEEKLY';
 }
 
 export type ActivateResult =
@@ -150,6 +153,7 @@ export async function activateSubscription(userId: string, input: ActivateInput)
             mealPlanId: plan.id,
             addressId: input.addressId,
             deliverySlot: 'SUBSCRIPTION_0630_0900',
+            deliveryMode: input.deliveryMode ?? 'DAILY',
             startDate,
             endDate,
             status: 'ACTIVE',

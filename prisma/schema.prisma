@@ -54,6 +54,19 @@ enum UnitType {
 enum OrderType {
   INSTANT
   MEAL_PLAN_DAILY
+  MEAL_PLAN_WEEKLY
+}
+
+/// DAILY (default): the 00:30 cron generates one order per day from that
+/// day's MealPlanDay picks, as it always has. WEEKLY: the same cron only
+/// generates one order every 7 days (aligned to the subscription's own
+/// startDate), combining all 7 MealPlanDay's items into that single order
+/// — a repeated product/variant across days becomes one OrderItem line
+/// with quantity = the number of days it was picked on, not several
+/// duplicate lines.
+enum DeliveryMode {
+  DAILY
+  WEEKLY
 }
 
 enum OrderStatus {
@@ -800,6 +813,7 @@ model Subscription {
   mealPlanId        String
   addressId         String
   deliverySlot      DeliverySlot       @default(SUBSCRIPTION_0630_0900)
+  deliveryMode      DeliveryMode       @default(DAILY)
   startDate         DateTime           @db.Date
   endDate           DateTime           @db.Date
   status            SubscriptionStatus @default(ACTIVE)

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { setRequestLocale } from 'next-intl/server';
 import { SubscribeScreen } from '@/components/meal-plan/subscribe-screen';
 
@@ -10,5 +11,12 @@ export default async function MealPlanSubscribePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <SubscribeScreen />;
+  // `Suspense` (session 2026-09-25) — `SubscribeScreen` now reads the
+  // `?mode=` query param via `useSearchParams`, which Next.js requires a
+  // Suspense boundary for.
+  return (
+    <Suspense fallback={null}>
+      <SubscribeScreen />
+    </Suspense>
+  );
 }

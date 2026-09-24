@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Leaf,
   List,
+  Package,
   PartyPopper,
   Save,
   ShoppingBasket,
@@ -232,6 +233,12 @@ function DayRow({ dayOfWeek }: { dayOfWeek: number }) {
 function SavedScreen({ daysCount }: { daysCount: number }) {
   const tw = useTranslations('mealPlan.wizard');
   const draft = usePlanDraft();
+  // Shown once, right after a real save (session 2026-09-25, user request)
+  // — asks Daily vs Weekly delivery before the customer moves on, since
+  // this is the moment they've just confirmed what they want delivered.
+  // Dismissable: the choice isn't forced, and it's asked again (still
+  // changeable) on the actual Subscribe screen either way.
+  const [showDeliveryModePopup, setShowDeliveryModePopup] = useState(true);
 
   return (
     <main className="flex min-h-[80vh] flex-col items-center justify-center gap-4 px-6 text-center">
@@ -260,7 +267,59 @@ function SavedScreen({ daysCount }: { daysCount: number }) {
         <ShoppingBasket className="size-4" aria-hidden />
         {tw('continueShopping')}
       </Link>
+
+      {showDeliveryModePopup && <DeliveryModePopup onDismiss={() => setShowDeliveryModePopup(false)} />}
     </main>
+  );
+}
+
+function DeliveryModePopup({ onDismiss }: { onDismiss: () => void }) {
+  const tw = useTranslations('mealPlan.wizard');
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center">
+      <div className="w-full max-w-[420px] rounded-t-[calc(var(--radius)*1.6)] bg-background p-4 text-left sm:rounded-[calc(var(--radius)*1.6)]">
+        <h2 className="text-center text-base font-black">{tw('deliveryModeTitle')}</h2>
+
+        <div className="mt-4 space-y-2.5">
+          <Link
+            href="/meal-plan/subscribe?mode=daily"
+            className="flex items-center gap-3 rounded-[var(--radius)] border-2 border-border bg-card p-3.5 transition-colors active:border-primary active:bg-tint-green"
+          >
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
+              <CalendarDays className="size-5" aria-hidden />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-bold">{tw('deliveryModeDaily')}</span>
+              <span className="block text-xs text-muted-foreground">{tw('deliveryModeDailyHint')}</span>
+            </span>
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+          </Link>
+
+          <Link
+            href="/meal-plan/subscribe?mode=weekly"
+            className="flex items-center gap-3 rounded-[var(--radius)] border-2 border-border bg-card p-3.5 transition-colors active:border-primary active:bg-tint-green"
+          >
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
+              <Package className="size-5" aria-hidden />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-bold">{tw('deliveryModeWeekly')}</span>
+              <span className="block text-xs text-muted-foreground">{tw('deliveryModeWeeklyHint')}</span>
+            </span>
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+          </Link>
+        </div>
+
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="mt-3 flex h-10 w-full items-center justify-center text-xs font-semibold text-muted-foreground"
+        >
+          {tw('deliveryModeDecideLater')}
+        </button>
+      </div>
+    </div>
   );
 }
 

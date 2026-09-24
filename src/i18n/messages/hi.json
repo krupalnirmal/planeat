@@ -504,7 +504,13 @@
       "seeOptions": "विकल्प देखें",
       "dairyBakeryTitle": "रोज़ का दूध व बेकरी",
       "savingsTitle": "आपकी बचत",
-      "savingsHint": "आपके प्लान पर बचत"
+      "savingsHint": "आपके प्लान पर बचत",
+      "deliveryModeTitle": "आपको डिलीवरी कैसी चाहिए?",
+      "deliveryModeDaily": "रोज़",
+      "deliveryModeDailyHint": "ताज़ा सामान हर रोज़ डिलीवर होगा",
+      "deliveryModeWeekly": "हफ्ते में एक बार",
+      "deliveryModeWeeklyHint": "पूरे हफ्ते का सामान एक ही डिलीवरी में, हफ्ते में एक बार",
+      "deliveryModeDecideLater": "बाद में तय करूंगा"
     },
     "subscribe": {
       "cta": "मेरी डिलीवरी शुरू करें",
@@ -628,7 +634,8 @@
       "SKIPPED": "छोड़ा",
       "PAUSED": "रोका",
       "SKIPPED_UNPAID": "भुगतान न होने से छोड़ा",
-      "OUTSIDE_PERIOD": "प्लान के बाहर"
+      "OUTSIDE_PERIOD": "प्लान के बाहर",
+      "NOT_A_DELIVERY_DAY": "आज डिलीवरी नहीं — साप्ताहिक प्लान"
     }
   },
   "approval": {

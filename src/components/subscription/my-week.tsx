@@ -31,7 +31,8 @@ export type DayStatus =
   | 'SKIPPED'
   | 'PAUSED'
   | 'SKIPPED_UNPAID'
-  | 'OUTSIDE_PERIOD';
+  | 'OUTSIDE_PERIOD'
+  | 'NOT_A_DELIVERY_DAY';
 
 export interface WeekDay {
   dateKey: string;
@@ -63,6 +64,7 @@ const TONE: Record<DayStatus, string> = {
   PAUSED: 'bg-secondary text-muted-foreground',
   SKIPPED_UNPAID: 'bg-[#FDF3E3] text-warning',
   OUTSIDE_PERIOD: 'bg-secondary text-muted-foreground',
+  NOT_A_DELIVERY_DAY: 'bg-secondary text-muted-foreground',
 };
 
 export function MyWeek({

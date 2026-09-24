@@ -38,6 +38,7 @@ const activateSchema = z.object({
   addressId: cuidSchema,
   durationDays: z.coerce.number().int().refine((n) => (DURATION_OPTIONS as readonly number[]).includes(n)),
   startDate: z.iso.date(),
+  deliveryMode: z.enum(['DAILY', 'WEEKLY']).default('DAILY'),
 });
 
 /**
@@ -53,6 +54,7 @@ export const POST = route(async (request: Request) => {
     addressId: input.addressId,
     durationDays: input.durationDays,
     startDateKey: input.startDate,
+    deliveryMode: input.deliveryMode,
   });
 
   if (result.ok) {

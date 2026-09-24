@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  CalendarDays,
   Check,
   CheckCircle2,
   ChevronRight,
@@ -9,12 +10,14 @@ import {
   Landmark,
   Loader2,
   MapPin,
+  Package,
   PartyPopper,
   ShieldCheck,
   Smartphone,
   Wallet,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { PageHeader } from '@/components/shop/page-header';
@@ -102,9 +105,16 @@ export function SubscribeScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { user, isLoggedIn, isLoading: sessionLoading, defaultAddress } = useSession();
+  const searchParams = useSearchParams();
 
   const [step, setStep] = useState<Step>('duration');
   const [durationDays, setDurationDays] = useState<(typeof DURATION_OPTIONS)[number]>(7);
+  // Pre-set from the Plan-Saved popup's `?mode=` link (session 2026-09-25,
+  // user request) — still changeable here, on the same step where duration
+  // is picked.
+  const [deliveryMode, setDeliveryMode] = useState<'DAILY' | 'WEEKLY'>(
+    searchParams.get('mode') === 'weekly' ? 'WEEKLY' : 'DAILY',
+  );
   const [addressId, setAddressId] = useState<string | null>(defaultAddress?.id ?? null);
   const [addressExpanded, setAddressExpanded] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -146,6 +156,7 @@ export function SubscribeScreen() {
         addressId: resolvedAddressId,
         durationDays,
         startDate: startDateKey,
+        deliveryMode,
       }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['meal-plan-current'] });
@@ -291,6 +302,8 @@ export function SubscribeScreen() {
             q={q}
             durationDays={durationDays}
             setDurationDays={setDurationDays}
+            deliveryMode={deliveryMode}
+            setDeliveryMode={setDeliveryMode}
             onContinue={() => setStep('summary')}
           />
         )}
@@ -415,17 +428,52 @@ function DurationStep({
   q,
   durationDays,
   setDurationDays,
+  deliveryMode,
+  setDeliveryMode,
   onContinue,
 }: {
   q: QuoteResponse['quote'] | undefined;
   durationDays: (typeof DURATION_OPTIONS)[number];
   setDurationDays: (d: (typeof DURATION_OPTIONS)[number]) => void;
+  deliveryMode: 'DAILY' | 'WEEKLY';
+  setDeliveryMode: (m: 'DAILY' | 'WEEKLY') => void;
   onContinue: () => void;
 }) {
   const t = useTranslations('mealPlan.subscribe');
+  const tw = useTranslations('mealPlan.wizard');
 
   return (
     <div className="space-y-3 px-4 pt-3">
+      <p className="text-sm font-bold">{tw('deliveryModeTitle')}</p>
+      <div className="grid grid-cols-2 gap-2.5">
+        {(
+          [
+            { mode: 'DAILY' as const, icon: CalendarDays, label: tw('deliveryModeDaily') },
+            { mode: 'WEEKLY' as const, icon: Package, label: tw('deliveryModeWeekly') },
+          ]
+        ).map(({ mode, icon: Icon, label }) => {
+          const active = deliveryMode === mode;
+          return (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setDeliveryMode(mode)}
+              aria-pressed={active}
+              className={cn(
+                'flex flex-col items-center gap-1.5 rounded-[var(--radius-2xl)] border-2 p-3.5 text-center',
+                active ? 'border-primary bg-tint-green' : 'border-border bg-card',
+              )}
+            >
+              <Icon className={cn('size-5 shrink-0', active ? 'text-primary' : 'text-muted-foreground')} aria-hidden />
+              <span className="text-sm font-bold">{label}</span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-xs text-muted-foreground">
+        {deliveryMode === 'WEEKLY' ? tw('deliveryModeWeeklyHint') : tw('deliveryModeDailyHint')}
+      </p>
+
       {DURATION_OPTIONS.map((days) => {
         const active = durationDays === days;
         const estimatedTotal = q ? paise(q.averageDailyPaise) * BigInt(days) : 0n;
