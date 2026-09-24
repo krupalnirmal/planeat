@@ -249,7 +249,6 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
               className="flex gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               {columns.map((column) => {
-                const Icon = CATEGORY_ICONS[column.slug] ?? Leaf;
                 const style = CATEGORY_CHIP_STYLE[column.slug] ?? DEFAULT_CHIP_STYLE;
                 const active = (activeColumn?.slug ?? columns[0]?.slug) === column.slug;
                 return (
@@ -258,22 +257,16 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
                     type="button"
                     onClick={() => setActiveSlug(column.slug)}
                     aria-current={active}
-                    // Wider pastel-tinted card, bigger un-badged icon
-                    // (session 2026-09-23, client reference screenshot) —
-                    // was a narrow plain-bordered chip with a small
-                    // muted-grey icon; the reference gives every category
-                    // its own background tint and a full-colour icon, with
-                    // a green ring marking the active one.
+                    // Name only, no icon (session 2026-09-25, user request)
+                    // — pastel-tinted pill sized to its own text instead of
+                    // the earlier fixed-width icon-over-label card.
                     className={cn(
-                      'flex w-[84px] shrink-0 flex-col items-center gap-1.5 rounded-2xl border-2 px-2 py-3 text-center transition-colors',
+                      'shrink-0 rounded-2xl border-2 px-3.5 py-2.5 text-center text-[11.5px] font-bold whitespace-nowrap text-foreground transition-colors',
                       active ? 'border-primary' : 'border-transparent',
                     )}
                     style={{ backgroundColor: style.bg }}
                   >
-                    <Icon className="size-6 shrink-0" style={{ color: style.icon }} aria-hidden />
-                    <span className="line-clamp-2 text-[10.5px] leading-tight font-bold text-foreground">
-                      {categoryLabel(column)}
-                    </span>
+                    {categoryLabel(column)}
                   </button>
                 );
               })}
