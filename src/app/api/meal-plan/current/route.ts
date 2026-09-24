@@ -26,10 +26,12 @@ export const GET = route(async (request: Request) => {
     getCustomerPlan(session.userId, locale),
     getPlanColumns(locale),
     // Cheap existence check — drives the meal-plan screen's "Start my
-    // deliveries" CTA (hidden once one is already running).
+    // deliveries" CTA (hidden once one is already running), and now also
+    // the "Daily"/"Weekly" tag on that same screen (session 2026-09-25,
+    // user request — "I should be able to see which plan is running").
     db.subscription.findFirst({
       where: { userId: session.userId, status: { in: ['ACTIVE', 'PAUSED'] } },
-      select: { id: true },
+      select: { id: true, deliveryMode: true },
     }),
   ]);
 
@@ -40,6 +42,7 @@ export const GET = route(async (request: Request) => {
     sprouts,
     choppedVegetables,
     hasActiveSubscription: activeSubscription !== null,
+    activeDeliveryMode: activeSubscription?.deliveryMode ?? null,
     // The home screen's "Your Savings" card — real, computed from the
     // saved plan's own MRP-vs-price gap, never a decorative number.
     weeklySavingsPaise: plan ? weeklySavingsPaise(plan).toString() : '0',

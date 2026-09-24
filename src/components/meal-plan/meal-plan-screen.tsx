@@ -54,6 +54,11 @@ const SAVINGS_ICON =
 interface PlanSummary {
   plan: { days: Array<{ items: unknown[] }> } | null;
   hasActiveSubscription: boolean;
+  /** Null when there's no active subscription; otherwise the mode the
+      running subscription was set up with — shown as a tag next to
+      "View My Subscription" (session 2026-09-25, user request — "I should
+      be able to see which plan is running"). */
+  activeDeliveryMode: 'DAILY' | 'WEEKLY' | null;
   weeklySavingsPaise: string;
   columns: Array<{ slug: string; iconUrl: string | null }>;
 }
@@ -207,6 +212,11 @@ export function MealPlanScreen() {
             <span className="flex items-center gap-2">
               <Truck className="size-4 shrink-0" aria-hidden />
               {t('wizard.viewSubscription')}
+              {data.activeDeliveryMode && (
+                <span className="rounded-full bg-primary-dark px-2 py-0.5 text-[10px] font-bold text-white">
+                  {data.activeDeliveryMode === 'WEEKLY' ? t('wizard.deliveryModeWeekly') : t('wizard.deliveryModeDaily')}
+                </span>
+              )}
             </span>
             <ChevronRight className="size-4 shrink-0" aria-hidden />
           </Link>
