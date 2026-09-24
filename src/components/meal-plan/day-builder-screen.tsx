@@ -12,9 +12,7 @@ import {
   Milk,
   Plus,
   Salad,
-  Search,
   ShoppingBasket,
-  SlidersHorizontal,
   Sprout,
   Trash2,
   Weight,
@@ -96,7 +94,6 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
   const draft = usePlanDraft();
 
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
   const [picker, setPicker] = useState<DraftProduct | null>(null);
   const [showSummary, setShowSummary] = useState(false);
 
@@ -151,7 +148,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
   // "unselected" each keeps the catalogue's own order rather than being
   // reshuffled every render.
   const filteredProducts = (activeColumn?.products ?? [])
-    .filter((product) => product.name.toLowerCase().includes(search.trim().toLowerCase()))
+    .slice()
     .sort((a, b) => Number(!daySelections[a.id]) - Number(!daySelections[b.id]));
 
   function categoryLabel(column: DraftColumn) {
@@ -216,23 +213,30 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
                 if (day !== dayOfWeek) router.push(`/meal-plan/build/${day}`);
               }}
               aria-current={active}
-              // Rounded pill, day abbreviation over day-number-plus-leaf
-              // (session 2026-09-23, client reference screenshot) — was a
-              // single-line "Mon"/"Tue" pill; the reference stacks the
-              // short name over the day's own number with a small leaf
-              // mark next to it. The real per-day item count (not shown in
-              // the reference's own static mockup) stays as a badge in the
-              // corner rather than being dropped — it's real state the
-              // customer benefits from seeing at a glance.
+              // Day name over item count over a leaf-in-circle badge
+              // (session 2026-09-25, client reference screenshot) — was a
+              // day-number-plus-inline-leaf row; the reference shows the
+              // real item count as text instead of the day's own number,
+              // with the leaf mark moved into its own circular badge below
+              // rather than sitting inline next to it. The corner count
+              // badge stays too, matching the reference's own small
+              // top-right number.
               className={cn(
-                'relative flex shrink-0 flex-col items-center gap-0.5 rounded-2xl px-3.5 py-2 text-center transition-colors',
+                'relative flex shrink-0 flex-col items-center gap-1 rounded-2xl px-3 py-2.5 text-center transition-colors',
                 active ? 'bg-primary text-primary-foreground' : 'bg-tint-green text-primary-dark',
               )}
             >
               <span className="text-xs font-bold">{t(`daysShort.${day}`)}</span>
-              <span className="flex items-center gap-0.5 text-sm font-black">
-                {day}
-                <Leaf className={cn('size-3 shrink-0', active ? 'text-white' : 'text-primary')} aria-hidden />
+              <span className="text-[10px] font-semibold whitespace-nowrap opacity-80">
+                {tw('itemCount', { count })}
+              </span>
+              <span
+                className={cn(
+                  'grid size-6 shrink-0 place-items-center rounded-full',
+                  active ? 'bg-white/25' : 'bg-card',
+                )}
+              >
+                <Leaf className={cn('size-3.5 shrink-0', active ? 'text-white' : 'text-primary')} aria-hidden />
               </span>
               {count > 0 && (
                 <span
@@ -257,34 +261,16 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
         />
       ) : (
         <main className="pb-28 lg:mx-auto lg:max-w-2xl">
-          {/* ── Search + category row, stacked and sticky under the day
-              tabs (session 2026-09-20, client reference mockup) — replaces
-              the earlier vertical left rail (session 2026-09-17's own
-              design) with a single full-width column: a search bar, then a
-              horizontally-scrollable row of icon-top/label-below chips,
-              exactly like the reference. Selecting a chip still swaps the
+          {/* ── Category row, sticky under the day tabs (session 2026-09-20,
+              client reference mockup; search bar dropped session 2026-09-25,
+              user request) — a horizontally-scrollable row of
+              icon-top/label-below chips. Selecting a chip still swaps the
               whole grid below rather than jump-scrolling to an anchor —
               this screen shows one category at a time. */}
           <div
-            className="sticky z-10 space-y-2.5 border-b border-border bg-card px-4 py-3"
+            className="sticky z-10 border-b border-border bg-card px-4 py-3"
             style={{ top: HEADER_OFFSET_PX }}
           >
-            <div className="flex items-center gap-2 rounded-[var(--radius)] border border-border bg-background px-3 py-2.5">
-              <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder={tw('searchPlaceholder', { category: activeColumn ? categoryLabel(activeColumn) : '' })}
-                className="w-full bg-transparent text-sm outline-none"
-              />
-              {/* Decorative, matching the reference's filter affordance —
-                  not a real control since there's nothing to filter by yet
-                  (same "look, don't fake a handler" call as the ADD pill in
-                  `PlanProductCard` below). */}
-              <span aria-hidden className="h-4 w-px shrink-0 bg-border" />
-              <SlidersHorizontal className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-            </div>
-
             <nav
               aria-label={tw('categoriesLabel')}
               className="flex gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -297,10 +283,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
                   <button
                     key={column.slug}
                     type="button"
-                    onClick={() => {
-                      setActiveSlug(column.slug);
-                      setSearch('');
-                    }}
+                    onClick={() => setActiveSlug(column.slug)}
                     aria-current={active}
                     // Wider pastel-tinted card, bigger un-badged icon
                     // (session 2026-09-23, client reference screenshot) —
