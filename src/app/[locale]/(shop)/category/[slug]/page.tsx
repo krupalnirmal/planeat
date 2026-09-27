@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { CategoryHeader } from '@/components/shop/category-header';
 import { CategoryProductList, type CategoryProduct } from '@/components/shop/category-product-list';
-import { getCategoryProducts } from '@/lib/catalog/queries';
+import { CategoryStrip } from '@/components/shop/category-strip';
+import { getCategories, getCategoryProducts } from '@/lib/catalog/queries';
 import type { AppLocale } from '@/i18n/routing';
 
 /** Category listing (M2). Server-rendered, cached for a minute. */
@@ -26,10 +27,13 @@ export default async function CategoryPage({
 
   const page = Math.max(1, Number(pageParam ?? '1') || 1);
 
-  const result = await getCategoryProducts(slug, locale as AppLocale, {
-    skip: (page - 1) * PER_PAGE,
-    take: PER_PAGE,
-  }).catch(() => null);
+  const [result, categories] = await Promise.all([
+    getCategoryProducts(slug, locale as AppLocale, {
+      skip: (page - 1) * PER_PAGE,
+      take: PER_PAGE,
+    }).catch(() => null),
+    getCategories(locale as AppLocale),
+  ]);
 
   if (!result) notFound();
 
@@ -67,6 +71,11 @@ export default async function CategoryPage({
           heading sitting directly on the background is what made these read
           as scattered rather than as one list. */}
       <main className="space-y-2 pb-2">
+        {/* Lets a shopper jump straight to another category without tapping
+            back to the home screen first (session 2026-09-27, owner
+            request). */}
+        <CategoryStrip categories={categories} activeSlug={slug} />
+
         <CategoryProductList
           products={products}
           slug={slug}

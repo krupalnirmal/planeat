@@ -24,7 +24,10 @@ import { Link } from '@/i18n/navigation';
  * tracks to match (`repeat(auto-fill,180px)` at `lg:`).
  */
 
-const CATEGORY_STYLE: Record<string, { bg: string; icon: string; Icon: typeof Leaf }> = {
+// Exported for `category-strip.tsx` (session 2026-09-27) — the same
+// per-category colour/icon so a category's own icon reads the same on the
+// home page's collage tile and the category page's own selector strip.
+export const CATEGORY_STYLE: Record<string, { bg: string; icon: string; Icon: typeof Leaf }> = {
   vegetables: { bg: '#E8F5EA', icon: '#2fa355', Icon: Leaf },
   fruits: { bg: '#FDF1DE', icon: '#c97a17', Icon: Apple },
   dairy: { bg: '#EAF2FE', icon: '#2a78d6', Icon: Milk },
@@ -32,7 +35,7 @@ const CATEGORY_STYLE: Record<string, { bg: string; icon: string; Icon: typeof Le
   aata: { bg: '#F1EEFC', icon: '#4a3aa7', Icon: Wheat },
   masala: { bg: '#FDEEE3', icon: '#eb6834', Icon: Flame },
 };
-const DEFAULT_STYLE = { bg: '#E8F5EA', icon: '#2fa355', Icon: Leaf };
+export const CATEGORY_DEFAULT_STYLE = { bg: '#E8F5EA', icon: '#2fa355', Icon: Leaf };
 
 export function CategoryCollageTile({
   slug,
@@ -43,7 +46,7 @@ export function CategoryCollageTile({
   name: string;
   images: string[];
 }) {
-  const style = CATEGORY_STYLE[slug] ?? DEFAULT_STYLE;
+  const style = CATEGORY_STYLE[slug] ?? CATEGORY_DEFAULT_STYLE;
   const Icon = style.Icon;
 
   return (
