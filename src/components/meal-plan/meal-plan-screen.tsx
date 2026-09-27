@@ -1,11 +1,12 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ChevronRight, Salad, ShoppingBasket, Truck } from 'lucide-react';
+import { CalendarDays, ChevronRight, Package, Salad, ShoppingBasket, Truck } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { AppHeader } from '@/components/shop/app-header';
 import { LoginPrompt } from '@/components/shop/login-prompt';
 import { Link } from '@/i18n/navigation';
+import { useDeliveryModePreference } from '@/hooks/use-delivery-mode-preference';
 import { useSession } from '@/hooks/use-session';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
@@ -67,6 +68,7 @@ export function MealPlanScreen() {
   const t = useTranslations('mealPlan');
   const locale = useLocale();
   const { isLoggedIn, isLoading: sessionLoading } = useSession();
+  const [deliveryModePreference, setDeliveryModePreference] = useDeliveryModePreference();
 
   const current = useQuery({
     queryKey: ['meal-plan-current', locale],
@@ -114,6 +116,18 @@ export function MealPlanScreen() {
           screenshot for this wizard (home, week view, day view) shows this
           same header at the very top, not a per-screen substitute. */}
       <AppHeader />
+      {/* Asked once, mandatorily, the first time this screen loads (session
+          2026-09-27, user request) — no "decide later" here, unlike the
+          same question asked again (skippable) on the Plan-Saved screen
+          after a real save. Skipped once a real subscription already has
+          its own real mode (`activeDeliveryMode`) — asking again then would
+          just be confusing, not useful. Picking an option here only saves
+          the on-device preference and closes the popup; it does not create
+          a subscription or navigate anywhere, since there's no saved plan
+          to subscribe yet at this point in the flow. */}
+      {!data?.hasActiveSubscription && !deliveryModePreference && (
+        <MandatoryDeliveryModePopup onSelect={setDeliveryModePreference} />
+      )}
       <main className="pb-6 lg:mx-auto lg:max-w-2xl">
       <div className="px-4 pt-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -224,6 +238,54 @@ export function MealPlanScreen() {
       </div>
       </main>
     </>
+  );
+}
+
+function MandatoryDeliveryModePopup({
+  onSelect,
+}: {
+  onSelect: (mode: 'DAILY' | 'WEEKLY') => void;
+}) {
+  const tw = useTranslations('mealPlan.wizard');
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-[420px] rounded-[calc(var(--radius)*1.6)] bg-background p-5">
+        <h2 className="text-center text-base font-black">{tw('deliveryModeTitle')}</h2>
+
+        <div className="mt-4 space-y-2.5">
+          <button
+            type="button"
+            onClick={() => onSelect('DAILY')}
+            className="flex w-full items-center gap-3 rounded-[var(--radius)] border-2 border-border bg-card p-3.5 text-left transition-colors active:border-primary active:bg-tint-green"
+          >
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
+              <CalendarDays className="size-5" aria-hidden />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-bold">{tw('deliveryModeDaily')}</span>
+              <span className="block text-xs text-muted-foreground">{tw('deliveryModeDailyHint')}</span>
+            </span>
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onSelect('WEEKLY')}
+            className="flex w-full items-center gap-3 rounded-[var(--radius)] border-2 border-border bg-card p-3.5 text-left transition-colors active:border-primary active:bg-tint-green"
+          >
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
+              <Package className="size-5" aria-hidden />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-bold">{tw('deliveryModeWeekly')}</span>
+              <span className="block text-xs text-muted-foreground">{tw('deliveryModeWeeklyHint')}</span>
+            </span>
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
