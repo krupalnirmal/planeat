@@ -132,7 +132,7 @@ export function MealPlanScreen() {
 
       <div className="space-y-3 px-4 pt-4">
         <Link
-          href={hasSavedItems ? '/meal-plan/build/summary' : '/meal-plan/build'}
+          href="/meal-plan/build/summary"
           className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground"
         >
           <ShoppingBasket className="size-4" aria-hidden />
@@ -149,7 +149,7 @@ export function MealPlanScreen() {
           chevron button, matching the reference. */}
       <div className="grid grid-cols-3 gap-2.5 px-4 pt-4">
         <Link
-          href="/meal-plan/build"
+          href="/meal-plan/build/summary"
           className="card-3d flex flex-col items-center gap-2 rounded-2xl bg-card p-2.5 text-center"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}

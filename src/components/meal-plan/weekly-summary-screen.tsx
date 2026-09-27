@@ -24,13 +24,18 @@ import { DAY_STYLE } from './day-style';
 import { MealPlanHero } from './meal-plan-hero';
 import { DAYS, usePlanDraft } from './plan-draft-context';
 
-/** Wizard screens 9–10: the weekly review, then the real save (the only
+/** Now also the wizard's entry point (session 2026-09-27, user report — the
+    old standalone `DayListScreen`, `/meal-plan/build`, showed the same
+    day-tile grid this screen does and confused users seeing "View Plan"
+    twice for what looked like one screen; that route now just redirects
+    here). Back here goes to `/meal-plan` (home), not the old day-list route.
+    Wizard screens 9–10: the weekly review, then the real save (the only
     point in the whole wizard that actually writes to the server), then a
     success confirmation.
-    Restyled (session 2026-09-23, client reference screenshot) — the same
-    green hero header as the day-list screen, colour-badged day tiles
-    reusing that screen's own `DAY_STYLE` palette, and an illustrated
-    total-cost strip + save button, matching the reference's warmer look. */
+    Restyled (session 2026-09-23, client reference screenshot) — a green
+    hero header, colour-badged day tiles keyed off `DAY_STYLE`, and an
+    illustrated total-cost strip + save button, matching the reference's
+    warmer look. */
 export function WeeklySummaryScreen() {
   const t = useTranslations('mealPlan');
   const tw = useTranslations('mealPlan.wizard');
@@ -62,7 +67,7 @@ export function WeeklySummaryScreen() {
     return (
       <>
         <AppHeader />
-        <PageHeader title={t('title')} backHref="/meal-plan/build" backLabel={tc('back')} />
+        <PageHeader title={t('title')} backHref="/meal-plan" backLabel={tc('back')} />
         <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>
       </>
     );
@@ -83,7 +88,7 @@ export function WeeklySummaryScreen() {
   return (
     <>
       <AppHeader />
-      <MealPlanHero title={t('title')} subtitle={tw('summaryHeroSubtitle')} backHref="/meal-plan/build" />
+      <MealPlanHero title={t('title')} subtitle={tw('summaryHeroSubtitle')} backHref="/meal-plan" />
       <main className="space-y-4 p-4 pb-28 lg:mx-auto lg:max-w-2xl">
         <div className="flex rounded-[var(--radius)] border border-border bg-card p-1">
           <button

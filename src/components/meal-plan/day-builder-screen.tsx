@@ -134,7 +134,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
     return (
       <>
         <AppHeader sticky={false} />
-        <PageHeader title={t(`days.${dayOfWeek}`)} backHref="/meal-plan/build" backLabel={tc('back')} />
+        <PageHeader title={t(`days.${dayOfWeek}`)} backHref="/meal-plan/build/summary" backLabel={tc('back')} />
         <main className="px-4 py-8 text-sm text-muted-foreground">{tc('loading')}</main>
       </>
     );
@@ -176,7 +176,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
       <PageHeader
         title={t(`days.${dayOfWeek}`)}
         subtitle={showSummary ? tw('reviewHint') : tw('addItemsHint')}
-        backHref={showSummary ? undefined : '/meal-plan/build'}
+        backHref={showSummary ? undefined : '/meal-plan/build/summary'}
         backLabel={tc('back')}
         trailing={
           <span className="flex items-center gap-1.5 rounded-full bg-tint-green px-2.5 py-1 text-xs font-bold text-primary">
@@ -342,7 +342,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
         >
           <button
             type="button"
-            onClick={() => router.push('/meal-plan/build')}
+            onClick={() => router.push('/meal-plan/build/summary')}
             className="flex h-12 max-w-full items-center justify-center rounded-full bg-accent px-6 text-sm font-bold text-accent-foreground"
           >
             <span className="truncate">{tw('saveForDay', { day: t(`days.${dayOfWeek}`) })}</span>

@@ -3,12 +3,13 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 
 /**
- * The green-tinted hero header shared by the meal-plan wizard's day-list
- * and weekly-summary screens (session 2026-09-23, client reference
- * screenshots for both) — a back link, a leaf-mark icon, a title/subtitle
- * pair, and a decorative handwritten-style tagline + real hero photo on
- * wider screens. Pulled out once both screens needed the identical
- * treatment rather than duplicating the same ~40 lines twice.
+ * The green-tinted hero header used by the meal-plan wizard's weekly-summary
+ * screen (session 2026-09-23, client reference screenshot; the old day-list
+ * screen shared this component too before it was dropped, session
+ * 2026-09-27) — a back link, a leaf-mark icon, a title/subtitle pair, and a
+ * decorative handwritten-style tagline + real hero photo on wider screens.
+ * Kept as its own component rather than inlined, in case a future wizard
+ * screen needs the identical treatment again.
  */
 
 // The client's own real hero photo, already cropped for this wizard's
