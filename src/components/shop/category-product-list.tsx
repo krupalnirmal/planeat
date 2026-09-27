@@ -8,6 +8,7 @@ import { SUBGROUP_TILE_IMAGES } from '@/lib/catalog/subgroup-tile-images';
 import { CATEGORY_SUBGROUPS, vegetableTypeLabel } from '@/lib/catalog/vegetable-types';
 import type { AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
+import { CATEGORY_DEFAULT_STYLE, CATEGORY_STYLE } from './category-collage-tile';
 import { ProductCard, type ProductCardData } from './product-card';
 import type { ProductRowVariant } from './product-row';
 
@@ -169,6 +170,8 @@ export function CategoryProductList({
   const [expandedTypes, setExpandedTypes] = useState<Set<string>>(() => new Set());
 
   const otherCategories = categories.filter((c) => c.slug !== slug);
+  const titleStyle = CATEGORY_STYLE[slug] ?? CATEGORY_DEFAULT_STYLE;
+  const TitleIcon = titleStyle.Icon;
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
@@ -387,8 +390,15 @@ export function CategoryProductList({
           key={categoryName}
           onClick={() => setCategoryPickerOpen((v) => !v)}
           aria-expanded={categoryPickerOpen}
-          className="animate-in fade-in slide-in-from-top-1 flex w-full items-center gap-1 px-4 pt-4 pb-3 text-left text-xl leading-tight font-black text-foreground duration-300"
+          className="animate-in fade-in slide-in-from-top-1 flex w-full items-center gap-2 px-4 pt-4 pb-3 text-left text-xl leading-tight font-black text-foreground duration-300"
         >
+          <span
+            className="grid size-8 shrink-0 place-items-center rounded-full"
+            style={{ backgroundColor: titleStyle.bg }}
+            aria-hidden
+          >
+            <TitleIcon className="size-4" style={{ color: titleStyle.icon }} aria-hidden />
+          </span>
           {categoryName}
           <ChevronDown
             className={cn('size-5 shrink-0 transition-transform', categoryPickerOpen && 'rotate-180')}
