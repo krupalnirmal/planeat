@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { AppHeader } from '@/components/shop/app-header';
 import { CategoryCollageTile } from '@/components/shop/category-collage-tile';
+import { HeroCarousel, type HeroSlide } from '@/components/shop/hero-carousel';
 import { HomeSection } from '@/components/shop/home-section';
 import { OrderAgainRow } from '@/components/shop/order-again-row';
 import { ProductCard } from '@/components/shop/product-card';
@@ -169,19 +170,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
 /**
  * The welcome banner (session 2026-09-23, client feedback — the rebuilt
- * headline/photo split "didn't match the design"). Renders the client's
- * own reference banner PNGs as-is (`public/brand/hero-banner-desktop.png`
- * / `-mobile.png`, straight copies of their `getfresh_customer_*_hero_
- * banner.png` files — no crop/recompose this time) instead of recreating
- * the layout in HTML. The banner art has its own headline/CTA copy and
- * feature-icon row baked in, so two real `Link`s are laid over the "Shop
- * Fresh"/"Explore Categories" buttons (transparent, positioned by
- * percentage over their baked-in position) to keep real navigation working
- * — everything else in the image is non-interactive decoration.
+ * headline/photo split "didn't match the design"; session 2026-09-28, owner
+ * request — turned into an auto-rotating carousel, "only one image shows, I
+ * want multiple"). Renders the client's own reference banner art as-is
+ * (each slide has its own headline/CTA copy and feature-icon row baked in)
+ * instead of recreating the layout in HTML — `HeroCarousel` handles the
+ * rotation and the real navigation `Link`(s) laid transparently over each
+ * slide's baked-in button(s); everything else in the art is non-interactive
+ * decoration.
  *
- * Trade-off worth knowing: the baked-in copy is English-only text inside a
- * PNG, so mr/hi locales will see this one banner in English regardless of
- * locale (the client's own reference art has no translated variant).
+ * Trade-off worth knowing: the baked-in copy is English-only text inside
+ * each image, so mr/hi locales see these banners in English regardless of
+ * locale (the client's own reference/generated art has no translated
+ * variant).
  *
  * Always renders (see the call site's own comment) — this is the page's
  * only banner now; admin-uploaded promo banners no longer render here.
@@ -189,34 +190,54 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 async function HeroBanner() {
   const t = await getTranslations('home');
   const alt = `${t('heroHeadline').replace(/\n/g, ' ')} — ${t('heroSubtitle')}`;
+  const mealPlanAlt = t('heroMealPlanAlt');
 
-  return (
-    <div className="relative overflow-hidden rounded-[var(--radius-xl)] border border-primary/10">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/brand/hero-banner-mobile.png"
-        alt={alt}
-        className="block w-full sm:hidden"
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/brand/hero-banner-desktop.png"
-        alt={alt}
-        className="hidden w-full sm:block"
-      />
+  const slides: HeroSlide[] = [
+    {
+      key: 'launch',
+      alt,
+      mobileSrc: '/brand/hero-banner-mobile.png',
+      desktopSrc: '/brand/hero-banner-desktop.png',
+      // Precise hit-boxes, not a whole-slide link: this slide's art bakes
+      // in two separate buttons ("Shop Fresh" / "Explore Categories"),
+      // positioned by percentage over their baked-in location.
+      overlays: [
+        {
+          href: '/category/vegetables',
+          ariaLabel: t('shopFresh'),
+          className: 'top-[56%] left-[2.5%] h-[19%] w-[19%] sm:left-[3%] sm:w-[17%]',
+        },
+        {
+          href: '/categories',
+          ariaLabel: t('exploreCategories'),
+          className: 'top-[56%] left-[22.5%] h-[19%] w-[26%] sm:left-[21%]',
+        },
+      ],
+    },
+    {
+      // Owner-supplied art (session 2026-09-28) — a single "Create Your Meal
+      // Plan" button baked in, at a different position/size than the launch
+      // slide's own buttons, so this gets one whole-slide link instead of
+      // trying to match that button's exact hit-box.
+      key: 'meal-plan-1',
+      alt: mealPlanAlt,
+      src: '/brand/hero-banner-mealplan-1.webp',
+      href: '/meal-plan',
+      ariaLabel: mealPlanAlt,
+    },
+    {
+      // Same art family, no baked-in button at all (it ends in a category
+      // showcase strip instead) — still links to My Meal Plan, the slide's
+      // own dominant message.
+      key: 'meal-plan-2',
+      alt: mealPlanAlt,
+      src: '/brand/hero-banner-mealplan-2.webp',
+      href: '/meal-plan',
+      ariaLabel: mealPlanAlt,
+    },
+  ];
 
-      <Link
-        href="/category/vegetables"
-        aria-label={t('shopFresh')}
-        className="absolute top-[56%] left-[2.5%] h-[19%] w-[19%] sm:left-[3%] sm:w-[17%]"
-      />
-      <Link
-        href="/categories"
-        aria-label={t('exploreCategories')}
-        className="absolute top-[56%] left-[22.5%] h-[19%] w-[26%] sm:left-[21%]"
-      />
-    </div>
-  );
+  return <HeroCarousel slides={slides} />;
 }
 
 /** The closing promotional strip, above the bottom nav. */
