@@ -12,6 +12,7 @@ import {
   MapPin,
   Package,
   PartyPopper,
+  Plus,
   ShieldCheck,
   Smartphone,
   Wallet,
@@ -21,8 +22,9 @@ import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
+import { AddressForm } from '@/components/shop/address-manager';
 import { PageHeader } from '@/components/shop/page-header';
-import { useSession } from '@/hooks/use-session';
+import { useInvalidateSession, useSession } from '@/hooks/use-session';
 import { ApiClientError, api, qs } from '@/lib/api/client';
 import { formatPaise, paise, rupeesToPaise } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -571,7 +573,14 @@ function SummaryStep({
   canContinue: boolean;
 }) {
   const t = useTranslations('mealPlan.subscribe');
+  const ta = useTranslations('address');
+  const invalidateSession = useInvalidateSession();
   const [showItems, setShowItems] = useState(false);
+  // Lets a customer with zero saved addresses add one right here instead of
+  // leaving the subscribe flow (session 2026-09-27, user request) — reuses
+  // the same `AddressForm` the standalone /addresses page uses, including
+  // its "use current location" option.
+  const [addingAddress, setAddingAddress] = useState(false);
   // A first-time subscriber's shortfall is waived server-side — they can
   // activate now and pay their first 7 days' deliveries as COD instead
   // (session 2026-09-27).
@@ -644,7 +653,14 @@ function SummaryStep({
           )}
         </div>
         {addresses.length === 0 ? (
-          <p className="mt-2 text-sm text-muted-foreground">{t('noAddress')}</p>
+          <button
+            type="button"
+            onClick={() => setAddingAddress(true)}
+            className="mt-2 flex w-full items-center gap-2 rounded-[var(--radius)] border border-dashed border-primary/50 px-3 py-2.5 text-left text-sm font-semibold text-primary"
+          >
+            <Plus className="size-4 shrink-0" aria-hidden />
+            {t('noAddress')}
+          </button>
         ) : !addressExpanded && selectedAddress ? (
           <div className="mt-3 flex gap-2 rounded-[var(--radius)] border border-primary bg-tint-green p-3">
             <MapPin className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
@@ -699,6 +715,21 @@ function SummaryStep({
       </div>
 
       {showItems && <PlanItemsPopup planDays={planDays} onClose={() => setShowItems(false)} />}
+
+      {addingAddress && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-5">
+            <h2 className="mb-1 text-base font-black">{ta('add')}</h2>
+            <AddressForm
+              onCancel={() => setAddingAddress(false)}
+              onSaved={() => {
+                setAddingAddress(false);
+                void invalidateSession();
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

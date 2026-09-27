@@ -183,7 +183,7 @@ export function AddressManager() {
   );
 }
 
-function AddressForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: () => void }) {
+export function AddressForm({ onCancel, onSaved }: { onCancel: () => void; onSaved: () => void }) {
   const t = useTranslations('address');
   const tc = useTranslations('common');
   const te = useTranslations('errors');
