@@ -567,49 +567,6 @@ export function CategoryProductList({
               </span>
             </button>
 
-            {/* The leftover/"rest" bucket's own rail button — placed right
-                after "All" (owner request, session 2026-09-21: it was
-                showing last, after the real subgroups, but it's actually
-                every ordinary vegetable, so it reads better as the second
-                stop, not the last one). Same treatment as a real subgroup
-                button below, just keyed off REST_ID instead of a
-                CATEGORY_SUBGROUPS entry. */}
-            {rest.length > 0 && (
-              <button
-                type="button"
-                onClick={() => jumpTo(REST_ID)}
-                aria-current={activeTypeId === REST_ID}
-                className={cn(
-                  'flex w-full flex-col items-center gap-1 border-r-4 px-1.5 py-3 text-center',
-                  'lg:flex-row lg:justify-start lg:gap-3 lg:px-4 lg:text-left',
-                  activeTypeId === REST_ID ? 'border-primary' : 'border-transparent',
-                )}
-              >
-                <span
-                  className={cn(
-                    'grid size-14 shrink-0 place-items-center overflow-hidden rounded-full p-1 lg:size-10',
-                    activeTypeId === REST_ID ? 'bg-tint-lime' : 'bg-background',
-                  )}
-                  aria-hidden
-                >
-                  {rest[0]?.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={rest[0].imageUrl} alt="" className="size-full rounded-full object-cover" />
-                  ) : (
-                    <Leaf className="size-5 text-primary" aria-hidden />
-                  )}
-                </span>
-                <span
-                  className={cn(
-                    'text-[11px] leading-tight lg:text-sm',
-                    activeTypeId === REST_ID ? 'font-bold text-foreground' : 'font-medium text-foreground',
-                  )}
-                >
-                  {slug === 'vegetables' ? t('otherVegetables') : t('other')}
-                </span>
-              </button>
-            )}
-
             {groups.map(({ type, products: groupProducts }) => {
               const active = activeTypeId === type.id;
               // Blinkit-matched (session 2026-08-25): a real photo, not an
@@ -654,6 +611,49 @@ export function CategoryProductList({
                 </button>
               );
             })}
+
+            {/* The leftover/"rest" bucket's own rail button — after every
+                real subgroup (owner request, session 2026-09-27, reversing
+                session 2026-09-21's "move it second" call: it should read
+                last, not as if it were a real named subgroup ahead of the
+                actual ones). Same treatment as a real subgroup button
+                above, just keyed off REST_ID instead of a
+                CATEGORY_SUBGROUPS entry. */}
+            {rest.length > 0 && (
+              <button
+                type="button"
+                onClick={() => jumpTo(REST_ID)}
+                aria-current={activeTypeId === REST_ID}
+                className={cn(
+                  'flex w-full flex-col items-center gap-1 border-r-4 px-1.5 py-3 text-center',
+                  'lg:flex-row lg:justify-start lg:gap-3 lg:px-4 lg:text-left',
+                  activeTypeId === REST_ID ? 'border-primary' : 'border-transparent',
+                )}
+              >
+                <span
+                  className={cn(
+                    'grid size-14 shrink-0 place-items-center overflow-hidden rounded-full p-1 lg:size-10',
+                    activeTypeId === REST_ID ? 'bg-tint-lime' : 'bg-background',
+                  )}
+                  aria-hidden
+                >
+                  {rest[0]?.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={rest[0].imageUrl} alt="" className="size-full rounded-full object-cover" />
+                  ) : (
+                    <Leaf className="size-5 text-primary" aria-hidden />
+                  )}
+                </span>
+                <span
+                  className={cn(
+                    'text-[11px] leading-tight lg:text-sm',
+                    activeTypeId === REST_ID ? 'font-bold text-foreground' : 'font-medium text-foreground',
+                  )}
+                >
+                  {slug === 'vegetables' ? t('otherVegetables') : t('other')}
+                </span>
+              </button>
+            )}
           </nav>
 
           {/* Right pane — the actual scrolling list; the rail above just
@@ -663,37 +663,6 @@ export function CategoryProductList({
               page — the rail stays white so it still reads as its own
               column. */}
           <div className="min-w-0 flex-1 bg-tint-lime">
-            {/* Moved ahead of the real subgroups (owner request, session
-                2026-09-21) so the scroll order matches the rail order above
-                — tapping the rail's 2nd button should land here, not past
-                every real subgroup. */}
-            {rest.length > 0 && (
-              <section
-                ref={(el) => {
-                  sectionRefs.current[REST_ID] = el;
-                }}
-                data-type-id={REST_ID}
-                style={{ scrollMarginTop: HEADER_OFFSET_PX + 8 }}
-                className="pb-2"
-              >
-                <h2
-                  className="sticky z-10 border-b border-border bg-tint-lime px-4 py-2.5 text-[15px] font-black text-primary-dark"
-                  style={{ top: HEADER_OFFSET_PX }}
-                >
-                  {/* Vegetables' own leftover bucket gets a real label
-                      (session 2026-09-20, client request) instead of the
-                      generic "Other" every other category still uses —
-                      it's not a mystery bucket here, it's every ordinary
-                      vegetable that isn't literally organic or pre-chopped. */}
-                  {slug === 'vegetables' ? t('otherVegetables') : t('other')}
-                </h2>
-                <div className="grid grid-cols-2 gap-3 px-4 pt-3 pb-3 lg:grid-cols-4">
-                  {rest.map((product) => (
-                    <ProductCard key={product.id} product={product} variants={product.variants} />
-                  ))}
-                </div>
-              </section>
-            )}
             {groups.map(({ type, products: groupProducts }) => {
               const expanded = expandedTypes.has(type.id);
               const visibleProducts = expanded
@@ -755,6 +724,38 @@ export function CategoryProductList({
                 </section>
               );
             })}
+
+            {/* After every real subgroup (owner request, session
+                2026-09-27, reversing session 2026-09-21's "move it ahead"
+                call) — the scroll order matches the rail order above, which
+                now also puts this button last. */}
+            {rest.length > 0 && (
+              <section
+                ref={(el) => {
+                  sectionRefs.current[REST_ID] = el;
+                }}
+                data-type-id={REST_ID}
+                style={{ scrollMarginTop: HEADER_OFFSET_PX + 8 }}
+                className="pb-2"
+              >
+                <h2
+                  className="sticky z-10 border-b border-border bg-tint-lime px-4 py-2.5 text-[15px] font-black text-primary-dark"
+                  style={{ top: HEADER_OFFSET_PX }}
+                >
+                  {/* Vegetables' own leftover bucket gets a real label
+                      (session 2026-09-20, client request) instead of the
+                      generic "Other" every other category still uses —
+                      it's not a mystery bucket here, it's every ordinary
+                      vegetable that isn't literally organic or pre-chopped. */}
+                  {slug === 'vegetables' ? t('otherVegetables') : t('other')}
+                </h2>
+                <div className="grid grid-cols-2 gap-3 px-4 pt-3 pb-3 lg:grid-cols-4">
+                  {rest.map((product) => (
+                    <ProductCard key={product.id} product={product} variants={product.variants} />
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
         </div>
       ) : (
