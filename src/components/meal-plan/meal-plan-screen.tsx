@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { AppHeader } from '@/components/shop/app-header';
 import { LoginPrompt } from '@/components/shop/login-prompt';
 import { Link } from '@/i18n/navigation';
+import { DeliveryModeTag } from './delivery-mode-tag';
 import { useDeliveryModePreference } from '@/hooks/use-delivery-mode-preference';
 import { useSession } from '@/hooks/use-session';
 import { api, qs } from '@/lib/api/client';
@@ -117,14 +118,18 @@ export function MealPlanScreen() {
           same header at the very top, not a per-screen substitute. */}
       <AppHeader />
       {/* Asked once, mandatorily, the first time this screen loads (session
-          2026-09-27, user request) — no "decide later" here, unlike the
-          same question asked again (skippable) on the Plan-Saved screen
-          after a real save. Skipped once a real subscription already has
-          its own real mode (`activeDeliveryMode`) — asking again then would
-          just be confusing, not useful. Picking an option here only saves
-          the on-device preference and closes the popup; it does not create
-          a subscription or navigate anywhere, since there's no saved plan
-          to subscribe yet at this point in the flow. */}
+          2026-09-27, user request) — no "decide later" here. Once answered,
+          the choice never asks again on its own; `DeliveryModeTag` below
+          shows the current pick and lets the customer change it, on demand
+          only (session 2026-09-27, second user report — the popup used to
+          pop up again on every single save, which felt broken once you'd
+          already answered it once). Skipped entirely once a real
+          subscription already has its own real mode (`activeDeliveryMode`)
+          — asking again then would just be confusing, not useful. Picking
+          an option here only saves the on-device preference and closes the
+          popup; it does not create a subscription or navigate anywhere,
+          since there's no saved plan to subscribe yet at this point in the
+          flow. */}
       {!data?.hasActiveSubscription && !deliveryModePreference && (
         <MandatoryDeliveryModePopup onSelect={setDeliveryModePreference} />
       )}
@@ -137,6 +142,16 @@ export function MealPlanScreen() {
           className="aspect-[3/1] w-full rounded-[var(--radius-2xl)] object-cover"
         />
       </div>
+
+      {/* Only while there's no real subscription yet — once one exists,
+          `activeDeliveryMode`'s own tag on the "View My Subscription" row
+          below is the real, authoritative mode, not this on-device
+          preference. */}
+      {!data?.hasActiveSubscription && (
+        <div className="px-4 pt-3">
+          <DeliveryModeTag />
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-2.5 px-4 pt-4">
         <FeatureCard image={ICON_FRESH} label={t('wizard.homeFresh')} />

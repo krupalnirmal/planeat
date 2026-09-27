@@ -7,10 +7,12 @@ import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { AppHeader } from '@/components/shop/app-header';
 import { PageHeader } from '@/components/shop/page-header';
+import { useDeliveryModePreference } from '@/hooks/use-delivery-mode-preference';
 import { ApiClientError, api, qs } from '@/lib/api/client';
 import { formatPaise } from '@/lib/money';
 import { cn } from '@/lib/utils';
 import { DAY_STYLE } from './day-style';
+import { DeliveryModeTag } from './delivery-mode-tag';
 import { MealPlanHero } from './meal-plan-hero';
 import { DAYS, usePlanDraft } from './plan-draft-context';
 
@@ -87,6 +89,8 @@ export function WeeklySummaryScreen() {
             <DayTile key={day} dayOfWeek={day} />
           ))}
         </div>
+
+        {!draft.hasActiveSubscription && <DeliveryModeTag />}
 
         {saveError && (
           <p className="rounded-[var(--radius)] bg-danger/10 px-3 py-2.5 text-sm text-danger">{saveError}</p>
@@ -184,21 +188,13 @@ function DayTile({ dayOfWeek }: { dayOfWeek: number }) {
 function SavedScreen({ daysCount }: { daysCount: number }) {
   const tw = useTranslations('mealPlan.wizard');
   const draft = usePlanDraft();
-  // Shown once, right after a real save (session 2026-09-25, user request)
-  // — asks Daily vs Weekly delivery before the customer moves on, since
-  // this is the moment they've just confirmed what they want delivered.
-  // Dismissable: the choice isn't forced, and it's asked again (still
-  // changeable) on the actual Subscribe screen either way.
-  //
-  // Only when there's no subscription yet (session 2026-09-25, user report)
-  // — a customer who already activated one and comes back to tweak items
-  // just re-saves the same plan the subscription already reads from every
-  // night (`generateDailyOrders` re-reads `MealPlanDay` fresh at generation
-  // time, not a snapshot from when they subscribed); asking Daily/Weekly
-  // again here is not just redundant, tapping either option would land on
-  // `/meal-plan/subscribe` and fail with "you already have an active
-  // subscription" (`activateSubscription`'s `ALREADY_ACTIVE` check).
-  const [showDeliveryModePopup, setShowDeliveryModePopup] = useState(true);
+  const [preference] = useDeliveryModePreference();
+  // No longer auto-shown on mount (session 2026-09-27, user report — it
+  // used to pop up again every single time a plan was saved, even once the
+  // customer had already answered it before). Now opened only by tapping
+  // the tag below, which also shows the current on-device pick so there's
+  // something to look at even when the customer doesn't tap it.
+  const [showDeliveryModePopup, setShowDeliveryModePopup] = useState(false);
 
   return (
     <main className="flex min-h-[80vh] flex-col items-center justify-center gap-4 px-6 text-center">
@@ -214,6 +210,33 @@ function SavedScreen({ daysCount }: { daysCount: number }) {
         <Stat value={formatPaise(draft.weekTotalPaise(), { hidePaise: true })} label={tw('statTotal')} />
       </div>
 
+      {/* Only when there's no subscription yet (session 2026-09-25, user
+          report) — a customer who already activated one and comes back to
+          tweak items just re-saves the same plan the subscription already
+          reads from every night (`generateDailyOrders` re-reads
+          `MealPlanDay` fresh at generation time, not a snapshot from when
+          they subscribed); showing Daily/Weekly again here is not just
+          redundant, tapping either option would land on
+          `/meal-plan/subscribe` and fail with "you already have an active
+          subscription" (`activateSubscription`'s `ALREADY_ACTIVE` check). */}
+      {!draft.hasActiveSubscription && preference && (
+        <button
+          type="button"
+          onClick={() => setShowDeliveryModePopup(true)}
+          className="flex w-full items-center gap-2 rounded-full border border-primary/40 bg-tint-green px-3.5 py-2 text-left text-xs font-bold text-primary-dark"
+        >
+          {preference === 'WEEKLY' ? (
+            <Package className="size-3.5 shrink-0" aria-hidden />
+          ) : (
+            <CalendarDays className="size-3.5 shrink-0" aria-hidden />
+          )}
+          <span className="min-w-0 flex-1 truncate">
+            {preference === 'WEEKLY' ? tw('deliveryModeWeekly') : tw('deliveryModeDaily')}
+          </span>
+          <ChevronRight className="size-3.5 shrink-0" aria-hidden />
+        </button>
+      )}
+
       <Link
         href="/meal-plan"
         className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
@@ -228,9 +251,6 @@ function SavedScreen({ daysCount }: { daysCount: number }) {
         {tw('continueShopping')}
       </Link>
 
-      {/* Re-checks `hasActiveSubscription` on every render rather than only
-          at the `useState` initializer, so it stays correct even if that
-          value resolves after this screen has already mounted. */}
       {!draft.hasActiveSubscription && showDeliveryModePopup && (
         <DeliveryModePopup onDismiss={() => setShowDeliveryModePopup(false)} />
       )}
@@ -238,12 +258,21 @@ function SavedScreen({ daysCount }: { daysCount: number }) {
   );
 }
 
+/** Unlike `DeliveryModeTag` (which only updates the on-device preference),
+    this one still navigates straight into `/meal-plan/subscribe` — a saved
+    plan already exists at this point in the flow, so tapping through here
+    is a real step toward subscribing, not just recording a soft
+    preference for later. Kept as its own component for that reason. */
 function DeliveryModePopup({ onDismiss }: { onDismiss: () => void }) {
   const tw = useTranslations('mealPlan.wizard');
+  const tc = useTranslations('common');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-4 text-left">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onDismiss}>
+      <div
+        className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-4 text-left"
+        onClick={(event) => event.stopPropagation()}
+      >
         <h2 className="text-center text-base font-black">{tw('deliveryModeTitle')}</h2>
 
         <div className="mt-4 space-y-2.5">
@@ -281,7 +310,7 @@ function DeliveryModePopup({ onDismiss }: { onDismiss: () => void }) {
           onClick={onDismiss}
           className="mt-3 flex h-10 w-full items-center justify-center text-xs font-semibold text-muted-foreground"
         >
-          {tw('deliveryModeDecideLater')}
+          {tc('cancel')}
         </button>
       </div>
     </div>
