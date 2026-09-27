@@ -4,10 +4,14 @@ import { defineRouting } from 'next-intl/routing';
  * B15 — the client set the default language explicitly rather than relying
  * on browser detection.
  *
- * `localePrefix: 'always'` keeps every URL explicit (`/mr/...`, `/hi/...`,
- * `/en/...`). Ambiguous root URLs are the usual source of "why is my page
- * suddenly English" bugs, and an explicit prefix is also what makes the
- * language switcher a plain link rather than a client-side state hack.
+ * `localePrefix: 'as-needed'` (session 2026-09-27, business requirement —
+ * `getfrresh.com/` must serve content directly, not 307-redirect to `/en`,
+ * so payment-gateway and other automated URL-liveness checks see a bare 200
+ * at the root) keeps the default locale ('en') unprefixed at `/...` while
+ * `mr`/`hi` still get an explicit prefix (`/mr/...`, `/hi/...`). The
+ * language switcher stays a plain link either way — `createNavigation`
+ * (`@/i18n/navigation`) adapts `Link`/`useRouter`/`getPathname` to whatever
+ * strategy is declared here, so nothing else in the app needs to know.
  */
 
 export const LOCALES = ['mr', 'hi', 'en'] as const;
@@ -24,7 +28,7 @@ export const LOCALE_LABELS: Record<AppLocale, string> = {
 export const routing = defineRouting({
   locales: LOCALES,
   defaultLocale: DEFAULT_LOCALE,
-  localePrefix: 'always',
+  localePrefix: 'as-needed',
   localeDetection: false,
 });
 

@@ -1,4 +1,5 @@
 import { createTranslator } from 'next-intl';
+import { DEFAULT_LOCALE } from '@/i18n/routing';
 import en from '@/i18n/messages/en.json';
 import hi from '@/i18n/messages/hi.json';
 import mr from '@/i18n/messages/mr.json';
@@ -163,7 +164,13 @@ export function renderNotification(
  * `PushMessage.url` and `public/sw.js`'s `notificationclick` handler have
  * both always supported a deep link; nothing ever supplied one, so every
  * push opened the storefront home instead of the thing it was about. Routes
- * are locale-prefixed, so the recipient's own language decides the path.
+ * are locale-aware, so the recipient's own language decides the path.
+ * Built by hand rather than via `@/i18n/navigation`'s `getPathname`: that
+ * one resolves through next-intl's React-navigation build (`next/
+ * navigation`), which isn't resolvable outside a full Next.js build/runtime
+ * (breaks under Vitest) — this module runs from a plain cron job, so it
+ * mirrors `@/i18n/routing`'s `localePrefix: 'as-needed'` manually instead
+ * (no prefix for the default locale, 'en'; `/mr`/`/hi` still prefixed).
  */
 export function urlFor(
   templateKey: TemplateKey,
@@ -172,23 +179,31 @@ export function urlFor(
 ): string | undefined {
   const orderId = typeof payload.orderId === 'string' ? payload.orderId : null;
 
+  let pathname: string | undefined;
   switch (templateKey) {
     case TEMPLATE.orderAssignedRider:
-      return orderId ? `/${locale}/delivery/orders/${orderId}` : `/${locale}/delivery`;
+      pathname = orderId ? `/delivery/orders/${orderId}` : '/delivery';
+      break;
     case TEMPLATE.orderPlacedAdmin:
-      return orderId ? `/${locale}/admin/orders/${orderId}` : `/${locale}/admin/orders`;
+      pathname = orderId ? `/admin/orders/${orderId}` : '/admin/orders';
+      break;
     case TEMPLATE.orderStatusChanged:
     case TEMPLATE.orderSubstituted:
     case TEMPLATE.orderItemDropped:
     case TEMPLATE.orderPaymentPending:
     case TEMPLATE.orderSkippedUnpaid:
-      return orderId ? `/${locale}/orders/${orderId}` : `/${locale}/orders`;
+      pathname = orderId ? `/orders/${orderId}` : '/orders';
+      break;
     case TEMPLATE.mealPlanReady:
     case TEMPLATE.tomorrowPreview:
-      return `/${locale}/meal-plan`;
+      pathname = '/meal-plan';
+      break;
     case TEMPLATE.lowWalletBalance:
-      return `/${locale}/wallet`;
+      pathname = '/wallet';
+      break;
     default:
       return undefined;
   }
+
+  return locale === DEFAULT_LOCALE ? pathname : `/${locale}${pathname}`;
 }
