@@ -296,8 +296,8 @@ function DeliveryModePopup({ onDismiss }: { onDismiss: () => void }) {
   const tw = useTranslations('mealPlan.wizard');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center">
-      <div className="w-full max-w-[420px] rounded-t-[calc(var(--radius)*1.6)] bg-background p-4 text-left sm:rounded-[calc(var(--radius)*1.6)]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-4 text-left">
         <h2 className="text-center text-base font-black">{tw('deliveryModeTitle')}</h2>
 
         <div className="mt-4 space-y-2.5">

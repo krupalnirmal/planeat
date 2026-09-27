@@ -52,8 +52,8 @@ export function ProfileForm() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center">
-      <div className="w-full max-w-[420px] rounded-t-[calc(var(--radius)*1.6)] bg-background p-5 sm:rounded-[calc(var(--radius)*1.6)]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-[420px] rounded-[calc(var(--radius)*1.6)] bg-background p-5">
         <h1 className="text-lg font-black">{t('completeTitle')}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t('completeSubtitle')}</p>
 

@@ -516,8 +516,8 @@ function QuantityModal({
   const [selected, setSelected] = useState(activeVariantId ?? product.variants[0]?.id);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center">
-      <div className="w-full max-w-[420px] rounded-t-[calc(var(--radius)*1.6)] bg-background p-4 sm:rounded-[calc(var(--radius)*1.6)]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-4">
         <div className="mb-3 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] bg-white">
