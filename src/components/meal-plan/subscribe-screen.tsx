@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Smartphone,
   Wallet,
+  X,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -62,8 +63,13 @@ interface QuoteResponse {
   };
 }
 
+interface PlanDay {
+  dayOfWeek: number;
+  items: Array<{ name: string; variantLabel: string; pricePaise: string }>;
+}
+
 interface PlanResponse {
-  plan: { days: Array<{ items: unknown[] }> } | null;
+  plan: { days: PlanDay[] } | null;
 }
 
 interface WalletResponse {
@@ -313,6 +319,7 @@ export function SubscribeScreen() {
             q={q}
             durationDays={durationDays}
             itemCount={itemCount}
+            planDays={plan.data?.plan?.days ?? []}
             shortfall={shortfall}
             selectedAddress={selectedAddress}
             addresses={user?.addresses ?? []}
@@ -532,6 +539,7 @@ function SummaryStep({
   q,
   durationDays,
   itemCount,
+  planDays,
   shortfall,
   selectedAddress,
   addresses,
@@ -546,6 +554,7 @@ function SummaryStep({
   q: QuoteResponse['quote'];
   durationDays: number;
   itemCount: number;
+  planDays: PlanDay[];
   shortfall: bigint;
   selectedAddress: { id: string; label: string; line1: string; line2: string | null; landmark: string | null; city: string; pincode: string } | null;
   addresses: Array<{ id: string; label: string; line1: string; line2: string | null; landmark: string | null; city: string; pincode: string }>;
@@ -558,6 +567,7 @@ function SummaryStep({
   canContinue: boolean;
 }) {
   const t = useTranslations('mealPlan.subscribe');
+  const [showItems, setShowItems] = useState(false);
 
   return (
     <div className="space-y-2 px-0">
@@ -565,7 +575,17 @@ function SummaryStep({
         <h2 className="mb-3 text-sm font-bold">{t('costTitle')}</h2>
         <dl className="space-y-2 text-sm">
           <Row label={t('totalDays')} value={t('days', { count: durationDays })} />
-          <Row label={t('totalItems')} value={t('itemsCount', { count: itemCount })} />
+          <button
+            type="button"
+            onClick={() => setShowItems(true)}
+            className="flex w-full items-baseline justify-between text-left"
+          >
+            <span className="text-muted-foreground">{t('totalItems')}</span>
+            <span className="flex items-center gap-1 font-semibold text-primary underline decoration-dotted underline-offset-2">
+              {t('itemsCount', { count: itemCount })}
+              <ChevronRight className="size-3.5 shrink-0" aria-hidden />
+            </span>
+          </button>
           <Row label={t('averageDaily')} value={formatPaise(paise(q.averageDailyPaise))} />
           <Row
             label={t('estimatedTotal', { days: durationDays })}
@@ -664,6 +684,51 @@ function SummaryStep({
         >
           {shortfall > 0n ? t('addMoneyToWallet') : t('continueToActivate')}
         </button>
+      </div>
+
+      {showItems && <PlanItemsPopup planDays={planDays} onClose={() => setShowItems(false)} />}
+    </div>
+  );
+}
+
+function PlanItemsPopup({ planDays, onClose }: { planDays: PlanDay[]; onClose: () => void }) {
+  const t = useTranslations('mealPlan.subscribe');
+  const tc = useTranslations('common');
+  const tDays = useTranslations('mealPlan.days');
+  const daysWithItems = planDays.filter((day) => day.items.length > 0);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-5">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="text-base font-black">{t('totalItems')}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={tc('close')}
+            className="grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground"
+          >
+            <X className="size-4" aria-hidden />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {daysWithItems.map((day) => (
+            <div key={day.dayOfWeek}>
+              <p className="text-xs font-bold text-primary">{tDays(String(day.dayOfWeek))}</p>
+              <ul className="mt-1.5 divide-y divide-border">
+                {day.items.map((item, index) => (
+                  <li key={`${day.dayOfWeek}-${index}`} className="flex items-center justify-between gap-2 py-1.5 text-sm">
+                    <span className="min-w-0 truncate">
+                      {item.name} <span className="text-xs text-muted-foreground">({item.variantLabel})</span>
+                    </span>
+                    <span className="shrink-0 font-semibold">{formatPaise(paise(item.pricePaise))}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
