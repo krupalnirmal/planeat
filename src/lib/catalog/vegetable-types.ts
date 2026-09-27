@@ -24,9 +24,13 @@ export interface VegetableType {
 // organic SKU exists. `chopped` keeps its id from last session's 10 real
 // chopped-vegetable products — only the label changed, so none of them
 // needed re-tagging.
+// Order (session 2026-09-27, owner request): Chopping before Organic, so the
+// rail reads Fresh (the "rest" bucket, moved ahead of both — see
+// `category-product-list.tsx`'s vegetables-only `restFirst`) → Chopping →
+// Organic.
 export const VEGETABLE_TYPES: VegetableType[] = [
-  { id: 'organic', emoji: '🌿', labelEn: 'Organic Vegetable', labelMr: 'ऑरगॅनिक भाजी', labelHi: 'जैविक सब्ज़ी' },
   { id: 'chopped', emoji: '🔪', labelEn: 'Chopping Vegetable', labelMr: 'चिरलेली भाजी', labelHi: 'कटी हुई सब्ज़ी' },
+  { id: 'organic', emoji: '🌿', labelEn: 'Organic Vegetable', labelMr: 'ऑरगॅनिक भाजी', labelHi: 'जैविक सब्ज़ी' },
 ];
 
 export function vegetableTypeLabel(type: VegetableType, locale: AppLocale): string {

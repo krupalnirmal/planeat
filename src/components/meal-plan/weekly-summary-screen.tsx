@@ -127,8 +127,15 @@ export function WeeklySummaryScreen() {
           last day tile with nothing useful to do. `draft.isDirty` (session
           2026-09-25) is the same "actually changed since the last save"
           check as before; it only appears once there's something real to
-          confirm. */}
-      {weekItems > 0 && draft.isDirty && (
+          confirm.
+
+          `weekItems > 0` deliberately dropped (session 2026-09-27, user
+          report): it hid the button after removing every remaining item,
+          so there was no way to save that "now empty" state, and a refresh
+          brought all the removed items straight back — `isDirty` alone
+          already covers "nothing to save yet" for an untouched plan, since
+          it starts false and only `setItem` (add OR remove) flips it. */}
+      {draft.isDirty && (
         <div
           className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
           style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
