@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, MapPin, Search, ShoppingCart, UserRound, Wallet, Zap } from 'lucide-react';
+import { ChevronDown, MapPin, Search, ShoppingCart, UserRound, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useCart } from '@/hooks/use-cart';
@@ -134,11 +134,6 @@ export function AppHeader({ sticky = true }: { sticky?: boolean } = {}) {
             </span>
           </span>
         </Link>
-
-        <span className="flex shrink-0 items-center gap-1 rounded-[calc(var(--radius)-6px)] bg-tint-green px-2.5 py-1.5 text-[11px] leading-tight font-bold text-primary-dark">
-          <Zap className="size-3.5 shrink-0 fill-primary-dark" aria-hidden />
-          {t('deliveryIn', { minutes: 30 })}
-        </span>
 
         <Link
           href="/search"
