@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { CategoryHeader } from '@/components/shop/category-header';
 import { CategoryProductList, type CategoryProduct } from '@/components/shop/category-product-list';
-import { CategoryStrip } from '@/components/shop/category-strip';
 import { getCategories, getCategoryProducts } from '@/lib/catalog/queries';
 import type { AppLocale } from '@/i18n/routing';
 
@@ -71,15 +70,11 @@ export default async function CategoryPage({
           heading sitting directly on the background is what made these read
           as scattered rather than as one list. */}
       <main className="space-y-2 pb-2">
-        {/* Lets a shopper jump straight to another category without tapping
-            back to the home screen first (session 2026-09-27, owner
-            request). */}
-        <CategoryStrip categories={categories} activeSlug={slug} />
-
         <CategoryProductList
           products={products}
           slug={slug}
           categoryName={result.category.name}
+          categories={categories}
           locale={locale as AppLocale}
         />
 

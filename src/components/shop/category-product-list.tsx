@@ -3,6 +3,7 @@
 import { ChevronDown, LayoutGrid, Leaf, Search, X, Zap } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from '@/i18n/navigation';
 import { SUBGROUP_TILE_IMAGES } from '@/lib/catalog/subgroup-tile-images';
 import { CATEGORY_SUBGROUPS, vegetableTypeLabel } from '@/lib/catalog/vegetable-types';
 import type { AppLocale } from '@/i18n/routing';
@@ -139,11 +140,16 @@ export function CategoryProductList({
   products,
   slug,
   categoryName,
+  categories,
   locale,
 }: {
   products: CategoryProduct[];
   slug: string;
   categoryName: string;
+  /** Every other shoppable category — lets the title double as a switcher
+      (session 2026-09-27, owner request) instead of needing a separate
+      strip or a trip back to the home screen. */
+  categories: Array<{ id: string; slug: string; name: string }>;
   locale: AppLocale;
 }) {
   const t = useTranslations('categories');
@@ -158,8 +164,11 @@ export function CategoryProductList({
   const [sort, setSort] = useState<SortOption>('default');
   const [inStockOnly, setInStockOnly] = useState(false);
   const [openPill, setOpenPill] = useState<PillId | null>(null);
+  const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
   const [activeTypeId, setActiveTypeId] = useState<string | null>(null);
   const [expandedTypes, setExpandedTypes] = useState<Set<string>>(() => new Set());
+
+  const otherCategories = categories.filter((c) => c.slug !== slug);
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
@@ -367,12 +376,50 @@ export function CategoryProductList({
 
   return (
     <>
-      <h1
-        key={categoryName}
-        className="animate-in fade-in slide-in-from-top-1 bg-tint-lime px-4 pt-4 pb-3 text-xl leading-tight font-black text-foreground duration-300"
-      >
-        {categoryName}
-      </h1>
+      {/* The title doubles as a category switcher (session 2026-09-27,
+          owner request) — tapping it opens the other shoppable categories
+          right here, so a shopper never has to go back to the home screen
+          just to jump from Vegetables to Fruits. The current category is
+          never listed in its own dropdown, only the others. */}
+      <div className="relative bg-tint-lime">
+        <button
+          type="button"
+          key={categoryName}
+          onClick={() => setCategoryPickerOpen((v) => !v)}
+          aria-expanded={categoryPickerOpen}
+          className="animate-in fade-in slide-in-from-top-1 flex w-full items-center gap-1 px-4 pt-4 pb-3 text-left text-xl leading-tight font-black text-foreground duration-300"
+        >
+          {categoryName}
+          <ChevronDown
+            className={cn('size-5 shrink-0 transition-transform', categoryPickerOpen && 'rotate-180')}
+            aria-hidden
+          />
+        </button>
+
+        {categoryPickerOpen && otherCategories.length > 0 && (
+          <>
+            <button
+              type="button"
+              aria-label={tc('close')}
+              onClick={() => setCategoryPickerOpen(false)}
+              className="fixed inset-0 z-10 cursor-default"
+            />
+            <ul className="absolute top-full left-4 z-20 mt-1 max-h-72 w-48 overflow-y-auto rounded-[var(--radius)] border border-border bg-card py-1 shadow-lg">
+              {otherCategories.map((category) => (
+                <li key={category.id}>
+                  <Link
+                    href={`/category/${category.slug}`}
+                    onClick={() => setCategoryPickerOpen(false)}
+                    className="block px-3 py-2.5 text-left text-sm whitespace-nowrap text-foreground"
+                  >
+                    {category.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
 
       <div className="relative bg-tint-lime px-4 pt-2 pb-2">
         <div className="flex items-center gap-2">
