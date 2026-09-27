@@ -109,18 +109,20 @@
      deep forest-green too dark across the app. */
   --primary: #2fa355; /* buttons, ADD, active tab, Shop Now */
   --primary-fg: #ffffff;
-  /* Switched from the earlier status-bar yellow (#ffd400) to the logo's own
-     orange (session 2026-09-27, owner request — "wherever we use yellow,
-     use the logo's orange instead"). Same value as `--accent-orange` below,
-     which this reuses rather than duplicating — small badges/flags/the
-     bottom nav's active pill, never a background field. */
-  --accent: #fc7c00;
-  --accent-fg: #111111;
+  /* Went yellow (#ffd400) -> the logo's orange (#fc7c00) -> the logo's own
+     green (session 2026-09-27, two owner requests in a row — the orange
+     swap was reverted almost immediately in favour of this). Reuses
+     `--primary` itself rather than a new sampled value: that IS the logo's
+     green already (see its own comment above). `--accent-fg` follows
+     `--primary-fg` (white) for the same reason `--primary` uses it — black
+     text (the old `--accent-fg`) doesn't contrast well on this green. */
+  --accent: var(--primary);
+  --accent-fg: var(--primary-fg);
   /* Sampled directly from the client's real logo file (session 2026-09-22,
-     `public/brand/logo.png`'s own arc pixels). Session 2026-09-27: `--accent`
-     above was repointed to this same value, so the two are identical for
-     now — kept as a separate token rather than merged, in case the accent
-     and the logo's own orange ever need to diverge again. */
+     `public/brand/logo.png`'s own arc pixels) — no longer reused by
+     `--accent` above (that went green instead, session 2026-09-27), but
+     kept here for whatever still wants the logo's actual orange
+     specifically. */
   --accent-orange: #fc7c00;
   /* The logo's own dark "get" charcoal (sampled the same way) — this app
      had no dedicated dark-navy token before; `--text` is a near-black
@@ -169,9 +171,11 @@
 
   /* A faint wash of `--accent` — for a header/footer band that echoes it
      without shouting. Lightened further per client feedback — even the
-     "faint" version was still reading as a solid band. Re-tinted orange
-     (session 2026-09-27) to follow `--accent`'s own switch from yellow. */
-  --accent-faint: #fdf0e3;
+     "faint" version was still reading as a solid band. Re-tinted green
+     (session 2026-09-27) to follow `--accent`'s own switch to `--primary` —
+     same value as `--brand-tint-green`, not merged into it since the two
+     names mean different things even when they happen to match. */
+  --accent-faint: var(--brand-tint-green);
 
   /* Safe-area aware height of the 5-tab bottom navigation — bumped 0.5rem
      (session 2026-09-17) to match the floating card's own bottom gap. */
@@ -187,8 +191,8 @@
 .dark {
   --primary: #2ea043;
   --primary-fg: #04140a;
-  --accent: #fc7c00;
-  --accent-fg: #111111;
+  --accent: var(--primary);
+  --accent-fg: var(--primary-fg);
   --surface: #121212;
   --surface-raised: #1c1c1c;
   --surface-sunken: #242424;
@@ -204,7 +208,7 @@
   --brand-tint-lime: #1c2812;
   --brand-page-grey: #0f0f0f;
   --brand-tint-yellow: #332a12;
-  --accent-faint: #3d2a12;
+  --accent-faint: var(--brand-tint-green);
 
   --accent-orange: #fc7c00;
   --navy: #e8ecef;
