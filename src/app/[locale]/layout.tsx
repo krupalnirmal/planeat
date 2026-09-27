@@ -54,7 +54,7 @@ export async function generateMetadata({
 }
 
 export const viewport: Viewport = {
-  themeColor: '#FFD400',
+  themeColor: '#FC7C00',
   width: 'device-width',
   initialScale: 1,
   // Zooming stays enabled: disabling it is an accessibility failure, and the

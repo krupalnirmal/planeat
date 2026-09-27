@@ -109,15 +109,18 @@
      deep forest-green too dark across the app. */
   --primary: #2fa355; /* buttons, ADD, active tab, Shop Now */
   --primary-fg: #ffffff;
-  --accent: #ffd400; /* small badges/flags only — never a background field */
+  /* Switched from the earlier status-bar yellow (#ffd400) to the logo's own
+     orange (session 2026-09-27, owner request — "wherever we use yellow,
+     use the logo's orange instead"). Same value as `--accent-orange` below,
+     which this reuses rather than duplicating — small badges/flags/the
+     bottom nav's active pill, never a background field. */
+  --accent: #fc7c00;
   --accent-fg: #111111;
   /* Sampled directly from the client's real logo file (session 2026-09-22,
-     `public/brand/logo.png`'s own arc pixels) — additive, not a
-     replacement for `--accent` above, which already carries real UI (cart
-     badges, the bottom nav's active pill) unrelated to this brand refresh.
-     Per the client's own brief: "use orange only as a subtle supporting/
-     accent color" — small flourishes only, never a background field,
-     same discipline `--accent` itself already follows. */
+     `public/brand/logo.png`'s own arc pixels). Session 2026-09-27: `--accent`
+     above was repointed to this same value, so the two are identical for
+     now — kept as a separate token rather than merged, in case the accent
+     and the logo's own orange ever need to diverge again. */
   --accent-orange: #fc7c00;
   /* The logo's own dark "get" charcoal (sampled the same way) — this app
      had no dedicated dark-navy token before; `--text` is a near-black
@@ -164,11 +167,11 @@
      structure; the background's only job is to separate them. */
   --brand-page-grey: #fafafa;
 
-  /* A faint wash of the brand's status-bar yellow (--accent, #FFD400) —
-     for a header/footer band that echoes it without shouting. Lightened
-     further per client feedback — even the "faint" version was still
-     reading as a solid yellow band. */
-  --accent-faint: #fdf6e6;
+  /* A faint wash of `--accent` — for a header/footer band that echoes it
+     without shouting. Lightened further per client feedback — even the
+     "faint" version was still reading as a solid band. Re-tinted orange
+     (session 2026-09-27) to follow `--accent`'s own switch from yellow. */
+  --accent-faint: #fdf0e3;
 
   /* Safe-area aware height of the 5-tab bottom navigation — bumped 0.5rem
      (session 2026-09-17) to match the floating card's own bottom gap. */
@@ -184,7 +187,7 @@
 .dark {
   --primary: #2ea043;
   --primary-fg: #04140a;
-  --accent: #ffd400;
+  --accent: #fc7c00;
   --accent-fg: #111111;
   --surface: #121212;
   --surface-raised: #1c1c1c;
@@ -201,7 +204,7 @@
   --brand-tint-lime: #1c2812;
   --brand-page-grey: #0f0f0f;
   --brand-tint-yellow: #332a12;
-  --accent-faint: #3d3212;
+  --accent-faint: #3d2a12;
 
   --accent-orange: #fc7c00;
   --navy: #e8ecef;
