@@ -1139,6 +1139,63 @@ const CATEGORIES: CategorySeed[] = [
       },
     ],
   },
+  {
+    // Session 2026-09-19, new category, client's own list — see AATA_TYPES
+    // in vegetable-types.ts for the sub-group split. Was created directly in
+    // the dev database at the time rather than through this file, which is
+    // why it never reached the production seed (session 2026-09-27, owner
+    // report: the category was missing on getfrresh.com). `gahu` (the third
+    // AATA_TYPES id) ships with no product here — the plan was to move
+    // GRC-ATTA-5KG in from Grocery, but that never actually happened either;
+    // out of scope for this fix, flagged rather than done silently.
+    slug: 'aata',
+    en: 'Aata',
+    mr: 'आटा',
+    hi: 'आटा',
+    sortOrder: 7,
+    // Flour bags are a pantry stock-up, not a daily meal-plan pick.
+    mealPlanEligible: false,
+    products: [
+      {
+        sku: 'AATA-MULTIGRAIN-5KG',
+        en: 'Multi Grain Aata',
+        mr: 'मल्टी ग्रेन आटा',
+        hi: 'मल्टी ग्रेन आटा',
+        unitType: UnitType.G,
+        vegetableType: 'multigrain',
+        tags: ['aata', 'flour'],
+        aliases: ['multigrain atta', 'multi grain flour', 'मल्टी ग्रेन आटा'],
+        variants: pack('5 kg', 5000, UnitType.G, 320, 350, 20),
+      },
+      {
+        sku: 'AATA-JWARI-5KG',
+        en: 'Jwari Aata',
+        mr: 'ज्वारी आटा',
+        hi: 'ज्वार आटा',
+        unitType: UnitType.G,
+        vegetableType: 'jwari',
+        tags: ['aata', 'flour'],
+        aliases: ['jwari atta', 'jowar flour', 'ज्वारी आटा', 'ज्वार आटा'],
+        variants: pack('5 kg', 5000, UnitType.G, 275, 300, 20),
+      },
+    ],
+  },
+  {
+    // Session 2026-09-19, new category, client's own list ("Trusted
+    // home-made" naming brands like Rajdevi/Udyogwardhini/Khandesi as
+    // examples — see MASALA_TYPES). Same missing-from-production gap as
+    // `aata` above. Ships with zero products, same as it already does in
+    // dev: no legitimate source for those specific branded products' real
+    // prices/pack sizes/photos exists yet — populate once the client
+    // provides the actual product list, or via the admin catalogue.
+    slug: 'masala',
+    en: 'Masala',
+    mr: 'मसाला',
+    hi: 'मसाला',
+    sortOrder: 8,
+    mealPlanEligible: false,
+    products: [],
+  },
 ];
 
 /**
