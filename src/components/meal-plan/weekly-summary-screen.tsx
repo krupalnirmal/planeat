@@ -159,25 +159,29 @@ export function WeeklySummaryScreen() {
         </div>
       </main>
 
-      <div
-        className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
-        style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
-      >
-        <button
-          type="button"
-          // `!draft.isDirty` (session 2026-09-25, user report) — nothing to
-          // save if nothing was picked/changed since the last save, so the
-          // button stops demanding a tap it has no effect. Still enabled the
-          // very first time (isDirty flips true as soon as `setItem` runs).
-          disabled={weekItems === 0 || save.isPending || !draft.isDirty}
-          onClick={() => save.mutate()}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+      {/* Hidden entirely, not just disabled (session 2026-09-27, user
+          report) — a disabled-but-visible button still floated over the
+          last day tile with nothing useful to do. `draft.isDirty` (session
+          2026-09-25) is the same "actually changed since the last save"
+          check as before; it only appears once there's something real to
+          confirm. */}
+      {weekItems > 0 && draft.isDirty && (
+        <div
+          className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-16 py-4"
+          style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))' }}
         >
-          <Save className="size-4 shrink-0" aria-hidden />
-          {save.isPending ? tc('loading') : tw('confirmSave')}
-          {!save.isPending && <ChevronRight className="size-4 shrink-0" aria-hidden />}
-        </button>
-      </div>
+          <button
+            type="button"
+            disabled={save.isPending}
+            onClick={() => save.mutate()}
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+          >
+            <Save className="size-4 shrink-0" aria-hidden />
+            {save.isPending ? tc('loading') : tw('confirmSave')}
+            {!save.isPending && <ChevronRight className="size-4 shrink-0" aria-hidden />}
+          </button>
+        </div>
+      )}
     </>
   );
 }
