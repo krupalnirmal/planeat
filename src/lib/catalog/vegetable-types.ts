@@ -91,14 +91,17 @@ export const BAKERY_TYPES: VegetableType[] = [
 ];
 
 // Aata's own sub-grouping (session 2026-09-19, new category, client's own
-// list). `gahu` is populated immediately — the existing "Whole Wheat Atta"
-// product moved here from the (storefront-inactive) Grocery category
-// rather than being duplicated. `multigrain`/`jwari` are real new products
-// with no existing photo to reuse, so they ship without one.
+// list). The doc comment here used to say `gahu` would be populated by
+// moving the existing "Whole Wheat Atta" product in from the
+// (storefront-inactive) Grocery category — that never actually happened
+// (`GRC-ATTA-5KG` is still there, unchanged); a real `AATA-GHAU-5KG`
+// product was added instead (session 2026-09-27), alongside a new `bajri`
+// subgroup for Bajri (pearl millet) Aata.
 export const AATA_TYPES: VegetableType[] = [
   { id: 'multigrain', emoji: '🌾', labelEn: 'Multi Grain Aata', labelMr: 'मल्टी ग्रेन आटा', labelHi: 'मल्टी ग्रेन आटा' },
   { id: 'jwari', emoji: '🌾', labelEn: 'Jwari Aata', labelMr: 'ज्वारी आटा', labelHi: 'ज्वार आटा' },
   { id: 'gahu', emoji: '🌾', labelEn: 'Gahu Aata', labelMr: 'गहू आटा', labelHi: 'गेहूं आटा' },
+  { id: 'bajri', emoji: '🌾', labelEn: 'Bajri Aata', labelMr: 'बाजरी आटा', labelHi: 'बाजरा आटा' },
 ];
 
 // Masala's own sub-grouping (session 2026-09-19, new category, client's own

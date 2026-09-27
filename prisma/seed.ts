@@ -1178,6 +1178,34 @@ const CATEGORIES: CategorySeed[] = [
         aliases: ['jwari atta', 'jowar flour', 'ज्वारी आटा', 'ज्वार आटा'],
         variants: pack('5 kg', 5000, UnitType.G, 275, 300, 20),
       },
+      {
+        // Session 2026-09-27, owner request. Not a duplicate of the
+        // Grocery category's `GRC-ATTA-5KG` (also whole wheat) — that one
+        // stays where it is (see AATA_TYPES' doc comment); this is its own
+        // product, priced independently, so a shopper deciding between
+        // "Aata" and "Grocery" always finds an actual choice in the store,
+        // not a phantom listing pointing at the same stock either way.
+        sku: 'AATA-GHAU-5KG',
+        en: 'Ghau Aata',
+        mr: 'गहू आटा',
+        hi: 'गेहूं आटा',
+        unitType: UnitType.G,
+        vegetableType: 'gahu',
+        tags: ['aata', 'flour'],
+        aliases: ['ghau atta', 'gahu peeth', 'wheat flour', 'गहू आटा', 'गेहूं आटा'],
+        variants: pack('5 kg', 5000, UnitType.G, 245, 270, 20),
+      },
+      {
+        sku: 'AATA-BAJRI-5KG',
+        en: 'Bajri Aata',
+        mr: 'बाजरी आटा',
+        hi: 'बाजरा आटा',
+        unitType: UnitType.G,
+        vegetableType: 'bajri',
+        tags: ['aata', 'flour'],
+        aliases: ['bajri atta', 'bajra flour', 'pearl millet flour', 'बाजरी आटा', 'बाजरा आटा'],
+        variants: pack('5 kg', 5000, UnitType.G, 260, 285, 20),
+      },
     ],
   },
   {
