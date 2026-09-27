@@ -60,6 +60,10 @@ interface QuoteResponse {
     };
     walletBalancePaise: string;
     shortfallPaise: string;
+    /** First-ever subscription for this customer — the shortfall above is
+        waived server-side and the first 7 days' deliveries bill as COD
+        instead (session 2026-09-27). */
+    isFirstSubscription: boolean;
   };
 }
 
@@ -336,7 +340,7 @@ export function SubscribeScreen() {
               setStep('topup');
             }}
             onContinue={() => setStep('confirm')}
-            canContinue={resolvedAddressId !== null && shortfall <= 0n}
+            canContinue={resolvedAddressId !== null && (shortfall <= 0n || q.isFirstSubscription)}
           />
         )}
 
@@ -568,6 +572,10 @@ function SummaryStep({
 }) {
   const t = useTranslations('mealPlan.subscribe');
   const [showItems, setShowItems] = useState(false);
+  // A first-time subscriber's shortfall is waived server-side — they can
+  // activate now and pay their first 7 days' deliveries as COD instead
+  // (session 2026-09-27).
+  const covered = shortfall <= 0n || q.isFirstSubscription;
 
   return (
     <div className="space-y-2 px-0">
@@ -610,7 +618,11 @@ function SummaryStep({
           <Row label={t('walletBalance')} value={formatPaise(paise(q.walletBalancePaise))} />
         </dl>
 
-        {shortfall > 0n ? (
+        {shortfall > 0n && q.isFirstSubscription ? (
+          <div className="mt-3 rounded-[var(--radius)] bg-tint-green px-3 py-2.5 text-sm text-primary-dark">
+            {t('codTrial', { amount: formatPaise(paise(q.prepay.requiredBalancePaise)) })}
+          </div>
+        ) : shortfall > 0n ? (
           <div className="mt-3 rounded-[var(--radius)] bg-[#FDF3E3] px-3 py-2.5 text-sm text-warning">
             {t('shortfall', { amount: formatPaise(shortfall) })}
           </div>
@@ -678,11 +690,11 @@ function SummaryStep({
       >
         <button
           type="button"
-          onClick={shortfall > 0n ? onNeedsTopup : onContinue}
-          disabled={!canContinue && shortfall <= 0n}
+          onClick={covered ? onContinue : onNeedsTopup}
+          disabled={!canContinue && covered}
           className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
-          {shortfall > 0n ? t('addMoneyToWallet') : t('continueToActivate')}
+          {covered ? t('continueToActivate') : t('addMoneyToWallet')}
         </button>
       </div>
 

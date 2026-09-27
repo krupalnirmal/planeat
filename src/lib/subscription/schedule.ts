@@ -200,3 +200,15 @@ export function isDeliveryDueToday(deliveryMode: string, startDate: Date, schedu
   const diffDays = Math.round((scheduledDate.getTime() - startDate.getTime()) / 86_400_000);
   return diffDays % 7 === 0;
 }
+
+/**
+ * Session 2026-09-27 — a first-time subscriber's `codTrialEligible`
+ * `Subscription` bills its first 7 calendar days as COD instead of wallet.
+ * Shared by the 00:30 generator (`generate-orders.ts`), same date-diffing
+ * shape as `isDeliveryDueToday`.
+ */
+export function isWithinCodTrial(codTrialEligible: boolean, startDate: Date, scheduledDate: Date): boolean {
+  if (!codTrialEligible) return false;
+  const daysSinceStart = Math.round((scheduledDate.getTime() - startDate.getTime()) / 86_400_000);
+  return daysSinceStart < 7;
+}

@@ -531,6 +531,7 @@
       "requiredBalance": "Wallet must have at least",
       "walletBalance": "Your wallet balance",
       "shortfall": "You need {amount} more in your wallet.",
+      "codTrial": "Your first 7 days are Cash on Delivery — no wallet balance needed to start. From day 8, keep {amount} in your wallet to keep deliveries going.",
       "topUp": "Top up",
       "walletCovered": "Your wallet covers this — you're ready to start",
       "activate": "Activate my plan",

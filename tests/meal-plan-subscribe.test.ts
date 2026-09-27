@@ -12,9 +12,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const dbMock = vi.hoisted(() => ({
   mealPlan: { findFirst: vi.fn() },
-  subscription: { findFirst: vi.fn(), count: vi.fn() },
+  subscription: { findFirst: vi.fn(), count: vi.fn(), create: vi.fn() },
   address: { findUnique: vi.fn() },
   mealPlanDay: { findMany: vi.fn() },
+  $transaction: vi.fn(async (fn: (tx: unknown) => unknown) => fn(dbMock)),
 }));
 
 vi.mock('@/lib/db', () => ({ db: dbMock }));
@@ -58,6 +59,7 @@ const INPUT = { addressId: 'addr_1', durationDays: 7, startDateKey: '2026-08-10'
 beforeEach(() => {
   vi.clearAllMocks();
   dbMock.mealPlanDay.findMany.mockResolvedValue([]);
+  dbMock.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(dbMock));
 });
 
 describe('activateSubscription — refusals', () => {
@@ -113,5 +115,40 @@ describe('activateSubscription — refusals', () => {
       expect(result.reason).toBe('INSUFFICIENT_BALANCE');
       expect(result.shortfallPaise).toBeGreaterThan(0n);
     }
+  });
+});
+
+describe('activateSubscription — first-time COD trial (session 2026-09-27)', () => {
+  it('activates a first-ever subscription despite an empty wallet, flagged for the COD trial', async () => {
+    dbMock.mealPlan.findFirst.mockResolvedValue(PLAN_WITH_ITEMS);
+    dbMock.subscription.findFirst.mockResolvedValue(null);
+    dbMock.subscription.count.mockResolvedValue(0); // first-ever subscription
+    dbMock.address.findUnique.mockResolvedValue({ userId: 'user_1' });
+    dbMock.mealPlanDay.findMany.mockResolvedValue([
+      { dayOfWeek: 1, items: [{ variant: { pricePaise: 100_000n } }] }, // ₹1,000/day
+    ]);
+    vi.mocked(getBalance).mockResolvedValue(0n); // no balance at all
+
+    const result = await activateSubscription('user_1', INPUT);
+
+    expect(result.ok).toBe(true);
+    expect(dbMock.subscription.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ codTrialEligible: true }) }),
+    );
+  });
+
+  it('still enforces the wallet gate on a second subscription for the same customer', async () => {
+    dbMock.mealPlan.findFirst.mockResolvedValue(PLAN_WITH_ITEMS);
+    dbMock.subscription.findFirst.mockResolvedValue(null);
+    dbMock.subscription.count.mockResolvedValue(1); // not their first
+    dbMock.address.findUnique.mockResolvedValue({ userId: 'user_1' });
+    dbMock.mealPlanDay.findMany.mockResolvedValue([
+      { dayOfWeek: 1, items: [{ variant: { pricePaise: 100_000n } }] },
+    ]);
+    vi.mocked(getBalance).mockResolvedValue(0n);
+
+    const result = await activateSubscription('user_1', INPUT);
+
+    expect(result).toEqual({ ok: false, reason: 'INSUFFICIENT_BALANCE', shortfallPaise: expect.any(BigInt) });
   });
 });

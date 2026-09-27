@@ -175,10 +175,11 @@ export function DeliveryOrderDetail({ orderId }: { orderId: string }) {
           </p>
         )}
 
-        {/* Meal-plan deliveries are always wallet-prepaid (B9 — COD is never
-            offered on a daily plan order) — called out explicitly so a rider
-            never wastes a doorstep asking for money that was already taken
-            from the wallet at generation. */}
+        {/* Meal-plan deliveries are wallet-prepaid (B9), except during a
+            first-time subscriber's 7-day COD trial (session 2026-09-27,
+            `order.isCod` handles that case above) — called out explicitly so
+            a rider never wastes a doorstep asking for money that was already
+            taken from the wallet at generation. */}
         {order.isMealPlan && !order.isCod && (
           <p className="mt-3 rounded-[var(--radius)] bg-success/10 px-3 py-2 text-center text-xs font-bold text-success">
             {t('prepaidBadge')}

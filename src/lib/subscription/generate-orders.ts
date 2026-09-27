@@ -10,7 +10,7 @@ import { notifyEventNow } from '@/lib/notifications/notify-now';
 import { InsufficientBalanceError, LEDGER_REF, debit } from '@/lib/wallet/ledger';
 import type { Locale } from '@/generated/prisma/enums';
 import { findSubstitute } from './substitute';
-import { generationTargetDate, isDeliveryDueToday } from './schedule';
+import { generationTargetDate, isDeliveryDueToday, isWithinCodTrial } from './schedule';
 
 /**
  * M6 — the 00:30 IST cron.
@@ -130,6 +130,7 @@ export async function generateDailyOrders(
       deliverySlot: true,
       deliveryMode: true,
       startDate: true,
+      codTrialEligible: true,
       assignedPartnerId: true,
       address: {
         select: {
@@ -202,6 +203,8 @@ interface PerSubscriptionInput {
     mealPlanId: string;
     deliverySlot: string;
     deliveryMode: string;
+    startDate: Date;
+    codTrialEligible: boolean;
     assignedPartnerId: string | null;
     address: {
       id: string;
@@ -383,6 +386,11 @@ async function generateForSubscription(
   const orderNumber = newOrderNumber(scheduledDate);
   let paymentPending = false;
 
+  // Session 2026-09-27 — a first-time subscriber's first 7 calendar days
+  // bill as COD instead of wallet, so activation never has to block on a
+  // wallet balance the customer hasn't had a chance to build up yet.
+  const cod = isWithinCodTrial(subscription.codTrialEligible, subscription.startDate, scheduledDate);
+
   try {
     await db.$transaction(async (tx) => {
       // Atomic conditional decrement, same pattern as instant orders. Two
@@ -411,8 +419,9 @@ async function generateForSubscription(
           handlingFeePaise: 0n,
           discountPaise: 0n,
           totalPaise: subtotalPaise,
-          // B9 — COD is never offered on a daily plan order.
-          paymentMethod: 'WALLET',
+          // B9 — COD is normally never offered on a daily plan order, except
+          // during a first-time subscriber's 7-day COD trial (`cod`, above).
+          paymentMethod: cod ? 'COD' : 'WALLET',
           paymentStatus: 'PENDING',
           subscriptionId: subscription.id,
           scheduledDate,
@@ -449,40 +458,46 @@ async function generateForSubscription(
         },
       });
 
-      // B3 — wallet auto-debit at generation.
-      try {
-        await debit(
-          {
-            userId: subscription.userId,
-            amountPaise: subtotalPaise,
-            source: 'ORDER',
-            ...LEDGER_REF.order(orderId),
-            note: subscription.deliveryMode === 'WEEKLY' ? `Weekly delivery ${targetDate}` : `Daily delivery ${targetDate}`,
-          },
-          tx,
-        );
-        await tx.order.update({ where: { id: orderId }, data: { paymentStatus: 'PAID' } });
-      } catch (error) {
-        if (!(error instanceof InsufficientBalanceError)) throw error;
+      // B3 — wallet auto-debit at generation. Skipped entirely for a COD-trial
+      // order: the customer pays the rider in cash, the same as every other
+      // COD order in this codebase (never transitioned to `paymentStatus:
+      // PAID` here either — cash collection is tracked separately, not via a
+      // status change).
+      if (!cod) {
+        try {
+          await debit(
+            {
+              userId: subscription.userId,
+              amountPaise: subtotalPaise,
+              source: 'ORDER',
+              ...LEDGER_REF.order(orderId),
+              note: subscription.deliveryMode === 'WEEKLY' ? `Weekly delivery ${targetDate}` : `Daily delivery ${targetDate}`,
+            },
+            tx,
+          );
+          await tx.order.update({ where: { id: orderId }, data: { paymentStatus: 'PAID' } });
+        } catch (error) {
+          if (!(error instanceof InsufficientBalanceError)) throw error;
 
-        // B3 — "Insufficient at generation → hold order PAYMENT_PENDING,
-        // notify, retry 08:00." The order still exists and the stock is still
-        // held; the 08:00 job resolves it either way.
-        paymentPending = true;
-        await tx.order.update({
-          where: { id: orderId },
-          data: { status: 'PAYMENT_PENDING' },
-        });
-        await tx.orderStatusHistory.create({
-          data: {
-            id: newId(ID_PREFIX.orderStatus),
-            orderId,
-            fromStatus: 'PLACED',
-            toStatus: 'PAYMENT_PENDING',
-            changedBy: null,
-            reason: 'Insufficient wallet balance at generation',
-          },
-        });
+          // B3 — "Insufficient at generation → hold order PAYMENT_PENDING,
+          // notify, retry 08:00." The order still exists and the stock is still
+          // held; the 08:00 job resolves it either way.
+          paymentPending = true;
+          await tx.order.update({
+            where: { id: orderId },
+            data: { status: 'PAYMENT_PENDING' },
+          });
+          await tx.orderStatusHistory.create({
+            data: {
+              id: newId(ID_PREFIX.orderStatus),
+              orderId,
+              fromStatus: 'PLACED',
+              toStatus: 'PAYMENT_PENDING',
+              changedBy: null,
+              reason: 'Insufficient wallet balance at generation',
+            },
+          });
+        }
       }
     }, { timeout: 20_000 });
     // ↑ Prisma's default interactive-transaction timeout is 5s. This one does

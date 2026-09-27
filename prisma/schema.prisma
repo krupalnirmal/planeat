@@ -821,6 +821,11 @@ model Subscription {
   planFeePaise      BigInt             @default(0)
   prepaidPaise      BigInt             @default(0)
   autoRenew         Boolean            @default(false)
+  /// Set once at activation for a customer's first-ever subscription
+  /// (session 2026-09-27) — lets the first 7 days of deliveries bill as COD
+  /// instead of requiring a prepaid wallet balance. See `isWithinCodTrial`
+  /// (src/lib/subscription/schedule.ts).
+  codTrialEligible  Boolean            @default(false)
   /// The rider the owner has assigned to carry every daily delivery for this
   /// subscription — set once, applied automatically to each day's generated
   /// order by the 00:30 cron instead of the owner assigning it fresh every

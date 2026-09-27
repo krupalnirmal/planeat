@@ -163,7 +163,7 @@ export const env = {
     quantityMinGrams: num('QUANTITY_MIN_GRAMS', 250),
     quantityMaxGrams: num('QUANTITY_MAX_GRAMS', 2000),
     maxSwapsPerPlanPerWeek: num('MAX_SWAPS_PER_PLAN_PER_WEEK', 10),
-    walletPrepayBufferPercent: num('WALLET_PREPAY_BUFFER_PERCENT', 15),
+    walletPrepayBufferPercent: num('WALLET_PREPAY_BUFFER_PERCENT', 5),
 
     subscriptionSlot: str('SUBSCRIPTION_SLOT', '06:30-09:00'),
     serviceRadiusMeters: num('SERVICE_RADIUS_METERS', 8000),

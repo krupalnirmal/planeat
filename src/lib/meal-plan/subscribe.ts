@@ -31,6 +31,9 @@ export interface QuoteResult {
   prepay: PrepayBreakdown;
   walletBalancePaise: bigint;
   shortfallPaise: bigint;
+  /** True for a customer's first-ever subscription — lets `activateSubscription`
+      waive the wallet-balance gate below for the 7-day COD trial. */
+  isFirstSubscription: boolean;
 }
 
 async function isFirstSubscription(userId: string): Promise<boolean> {
@@ -73,6 +76,7 @@ export async function getSubscriptionQuote(
     prepay,
     walletBalancePaise: balance,
     shortfallPaise: shortfallPaise(prepay.requiredBalancePaise, balance),
+    isFirstSubscription: firstPlan,
   };
 }
 
@@ -122,7 +126,9 @@ export async function activateSubscription(userId: string, input: ActivateInput)
   if (!address || address.userId !== userId) return { ok: false, reason: 'ADDRESS_NOT_FOUND' };
 
   const quote = await getSubscriptionQuote(userId, plan.id, input.durationDays, input.startDateKey);
-  if (quote.shortfallPaise > 0n) {
+  // A first-time subscriber can activate with zero wallet balance — their
+  // first 7 days of deliveries bill as COD instead (session 2026-09-27).
+  if (quote.shortfallPaise > 0n && !quote.isFirstSubscription) {
     return { ok: false, reason: 'INSUFFICIENT_BALANCE', shortfallPaise: quote.shortfallPaise };
   }
 
@@ -133,7 +139,14 @@ export async function activateSubscription(userId: string, input: ActivateInput)
   try {
     await db.$transaction(
       async (tx) => {
-        if (quote.planFee.feePaise > 0n) {
+        // A first-time subscriber activates with zero wallet balance
+        // required, full stop (session 2026-09-27) — not just the
+        // trial-days-bounded waiver `computePlanFee` already applies. Any
+        // plan fee still owed for a longer first plan is simply not charged
+        // at activation; only the per-delivery COD-trial cost (handled in
+        // `generate-orders.ts`) and, from day 8, the normal wallet billing
+        // apply.
+        if (quote.planFee.feePaise > 0n && !quote.isFirstSubscription) {
           await debit(
             {
               userId,
@@ -158,6 +171,7 @@ export async function activateSubscription(userId: string, input: ActivateInput)
             endDate,
             status: 'ACTIVE',
             pricingMode: 'PER_DELIVERY',
+            codTrialEligible: quote.isFirstSubscription,
             planFeePaise: quote.planFee.feePaise,
             // Informational snapshot of what was required at approval, not
             // a second charge — the buffer itself stays in the wallet.
