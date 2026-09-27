@@ -7,6 +7,7 @@ import { useTransition } from 'react';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { LOCALES, LOCALE_LABELS, type AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
+import { writePreferredLocale } from './locale-sync';
 
 /**
  * B15 / M11 — instant language switch, no reload.
@@ -24,6 +25,10 @@ export function LanguageSwitcher({ className }: { className?: string }) {
 
   function switchTo(next: AppLocale) {
     if (next === locale) return;
+    // Remembered so `LocaleSync` can keep this choice sticky even when the
+    // phone's own back button lands on a page still carrying the old
+    // locale in its URL (session 2026-09-27, user report).
+    writePreferredLocale(next);
     startTransition(() => {
       router.replace(
         // @ts-expect-error — pathname is a runtime string; params carry any

@@ -6,6 +6,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import NextTopLoader from 'nextjs-toploader';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { ServiceWorkerRegistration } from '@/components/providers/service-worker-registration';
+import { LocaleSync } from '@/components/shop/locale-sync';
 import { routing } from '@/i18n/routing';
 import '../globals.css';
 
@@ -94,6 +95,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider locale={locale} messages={messages}>
           <QueryProvider>{children}</QueryProvider>
           <ServiceWorkerRegistration />
+          <LocaleSync />
         </NextIntlClientProvider>
       </body>
     </html>
