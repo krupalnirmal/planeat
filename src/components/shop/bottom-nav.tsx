@@ -1,14 +1,14 @@
 'use client';
 
-import { Home, Mic, Salad } from 'lucide-react';
+import { Home, Mic, Salad, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
 /**
- * PART 5 — the 3-tab bottom navigation.
+ * PART 5 — the 4-tab bottom navigation.
  *
- *   Home | Smart List | My Meal Plan
+ *   Home | Smart List | My Meal Plan | Wallet
  *
  * A floating white rounded card (session 2026-09-17, client reference) —
  * inset from all four edges rather than a bar spanning the screen, with the
@@ -24,17 +24,18 @@ import { cn } from '@/lib/utils';
  * "small badges/flags only — never a background field"; this is the first
  * place it's used as one, at the client's explicit ask to try it here.
  *
- * Wallet and Profile dropped (session 2026-09-24, user request — "5 distay
- * 3ch thev") since `AppHeader`'s own wallet chip and profile icon already
- * reach those two screens from every page; this nav no longer needs to
- * duplicate them. Both routes still exist and are still reachable, just not
- * as bottom-nav tabs, so Home stays the fallback active tab there too — same
- * "not one of the tab routes" rule this file already documents for /cart.
+ * Wallet and Profile both dropped (session 2026-09-24, user request — "5
+ * distay 3ch thev") since `AppHeader`'s own wallet chip and profile icon
+ * already reach those two screens from every page. Wallet came back
+ * (session 2026-09-27, user request) as its own tab again — Profile stays
+ * off, reachable only via `AppHeader`. Wallet's own route is still excluded
+ * from `NON_HOME_PREFIXES`'s fallback logic below since it is now one of
+ * the real tabs, not a "not one of the tab routes" case any more.
  *
  * Home is the fallback active tab on any route that isn't one of the other
- * two sections (cart, checkout, product pages, orders, login, wallet,
- * profile, …) — the reference shows Home highlighted on the cart screen even
- * though "/cart" isn't itself one of the tab routes.
+ * three sections (cart, checkout, product pages, orders, login, profile, …)
+ * — the reference shows Home highlighted on the cart screen even though
+ * "/cart" isn't itself one of the tab routes.
  *
  * Always visible (session 2026-09-16) — see `CartBar`
  * (src/components/shop/cart-bar.tsx), which always sits above this nav's
@@ -45,9 +46,10 @@ const TABS = [
   { href: '/', icon: Home, key: 'home' },
   { href: '/smart-list', icon: Mic, key: 'smartList' },
   { href: '/meal-plan', icon: Salad, key: 'mealPlan' },
+  { href: '/wallet', icon: Wallet, key: 'wallet' },
 ] as const;
 
-const NON_HOME_PREFIXES = ['/smart-list', '/meal-plan'] as const;
+const NON_HOME_PREFIXES = ['/smart-list', '/meal-plan', '/wallet'] as const;
 
 export function BottomNav() {
   const t = useTranslations('nav');
@@ -61,7 +63,7 @@ export function BottomNav() {
       className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] px-3 lg:hidden"
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)' }}
     >
-      <ul className="card-3d grid grid-cols-3 gap-1 rounded-[24px] bg-card px-1.5 py-2">
+      <ul className="card-3d grid grid-cols-4 gap-1 rounded-[24px] bg-card px-1.5 py-2">
         {TABS.map((tab) => {
           const active =
             tab.href === '/'
