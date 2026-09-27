@@ -160,6 +160,14 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
 
   function pick(product: DraftProduct, variantId: string | null) {
     draft.setItem(dayOfWeek, product.id, variantId);
+    // A remove is destructive and easy to think already "done" once the
+    // item visibly disappears (session 2026-09-27, user report) — unlike
+    // adding/swapping a variant, which stays a draft change reviewable on
+    // the summary screen, a remove saves immediately so it can't silently
+    // revert on refresh. `.catch` swallows a failed save deliberately:
+    // `isDirty` then simply stays true, so the summary screen's own
+    // "Confirm & Save Plan" button is still there as a fallback.
+    if (variantId === null) void draft.saveNow().catch(() => {});
     setPicker(null);
   }
 
@@ -652,7 +660,12 @@ function DaySummaryView({
               <span className="text-sm font-bold">{formatPaise(paise(variant.pricePaise))}</span>
               <button
                 type="button"
-                onClick={() => draft.setItem(dayOfWeek, product.id, null)}
+                onClick={() => {
+                  draft.setItem(dayOfWeek, product.id, null);
+                  // Same immediate-save treatment as the picker's own
+                  // "Remove item" button — see `pick()`'s comment above.
+                  void draft.saveNow().catch(() => {});
+                }}
                 aria-label={tw('removeItem')}
                 className="grid size-9 shrink-0 place-items-center rounded-full text-danger"
               >

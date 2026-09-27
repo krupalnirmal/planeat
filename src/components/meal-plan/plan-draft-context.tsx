@@ -1,8 +1,8 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocale } from 'next-intl';
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useMemo, useRef, useState } from 'react';
 import { api, qs } from '@/lib/api/client';
 import { paise } from '@/lib/money';
 
@@ -99,15 +99,31 @@ interface PlanDraftContextValue {
       current draft, so the summary screen's save mutation never has to know
       the selections' internal representation. */
   buildSavePayload: () => Array<{ dayOfWeek: number; variantIds: string[] }>;
+  /** Persists the whole draft immediately (session 2026-09-27, user report —
+      removing an item from the day-builder's picker only ever updated the
+      in-memory draft, so it silently came back on refresh unless the
+      customer separately visited the summary screen and tapped "Confirm &
+      Save Plan"). Removal is destructive enough that it shouldn't wait on a
+      second, easy-to-miss step; adding/swapping a variant still only
+      updates the draft, same as before — those stay reviewable on the
+      summary screen before committing. */
+  saveNow: () => Promise<void>;
 }
 
 const PlanDraftContext = createContext<PlanDraftContextValue | null>(null);
 
 export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
   const locale = useLocale();
+  const queryClient = useQueryClient();
   const [selections, setSelections] = useState<Selections>(emptySelections);
   const [seededFor, setSeededFor] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+  // Mirrors `selections`, but updated synchronously inside `setSelections`'s
+  // own updater — `saveNow` reads this instead of the closed-over
+  // `selections` variable so a remove-then-save-immediately call (session
+  // 2026-09-27) always saves what was JUST set, not whatever this render
+  // captured before React applied the state update.
+  const selectionsRef = useRef<Selections>(selections);
 
   const current = useQuery({
     queryKey: ['meal-plan-current', locale],
@@ -194,7 +210,9 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
       const day = { ...prev[dayOfWeek] };
       if (variantId) day[productId] = variantId;
       else delete day[productId];
-      return { ...prev, [dayOfWeek]: day };
+      const next = { ...prev, [dayOfWeek]: day };
+      selectionsRef.current = next;
+      return next;
     });
     setIsDirty(true);
   }
@@ -230,6 +248,16 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
     }));
   }
 
+  async function saveNow(): Promise<void> {
+    const days = DAYS.map((dayOfWeek) => ({
+      dayOfWeek,
+      variantIds: Object.values(selectionsRef.current[dayOfWeek] ?? {}),
+    }));
+    await api.put(`/api/meal-plan/current${qs({ locale })}`, { days });
+    setIsDirty(false);
+    void queryClient.invalidateQueries({ queryKey: ['meal-plan-current', locale] });
+  }
+
   const value: PlanDraftContextValue = {
     loading: current.isLoading,
     loaded: data !== undefined,
@@ -246,6 +274,7 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
     isDirty,
     markSaved,
     buildSavePayload,
+    saveNow,
   };
 
   return <PlanDraftContext.Provider value={value}>{children}</PlanDraftContext.Provider>;
