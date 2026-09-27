@@ -152,7 +152,7 @@ function AdminSearchBox() {
         placeholder={t('searchPlaceholder')}
         className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
       />
-      <kbd className="hidden shrink-0 rounded border border-border bg-card px-1.5 py-0.5 text-[10px] text-muted-foreground sm:block">
+      <kbd className="hidden shrink-0 rounded border border-border bg-card px-1.5 py-0.5 text-[11px] text-muted-foreground sm:block">
         ⌘K
       </kbd>
     </form>
@@ -206,7 +206,7 @@ function ProfileMenu() {
         </span>
         <span className="hidden min-w-0 text-left lg:block">
           <span className="block truncate text-xs font-semibold text-foreground">{name}</span>
-          <span className="block text-[10px] text-muted-foreground">
+          <span className="block text-[11px] text-muted-foreground">
             {user ? t(ROLE_LABEL_KEY[user.role] ?? 'roleStoreAdmin') : ''}
           </span>
         </span>
@@ -275,7 +275,7 @@ function AdminBottomNav({ onMore }: { onMore: () => void }) {
             className="flex flex-1 flex-col items-center gap-0.5 py-2"
           >
             <Icon className={cn('size-5', active ? 'text-primary' : 'text-muted-foreground')} aria-hidden />
-            <span className={cn('text-[10px]', active ? 'font-bold text-primary' : 'text-muted-foreground')}>
+            <span className={cn('text-[11px]', active ? 'font-bold text-primary' : 'text-muted-foreground')}>
               {t(section.key)}
             </span>
             {active && <span className="mt-0.5 h-0.5 w-5 rounded-full bg-primary" aria-hidden />}
@@ -284,7 +284,7 @@ function AdminBottomNav({ onMore }: { onMore: () => void }) {
       })}
       <button type="button" onClick={onMore} className="flex flex-1 flex-col items-center gap-0.5 py-2">
         <MoreHorizontal className="size-5 text-muted-foreground" aria-hidden />
-        <span className="text-[10px] text-muted-foreground">{t('more')}</span>
+        <span className="text-[11px] text-muted-foreground">{t('more')}</span>
       </button>
     </nav>
   );
@@ -319,7 +319,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="border-b border-border px-5 py-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/logo.png" alt="getFrresh" className="h-16 w-auto" />
-          <p className="mt-1 text-[11px] text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
+          <p className="mt-1 text-[12px] text-muted-foreground">{tAdmin('nav.dashboardSubtitle')}</p>
         </div>
 
         <div className="flex flex-1 flex-col justify-between overflow-y-auto">

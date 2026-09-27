@@ -46,7 +46,7 @@ export function OrderStatusBadge({
   return (
     <span
       className={cn(
-        'inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold',
+        'inline-block rounded-full px-2.5 py-1 text-[12px] font-semibold',
         TONE[status],
         className,
       )}

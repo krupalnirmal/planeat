@@ -40,14 +40,14 @@ export function CategoryHeader() {
         </Link>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[15px] leading-tight font-bold">
+          <p className="truncate text-[16px] leading-tight font-bold">
             {t('deliveryIn', { minutes: 30 })}
           </p>
           <Link
             href={defaultAddress ? '/addresses' : '/serviceability'}
             className="mt-0.5 flex max-w-full items-center gap-1"
           >
-            <span className="truncate text-[12px] text-muted-foreground">{addressLine}</span>
+            <span className="truncate text-[13px] text-muted-foreground">{addressLine}</span>
             <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
           </Link>
         </div>

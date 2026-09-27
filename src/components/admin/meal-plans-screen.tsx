@@ -125,7 +125,7 @@ export function AdminMealPlansScreen() {
                       <span className="text-xs text-muted-foreground">{sub.customerPhone}</span>
                     </td>
                     <td className="px-3 py-2.5">
-                      <span className={cn('rounded-full px-2 py-1 text-[11px] font-semibold', STATUS_TONE[sub.status])}>
+                      <span className={cn('rounded-full px-2 py-1 text-[12px] font-semibold', STATUS_TONE[sub.status])}>
                         {tStatus(sub.status)}
                       </span>
                     </td>
@@ -160,7 +160,7 @@ export function AdminMealPlansScreen() {
                     <p className="truncate text-sm font-medium">{sub.customerName}</p>
                     <p className="text-xs text-muted-foreground">{sub.customerPhone}</p>
                   </div>
-                  <span className={cn('shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold', STATUS_TONE[sub.status])}>
+                  <span className={cn('shrink-0 rounded-full px-2 py-1 text-[12px] font-semibold', STATUS_TONE[sub.status])}>
                     {tStatus(sub.status)}
                   </span>
                 </div>

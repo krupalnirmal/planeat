@@ -22,7 +22,7 @@ export function HeaderCartLink() {
     >
       <ShoppingCart className="size-5" aria-hidden />
       {cart.itemCount > 0 && (
-        <span className="absolute top-1 right-1 grid size-4 place-items-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+        <span className="absolute top-1 right-1 grid size-4 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
           {cart.itemCount > 9 ? '9+' : cart.itemCount}
         </span>
       )}

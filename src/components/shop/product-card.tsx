@@ -253,7 +253,7 @@ export function ProductCard({
           />
 
           {hasDiscount && product.inStock && (
-            <span className="absolute top-1.5 left-1.5 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+            <span className="absolute top-1.5 left-1.5 rounded bg-primary px-1.5 py-0.5 text-[11px] font-bold text-primary-foreground">
               {Math.round((1 - Number(price) / Number(mrp)) * 100)}% {t('off')}
             </span>
           )}
@@ -302,14 +302,14 @@ export function ProductCard({
             `ProductCardData` — a caller that hasn't been updated yet still
             gets the single already-localised `name` it always had. Clamped
             to 1 line in every mode (see the block comment above). */}
-        <h3 className="line-clamp-1 text-[13px] leading-tight font-semibold">
+        <h3 className="line-clamp-1 text-[14px] leading-tight font-semibold">
           {product.nameEn ?? product.name}
           {product.localName && (
             <span className="font-normal text-muted-foreground"> ({product.localName})</span>
           )}
         </h3>
         {activeVariant && (
-          <p className="truncate text-[12px] text-muted-foreground">
+          <p className="truncate text-[13px] text-muted-foreground">
             {formatQuantity(activeVariant.quantity, activeVariant.unit as QuantityUnit)}
           </p>
         )}
@@ -323,15 +323,15 @@ export function ProductCard({
       <div className={cn('flex items-end justify-between gap-1.5 px-2.5 pt-1.5 pb-2', !compact && 'mt-auto')}>
         <div className="min-w-0">
           <div className="flex items-baseline gap-1">
-            <span className="text-[14px] font-bold">{formatPaise(price, { hidePaise: true })}</span>
+            <span className="text-[15px] font-bold">{formatPaise(price, { hidePaise: true })}</span>
             {hasDiscount && (
-              <span className="text-[12px] text-muted-foreground line-through">
+              <span className="text-[13px] text-muted-foreground line-through">
                 {formatPaise(mrp, { hidePaise: true })}
               </span>
             )}
           </div>
           {isLowStock && (
-            <p className="mt-0.5 text-[10px] font-medium text-warning">
+            <p className="mt-0.5 text-[11px] font-medium text-warning">
               {t('lowStock', { count: activeVariant.stockQty })}
             </p>
           )}
@@ -339,7 +339,7 @@ export function ProductCard({
 
         <div className="flex shrink-0 flex-col items-end">
           {!product.inStock || !activeVariant ? (
-            <span className="text-[10px] font-semibold text-muted-foreground">{t('outOfStock')}</span>
+            <span className="text-[11px] font-semibold text-muted-foreground">{t('outOfStock')}</span>
           ) : quantity === 0 ? (
             <button
               type="button"
@@ -364,7 +364,7 @@ export function ProductCard({
               // the two-line "N options" case still needs its natural,
               // taller height) makes it match the stepper exactly.
               className={cn(
-                'flex min-w-[44px] min-h-0 flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-1.5 py-1 text-[12px] font-bold text-primary transition-transform active:scale-90',
+                'flex min-w-[44px] min-h-0 flex-col items-center justify-center gap-0 rounded-lg border-[1.5px] border-primary bg-card px-1.5 py-1 text-[13px] font-bold text-primary transition-transform active:scale-90',
                 !multiVariant && 'h-7',
               )}
             >
@@ -372,7 +372,7 @@ export function ProductCard({
               {/* "N options" sits inside the same bordered button as a
                   second line, not as a separate underlined link below it. */}
               {multiVariant && (
-                <span className="text-[8px] leading-none font-semibold text-muted-foreground">
+                <span className="text-[9px] leading-none font-semibold text-muted-foreground">
                   {t('nOptions', { count: variants!.length })}
                 </span>
               )}
@@ -396,7 +396,7 @@ export function ProductCard({
                 <button
                   type="button"
                   onClick={() => setPickerOpen(true)}
-                  className="mt-0.5 text-[9px] font-semibold text-muted-foreground underline underline-offset-2"
+                  className="mt-0.5 text-[10px] font-semibold text-muted-foreground underline underline-offset-2"
                 >
                   {t('nOptions', { count: variants!.length })}
                 </button>

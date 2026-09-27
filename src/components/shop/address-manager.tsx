@@ -119,7 +119,7 @@ export function AddressManager() {
                       <MapPin className="size-4 shrink-0 text-primary" aria-hidden />
                       {address.label}
                       {address.isDefault && (
-                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
                           {t('isDefault')}
                         </span>
                       )}

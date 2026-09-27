@@ -133,7 +133,7 @@ export function ProfileScreen() {
             >
               <Icon className="size-5 shrink-0 text-primary" aria-hidden />
               <span className="flex-1 text-sm font-medium">{t(key)}</span>
-              <span className="text-[10px] text-muted-foreground">{tc('comingSoon')}</span>
+              <span className="text-[11px] text-muted-foreground">{tc('comingSoon')}</span>
             </button>
           </li>
         ))}

@@ -140,7 +140,7 @@ export function DesktopHeader({ categories }: { categories: { slug: string; name
             >
               <ShoppingCart className="size-5" aria-hidden />
               {cart.itemCount > 0 && (
-                <span className="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-accent text-[9px] font-bold text-accent-foreground">
+                <span className="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
                   {cart.itemCount > 9 ? '9+' : cart.itemCount}
                 </span>
               )}

@@ -502,7 +502,7 @@ function DurationStep({
             )}
           >
             {days === MOST_POPULAR_DAYS && (
-              <span className="absolute -top-2.5 right-4 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+              <span className="absolute -top-2.5 right-4 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-primary-foreground">
                 {t('mostPopular')}
               </span>
             )}
@@ -968,7 +968,7 @@ function PaymentMethodStep({
           {paying && <Loader2 className="size-4 animate-spin" aria-hidden />}
           {t('pay', { amount: formatPaise(paise(amountPaise), { hidePaise: true }) })}
         </button>
-        <p className="mt-2 flex items-center justify-center gap-1 text-[11px] text-muted-foreground">
+        <p className="mt-2 flex items-center justify-center gap-1 text-[12px] text-muted-foreground">
           <ShieldCheck className="size-3" aria-hidden />
           {t('securePayment')}
         </p>
@@ -1110,7 +1110,7 @@ function Row({ label, value, hint }: { label: string; value: React.ReactNode; hi
     <div className="flex items-baseline justify-between">
       <dt className="text-muted-foreground">
         {label}
-        {hint && <span className="ml-1 text-[11px]">({hint})</span>}
+        {hint && <span className="ml-1 text-[12px]">({hint})</span>}
       </dt>
       <dd>{value}</dd>
     </div>

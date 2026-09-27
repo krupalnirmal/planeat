@@ -280,7 +280,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
                     // — pastel-tinted pill sized to its own text instead of
                     // the earlier fixed-width icon-over-label card.
                     className={cn(
-                      'shrink-0 rounded-2xl border-2 px-3.5 py-2.5 text-center text-[11.5px] font-bold whitespace-nowrap text-foreground transition-colors',
+                      'shrink-0 rounded-2xl border-2 px-3.5 py-2.5 text-center text-[12.5px] font-bold whitespace-nowrap text-foreground transition-colors',
                       active ? 'border-primary' : 'border-transparent',
                     )}
                     style={{ backgroundColor: style.bg }}
@@ -409,7 +409,7 @@ function PlanProductCard({
             <ImageIcon className="size-8 text-muted-foreground/40" aria-hidden />
           )}
           {hasDiscount && (
-            <span className="absolute top-1.5 left-1.5 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+            <span className="absolute top-1.5 left-1.5 rounded bg-primary px-1.5 py-0.5 text-[11px] font-bold text-primary-foreground">
               {Math.round((1 - Number(price) / Number(mrp)) * 100)}% {t('off')}
             </span>
           )}
@@ -443,33 +443,33 @@ function PlanProductCard({
             name line and an outlined text-only "ADD" label; the reference
             leads the name with the category's own icon and gives the CTA
             real button weight (filled green, a leading plus). */}
-        <h3 className="flex items-center gap-1 text-[13px] leading-tight font-semibold">
+        <h3 className="flex items-center gap-1 text-[14px] leading-tight font-semibold">
           <CategoryIcon className="size-3.5 shrink-0 text-primary" aria-hidden />
           <span className="line-clamp-1">{product.nameEn ?? product.name}</span>
         </h3>
         {product.localName && (
-          <p className="line-clamp-1 text-[11.5px] text-muted-foreground">({product.localName})</p>
+          <p className="line-clamp-1 text-[12.5px] text-muted-foreground">({product.localName})</p>
         )}
         {displayVariant && (
           <>
-            <p className="flex items-center gap-1 truncate text-[11px] text-muted-foreground">
+            <p className="flex items-center gap-1 truncate text-[12px] text-muted-foreground">
               <Weight className="size-3 shrink-0" aria-hidden />
               {displayVariant.label}
             </p>
             <div className="mt-1 flex items-end justify-between gap-1.5">
               <div className="min-w-0">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-[14px] font-bold text-primary">
+                  <span className="text-[15px] font-bold text-primary">
                     {formatPaise(price, { hidePaise: true })}
                   </span>
                   {hasDiscount && (
-                    <span className="text-[11px] text-muted-foreground line-through">
+                    <span className="text-[12px] text-muted-foreground line-through">
                       {formatPaise(mrp, { hidePaise: true })}
                     </span>
                   )}
                 </div>
                 {multiVariant && (
-                  <span className="text-[9px] leading-none font-semibold text-muted-foreground">
+                  <span className="text-[10px] leading-none font-semibold text-muted-foreground">
                     {t('nOptions', { count: product.variants.length })}
                   </span>
                 )}
@@ -478,7 +478,7 @@ function PlanProductCard({
                   already the tap target (it opens the quantity/weight
                   modal), so this just mirrors the storefront's filled
                   pill visually instead of duplicating its click handler. */}
-              <span className="flex shrink-0 items-center gap-0.5 rounded-full bg-primary px-2.5 py-1.5 text-[11px] font-bold text-primary-foreground">
+              <span className="flex shrink-0 items-center gap-0.5 rounded-full bg-primary px-2.5 py-1.5 text-[12px] font-bold text-primary-foreground">
                 <Plus className="size-3 shrink-0" aria-hidden />
                 {t('add')}
               </span>

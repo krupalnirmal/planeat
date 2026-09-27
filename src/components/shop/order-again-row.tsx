@@ -48,7 +48,7 @@ export function OrderAgainRow() {
       <div className="mb-3 flex items-baseline justify-between">
         <h2
           id="order-again-heading"
-          className="flex items-center gap-1.5 text-[17px] font-bold"
+          className="flex items-center gap-1.5 text-[18px] font-bold"
         >
           <RotateCcw className="size-4.5 text-primary" aria-hidden />
           {t('orderAgain')}

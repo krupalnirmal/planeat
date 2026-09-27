@@ -176,7 +176,7 @@ export function Recorder({
             {t('recording')} {String(Math.floor(seconds / 60)).padStart(2, '0')}:
             {String(seconds % 60).padStart(2, '0')}
           </p>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">
+          <p className="mt-0.5 text-[12px] text-muted-foreground">
             {t('maxSeconds', { seconds: MAX_SECONDS })}
           </p>
 

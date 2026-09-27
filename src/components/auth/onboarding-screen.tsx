@@ -17,7 +17,7 @@ export function OnboardingScreen() {
   return (
     <main className="flex min-h-dvh flex-col bg-tint-green px-6 pt-14 pb-8 text-center">
       <div className="flex flex-1 flex-col items-center justify-center">
-        <h1 className="text-[26px] leading-tight font-black text-primary-dark text-balance">
+        <h1 className="text-[27px] leading-tight font-black text-primary-dark text-balance">
           {t('onboardingTitle')}
         </h1>
         <p className="mt-2 text-sm font-medium text-muted-foreground">

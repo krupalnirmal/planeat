@@ -144,13 +144,13 @@ export function AdminInstallPrompt() {
               setUsed(true);
               if (choice.outcome === 'accepted') setDismissed(true);
             }}
-            className="mt-1 flex h-8 items-center gap-1.5 rounded-full bg-primary px-3 text-[11px] font-bold text-primary-foreground"
+            className="mt-1 flex h-8 items-center gap-1.5 rounded-full bg-primary px-3 text-[12px] font-bold text-primary-foreground"
           >
             <Download className="size-3.5" aria-hidden />
             {t('installAction')}
           </button>
         ) : (
-          <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+          <p className="mt-0.5 flex items-center gap-1 text-[12px] text-muted-foreground">
             {state === 'ios' ? (
               <>
                 <Share className="size-3 shrink-0" aria-hidden />

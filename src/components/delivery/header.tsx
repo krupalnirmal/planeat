@@ -42,7 +42,7 @@ export function DeliveryHeader() {
     <header className="sticky top-0 z-30 flex items-center justify-between gap-2 bg-primary px-4 py-3 text-primary-foreground">
       <div className="min-w-0">
         <p className="text-sm font-semibold">{t('appTitle')}</p>
-        {me.data?.name && <p className="truncate text-[11px] opacity-80">{me.data.name}</p>}
+        {me.data?.name && <p className="truncate text-[12px] opacity-80">{me.data.name}</p>}
       </div>
       <div className="flex items-center gap-3">
         <label className="flex items-center gap-1.5 text-xs font-medium">

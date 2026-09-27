@@ -167,7 +167,7 @@ export function CustomersExplorerTab() {
                       </div>
                       <div className="shrink-0 text-right">
                         <p className="text-sm font-bold tabular-nums">{customer.orderCount}</p>
-                        <p className="text-[11px] text-muted-foreground">{t('orders')}</p>
+                        <p className="text-[12px] text-muted-foreground">{t('orders')}</p>
                       </div>
                     </button>
                   </li>

@@ -61,7 +61,7 @@ export function SearchBar({
         placeholder={t('placeholder')}
         aria-label={t('placeholder')}
         enterKeyHint="search"
-        className="min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted-foreground"
+        className="min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-muted-foreground"
       />
       {value ? (
         <button

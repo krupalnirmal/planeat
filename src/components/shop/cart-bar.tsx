@@ -113,7 +113,7 @@ export function CartBar() {
       {forFreeDelivery > 0n && (
         // Sits directly on top of the bar and tucks behind it, so the two
         // read as one stacked unit rather than two floating cards.
-        <p className="-mb-3 flex items-center gap-1.5 rounded-t-[var(--radius)] bg-tint-green px-3 pt-1.5 pb-3 text-[10.5px] font-medium">
+        <p className="-mb-3 flex items-center gap-1.5 rounded-t-[var(--radius)] bg-tint-green px-3 pt-1.5 pb-3 text-[11.5px] font-medium">
           <Truck className="size-3.5 shrink-0 text-primary" aria-hidden />
           {t('freeDeliveryNudge', {
             amount: formatPaise(forFreeDelivery, { hidePaise: true }),
@@ -148,8 +148,8 @@ export function CartBar() {
         </span>
 
         <span className="min-w-0 flex-1">
-          <span className="block text-[15px] leading-tight font-bold">{t('viewCart')}</span>
-          <span className="block text-[11px] leading-tight text-accent-foreground/70">
+          <span className="block text-[16px] leading-tight font-bold">{t('viewCart')}</span>
+          <span className="block text-[12px] leading-tight text-accent-foreground/70">
             {t('itemCount', { count: cart.itemCount })}
           </span>
         </span>

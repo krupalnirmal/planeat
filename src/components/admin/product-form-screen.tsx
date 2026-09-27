@@ -428,7 +428,7 @@ function ImagesField({
             ) : (
               <Plus className="size-4" aria-hidden />
             )}
-            <span className="text-[10px]">{upload.isPending ? t('uploading') : t('addImage')}</span>
+            <span className="text-[11px]">{upload.isPending ? t('uploading') : t('addImage')}</span>
           </button>
         )}
       </div>
@@ -459,7 +459,7 @@ function Field({
     <div className={className}>
       <label className="mb-1 block text-xs font-medium text-muted-foreground">{label}</label>
       {children}
-      {hint && <p className="mt-0.5 text-[11px] text-muted-foreground">{hint}</p>}
+      {hint && <p className="mt-0.5 text-[12px] text-muted-foreground">{hint}</p>}
     </div>
   );
 }
@@ -711,7 +711,7 @@ function VariantRowEditor({
           onChange={(e) => setDraft((d) => ({ ...d, label: e.target.value }))}
           className="h-8 w-24 rounded border border-border bg-background px-1.5 text-xs outline-none"
         />
-        {error && <p className="mt-1 text-[10px] text-danger">{error}</p>}
+        {error && <p className="mt-1 text-[11px] text-danger">{error}</p>}
       </td>
       <td className="px-2 py-1.5">
         <div className="flex gap-1">
@@ -787,7 +787,7 @@ function VariantRowEditor({
           type="button"
           disabled={save.isPending}
           onClick={() => save.mutate()}
-          className="h-8 rounded border border-primary px-2 text-[11px] font-bold text-primary disabled:opacity-50"
+          className="h-8 rounded border border-primary px-2 text-[12px] font-bold text-primary disabled:opacity-50"
         >
           {save.isPending ? <Loader2 className="size-3 animate-spin" aria-hidden /> : t('save')}
         </button>

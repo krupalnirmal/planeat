@@ -105,7 +105,7 @@ export function AdminCatalogueScreen() {
                           <Link href={`/admin/catalogue/${product.id}`} className="block truncate font-medium text-primary hover:underline">
                             {product.name}
                           </Link>
-                          <span className="font-mono text-[11px] text-muted-foreground">
+                          <span className="font-mono text-[12px] text-muted-foreground">
                             {product.sku}
                             {product.lowestPricePaise &&
                               ` · ${formatPaise(paise(product.lowestPricePaise), { hidePaise: true })}`}
@@ -139,12 +139,12 @@ export function AdminCatalogueScreen() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-foreground">{product.name}</p>
-                  <p className="font-mono text-[11px] text-muted-foreground">
+                  <p className="font-mono text-[12px] text-muted-foreground">
                     {product.sku}
                     {product.lowestPricePaise &&
                       ` · ${formatPaise(paise(product.lowestPricePaise), { hidePaise: true })}`}
                   </p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  <p className="mt-0.5 text-[12px] text-muted-foreground">
                     {product.categorySlug} · {t('variants')}: {product.variantCount} · {t('stock')}: {product.totalStock}
                   </p>
                 </div>

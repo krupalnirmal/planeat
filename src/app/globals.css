@@ -131,7 +131,10 @@
   --surface-raised: #ffffff;
   --surface-sunken: #e4e2da;
   --text: #14140f;
-  --text-muted: #6b7280;
+  /* Darkened from #6b7280 (session 2026-09-27, owner request — labels/hints
+     read too pale next to Blinkit's bolder secondary text). Still visibly
+     lighter than `--text` for hierarchy, just not washed-out grey. */
+  --text-muted: #45463f;
   --success: #2fa355;
   --warning: #c97a17;
   --danger: #c0392b;

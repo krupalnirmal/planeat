@@ -307,7 +307,7 @@ export function HorizontalBarChart({
                 <span className="flex shrink-0 items-center gap-1.5">
                   <span className="font-semibold tabular-nums text-foreground">{valueFormat(item.value)}</span>
                   {item.badge && (
-                    <span className="rounded-full bg-secondary px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                    <span className="rounded-full bg-secondary px-1.5 py-0.5 text-[11px] font-semibold text-muted-foreground">
                       {item.badge}
                     </span>
                   )}
@@ -404,7 +404,7 @@ export function DonutChart({
         <div className="absolute inset-0 grid place-items-center">
           <div className="text-center">
             <p className="text-2xl font-bold tabular-nums text-foreground">{formatTotal(total)}</p>
-            <p className="text-[11px] text-muted-foreground">Total</p>
+            <p className="text-[12px] text-muted-foreground">Total</p>
           </div>
         </div>
       </div>

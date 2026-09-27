@@ -91,7 +91,7 @@ export function AdminSettingsScreen() {
                   >
                     <div className="min-w-0">
                       <p className="font-mono text-xs">{row.key}</p>
-                      <p className="mt-0.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                      <p className="mt-0.5 flex items-center gap-1.5 text-[12px] text-muted-foreground">
                         <Info className="size-3" aria-hidden />
                         {t('reference')} {row.reference}
                         {row.updatedByName && ` · ${t('updatedBy')} ${row.updatedByName}`}

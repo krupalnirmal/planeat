@@ -194,7 +194,7 @@ export function InventoryExplorerTab() {
                         >
                           {row.stockQty}
                         </p>
-                        <p className="text-[11px] text-muted-foreground">{t('stock')}</p>
+                        <p className="text-[12px] text-muted-foreground">{t('stock')}</p>
                       </div>
                     </button>
                   </li>

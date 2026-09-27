@@ -242,7 +242,7 @@ export function SubscriptionManageScreen() {
       {/* ── Address for future deliveries */}
       <section className="bg-card px-4 py-4">
         <h2 className="text-sm font-semibold">{t('changeAddress')}</h2>
-        <p className="mt-0.5 text-[11px] text-muted-foreground">{t('addressNote')}</p>
+        <p className="mt-0.5 text-[12px] text-muted-foreground">{t('addressNote')}</p>
 
         <ul className="mt-3 space-y-2">
           {user?.addresses.map((address) => (
@@ -390,7 +390,7 @@ function DuringPlanDashboard({
         <div className="h-2 overflow-hidden rounded-full bg-secondary">
           <div className="h-full rounded-full bg-primary" style={{ width: `${progressPercent}%` }} />
         </div>
-        <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+        <div className="mt-1 flex items-center justify-between text-[12px] text-muted-foreground">
           <span>{t('daysCompleted')}</span>
           <span>{t('daysRemaining')}</span>
         </div>

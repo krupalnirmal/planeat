@@ -89,8 +89,8 @@ export function LoginPrompt({
               <span className="grid size-11 place-items-center rounded-full bg-tint-green text-primary">
                 <Icon className="size-5" aria-hidden />
               </span>
-              <p className="text-[11px] leading-tight font-bold">{t(`${key}Title`)}</p>
-              <p className="text-[10px] leading-tight text-muted-foreground">{t(`${key}Body`)}</p>
+              <p className="text-[12px] leading-tight font-bold">{t(`${key}Title`)}</p>
+              <p className="text-[11px] leading-tight text-muted-foreground">{t(`${key}Body`)}</p>
             </div>
           ))}
         </div>
@@ -102,7 +102,7 @@ export function LoginPrompt({
           </span>
           <div className="min-w-0">
             <p className="text-sm font-black text-primary-dark">{t('promoTitle')}</p>
-            <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{t('promoBody')}</p>
+            <p className="mt-0.5 text-[12px] leading-snug text-muted-foreground">{t('promoBody')}</p>
           </div>
         </div>
       </div>

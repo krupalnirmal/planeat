@@ -177,7 +177,7 @@ export function PaymentsExplorerTab() {
                         <td className="px-3 py-2.5">
                           <span
                             className={cn(
-                              'rounded-full px-2 py-1 text-[11px] font-semibold',
+                              'rounded-full px-2 py-1 text-[12px] font-semibold',
                               PAYMENT_STATUS_TONE[row.paymentStatus] ?? 'bg-secondary',
                             )}
                           >
@@ -208,7 +208,7 @@ export function PaymentsExplorerTab() {
                         <span className="font-mono text-xs font-semibold text-primary">#{row.orderNumber}</span>
                         <span
                           className={cn(
-                            'shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold',
+                            'shrink-0 rounded-full px-2 py-1 text-[12px] font-semibold',
                             PAYMENT_STATUS_TONE[row.paymentStatus] ?? 'bg-secondary',
                           )}
                         >

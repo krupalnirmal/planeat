@@ -218,7 +218,7 @@ export function WalletScreen() {
                 <span className="block truncate text-sm font-medium">
                   {row.note ?? t(`source.${row.source}`)}
                 </span>
-                <span className="block text-[11px] text-muted-foreground">
+                <span className="block text-[12px] text-muted-foreground">
                   {format.dateTime(new Date(row.createdAt), {
                     day: 'numeric',
                     month: 'short',

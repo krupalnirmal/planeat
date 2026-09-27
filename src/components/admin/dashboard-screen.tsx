@@ -209,7 +209,7 @@ export function AdminDashboard() {
             className="flex flex-col items-center gap-1.5 rounded-[var(--radius)] bg-tint-green px-1 py-3"
           >
             <section.icon className="size-5 text-primary" aria-hidden />
-            <span className="text-[11px] font-semibold text-primary-dark">{tNav(section.key)}</span>
+            <span className="text-[12px] font-semibold text-primary-dark">{tNav(section.key)}</span>
           </Link>
         ))}
       </div>

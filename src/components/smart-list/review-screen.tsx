@@ -231,7 +231,7 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
                   {item.matchedName ? (
                     <p className="truncate text-xs text-muted-foreground">{item.matchedName}</p>
                   ) : (
-                    <p className="text-[11px] text-muted-foreground">“{item.rawText}”</p>
+                    <p className="text-[12px] text-muted-foreground">“{item.rawText}”</p>
                   )}
 
                   {/* Real per-kg/per-litre/per-count unit pricing, derived
@@ -264,7 +264,7 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
                         {formatPaise(paise(item.linePricePaise), { hidePaise: true })}
                       </p>
                       {item.quantity && item.unit && (
-                        <p className="text-[11px] text-muted-foreground">
+                        <p className="text-[12px] text-muted-foreground">
                           ({formatQuantity(item.quantity, item.unit as QuantityUnit)})
                         </p>
                       )}
@@ -461,12 +461,12 @@ function StatusBadge({ status, confidence }: { status: ReviewItem['status']; con
 
   return (
     <p className="mt-1 flex items-center gap-1.5">
-      <span className={cn('flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold', tone)}>
+      <span className={cn('flex items-center gap-1 rounded-full px-2 py-0.5 text-[12px] font-bold', tone)}>
         <Icon className="size-3 shrink-0" aria-hidden />
         {label}
       </span>
       {status !== 'UNMATCHED' && (
-        <span className="text-[11px] text-muted-foreground">
+        <span className="text-[12px] text-muted-foreground">
           {t('matchPercent', { percent: Math.round(confidence * 100) })}
         </span>
       )}

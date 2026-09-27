@@ -168,7 +168,7 @@ export function OrdersExplorerTab() {
                         <td className="px-3 py-2.5">
                           <span
                             className={cn(
-                              'rounded-full px-2 py-1 text-[11px] font-semibold',
+                              'rounded-full px-2 py-1 text-[12px] font-semibold',
                               STATUS_TONE[order.status] ?? 'bg-secondary',
                             )}
                           >
@@ -204,7 +204,7 @@ export function OrdersExplorerTab() {
                         </span>
                         <span
                           className={cn(
-                            'shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold',
+                            'shrink-0 rounded-full px-2 py-1 text-[12px] font-semibold',
                             STATUS_TONE[order.status] ?? 'bg-secondary',
                           )}
                         >

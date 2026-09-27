@@ -73,7 +73,7 @@ export function CategoryCollageTile({
           <Icon className="size-2.5 lg:size-3.5" aria-hidden />
         </span>
       </div>
-      <p className="line-clamp-2 px-1.5 pb-2 text-center text-[10.5px] leading-tight font-semibold lg:px-2.5 lg:pb-3 lg:text-sm">
+      <p className="line-clamp-2 px-1.5 pb-2 text-center text-[11.5px] leading-tight font-semibold lg:px-2.5 lg:pb-3 lg:text-sm">
         {name}
       </p>
     </Link>

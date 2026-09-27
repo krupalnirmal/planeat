@@ -71,7 +71,7 @@ export function NotificationBell({ align = 'right' }: { align?: 'left' | 'right'
       >
         <Bell className="size-4.5" aria-hidden />
         {unreadCount > 0 && (
-          <span className="absolute top-0.5 right-0.5 grid size-4 place-items-center rounded-full bg-danger text-[9px] font-bold text-white">
+          <span className="absolute top-0.5 right-0.5 grid size-4 place-items-center rounded-full bg-danger text-[10px] font-bold text-white">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -111,7 +111,7 @@ export function NotificationBell({ align = 'right' }: { align?: 'left' | 'right'
                     <>
                       <p className="text-sm font-semibold">{row.title}</p>
                       <p className="mt-0.5 text-xs text-muted-foreground">{row.body}</p>
-                      <p className="mt-1 text-[11px] text-muted-foreground">
+                      <p className="mt-1 text-[12px] text-muted-foreground">
                         {format.dateTime(new Date(row.createdAt), {
                           day: 'numeric',
                           month: 'short',

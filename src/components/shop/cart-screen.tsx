@@ -166,7 +166,7 @@ export function CartScreen() {
             </span>
             <span
               key={cart.itemCount}
-              className="animate-in zoom-in absolute -top-1 -right-1 grid size-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground duration-200"
+              className="animate-in zoom-in absolute -top-1 -right-1 grid size-5 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground duration-200"
             >
               {cart.itemCount}
             </span>
@@ -237,7 +237,7 @@ export function CartScreen() {
                   </p>
 
                   {unavailable && (
-                    <p className="mt-1 text-[11px] font-medium text-warning">
+                    <p className="mt-1 text-[12px] font-medium text-warning">
                       {line.isActive
                         ? t('outOfStockLine', { count: line.availableQty })
                         : t('unavailableItems')}

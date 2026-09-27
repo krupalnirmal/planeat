@@ -265,7 +265,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                       </div>
                       <span
                         className={cn(
-                          'shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold',
+                          'shrink-0 rounded-full px-2.5 py-1 text-[12px] font-bold',
                           reached ? 'bg-tint-green text-primary-dark' : 'bg-accent-faint text-warning',
                         )}
                       >
@@ -313,7 +313,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
             href={mapUrl}
             target="_blank"
             rel="noreferrer"
-            className="flex shrink-0 flex-col items-center gap-1 text-center text-[11px] font-bold text-primary"
+            className="flex shrink-0 flex-col items-center gap-1 text-center text-[12px] font-bold text-primary"
           >
             <span className="grid size-9 place-items-center rounded-full bg-tint-green">
               <Map className="size-4" aria-hidden />

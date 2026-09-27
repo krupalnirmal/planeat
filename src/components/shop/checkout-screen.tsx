@@ -355,7 +355,7 @@ export function CheckoutScreen() {
                     <span className="block text-sm font-medium">
                       {address.label}
                       {address.isDefault && (
-                        <span className="ml-2 text-[10px] font-bold text-primary">
+                        <span className="ml-2 text-[11px] font-bold text-primary">
                           {ta('isDefault')}
                         </span>
                       )}
@@ -397,7 +397,7 @@ export function CheckoutScreen() {
             >
               <span>{t(option.labelKey)}</span>
               {option.value === 'EXPRESS' && (
-                <span className="text-[11px] text-muted-foreground">{t('slotExpressHint')}</span>
+                <span className="text-[12px] text-muted-foreground">{t('slotExpressHint')}</span>
               )}
             </button>
           ))}
@@ -600,7 +600,7 @@ function PaymentOption({
       <span className="min-w-0 flex-1">
         <span className="block">{label}</span>
         {(disabled ? disabledHint : hint) && (
-          <span className="block text-[11px] font-normal text-muted-foreground">
+          <span className="block text-[12px] font-normal text-muted-foreground">
             {disabled ? disabledHint : hint}
           </span>
         )}
@@ -626,7 +626,7 @@ function PaymentOption({
     track a live wizard state. */
 function StepBadge({ step }: { step: number }) {
   return (
-    <span className="grid size-5 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+    <span className="grid size-5 shrink-0 place-items-center rounded-full bg-primary text-[12px] font-bold text-primary-foreground">
       {step}
     </span>
   );

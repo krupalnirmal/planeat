@@ -183,7 +183,7 @@ export function MealPlanScreen() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={QUICKPLAN_IMAGE} alt="" className="aspect-[3/2] w-full rounded-xl object-cover" />
-          <span className="text-[11px] leading-tight font-bold">{t('wizard.quickPlanTitle')}</span>
+          <span className="text-[12px] leading-tight font-bold">{t('wizard.quickPlanTitle')}</span>
           <span className="grid size-7 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
             <ChevronRight className="size-4" aria-hidden />
           </span>
@@ -199,7 +199,7 @@ export function MealPlanScreen() {
           ) : (
             <div className="aspect-[3/2] w-full rounded-xl bg-tint-green" />
           )}
-          <span className="text-[11px] leading-tight font-bold">{t('wizard.dairyBakeryTitle')}</span>
+          <span className="text-[12px] leading-tight font-bold">{t('wizard.dairyBakeryTitle')}</span>
           <span className="grid size-7 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
             <ChevronRight className="size-4" aria-hidden />
           </span>
@@ -208,11 +208,11 @@ export function MealPlanScreen() {
         <div className="card-3d flex flex-col items-center gap-1.5 rounded-2xl bg-card p-2.5 text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={SAVINGS_ICON} alt="" className="size-14 object-contain" />
-          <span className="text-[10px] leading-tight font-semibold text-muted-foreground">
+          <span className="text-[11px] leading-tight font-semibold text-muted-foreground">
             {t('wizard.savingsTitle')}
           </span>
           <span className="text-base font-black text-primary">{formatPaise(savings, { hidePaise: true })}</span>
-          <span className="text-[9px] leading-tight text-muted-foreground">{t('wizard.savingsHint')}</span>
+          <span className="text-[10px] leading-tight text-muted-foreground">{t('wizard.savingsHint')}</span>
         </div>
       </div>
 
@@ -242,7 +242,7 @@ export function MealPlanScreen() {
               <Truck className="size-4 shrink-0" aria-hidden />
               {t('wizard.viewSubscription')}
               {data.activeDeliveryMode && (
-                <span className="rounded-full bg-primary-dark px-2 py-0.5 text-[10px] font-bold text-white">
+                <span className="rounded-full bg-primary-dark px-2 py-0.5 text-[11px] font-bold text-white">
                   {data.activeDeliveryMode === 'WEEKLY' ? t('wizard.deliveryModeWeekly') : t('wizard.deliveryModeDaily')}
                 </span>
               )}
@@ -311,7 +311,7 @@ function FeatureCard({ image, label }: { image: string; label: string }) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={image} alt="" className="size-full object-cover" />
       </span>
-      <span className="flex items-center gap-0.5 text-[11.5px] leading-tight font-bold">
+      <span className="flex items-center gap-0.5 text-[12.5px] leading-tight font-bold">
         {label}
         <ChevronRight className="size-3.5 shrink-0 text-primary" aria-hidden />
       </span>

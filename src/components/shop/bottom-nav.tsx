@@ -97,7 +97,7 @@ export function BottomNav() {
                 />
                 <span
                   className={cn(
-                    'text-[9.5px] leading-none whitespace-nowrap',
+                    'text-[10.5px] leading-none whitespace-nowrap',
                     active ? 'font-bold text-accent-foreground' : 'text-muted-foreground',
                   )}
                 >

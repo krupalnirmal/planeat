@@ -84,30 +84,30 @@ export function AppHeader({ sticky = true }: { sticky?: boolean } = {}) {
               {/* The balance rides under the icon as its own chip, the way
                   the reference does — a number glanced at, not a button
                   read. */}
-              <span className="absolute -bottom-1.5 rounded-full bg-primary px-1.5 text-[10px] leading-[15px] font-bold text-primary-foreground">
+              <span className="absolute -bottom-1.5 rounded-full bg-primary px-1.5 text-[11px] leading-[15px] font-bold text-primary-foreground">
                 {formatPaise(paise(wallet.data?.balancePaise ?? '0'), { hidePaise: true })}
               </span>
             </span>
-            <span className="text-[10px] font-medium text-muted-foreground">{tw('title')}</span>
+            <span className="text-[11px] font-medium text-muted-foreground">{tw('title')}</span>
           </Link>
 
           <Link href="/cart" className="flex flex-col items-center gap-1">
             <span className="relative grid size-11 place-items-center rounded-full bg-card text-primary shadow-sm">
               <ShoppingCart className="size-[18px]" aria-hidden />
               {cart.itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 grid min-w-5 place-items-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-foreground">
+                <span className="absolute -top-1 -right-1 grid min-w-5 place-items-center rounded-full bg-accent px-1 text-[11px] font-bold text-accent-foreground">
                   {cart.itemCount}
                 </span>
               )}
             </span>
-            <span className="text-[10px] font-medium text-muted-foreground">{tCart('title')}</span>
+            <span className="text-[11px] font-medium text-muted-foreground">{tCart('title')}</span>
           </Link>
 
           <Link href="/profile" className="flex flex-col items-center gap-1">
             <span className="grid size-11 place-items-center rounded-full bg-card text-primary shadow-sm">
               {initial || <UserRound className="size-5" aria-hidden />}
             </span>
-            <span className="text-[10px] font-medium text-muted-foreground">{tp('title')}</span>
+            <span className="text-[11px] font-medium text-muted-foreground">{tp('title')}</span>
           </Link>
         </div>
       </div>
@@ -125,11 +125,11 @@ export function AppHeader({ sticky = true }: { sticky?: boolean } = {}) {
         >
           <MapPin className="size-4 shrink-0 text-primary" aria-hidden />
           <span className="min-w-0">
-            <span className="block text-[11px] leading-tight text-muted-foreground">
+            <span className="block text-[12px] leading-tight text-muted-foreground">
               {t('deliverTo')}
             </span>
             <span className="flex items-center gap-1">
-              <span className="truncate text-[13px] leading-tight font-bold">{addressLine}</span>
+              <span className="truncate text-[14px] leading-tight font-bold">{addressLine}</span>
               <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
             </span>
           </span>

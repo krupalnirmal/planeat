@@ -93,7 +93,7 @@ function FilterPillButton({
       type="button"
       onClick={onToggle}
       aria-expanded={isOpen}
-      className="flex h-10 shrink-0 items-center gap-1 rounded-full border border-border bg-card px-3.5 text-[13px] font-semibold whitespace-nowrap"
+      className="flex h-10 shrink-0 items-center gap-1 rounded-full border border-border bg-card px-3.5 text-[14px] font-semibold whitespace-nowrap"
     >
       {label}
       <ChevronDown className={cn('size-3.5 transition-transform', isOpen && 'rotate-180')} aria-hidden />
@@ -338,7 +338,7 @@ export function CategoryProductList({
       </span>
       <span
         className={cn(
-          'text-[11px] leading-tight lg:text-sm',
+          'text-[12px] leading-tight lg:text-sm',
           activeTypeId === REST_ID ? 'font-bold text-foreground' : 'font-medium text-foreground',
         )}
       >
@@ -359,7 +359,7 @@ export function CategoryProductList({
       className="pb-2"
     >
       <h2
-        className="sticky z-10 border-b border-border bg-tint-lime px-4 py-2.5 text-[15px] font-black text-primary-dark"
+        className="sticky z-10 border-b border-border bg-tint-lime px-4 py-2.5 text-[16px] font-black text-primary-dark"
         style={{ top: HEADER_OFFSET_PX }}
       >
         {/* Vegetables' own leftover bucket gets a real label (session
@@ -615,13 +615,13 @@ export function CategoryProductList({
 
             <div className="relative flex items-center gap-3">
               <div className="min-w-0 flex-1">
-                <h2 className="text-[19px] leading-tight font-black text-primary-dark drop-shadow-sm">
+                <h2 className="text-[20px] leading-tight font-black text-primary-dark drop-shadow-sm">
                   {t(`banner.${slug}.headline`)}
                 </h2>
-                <p className="mt-1 text-[13px] leading-snug font-medium text-foreground/70">
+                <p className="mt-1 text-[14px] leading-snug font-medium text-foreground/70">
                   {t(`banner.${slug}.sub`)}
                 </p>
-                <span className="mt-2.5 inline-flex items-center gap-1 rounded-full bg-primary-dark px-2.5 py-1 text-[11px] font-bold text-white">
+                <span className="mt-2.5 inline-flex items-center gap-1 rounded-full bg-primary-dark px-2.5 py-1 text-[12px] font-bold text-white">
                   <Zap className="size-3 fill-white" aria-hidden />
                   {th('deliveryIn', { minutes: 30 })}
                 </span>
@@ -698,7 +698,7 @@ export function CategoryProductList({
               </span>
               <span
                 className={cn(
-                  'text-[11px] leading-tight lg:text-sm',
+                  'text-[12px] leading-tight lg:text-sm',
                   activeTypeId === ALL_ID ? 'font-bold text-foreground' : 'font-medium text-foreground',
                 )}
               >
@@ -743,7 +743,7 @@ export function CategoryProductList({
                   </span>
                   <span
                     className={cn(
-                      'text-[11px] leading-tight lg:text-sm',
+                      'text-[12px] leading-tight lg:text-sm',
                       active ? 'font-bold text-foreground' : 'font-medium text-foreground',
                     )}
                   >
@@ -805,7 +805,7 @@ export function CategoryProductList({
                         <span className="text-base">{type.emoji}</span>
                       )}
                     </span>
-                    <span className="flex-1 text-[15px] font-black text-primary-dark">
+                    <span className="flex-1 text-[16px] font-black text-primary-dark">
                       {vegetableTypeLabel(type, locale)}
                     </span>
                     {hasMore && (

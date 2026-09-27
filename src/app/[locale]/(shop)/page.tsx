@@ -233,7 +233,7 @@ async function FastDeliveryBanner() {
         <p className="text-sm font-black">
           {t('fastDeliveryTitle')} · {t('fastDeliverySubtitle')}
         </p>
-        <p className="mt-0.5 text-[11px] text-muted-foreground">{t('fastDeliveryBody')}</p>
+        <p className="mt-0.5 text-[12px] text-muted-foreground">{t('fastDeliveryBody')}</p>
       </div>
 
       {/* R10 — a plain <a> doesn't pick up the global 44px-touch-target rule

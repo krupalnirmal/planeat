@@ -283,7 +283,7 @@ export function AdminOrdersScreen() {
                         {order.orderNumber}
                       </Link>
                       {order.type === 'MEAL_PLAN_DAILY' && (
-                        <span className="ml-1.5 rounded-full bg-tint-green px-1.5 py-0.5 text-[10px] font-semibold text-primary-dark">
+                        <span className="ml-1.5 rounded-full bg-tint-green px-1.5 py-0.5 text-[11px] font-semibold text-primary-dark">
                           {tType('MEAL_PLAN_DAILY')}
                         </span>
                       )}
@@ -297,7 +297,7 @@ export function AdminOrdersScreen() {
                     <td className="px-3 py-2.5">
                       <span
                         className={cn(
-                          'rounded-full px-2 py-1 text-[11px] font-semibold',
+                          'rounded-full px-2 py-1 text-[12px] font-semibold',
                           STATUS_TONE[order.status] ?? 'bg-secondary',
                         )}
                       >
@@ -335,14 +335,14 @@ export function AdminOrdersScreen() {
                   <span className="flex min-w-0 items-center gap-1.5">
                     <span className="truncate font-mono text-xs text-primary">{order.orderNumber}</span>
                     {order.type === 'MEAL_PLAN_DAILY' && (
-                      <span className="shrink-0 rounded-full bg-tint-green px-1.5 py-0.5 text-[10px] font-semibold text-primary-dark">
+                      <span className="shrink-0 rounded-full bg-tint-green px-1.5 py-0.5 text-[11px] font-semibold text-primary-dark">
                         {tType('MEAL_PLAN_DAILY')}
                       </span>
                     )}
                   </span>
                   <span
                     className={cn(
-                      'shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold',
+                      'shrink-0 rounded-full px-2 py-1 text-[12px] font-semibold',
                       STATUS_TONE[order.status] ?? 'bg-secondary',
                     )}
                   >

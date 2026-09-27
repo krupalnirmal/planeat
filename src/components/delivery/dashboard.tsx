@@ -67,7 +67,7 @@ export function DeliveryDashboard() {
             <p className="text-base font-black tabular-nums">
               {formatPaise(paise(s.codCollectedPaise), { hidePaise: true })}
             </p>
-            <p className="text-[10px] text-muted-foreground">{t('summaryCod')}</p>
+            <p className="text-[11px] text-muted-foreground">{t('summaryCod')}</p>
           </div>
         </div>
       )}
@@ -135,7 +135,7 @@ function AssignmentRow({ row }: { row: DeliveryOrderRow }) {
               {row.address.line1}, {row.address.city}
             </span>
           </span>
-          <span className="mt-0.5 block text-[11px] text-muted-foreground">
+          <span className="mt-0.5 block text-[12px] text-muted-foreground">
             {t('itemCount', { count: row.items.length })}
             {row.isCod && ` · ${t('codBadge')} ${formatPaise(paise(row.totalPaise))}`}
             {row.isMealPlan && !row.isCod && (
@@ -163,7 +163,7 @@ function SummaryStat({
       <p className={cn('text-base font-black tabular-nums', tone === 'danger' && 'text-danger')}>
         {value}
       </p>
-      <p className="text-[10px] text-muted-foreground">{label}</p>
+      <p className="text-[11px] text-muted-foreground">{label}</p>
     </div>
   );
 }
@@ -179,7 +179,7 @@ export function StatusPill({ status }: { status: AssignmentStatus }) {
   };
   return (
     <span
-      className={cn('shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold', tone[status])}
+      className={cn('shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold', tone[status])}
     >
       {t(status)}
     </span>

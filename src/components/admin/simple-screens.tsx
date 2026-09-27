@@ -141,15 +141,15 @@ export function AdminAuditLogScreen() {
                     </td>
                     <td className="px-3 py-2.5 text-xs">{entry.actorName ?? '—'}</td>
                     <td className="px-3 py-2.5 font-mono text-xs">{entry.action}</td>
-                    <td className="px-3 py-2.5 font-mono text-[11px] text-muted-foreground">
+                    <td className="px-3 py-2.5 font-mono text-[12px] text-muted-foreground">
                       {entry.entityType}
                     </td>
                     {/* before/after are the point — "somebody changed the fee" is
                         not useful; "₹25 → ₹40" is. */}
-                    <td className="max-w-40 px-3 py-2.5 font-mono text-[11px] break-all text-muted-foreground">
+                    <td className="max-w-40 px-3 py-2.5 font-mono text-[12px] break-all text-muted-foreground">
                       {summarise(entry.before)}
                     </td>
-                    <td className="max-w-40 px-3 py-2.5 font-mono text-[11px] break-all">
+                    <td className="max-w-40 px-3 py-2.5 font-mono text-[12px] break-all">
                       {summarise(entry.after)}
                     </td>
                   </tr>
@@ -176,7 +176,7 @@ export function AdminAuditLogScreen() {
               <p className="font-mono text-xs">
                 {entry.action} <span className="text-muted-foreground">· {entry.entityType}</span>
               </p>
-              <p className="font-mono text-[11px] break-all text-muted-foreground">
+              <p className="font-mono text-[12px] break-all text-muted-foreground">
                 {summarise(entry.before)} → <span className="text-foreground">{summarise(entry.after)}</span>
               </p>
             </li>
@@ -277,7 +277,7 @@ export function AdminCustomersScreen() {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-primary">{customer.name ?? '—'}</p>
                   <p className="font-mono text-xs text-muted-foreground">{customer.phone}</p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  <p className="mt-0.5 text-[12px] text-muted-foreground">
                     {format.dateTime(new Date(customer.createdAt), {
                       day: 'numeric',
                       month: 'short',
@@ -287,7 +287,7 @@ export function AdminCustomersScreen() {
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="text-lg font-bold tabular-nums">{customer.orderCount}</p>
-                  <p className="text-[11px] text-muted-foreground">{t('orders')}</p>
+                  <p className="text-[12px] text-muted-foreground">{t('orders')}</p>
                 </div>
               </Link>
             </li>

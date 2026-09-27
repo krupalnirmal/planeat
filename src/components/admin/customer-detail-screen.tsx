@@ -262,14 +262,14 @@ export function CustomerDetailScreen({
                         <div className="flex items-center gap-2">
                           <span
                             className={cn(
-                              'rounded-full px-2.5 py-0.5 text-[11px] font-bold',
+                              'rounded-full px-2.5 py-0.5 text-[12px] font-bold',
                               isToday ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground',
                             )}
                           >
                             {tPlan(`days.${day.dayOfWeek}`)}
                           </span>
                           {isToday && (
-                            <span className="text-[11px] font-bold text-primary-dark">· {t('today')}</span>
+                            <span className="text-[12px] font-bold text-primary-dark">· {t('today')}</span>
                           )}
                         </div>
                         <span

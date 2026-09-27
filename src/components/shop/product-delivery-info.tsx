@@ -36,7 +36,7 @@ export function ProductDeliveryInfo() {
         <Truck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
         <span className="min-w-0 flex-1">
           <span className="block text-xs font-bold">{t('deliveryIn', { minutes: 30 })}</span>
-          <span className="truncate text-[11px] text-muted-foreground">{addressLine}</span>
+          <span className="truncate text-[12px] text-muted-foreground">{addressLine}</span>
         </span>
         <ChevronRight className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" aria-hidden />
       </Link>
@@ -45,7 +45,7 @@ export function ProductDeliveryInfo() {
         <Leaf className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
         <span className="min-w-0">
           <span className="block text-xs font-bold">{tp('freshQualityTag')}</span>
-          <span className="truncate text-[11px] text-muted-foreground">{tp('qualityChecked')}</span>
+          <span className="truncate text-[12px] text-muted-foreground">{tp('qualityChecked')}</span>
         </span>
       </div>
     </div>

@@ -224,7 +224,7 @@ export function PicklistScreen() {
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{line.name}</p>
-                    <p className="text-[11px] text-muted-foreground">
+                    <p className="text-[12px] text-muted-foreground">
                       {line.orderCount} {t('orders')} · {t('inStock')}: {line.stockQty}
                     </p>
                   </div>
@@ -296,7 +296,7 @@ export function PicklistScreen() {
                   </div>
 
                   {slip.notes && (
-                    <p className="mt-2 rounded bg-secondary px-2 py-1.5 text-[11px]">
+                    <p className="mt-2 rounded bg-secondary px-2 py-1.5 text-[12px]">
                       {slip.notes}
                     </p>
                   )}
@@ -336,13 +336,13 @@ function SubscriptionStatusCard({
         <div className="text-right">
           <span
             className={cn(
-              'rounded-full px-2.5 py-0.5 text-[11px] font-bold',
+              'rounded-full px-2.5 py-0.5 text-[12px] font-bold',
               generated ? 'bg-secondary text-muted-foreground' : 'bg-danger/10 text-danger',
             )}
           >
             {generated ? tStatus(sub.orderStatus as never) : t('notGenerated')}
           </span>
-          <p className="mt-1 text-[11px] text-muted-foreground">
+          <p className="mt-1 text-[12px] text-muted-foreground">
             {sub.riderName ?? t('unassigned')}
           </p>
         </div>
@@ -377,7 +377,7 @@ function SlipSection({
 }) {
   return (
     <div className="mt-3">
-      <p className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground uppercase">
+      <p className="flex items-center gap-1.5 text-[12px] font-bold text-muted-foreground uppercase">
         {Icon && <Icon className="size-3 text-accent" aria-hidden />}
         {title}
       </p>
@@ -388,7 +388,7 @@ function SlipSection({
               {item.name}
               {/* B7 — a substitution is never silent, not even on paper. */}
               {item.isSubstituted && item.originalName && (
-                <span className="ml-1 text-[11px] text-warning">
+                <span className="ml-1 text-[12px] text-warning">
                   {t('substitutedFrom', { name: item.originalName })}
                 </span>
               )}

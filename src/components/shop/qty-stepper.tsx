@@ -96,7 +96,7 @@ export function QtyStepper({
           // of the digit) — just enough side padding to keep the number
           // off the buttons' rounded corners, so a 1-digit quantity doesn't
           // carry the same reserved width as a would-be 2-digit one.
-          sm ? 'px-0.5 text-[11px]' : 'min-w-6 text-sm',
+          sm ? 'px-0.5 text-[12px]' : 'min-w-6 text-sm',
         )}
       >
         {quantity}

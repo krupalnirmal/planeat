@@ -269,7 +269,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
           {!isStaff && (
             <Link
               href="/"
-              className="shrink-0 rounded-full bg-card px-4 py-2 text-[13px] font-bold shadow-sm"
+              className="shrink-0 rounded-full bg-card px-4 py-2 text-[14px] font-bold shadow-sm"
             >
               {t('skipLogin')}
             </Link>
@@ -342,7 +342,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
           <button
             type="submit"
             disabled={!phoneValid || busy}
-            className="mt-4 h-13 w-full rounded-2xl bg-primary text-[15px] font-bold text-primary-foreground shadow-sm transition-colors disabled:bg-muted-foreground/45 disabled:text-white disabled:shadow-none"
+            className="mt-4 h-13 w-full rounded-2xl bg-primary text-[16px] font-bold text-primary-foreground shadow-sm transition-colors disabled:bg-muted-foreground/45 disabled:text-white disabled:shadow-none"
           >
             {busy ? t('sending') : t('sendOtp')}
           </button>
@@ -352,7 +352,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
             the viewport left a large dead gap under the button on anything
             taller than the shortest phones, with the top and bottom margins
             reading as mismatched. */}
-        <p className="mt-8 text-center text-[11px] leading-relaxed text-muted-foreground">
+        <p className="mt-8 text-center text-[12px] leading-relaxed text-muted-foreground">
           {t('termsNote')}
         </p>
       </main>
@@ -515,7 +515,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
             <button
               type="submit"
               disabled={code.length !== OTP_LENGTH || busy}
-              className="mt-6 flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-[15px] font-bold text-primary-foreground shadow-sm disabled:opacity-50 disabled:shadow-none"
+              className="mt-6 flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-[16px] font-bold text-primary-foreground shadow-sm disabled:opacity-50 disabled:shadow-none"
             >
               {busy ? (
                 t('verifying')
@@ -528,7 +528,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
             </button>
 
             <div className="mt-5 border-t border-border pt-4">
-              <p className="flex items-center justify-center gap-1.5 text-center text-[11px] font-semibold text-muted-foreground">
+              <p className="flex items-center justify-center gap-1.5 text-center text-[12px] font-semibold text-muted-foreground">
                 <ShieldCheck className="size-3.5 text-primary" aria-hidden />
                 {t('otpSecuredFooter')}
               </p>
@@ -540,7 +540,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
             three reassurances the card's own "Secured" line already implies,
             spelled out once more since this is the highest-stakes screen in
             the whole flow (entering a code that logs someone in). */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[10px] text-muted-foreground">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[11px] text-muted-foreground">
           <span className="flex items-center gap-1">
             <Lock className="size-3" aria-hidden />
             {t('otpFooterDataSafe')}

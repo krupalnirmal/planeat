@@ -145,7 +145,7 @@ export function ReportIssueForm({
           className="h-12 min-w-0 flex-1 bg-transparent text-sm outline-none"
         />
       </div>
-      <p className="mt-1 text-[11px] text-muted-foreground">{t('photoHint')}</p>
+      <p className="mt-1 text-[12px] text-muted-foreground">{t('photoHint')}</p>
 
       <label htmlFor="issue-amount" className="mt-4 block text-sm font-medium">
         {t('amount')}

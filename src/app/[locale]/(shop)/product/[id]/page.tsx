@@ -93,7 +93,7 @@ export default async function ProductPage({
           <div className="relative lg:w-[420px] lg:shrink-0">
             <ProductGallery images={product.images} alt={product.name} />
             {product.vegetableType === 'organic' && (
-              <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold text-primary-foreground">
+              <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[12px] font-bold text-primary-foreground">
                 <Leaf className="size-3" aria-hidden />
                 {t('organicBadge')}
               </span>

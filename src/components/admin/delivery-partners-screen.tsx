@@ -152,7 +152,7 @@ export function AdminDeliveryPartnersScreen() {
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{partner.name}</p>
                 <p className="font-mono text-xs text-muted-foreground">{partner.phone}</p>
-                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                <p className="mt-0.5 text-[12px] text-muted-foreground">
                   {t(`vehicles.${partner.vehicleType}`)} · {partner.serviceAreaName ?? '—'}
                 </p>
               </div>

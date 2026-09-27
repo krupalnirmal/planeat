@@ -402,7 +402,7 @@ export function AnalyticsExplorerTab({
                   </div>
                   <span
                     className={cn(
-                      'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap',
+                      'shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap',
                       STATUS_BADGE[order.status] ?? 'bg-secondary text-muted-foreground',
                     )}
                   >
@@ -474,7 +474,7 @@ export function AnalyticsExplorerTab({
                         {formatQuantity(product.quantity, product.unit as QuantityUnit)}
                       </span>
                     </span>
-                    <span className="shrink-0 rounded-full bg-danger/10 px-2 py-0.5 text-[11px] font-semibold text-danger">
+                    <span className="shrink-0 rounded-full bg-danger/10 px-2 py-0.5 text-[12px] font-semibold text-danger">
                       {t('stockLeft', { count: product.stockQty })}
                     </span>
                   </li>
@@ -602,7 +602,7 @@ function StatTile({
         <p className="mt-1.5 text-2xl font-bold tabular-nums text-foreground">{value}</p>
         <p
           className={cn(
-            'mt-0.5 text-[11px] font-semibold',
+            'mt-0.5 text-[12px] font-semibold',
             delta === null ? 'text-muted-foreground' : delta > 0 ? 'text-success' : delta < 0 ? 'text-danger' : 'text-muted-foreground',
           )}
         >
