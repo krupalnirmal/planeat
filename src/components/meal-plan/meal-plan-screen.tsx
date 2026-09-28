@@ -45,13 +45,14 @@ import { formatPaise, paise } from '@/lib/money';
 const HERO_IMAGE = '/brand/meal-plan-hero.png';
 // Re-uploaded (session 2026-09-28, owner-supplied WhatsApp images,
 // D:\Downloads\GetFresh\icon) at the same Cloudinary public_ids as before —
-// only the version in each URL changed.
+// only the version in each URL changed. The circle backdrop baked into each
+// photo was chroma-keyed from green to white to match the card surface.
 const ICON_FRESH =
-  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1790617652/planeat/meal-plan-home/meal-plan-home-icon-fresh.png';
+  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1790618239/planeat/meal-plan-home/meal-plan-home-icon-fresh.png';
 const ICON_CHOICE =
-  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1790617653/planeat/meal-plan-home/meal-plan-home-icon-choice.png';
+  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1790618241/planeat/meal-plan-home/meal-plan-home-icon-choice.png';
 const ICON_HEALTHY =
-  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1790617655/planeat/meal-plan-home/meal-plan-home-icon-healthy.png';
+  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1790618242/planeat/meal-plan-home/meal-plan-home-icon-healthy.png';
 const QUICKPLAN_IMAGE =
   'https://res.cloudinary.com/kf9nvvpv/image/upload/v1789846985/planeat/meal-plan-home/meal-plan-home-quickplan.png';
 const SAVINGS_ICON =
@@ -333,7 +334,7 @@ function MandatoryDeliveryModePopup({
 
 function FeatureCard({ image, label }: { image: string; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-tint-lime px-2 py-3.5 text-center">
+    <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-card px-2 py-3.5 text-center">
       <span className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-full">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={image} alt="" className="size-full object-cover" />
