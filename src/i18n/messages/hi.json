@@ -282,7 +282,13 @@
     "unavailableItems": "कुछ चीज़ें अब उपलब्ध नहीं हैं",
     "removeUnavailable": "उन्हें हटाएँ",
     "outOfStockLine": "सिर्फ़ {count} बचे",
-    "deliverTo": "डिलीवरी का पता"
+    "deliverTo": "डिलीवरी का पता",
+    "deliveryInMinutes": "{minutes} मिनट में डिलीवरी",
+    "shipmentOf": "{count} चीज़ों की शिपमेंट",
+    "savedBadge": "{amount} बचाए",
+    "totalSavings": "आपकी कुल बचत",
+    "cancellationPolicyTitle": "रद्द करने की नीति",
+    "cancellationPolicyBody": "ऑर्डर पैक होने के बाद रद्द नहीं किया जा सकता। उससे पहले रद्द करने पर, भुगतान की गई राशि आपके वॉलेट में वापस कर दी जाएगी।"
   },
   "checkout": {
     "title": "ऑर्डर पक्का करें",
