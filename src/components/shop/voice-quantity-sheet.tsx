@@ -110,7 +110,7 @@ export function VoiceQuantitySheet({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[85vh] w-full max-w-[480px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-5 sm:max-w-md">
+      <div className="max-h-[85vh] w-full max-w-[480px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-5 [-ms-overflow-style:none] [scrollbar-width:none] sm:max-w-md [&::-webkit-scrollbar]:hidden">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-bold">
             {t('voiceQuantity.sheetTitle', { product: productName })}

@@ -718,7 +718,7 @@ function SummaryStep({
 
       {addingAddress && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-5">
+          <div className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <h2 className="mb-1 text-base font-black">{ta('add')}</h2>
             <AddressForm
               onCancel={() => setAddingAddress(false)}
@@ -742,7 +742,7 @@ function PlanItemsPopup({ planDays, onClose }: { planDays: PlanDay[]; onClose: (
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-5">
+      <div className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="mb-3 flex items-center justify-between gap-3">
           <h2 className="text-base font-black">{t('totalItems')}</h2>
           <button

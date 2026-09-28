@@ -391,7 +391,7 @@ export function SmartListScreen() {
           onClick={() => setPhotoSheetOpen(false)}
         >
           <div
-            className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-4"
+            className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             onClick={(event) => event.stopPropagation()}
           >
             <p className="mb-3 text-sm font-semibold">{t('choosePhotoSource')}</p>

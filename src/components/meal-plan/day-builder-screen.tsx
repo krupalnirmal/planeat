@@ -525,7 +525,7 @@ function QuantityModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-4">
+      <div className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="mb-3 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] bg-white">

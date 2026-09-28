@@ -414,7 +414,7 @@ export function CategoryProductList({
               onClick={() => setCategoryPickerOpen(false)}
               className="fixed inset-0 z-10 cursor-default"
             />
-            <ul className="absolute top-full left-4 z-20 mt-1 max-h-72 w-48 overflow-y-auto rounded-[var(--radius)] border border-border bg-card py-1 shadow-lg">
+            <ul className="absolute top-full left-4 z-20 mt-1 max-h-72 w-48 overflow-y-auto rounded-[var(--radius)] border border-border bg-card py-1 shadow-lg [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {otherCategories.map((category) => (
                 <li key={category.id}>
                   <Link
@@ -472,7 +472,7 @@ export function CategoryProductList({
               </button>
             </div>
           ) : (
-            <div className="flex flex-1 gap-2 overflow-x-auto">
+            <div className="flex flex-1 gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <FilterPillButton
                 label={t('pillFilters')}
                 isOpen={openPill === 'filters'}
@@ -509,7 +509,7 @@ export function CategoryProductList({
               onClick={() => setOpenPill(null)}
               className="fixed inset-0 z-10 cursor-default"
             />
-            <div className="absolute top-full left-4 z-20 mt-1 max-h-64 min-w-40 overflow-y-auto rounded-[var(--radius)] border border-border bg-card py-1 shadow-lg">
+            <div className="absolute top-full left-4 z-20 mt-1 max-h-64 min-w-40 overflow-y-auto rounded-[var(--radius)] border border-border bg-card py-1 shadow-lg [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {openPill === 'filters' &&
                 [
                   { value: false, label: t('all') },
@@ -671,7 +671,7 @@ export function CategoryProductList({
               row, the normal shape for a wide sidebar. */}
           <nav
             aria-label={categoryName}
-            className="sticky w-[76px] shrink-0 self-start overflow-y-auto bg-card lg:w-56"
+            className="sticky w-[76px] shrink-0 self-start overflow-y-auto bg-card [-ms-overflow-style:none] [scrollbar-width:none] lg:w-56 [&::-webkit-scrollbar]:hidden"
             style={{ top: HEADER_OFFSET_PX, maxHeight: `calc(100dvh - ${HEADER_OFFSET_PX}px)` }}
           >
             {/* The rail always leads with a non-photo "All" tab, active by

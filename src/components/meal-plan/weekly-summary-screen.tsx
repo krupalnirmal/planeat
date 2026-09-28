@@ -277,7 +277,7 @@ function DeliveryModePopup({ onDismiss }: { onDismiss: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onDismiss}>
       <div
-        className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-4 text-left"
+        className="max-h-[85vh] w-full max-w-[420px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-4 text-left [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         onClick={(event) => event.stopPropagation()}
       >
         <h2 className="text-center text-base font-black">{tw('deliveryModeTitle')}</h2>
