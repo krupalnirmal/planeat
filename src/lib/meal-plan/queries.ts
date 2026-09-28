@@ -396,10 +396,19 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
         variants: product.variants,
       }));
 
+    // The "Daily Dairy & Bakery" home tile always wants Paneer's own photo
+    // rather than whichever product happens to sort first (user request,
+    // session 2026-09-28 — the sort-first product kept lacking a photo).
+    const dairyTileProduct =
+      slug === 'dairy' ? category.products.find((p) => p.sku === 'DRY-PANEER-200') : undefined;
+
     return {
       slug,
       name: pickName(category, locale),
-      iconUrl: category.iconUrl ?? firstImage(category.products[0]?.imageUrls),
+      iconUrl:
+        firstImage(dairyTileProduct?.imageUrls) ??
+        category.iconUrl ??
+        firstImage(category.products[0]?.imageUrls),
       products,
     };
   });
