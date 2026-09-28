@@ -99,14 +99,15 @@ export function CartBar() {
   return (
     <div
       ref={barRef}
-      // Narrower side inset than the edge-to-edge Blinkit original (session
-      // 2026-08-26, client feedback: the full-width bar read as too big),
-      // narrowed again (session 2026-09-17, client feedback: still too
-      // wide) — still one stacked unit with the free-delivery nudge above
-      // it, just a compact floating pill instead of a bar spanning the
-      // screen. `lg:hidden` (session 2026-09-20) — DesktopHeader's cart
-      // icon is the desktop equivalent.
-      className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-32 lg:hidden"
+      // Side inset went full-width -> px-32 (session 2026-08-26, then
+      // 2026-09-17, client feedback each time on how wide/narrow it read)
+      // -> px-4 (session 2026-09-28, owner request: wider, but the pill's
+      // own height stays whatever `min-h-14` below already sets — only
+      // this side inset changed). Still one stacked unit with the
+      // free-delivery nudge above it, just a compact floating pill instead
+      // of a bar spanning the screen edge-to-edge. `lg:hidden` (session
+      // 2026-09-20) — DesktopHeader's cart icon is the desktop equivalent.
+      className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-4 lg:hidden"
       style={{
         // BottomNav is always visible now (session 2026-09-16), so this
         // always sits above its fixed height — same pattern every other
