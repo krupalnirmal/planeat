@@ -86,11 +86,15 @@ export function CartBar() {
   if (!visible) return null;
 
   const forFreeDelivery = paise(cart.amountForFreeDeliveryPaise);
-  // The most recently touched line — the one photo worth showing on the
-  // bar, matching the same "confirm that tap landed" job the icon used to
-  // do (client feedback, session 2026-09-02), now with the actual product
-  // instead of a generic cart glyph (session 2026-09-16, client reference).
-  const latestImage = cart.lines[cart.lines.length - 1]?.imageUrl ?? null;
+  // Up to 3 of the most recently touched lines, most recent first — a small
+  // stacked thumbnail cluster (session 2026-09-28, owner's Blinkit
+  // reference), replacing the single photo that used to pop out above the
+  // pill's corner (client feedback, session 2026-09-02/2026-09-16). Falls
+  // back to a generic cart glyph tile only when a line has no photo at all.
+  const recentImages = cart.lines
+    .slice(-3)
+    .reverse()
+    .map((line) => line.imageUrl);
 
   return (
     <div
@@ -129,22 +133,28 @@ export function CartBar() {
         // on a real device, to the point the bar was hard to spot at all.
         // Full-strength, with `--accent-fg` for contrast, same pairing the
         // header's cart badge already uses.
-        className="animate-in slide-in-from-bottom-4 fade-in relative flex min-h-14 items-center gap-3 rounded-full bg-accent py-2 pr-4 pl-16 text-accent-foreground duration-300"
+        className="animate-in slide-in-from-bottom-4 fade-in relative flex min-h-14 items-center gap-3 rounded-full bg-accent py-2 pr-4 pl-3 text-accent-foreground duration-300"
       >
-        {/* Pops half out of the pill's top-left corner, a white ring
-            separating it from the green — the reference's "product peeking
-            out of the bag" treatment. `key` remounts it on every count
-            change to replay the pop-in, same trigger the old icon used. */}
-        <span
-          key={cart.itemCount}
-          className="absolute -top-2.5 left-1.5 grid size-14 shrink-0 animate-in zoom-in-75 place-items-center overflow-hidden rounded-full border-[3px] border-background bg-card duration-200"
-        >
-          {latestImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={latestImage} alt="" className="size-full object-cover" />
-          ) : (
-            <ShoppingCart className="size-5 text-primary" aria-hidden />
-          )}
+        {/* A small overlapping thumbnail cluster, inline in the pill
+            (session 2026-09-28, owner's Blinkit reference) — replaces the
+            single photo that used to pop out above the pill's corner.
+            `key` remounts the whole cluster on every count change to
+            replay the pop-in, same trigger the old single photo used. */}
+        <span key={cart.itemCount} className="flex shrink-0 -space-x-3">
+          {recentImages.map((imageUrl, index) => (
+            <span
+              key={index}
+              className="animate-in zoom-in-75 grid size-10 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-accent bg-card duration-200"
+              style={{ zIndex: recentImages.length - index }}
+            >
+              {imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={imageUrl} alt="" className="size-full object-cover" />
+              ) : (
+                <ShoppingCart className="size-4 text-primary" aria-hidden />
+              )}
+            </span>
+          ))}
         </span>
 
         <span className="min-w-0 flex-1">
