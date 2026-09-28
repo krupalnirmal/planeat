@@ -369,6 +369,10 @@ export async function getPlanColumns(locale: Locale): Promise<PlanColumnsView> {
     if (!category) return { slug, name: slug, iconUrl: null, products: [] };
 
     const products = category.products
+      // A product with no photo has nothing to show in the picker grid, so
+      // it's excluded outright rather than rendered with a placeholder icon
+      // (user request, session 2026-09-28).
+      .filter((product) => firstImage(product.imageUrls) !== null)
       .filter((product) => {
         if (slug !== 'vegetables') return true;
         const curated = curatedLists.find((list) => list.skus.includes(product.sku));
