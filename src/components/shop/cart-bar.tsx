@@ -134,7 +134,12 @@ export function CartBar() {
         // on a real device, to the point the bar was hard to spot at all.
         // Full-strength, with `--accent-fg` for contrast, same pairing the
         // header's cart badge already uses.
-        className="animate-in slide-in-from-bottom-4 fade-in relative flex min-h-14 items-center gap-3 rounded-full bg-accent py-2 pr-4 pl-3 text-accent-foreground duration-300"
+        // `w-full` (session 2026-09-28, owner report — widening the outer
+        // wrapper's inset alone did nothing, because this `<a>` was never
+        // told to actually fill it, so it kept shrink-wrapping to its own
+        // content and forcing "View cart" onto two lines, which is what
+        // was inflating the height past `min-h-14` in the first place.
+        className="animate-in slide-in-from-bottom-4 fade-in relative flex min-h-14 w-full items-center gap-3 rounded-full bg-accent py-2 pr-4 pl-3 text-accent-foreground duration-300"
       >
         {/* A small overlapping thumbnail cluster, inline in the pill
             (session 2026-09-28, owner's Blinkit reference) — replaces the
@@ -159,8 +164,8 @@ export function CartBar() {
         </span>
 
         <span className="min-w-0 flex-1">
-          <span className="block text-[16px] leading-tight font-bold">{t('viewCart')}</span>
-          <span className="block text-[12px] leading-tight text-accent-foreground/70">
+          <span className="block truncate text-[16px] leading-tight font-bold">{t('viewCart')}</span>
+          <span className="block truncate text-[12px] leading-tight text-accent-foreground/70">
             {t('itemCount', { count: cart.itemCount })}
           </span>
         </span>
