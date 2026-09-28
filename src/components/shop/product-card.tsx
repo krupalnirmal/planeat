@@ -268,10 +268,17 @@ export function ProductCard({
         onClick={toggleWishlisted}
         aria-pressed={wishlisted}
         aria-label={t(wishlisted ? 'wishlistRemove' : 'wishlistAdd', { name: product.name })}
-        className="absolute top-1.5 right-1.5 grid size-7 place-items-center rounded-full bg-card/95 shadow-sm"
+        className="absolute top-1.5 right-1.5 grid size-7 place-items-center"
       >
+        {/* No white chip behind it any more (session 2026-09-28, owner
+            request: "only heart symbol pahije") — a drop-shadow on the
+            glyph itself keeps it legible over a light-coloured product
+            photo instead, the same job the circle used to do. */}
         <Heart
-          className={cn('size-3.5', wishlisted ? 'fill-primary text-primary' : 'text-muted-foreground')}
+          className={cn(
+            'size-4 drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]',
+            wishlisted ? 'fill-primary text-primary' : 'fill-white/90 text-muted-foreground',
+          )}
           aria-hidden
         />
       </button>
