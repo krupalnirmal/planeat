@@ -43,16 +43,6 @@ import { formatPaise, paise } from '@/lib/money';
 // from `public/brand` like the wordmark rather than re-uploaded to
 // Cloudinary as a product-style asset.
 const HERO_IMAGE = '/brand/meal-plan-hero.png';
-// Re-uploaded (session 2026-09-28, owner-supplied WhatsApp images,
-// D:\Downloads\GetFresh\icon) at the same Cloudinary public_ids as before —
-// only the version in each URL changed. The circle backdrop baked into each
-// photo was chroma-keyed from green to white to match the card surface.
-const ICON_FRESH =
-  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1790618239/planeat/meal-plan-home/meal-plan-home-icon-fresh.png';
-const ICON_CHOICE =
-  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1790618241/planeat/meal-plan-home/meal-plan-home-icon-choice.png';
-const ICON_HEALTHY =
-  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1790618242/planeat/meal-plan-home/meal-plan-home-icon-healthy.png';
 const QUICKPLAN_IMAGE =
   'https://res.cloudinary.com/kf9nvvpv/image/upload/v1789846985/planeat/meal-plan-home/meal-plan-home-quickplan.png';
 const SAVINGS_ICON =
@@ -161,12 +151,6 @@ export function MealPlanScreen() {
           <DeliveryModeTag />
         </div>
       )}
-
-      <div className="grid grid-cols-3 gap-2.5 px-4 pt-4">
-        <FeatureCard image={ICON_FRESH} label={t('wizard.homeFresh')} />
-        <FeatureCard image={ICON_CHOICE} label={t('wizard.homeChoice')} />
-        <FeatureCard image={ICON_HEALTHY} label={t('wizard.homeHealthy')} />
-      </div>
 
       <div className="space-y-3 px-4 pt-4">
         <Link
@@ -328,21 +312,6 @@ function MandatoryDeliveryModePopup({
           </button>
         </div>
       </div>
-    </div>
-  );
-}
-
-function FeatureCard({ image, label }: { image: string; label: string }) {
-  return (
-    <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-card px-2 py-3.5 text-center">
-      <span className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-full">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={image} alt="" className="size-full object-cover" />
-      </span>
-      <span className="flex items-center gap-0.5 text-[12.5px] leading-tight font-bold">
-        {label}
-        <ChevronRight className="size-3.5 shrink-0 text-primary" aria-hidden />
-      </span>
     </div>
   );
 }
