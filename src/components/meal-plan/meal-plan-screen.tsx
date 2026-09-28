@@ -43,12 +43,15 @@ import { formatPaise, paise } from '@/lib/money';
 // from `public/brand` like the wordmark rather than re-uploaded to
 // Cloudinary as a product-style asset.
 const HERO_IMAGE = '/brand/meal-plan-hero.png';
+// Re-uploaded (session 2026-09-28, owner-supplied WhatsApp images,
+// D:\Downloads\GetFresh\icon) at the same Cloudinary public_ids as before —
+// only the version in each URL changed.
 const ICON_FRESH =
-  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1789846983/planeat/meal-plan-home/meal-plan-home-icon-fresh.png';
+  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1790617652/planeat/meal-plan-home/meal-plan-home-icon-fresh.png';
 const ICON_CHOICE =
-  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1789846984/planeat/meal-plan-home/meal-plan-home-icon-choice.png';
+  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1790617653/planeat/meal-plan-home/meal-plan-home-icon-choice.png';
 const ICON_HEALTHY =
-  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1789846985/planeat/meal-plan-home/meal-plan-home-icon-healthy.png';
+  'https://res.cloudinary.com/kf9nvvpv/image/upload/v1790617655/planeat/meal-plan-home/meal-plan-home-icon-healthy.png';
 const QUICKPLAN_IMAGE =
   'https://res.cloudinary.com/kf9nvvpv/image/upload/v1789846985/planeat/meal-plan-home/meal-plan-home-quickplan.png';
 const SAVINGS_ICON =
