@@ -1,8 +1,9 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { CalendarDays, ChevronRight, Package, Salad, ShoppingBasket, Truck } from 'lucide-react';
+import { CalendarDays, ChevronRight, Package, Salad, ShoppingBasket, Truck, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { AppHeader } from '@/components/shop/app-header';
 import { LoginPrompt } from '@/components/shop/login-prompt';
 import { Link } from '@/i18n/navigation';
@@ -117,9 +118,13 @@ export function MealPlanScreen() {
           screenshot for this wizard (home, week view, day view) shows this
           same header at the very top, not a per-screen substitute. */}
       <AppHeader />
-      {/* Asked once, mandatorily, the first time this screen loads (session
-          2026-09-27, user request) — no "decide later" here. Once answered,
-          the choice never asks again on its own; `DeliveryModeTag` below
+      {/* Asked once, up front, the first time this screen loads (session
+          2026-09-27, user request); a real close button was added a
+          session later (2026-09-28, owner report — no way to dismiss it
+          left a customer genuinely stuck) — closing without picking just
+          lets that visit continue, and it's free to ask again next visit
+          since no preference got saved. Once answered for real, the
+          choice never asks again on its own; `DeliveryModeTag` below
           shows the current pick and lets the customer change it, on demand
           only (session 2026-09-27, second user report — the popup used to
           pop up again on every single save, which felt broken once you'd
@@ -262,10 +267,29 @@ function MandatoryDeliveryModePopup({
   onSelect: (mode: 'DAILY' | 'WEEKLY') => void;
 }) {
   const tw = useTranslations('mealPlan.wizard');
+  const tc = useTranslations('common');
+  // No longer un-closeable (session 2026-09-28, owner report — a customer
+  // with no way to dismiss this was genuinely stuck). Local state only,
+  // not the stored preference itself: closing without picking just lets
+  // this visit continue, and the popup is free to ask again next time
+  // `deliveryModePreference` is still unset — it doesn't silently give up
+  // on ever asking.
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-[420px] rounded-[calc(var(--radius)*1.6)] bg-background p-5">
+      <div className="relative w-full max-w-[420px] rounded-[calc(var(--radius)*1.6)] bg-background p-5">
+        <button
+          type="button"
+          onClick={() => setDismissed(true)}
+          aria-label={tc('close')}
+          className="absolute top-3 right-3 grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground"
+        >
+          <X className="size-4" aria-hidden />
+        </button>
+
         <h2 className="text-center text-base font-black">{tw('deliveryModeTitle')}</h2>
 
         <div className="mt-4 space-y-2.5">
