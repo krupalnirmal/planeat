@@ -381,7 +381,16 @@ export function ProductCard({
             <>
               {/* Blinkit-matched (session 2026-08-25): the ADD button pops
                   into the stepper rather than swapping instantly — the
-                  same brief scale+fade Blinkit plays on its own button. */}
+                  same brief scale+fade Blinkit plays on its own button.
+                  The "N options" link that used to sit under it here was
+                  removed (session 2026-09-28, owner report: once a weight
+                  is already picked and in the cart, it reads as an
+                  unnecessary extra line — the design should be one clean
+                  row of price + stepper, matching the quantity===0 "ADD"
+                  state's own single-line height exactly). Switching to a
+                  different weight once one is already in the cart still
+                  works the same way it always did for a single-variant
+                  product: through the product page, not this card. */}
               <QtyStepper
                 quantity={quantity}
                 onIncrement={() => cart.increment(activeVariant.id)}
@@ -392,15 +401,6 @@ export function ProductCard({
                 size="sm"
                 className="animate-in zoom-in-95 fade-in duration-200"
               />
-              {multiVariant && (
-                <button
-                  type="button"
-                  onClick={() => setPickerOpen(true)}
-                  className="mt-0.5 text-[10px] font-semibold text-muted-foreground underline underline-offset-2"
-                >
-                  {t('nOptions', { count: variants!.length })}
-                </button>
-              )}
             </>
           )}
         </div>
