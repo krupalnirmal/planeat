@@ -138,8 +138,10 @@ export function CartBar() {
         // wrapper's inset alone did nothing, because this `<a>` was never
         // told to actually fill it, so it kept shrink-wrapping to its own
         // content and forcing "View cart" onto two lines, which is what
-        // was inflating the height past `min-h-14` in the first place.
-        className="animate-in slide-in-from-bottom-4 fade-in relative flex min-h-14 w-full items-center gap-3 rounded-full bg-accent py-2 pr-4 pl-3 text-accent-foreground duration-300"
+        // was inflating the height past `min-h-14` in the first place) —
+        // then dialled back to `w-[70%] mx-auto` (same session, immediate
+        // follow-up: full-width read as too wide once it actually worked).
+        className="animate-in slide-in-from-bottom-4 fade-in relative mx-auto flex min-h-14 w-[70%] items-center gap-3 rounded-full bg-accent py-2 pr-4 pl-3 text-accent-foreground duration-300"
       >
         {/* A small overlapping thumbnail cluster, inline in the pill
             (session 2026-09-28, owner's Blinkit reference) — replaces the
