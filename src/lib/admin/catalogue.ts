@@ -2,20 +2,31 @@ import { firstImage, normaliseSearchText, pickName } from '@/lib/catalog/text';
 import { db } from '@/lib/db';
 import { isUniqueViolation } from '@/lib/db-errors';
 import { ID_PREFIX, newId } from '@/lib/ids';
+import { PLAN_CATEGORY_SLUGS } from '@/lib/meal-plan/plan-categories';
 import type { Locale, UnitType } from '@/generated/prisma/enums';
 import { audit } from './audit';
 
 /**
  * M9 — Catalogue: categories and products CRUD, variants, pricing.
  *
- * B13 is enforced here, not left to whoever fills the form: only Vegetables
- * and Fruits may be meal-plan eligible. A misconfigured ice cream in a
- * customer's weekly plan is not a data-entry mistake anybody would spot before
- * it reached them.
+ * B13 is enforced here, not left to whoever fills the form: a product can
+ * only be meal-plan eligible in a category the picker actually has a column
+ * for. A misconfigured ice cream in a customer's weekly plan is not a
+ * data-entry mistake anybody would spot before it reached them.
  */
 
-/** B13 — the only categories a meal plan may draw from. */
-const MEAL_PLAN_CATEGORIES = new Set(['vegetables', 'fruits']);
+/**
+ * B13 — the only categories a meal plan may draw from. Shares
+ * `PLAN_CATEGORY_SLUGS` with the picker itself (`src/lib/meal-plan/
+ * plan-categories.ts`) rather than a second hand-maintained list — this used
+ * to be its own `Set(['vegetables', 'fruits'])`, frozen from before Dairy and
+ * Bakery & Biscuits became real picker columns (session 2026-08-30), which
+ * silently forced `isMealPlanEligible` back to `false` on every save for
+ * those two categories no matter what the admin checked (found session
+ * 2026-09-29 — a Dairy product's "Allowed in meal plans" box reverted itself
+ * right after saving).
+ */
+const MEAL_PLAN_CATEGORIES = new Set<string>(PLAN_CATEGORY_SLUGS);
 
 export interface AdminProductRow {
   id: string;
