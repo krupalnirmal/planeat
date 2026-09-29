@@ -81,6 +81,11 @@ export const env = {
     anthropicModel: str('ANTHROPIC_MODEL', 'claude-sonnet-5'),
     groqApiKey: str('GROQ_API_KEY', ''),
     groqModel: str('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+    /** Cloudflare Workers AI — speech-to-text only (no chat/vision model
+        wired up here), same shape as Groq's STT-only role. */
+    cloudflareAccountId: str('CLOUDFLARE_ACCOUNT_ID', ''),
+    cloudflareApiToken: str('CLOUDFLARE_API_TOKEN', ''),
+    cloudflareSttModel: str('CLOUDFLARE_STT_MODEL', '@cf/openai/whisper-large-v3-turbo'),
     /** Tried when AI_PROVIDER fails a call. Empty = no fallback (default). */
     fallbackProvider: str('AI_FALLBACK_PROVIDER', ''),
     sttProvider: str('AI_STT_PROVIDER', 'gemini'),

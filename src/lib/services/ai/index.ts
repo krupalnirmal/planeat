@@ -2,6 +2,7 @@ import { env } from '@/lib/env';
 import { FallbackAIProvider } from './fallback';
 import { MockAIProvider } from './mock';
 import { AnthropicProvider } from './providers/anthropic';
+import { CloudflareProvider } from './providers/cloudflare';
 import { GeminiProvider } from './providers/gemini';
 import { GroqProvider } from './providers/groq';
 import type { AIProvider } from './types';
@@ -29,11 +30,13 @@ function build(name: string): AIProvider {
       return new AnthropicProvider();
     case 'groq':
       return new GroqProvider();
+    case 'cloudflare':
+      return new CloudflareProvider();
     case 'mock':
       return new MockAIProvider();
     default:
       throw new Error(
-        `Unknown AI_PROVIDER "${name}". Expected one of: mock, gemini, anthropic, groq.`,
+        `Unknown AI_PROVIDER "${name}". Expected one of: mock, gemini, anthropic, groq, cloudflare.`,
       );
   }
 }
