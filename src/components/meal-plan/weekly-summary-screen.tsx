@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { DAY_STYLE } from './day-style';
 import { DeliveryModeTag } from './delivery-mode-tag';
 import { MealPlanHero } from './meal-plan-hero';
-import { DAYS, usePlanDraft } from './plan-draft-context';
+import { DAYS, type SavePlanResponse, usePlanDraft } from './plan-draft-context';
 
 /** Now also the wizard's entry point (session 2026-09-27, user report — the
     old standalone `DayListScreen`, `/meal-plan/build`, showed the same
@@ -42,13 +42,17 @@ export function WeeklySummaryScreen() {
 
   const save = useMutation({
     mutationFn: () =>
-      api.put<{ plan: unknown }>(`/api/meal-plan/current${qs({ locale })}`, {
+      api.put<SavePlanResponse>(`/api/meal-plan/current${qs({ locale })}`, {
         days: draft.buildSavePayload(),
       }),
-    onSuccess: () => {
+    onSuccess: (response) => {
       setSaveError(null);
       setSaved(true);
-      draft.markSaved();
+      // Reconciles against what the server actually kept — `saveCustomerPlan`
+      // silently drops a pick that went inactive/out-of-stock/imageless
+      // between pick-time and save-time, so the "Saved!" screen's own
+      // totals must come from this response, not the pre-save draft.
+      draft.applyServerPlan(response.plan.days);
       void queryClient.invalidateQueries({ queryKey: ['meal-plan-current'] });
     },
     onError: (err) => setSaveError(err instanceof ApiClientError ? err.message : te('generic')),

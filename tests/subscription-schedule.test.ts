@@ -4,10 +4,13 @@ import {
   canSkipDate,
   dateRange,
   hasExpired,
+  isDeliveryDueToday,
   isExpiringSoon,
   istDateKeyOf,
   istHourOf,
+  isWithinCodTrial,
   generationTargetDate,
+  parseDateKey,
   remainingDays,
   totalDays,
 } from '@/lib/subscription/schedule';
@@ -206,5 +209,50 @@ describe('prorated cancellation (B3)', () => {
     const fee = 9_900n;
     const refund = (fee * BigInt(remainingDays('2026-08-20', now))) / BigInt(30);
     expect(refund).toBe(2_970n);
+  });
+});
+
+describe('isDeliveryDueToday (WEEKLY cadence)', () => {
+  const start = parseDateKey('2026-08-10'); // a Monday
+
+  it('is always due for a DAILY subscription', () => {
+    expect(isDeliveryDueToday('DAILY', start, parseDateKey('2026-08-10'))).toBe(true);
+    expect(isDeliveryDueToday('DAILY', start, parseDateKey('2026-08-11'))).toBe(true);
+    expect(isDeliveryDueToday('DAILY', start, parseDateKey('2026-09-20'))).toBe(true);
+  });
+
+  it('is due on day 0 (the start date itself) for WEEKLY', () => {
+    expect(isDeliveryDueToday('WEEKLY', start, parseDateKey('2026-08-10'))).toBe(true);
+  });
+
+  it('is due every 7th day from the start date, and no other day, for WEEKLY', () => {
+    expect(isDeliveryDueToday('WEEKLY', start, parseDateKey('2026-08-17'))).toBe(true);
+    expect(isDeliveryDueToday('WEEKLY', start, parseDateKey('2026-08-24'))).toBe(true);
+    for (const offset of [1, 2, 3, 4, 5, 6, 8, 13]) {
+      expect(isDeliveryDueToday('WEEKLY', start, parseDateKey(dateRange('2026-08-10', offset + 1)[offset]))).toBe(
+        false,
+      );
+    }
+  });
+});
+
+describe('isWithinCodTrial (session 2026-09-27)', () => {
+  const start = parseDateKey('2026-09-29');
+
+  it('is never within the trial when the subscription is not COD-trial-eligible', () => {
+    expect(isWithinCodTrial(false, start, start)).toBe(false);
+    expect(isWithinCodTrial(false, start, parseDateKey('2026-09-30'))).toBe(false);
+  });
+
+  it('covers the start date and the following 6 days — 7 calendar days total', () => {
+    for (let offset = 0; offset <= 6; offset++) {
+      expect(isWithinCodTrial(true, start, parseDateKey(dateRange('2026-09-29', offset + 1)[offset]))).toBe(true);
+    }
+  });
+
+  it('excludes day 7 onward — that delivery bills as WALLET instead', () => {
+    expect(isWithinCodTrial(true, start, parseDateKey('2026-10-06'))).toBe(false);
+    expect(isWithinCodTrial(true, start, parseDateKey('2026-10-07'))).toBe(false);
+    expect(isWithinCodTrial(true, start, parseDateKey('2026-11-01'))).toBe(false);
   });
 });

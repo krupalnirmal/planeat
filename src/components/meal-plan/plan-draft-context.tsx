@@ -49,6 +49,13 @@ export interface DraftColumn {
   products: DraftProduct[];
 }
 
+export interface SavePlanResponse {
+  plan: {
+    id: string;
+    days: Array<{ dayOfWeek: number; items: Array<{ productId: string; variantId: string }> }>;
+  };
+}
+
 interface PlanCurrentResponse {
   plan: {
     id: string;
@@ -95,6 +102,14 @@ interface PlanDraftContextValue {
   /** Called after a successful save — marks the current selections as the
       new baseline, so `isDirty` goes back to false until the next edit. */
   markSaved: () => void;
+  /** Reconciles the draft against what the server actually persisted —
+      `saveCustomerPlan` silently drops any variant that went inactive,
+      out-of-stock, or otherwise ineligible between pick-time and save-time
+      (see its own doc comment), so the draft the customer was just editing
+      can hold picks the server didn't keep. Called with a save response's
+      own `plan.days`, this replaces `selections` with the authoritative
+      result instead of leaving stale, dropped picks in the UI. */
+  applyServerPlan: (days: Array<{ dayOfWeek: number; items: Array<{ productId: string; variantId: string }> }>) => void;
   /** `PUT /api/meal-plan/current`'s exact body shape — built fresh from the
       current draft, so the summary screen's save mutation never has to know
       the selections' internal representation. */
@@ -221,8 +236,30 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
     setIsDirty(false);
   }
 
+  function applyServerPlan(days: Array<{ dayOfWeek: number; items: Array<{ productId: string; variantId: string }> }>) {
+    const next = emptySelections();
+    for (const day of days) {
+      for (const item of day.items) next[day.dayOfWeek][item.productId] = item.variantId;
+    }
+    setSelections(next);
+    selectionsRef.current = next;
+    setIsDirty(false);
+    // The plan's own id didn't change (a save reuses the existing plan row),
+    // so the query-driven reseed above would never re-run for this id on
+    // its own — `selections` is already correct here, this just keeps that
+    // guard consistent so a later background refetch of the same plan
+    // doesn't redundantly reseed over it.
+    setSeededFor(planKey);
+  }
+
   function itemCount(dayOfWeek: number): number {
-    return Object.keys(selections[dayOfWeek] ?? {}).length;
+    const day = selections[dayOfWeek] ?? {};
+    // Matches `dayTotalPaise` below: a pick that no longer resolves (its
+    // product/variant went inactive, out of stock, or lost its photo since
+    // it was picked) doesn't count as an item either, so the count and the
+    // total never disagree about the same dropped pick.
+    return Object.entries(day).filter(([productId, variantId]) => variantOf(productId, variantId) !== undefined)
+      .length;
   }
 
   function dayTotalPaise(dayOfWeek: number): bigint {
@@ -253,8 +290,8 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
       dayOfWeek,
       variantIds: Object.values(selectionsRef.current[dayOfWeek] ?? {}),
     }));
-    await api.put(`/api/meal-plan/current${qs({ locale })}`, { days });
-    setIsDirty(false);
+    const response = await api.put<SavePlanResponse>(`/api/meal-plan/current${qs({ locale })}`, { days });
+    applyServerPlan(response.plan.days);
     void queryClient.invalidateQueries({ queryKey: ['meal-plan-current', locale] });
   }
 
@@ -273,6 +310,7 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
     hasActiveSubscription: data?.hasActiveSubscription ?? false,
     isDirty,
     markSaved,
+    applyServerPlan,
     buildSavePayload,
     saveNow,
   };

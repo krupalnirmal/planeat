@@ -138,27 +138,35 @@ export async function pauseSubscription(
   const end = parseDateKey(toDateKey_);
   const days = Math.floor((end.getTime() - start.getTime()) / 86_400_000) + 1;
 
-  await db.$transaction(async (tx) => {
-    for (let offset = 0; offset < days; offset++) {
-      const date = addDays(start, offset);
-      await tx.subscriptionException.upsert({
-        where: { subscriptionId_date: { subscriptionId, date } },
-        create: {
-          id: newId(ID_PREFIX.subscriptionException),
-          subscriptionId,
-          date,
-          type: 'PAUSE',
-          reason: `Paused ${fromDateKey} to ${toDateKey_}`,
-        },
-        update: { type: 'PAUSE' },
-      });
-    }
+  await db.$transaction(
+    async (tx) => {
+      for (let offset = 0; offset < days; offset++) {
+        const date = addDays(start, offset);
+        await tx.subscriptionException.upsert({
+          where: { subscriptionId_date: { subscriptionId, date } },
+          create: {
+            id: newId(ID_PREFIX.subscriptionException),
+            subscriptionId,
+            date,
+            type: 'PAUSE',
+            reason: `Paused ${fromDateKey} to ${toDateKey_}`,
+          },
+          update: { type: 'PAUSE' },
+        });
+      }
 
-    await tx.subscription.update({
-      where: { id: subscriptionId },
-      data: { status: 'PAUSED' },
-    });
-  });
+      await tx.subscription.update({
+        where: { id: subscriptionId },
+        data: { status: 'PAUSED' },
+      });
+    },
+    // A sequential upsert per paused day against the remote TiDB connection
+    // — a long pause range (a week's vacation is an ordinary ask) blows
+    // Prisma's default 5s interactive-transaction timeout well before it
+    // blows the route's own generous limit. Same fix already applied to
+    // `saveCustomerPlan` and `generateForSubscription` for the same reason.
+    { timeout: 25_000 },
+  );
 
   return { ok: true, days };
 }

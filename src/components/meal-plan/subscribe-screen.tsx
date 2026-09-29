@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   CalendarDays,
   Check,
@@ -18,7 +18,7 @@ import {
   Wallet,
   X,
 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -114,6 +114,7 @@ export function SubscribeScreen() {
   const tc = useTranslations('common');
   const te = useTranslations('errors');
   const tw = useTranslations('wallet');
+  const locale = useLocale();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { user, isLoggedIn, isLoading: sessionLoading, defaultAddress } = useSession();
@@ -143,16 +144,26 @@ export function SubscribeScreen() {
   const resolvedAddressId = addressId ?? defaultAddress?.id ?? null;
   const selectedAddress = user?.addresses.find((address) => address.id === resolvedAddressId) ?? null;
 
-  const quote = useQuery({
-    queryKey: ['meal-plan-subscribe-quote', durationDays, startDateKey],
-    queryFn: () =>
-      api.get<QuoteResponse>(`/api/meal-plan/subscribe${qs({ durationDays, startDate: startDateKey })}`),
-    enabled: isLoggedIn,
+  // One quote per duration option, fetched in parallel — the Duration step
+  // shows each option's own real total (`estimatedPeriodCostPaise`, which
+  // depends on which weekdays that specific duration+start date actually
+  // covers per `estimatePeriodCost`'s own doc comment), not a flat
+  // daily-average estimate that would silently disagree with the exact
+  // total the Summary step shows moments later for the same duration.
+  const quoteQueries = useQueries({
+    queries: DURATION_OPTIONS.map((days) => ({
+      queryKey: ['meal-plan-subscribe-quote', days, startDateKey],
+      queryFn: () =>
+        api.get<QuoteResponse>(`/api/meal-plan/subscribe${qs({ durationDays: days, startDate: startDateKey })}`),
+      enabled: isLoggedIn,
+    })),
   });
+  const quoteByDuration = new Map(DURATION_OPTIONS.map((days, i) => [days, quoteQueries[i]]));
+  const quote = quoteByDuration.get(durationDays)!;
 
   const plan = useQuery({
-    queryKey: ['meal-plan-current'],
-    queryFn: () => api.get<PlanResponse>('/api/meal-plan/current'),
+    queryKey: ['meal-plan-current', locale],
+    queryFn: () => api.get<PlanResponse>(`/api/meal-plan/current${qs({ locale })}`),
     enabled: isLoggedIn,
   });
 
@@ -311,7 +322,7 @@ export function SubscribeScreen() {
 
         {step === 'duration' && (
           <DurationStep
-            q={q}
+            quoteByDuration={quoteByDuration}
             durationDays={durationDays}
             setDurationDays={setDurationDays}
             deliveryMode={deliveryMode}
@@ -342,7 +353,6 @@ export function SubscribeScreen() {
               setStep('topup');
             }}
             onContinue={() => setStep('confirm')}
-            canContinue={resolvedAddressId !== null && (shortfall <= 0n || q.isFirstSubscription)}
           />
         )}
 
@@ -438,14 +448,14 @@ function prevStep(step: Step): Step {
 }
 
 function DurationStep({
-  q,
+  quoteByDuration,
   durationDays,
   setDurationDays,
   deliveryMode,
   setDeliveryMode,
   onContinue,
 }: {
-  q: QuoteResponse['quote'] | undefined;
+  quoteByDuration: Map<number, { data?: QuoteResponse }>;
   durationDays: (typeof DURATION_OPTIONS)[number];
   setDurationDays: (d: (typeof DURATION_OPTIONS)[number]) => void;
   deliveryMode: 'DAILY' | 'WEEKLY';
@@ -489,7 +499,7 @@ function DurationStep({
 
       {DURATION_OPTIONS.map((days) => {
         const active = durationDays === days;
-        const estimatedTotal = q ? paise(q.averageDailyPaise) * BigInt(days) : 0n;
+        const optionQuote = quoteByDuration.get(days)?.data?.quote;
         return (
           <button
             key={days}
@@ -508,11 +518,15 @@ function DurationStep({
             )}
             <div className="flex items-center justify-between">
               <span className="text-base font-bold">{t('days', { count: days })}</span>
-              <span className="text-base font-black">{formatPaise(estimatedTotal, { hidePaise: true })}</span>
+              <span className="text-base font-black">
+                {optionQuote
+                  ? formatPaise(paise(optionQuote.estimatedPeriodCostPaise), { hidePaise: true })
+                  : '—'}
+              </span>
             </div>
-            {q && (
+            {optionQuote && (
               <p className="mt-0.5 text-xs text-muted-foreground">
-                ({formatPaise(paise(q.averageDailyPaise))}/{t('day')})
+                ({formatPaise(paise(optionQuote.averageDailyPaise))}/{t('day')})
               </p>
             )}
           </button>
@@ -555,7 +569,6 @@ function SummaryStep({
   onPickAddress,
   onNeedsTopup,
   onContinue,
-  canContinue,
 }: {
   q: QuoteResponse['quote'];
   durationDays: number;
@@ -570,7 +583,6 @@ function SummaryStep({
   onPickAddress: (id: string) => void;
   onNeedsTopup: () => void;
   onContinue: () => void;
-  canContinue: boolean;
 }) {
   const t = useTranslations('mealPlan.subscribe');
   const ta = useTranslations('address');
@@ -707,7 +719,12 @@ function SummaryStep({
         <button
           type="button"
           onClick={covered ? onContinue : onNeedsTopup}
-          disabled={!canContinue && covered}
+          // An address is required before EITHER path: activating directly,
+          // or topping up — the top-up flow lands on Confirm straight after
+          // payment with no address step of its own, so skipping this check
+          // for `!covered` let a customer pay into their wallet and only
+          // then discover activation fails for a missing address.
+          disabled={resolvedAddressId === null}
           className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
           {covered ? t('continueToActivate') : t('addMoneyToWallet')}
@@ -925,11 +942,17 @@ function PaymentMethodStep({
       )}
 
       <p className="text-sm font-semibold">{t('paymentMethod')}</p>
-      <ul className="divide-y divide-border overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-card">
+      <ul
+        role="radiogroup"
+        aria-label={t('paymentMethod')}
+        className="divide-y divide-border overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-card"
+      >
         {PAYMENT_METHODS.map(({ id, icon: Icon }) => (
           <li key={id}>
             <button
               type="button"
+              role="radio"
+              aria-checked={method === id}
               onClick={() => setMethod(id)}
               className="flex w-full items-center justify-between gap-3 px-4 py-3.5"
             >
@@ -1043,7 +1066,11 @@ function ConfirmStep({
           <Wallet className="size-4" aria-hidden />
           {t('walletBalance')}: {formatPaise(paise(q.walletBalancePaise))}
         </p>
-        <p className="mt-0.5 text-xs text-primary-dark">{t('sufficientBalance')}</p>
+        <p className="mt-0.5 text-xs text-primary-dark">
+          {paise(q.shortfallPaise) > 0n && q.isFirstSubscription
+            ? t('codTrial', { amount: formatPaise(paise(q.prepay.requiredBalancePaise)) })
+            : t('sufficientBalance')}
+        </p>
       </section>
 
       <div>
