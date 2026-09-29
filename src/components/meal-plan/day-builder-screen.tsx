@@ -292,16 +292,29 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
             </nav>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 bg-tint-lime px-4 py-3">
-            {filteredProducts.map((product) => (
-              <PlanProductCard
-                key={product.id}
-                product={product}
-                categoryIcon={activeColumn ? (CATEGORY_ICONS[activeColumn.slug] ?? Leaf) : Leaf}
-                selectedVariantId={daySelections[product.id]}
-                onTap={() => setPicker(product)}
-              />
-            ))}
+          <div className="bg-tint-lime px-4 py-3">
+            {filteredProducts.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3">
+                {filteredProducts.map((product) => (
+                  <PlanProductCard
+                    key={product.id}
+                    product={product}
+                    categoryIcon={activeColumn ? (CATEGORY_ICONS[activeColumn.slug] ?? Leaf) : Leaf}
+                    selectedVariantId={daySelections[product.id]}
+                    onTap={() => setPicker(product)}
+                  />
+                ))}
+              </div>
+            ) : (
+              // A category can legitimately have zero pickable products —
+              // every one currently lacks a photo (excluded from the
+              // column entirely, session 2026-09-28) or is out of stock —
+              // and a bare, unexplained blank rectangle read as broken
+              // (user report, session 2026-09-29).
+              <p className="py-10 text-center text-sm text-muted-foreground">
+                {t('builder.noProductsInCategory')}
+              </p>
+            )}
           </div>
         </main>
       )}

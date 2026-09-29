@@ -463,7 +463,8 @@
       "dailyEssentialsTitle": "रोजच्या वापरातील भाज्या",
       "dailyEssentialsHint": "एकदा निवडा, आठवड्याभर तेच वापरले जाईल",
       "sproutsTitle": "स्प्राऊट्स",
-      "choppedVegetablesTitle": "चिरलेल्या भाज्या"
+      "choppedVegetablesTitle": "चिरलेल्या भाज्या",
+      "noProductsInCategory": "इथे अजून काही उत्पादनं नाहीत — लवकरच येतील"
     },
     "wizard": {
       "selectDayHint": "आयटम्स जोडण्यासाठी कोणताही दिवस निवडा",

@@ -463,7 +463,8 @@
       "dailyEssentialsTitle": "Daily Use Vegetables",
       "dailyEssentialsHint": "Picked once, used every day of the week",
       "sproutsTitle": "Sprouts",
-      "choppedVegetablesTitle": "Chopped Vegetables"
+      "choppedVegetablesTitle": "Chopped Vegetables",
+      "noProductsInCategory": "No products here yet — check back soon"
     },
     "wizard": {
       "selectDayHint": "Choose any day to add items",
