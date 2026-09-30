@@ -25,6 +25,7 @@ const MESSAGES: Record<Locale, Record<string, unknown>> = { mr, hi, en };
  * key maps to a flat message id under the `notifications` namespace.
  */
 const MESSAGE_ID: Record<TemplateKey, string> = {
+  [TEMPLATE.orderPlaced]: 'orderPlaced',
   [TEMPLATE.orderSubstituted]: 'orderSubstituted',
   [TEMPLATE.orderItemDropped]: 'orderItemDropped',
   [TEMPLATE.orderPaymentPending]: 'orderPaymentPending',
@@ -84,6 +85,11 @@ function variablesFor(
   payload: Record<string, unknown>,
 ): Record<string, string> {
   switch (templateKey) {
+    case TEMPLATE.orderPlaced:
+      return {
+        orderNumber: String(payload.orderNumber ?? ''),
+        amount: money(payload.totalPaise),
+      };
     case TEMPLATE.orderSubstituted:
       return { date: String(payload.date ?? ''), items: itemNames(locale, payload.substitutions) };
     case TEMPLATE.orderItemDropped:
@@ -187,6 +193,7 @@ export function urlFor(
     case TEMPLATE.orderPlacedAdmin:
       pathname = orderId ? `/admin/orders/${orderId}` : '/admin/orders';
       break;
+    case TEMPLATE.orderPlaced:
     case TEMPLATE.orderStatusChanged:
     case TEMPLATE.orderSubstituted:
     case TEMPLATE.orderItemDropped:

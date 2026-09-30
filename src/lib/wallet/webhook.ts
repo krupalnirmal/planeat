@@ -1,5 +1,7 @@
 import { db } from '@/lib/db';
 import { ID_PREFIX, newId } from '@/lib/ids';
+import { TEMPLATE } from '@/lib/notifications/notify';
+import { notifyEventNow } from '@/lib/notifications/notify-now';
 import type { WebhookEvent } from '@/lib/services/payment';
 import { LEDGER_REF, credit } from './ledger';
 
@@ -181,7 +183,7 @@ export async function handlePaymentWebhook(event: WebhookEvent): Promise<Webhook
       return { handled: true, action: 'AMOUNT_MISMATCH', paymentId: payment.id, orderId };
     }
 
-    return db.$transaction(async (tx) => {
+    const outcome = await db.$transaction(async (tx) => {
       await tx.payment.update({
         where: { id: payment.id },
         data: {
@@ -207,6 +209,25 @@ export async function handlePaymentWebhook(event: WebhookEvent): Promise<Webhook
       }
       return { handled: true as const, action: 'ORDER_PAID' as const, paymentId: payment.id, orderId };
     });
+
+    // Confirmation outside the transaction, and only for the genuine
+    // PENDING->PAID transition — a replayed webhook for an already-paid
+    // order (ALREADY_PAID) must not notify the customer a second time.
+    // This is the RAZORPAY counterpart to placeOrder's own orderPlaced
+    // notification (WALLET/COD fire it immediately; RAZORPAY only becomes
+    // real once this webhook lands).
+    if (outcome.action === 'ORDER_PAID') {
+      const order = await db.order.findUnique({ where: { id: orderId }, select: { orderNumber: true } });
+      if (order) {
+        await notifyEventNow(payment.userId, TEMPLATE.orderPlaced, {
+          orderId,
+          orderNumber: order.orderNumber,
+          totalPaise: payment.amountPaise,
+        });
+      }
+    }
+
+    return outcome;
   }
 
   return db.$transaction(async (tx) => {

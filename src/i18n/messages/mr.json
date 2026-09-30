@@ -1278,6 +1278,10 @@
     }
   },
   "notifications": {
+    "orderPlaced": {
+      "title": "ऑर्डर कन्फर्म झाली",
+      "body": "ऑर्डर {orderNumber} प्लेस झाली — {amount}"
+    },
     "orderSubstituted": {
       "title": "वस्तू बदलली",
       "body": "{date} च्या ऑर्डरमध्ये बदल: {items}"

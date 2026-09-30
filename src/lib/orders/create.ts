@@ -2,6 +2,8 @@ import { db } from '@/lib/db';
 import { isUniqueViolation } from '@/lib/db-errors';
 import { ID_PREFIX, newId, newOrderNumber } from '@/lib/ids';
 import { pickName } from '@/lib/catalog/text';
+import { TEMPLATE } from '@/lib/notifications/notify';
+import { notifyEventNow } from '@/lib/notifications/notify-now';
 import { checkServiceability } from '@/lib/serviceability';
 import { InsufficientBalanceError, LEDGER_REF, debit } from '@/lib/wallet/ledger';
 import { computeBill, isPaymentMethodAllowed, loadFeeConfig } from './pricing';
@@ -328,6 +330,20 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
 
       return { orderId: order.id, orderNumber: order.orderNumber, totalPaise: order.totalPaise };
     });
+
+    // Confirmation outside the transaction — a failed notification must
+    // never undo an order that already committed. WALLET and COD are both
+    // genuinely confirmed the moment this returns (WALLET is debited above;
+    // COD needs no payment yet); RAZORPAY isn't — that order sits PENDING
+    // until the signature-verified webhook lands, which sends this same
+    // notification itself (see handlePaymentWebhook's ORDER_PAID branch).
+    if (input.paymentMethod !== 'RAZORPAY') {
+      await notifyEventNow(input.userId, TEMPLATE.orderPlaced, {
+        orderId: result.orderId,
+        orderNumber: result.orderNumber,
+        totalPaise: result.totalPaise,
+      });
+    }
 
     return { ok: true, ...result, duplicate: false };
   } catch (error) {

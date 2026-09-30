@@ -1278,6 +1278,10 @@
     }
   },
   "notifications": {
+    "orderPlaced": {
+      "title": "Order confirmed",
+      "body": "Order {orderNumber} placed — {amount}"
+    },
     "orderSubstituted": {
       "title": "An item was substituted",
       "body": "Change to your {date} order: {items}"

@@ -13,15 +13,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const dbMock = vi.hoisted(() => ({
   payment: { findUnique: vi.fn(), findFirst: vi.fn(), update: vi.fn() },
-  order: { updateMany: vi.fn() },
+  order: { updateMany: vi.fn(), findUnique: vi.fn() },
   auditLog: { create: vi.fn() },
   $transaction: vi.fn(async (fn: (tx: unknown) => unknown) => fn(dbMock)),
 }));
 
 vi.mock('@/lib/db', () => ({ db: dbMock }));
 vi.mock('./ledger', () => ({ credit: vi.fn(), LEDGER_REF: { payment: () => ({}) } }));
+vi.mock('@/lib/notifications/notify-now', () => ({ notifyEventNow: vi.fn() }));
 
 import { handlePaymentWebhook } from '@/lib/wallet/webhook';
+import { TEMPLATE } from '@/lib/notifications/notify';
 import type { WebhookEvent } from '@/lib/services/payment';
 
 const PAYMENT_ROW = {
@@ -49,10 +51,11 @@ beforeEach(() => {
   dbMock.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(dbMock));
   dbMock.payment.findUnique.mockResolvedValue(PAYMENT_ROW);
   dbMock.order.updateMany.mockResolvedValue({ count: 1 });
+  dbMock.order.findUnique.mockResolvedValue({ orderNumber: 'AC-260930-TEST01' });
 });
 
 describe('handlePaymentWebhook — order-payment amount check', () => {
-  it('marks the order paid when the captured amount matches exactly', async () => {
+  it('marks the order paid when the captured amount matches exactly, and confirms the customer', async () => {
     const result = await handlePaymentWebhook(capturedEvent(10_000n));
 
     expect(result).toEqual({ handled: true, action: 'ORDER_PAID', paymentId: 'pay_1', orderId: 'ord_1' });
@@ -60,6 +63,24 @@ describe('handlePaymentWebhook — order-payment amount check', () => {
       where: { id: 'ord_1', paymentStatus: 'PENDING' },
       data: { paymentStatus: 'PAID' },
     });
+
+    const { notifyEventNow } = await import('@/lib/notifications/notify-now');
+    expect(notifyEventNow).toHaveBeenCalledWith(
+      'usr_1',
+      TEMPLATE.orderPlaced,
+      expect.objectContaining({ orderId: 'ord_1', orderNumber: 'AC-260930-TEST01' }),
+    );
+  });
+
+  it('does not re-confirm a replayed webhook for an already-paid order', async () => {
+    dbMock.order.updateMany.mockResolvedValue({ count: 0 }); // already PAID, nothing to flip
+
+    const result = await handlePaymentWebhook(capturedEvent(10_000n));
+
+    expect(result).toEqual({ handled: true, action: 'ALREADY_PAID', paymentId: 'pay_1' });
+
+    const { notifyEventNow } = await import('@/lib/notifications/notify-now');
+    expect(notifyEventNow).not.toHaveBeenCalled();
   });
 
   it('refuses to mark the order paid when the gateway captured less than the order is worth', async () => {

@@ -17,6 +17,7 @@ import type { NotificationChannel } from '@/generated/prisma/enums';
  */
 
 export const TEMPLATE = {
+  orderPlaced: 'order.placed',
   orderSubstituted: 'order.substituted',
   orderItemDropped: 'order.item_dropped',
   orderPaymentPending: 'order.payment_pending',
@@ -42,6 +43,7 @@ export type TemplateKey = (typeof TEMPLATE)[keyof typeof TEMPLATE];
  * here because B16 restricts SMS to OTP alone (`src/lib/auth/otp.ts`).
  */
 export const CHANNELS_BY_TEMPLATE: Record<TemplateKey, readonly NotificationChannel[]> = {
+  [TEMPLATE.orderPlaced]: ['IN_APP', 'PUSH'],
   [TEMPLATE.orderStatusChanged]: ['IN_APP', 'PUSH'],
   [TEMPLATE.orderSubstituted]: ['IN_APP', 'PUSH'],
   [TEMPLATE.orderItemDropped]: ['IN_APP', 'PUSH'],
