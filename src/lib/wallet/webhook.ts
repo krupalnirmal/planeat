@@ -37,6 +37,7 @@ export type WebhookOutcome =
   | { handled: true; action: 'ALREADY_PAID'; paymentId: string }
   | { handled: true; action: 'MARKED_FAILED'; paymentId: string }
   | { handled: true; action: 'STALE_FAILURE_IGNORED'; paymentId: string }
+  | { handled: true; action: 'AMOUNT_MISMATCH'; paymentId: string; orderId: string }
   | { handled: true; action: 'IGNORED'; reason: string };
 
 /**
@@ -144,6 +145,42 @@ export async function handlePaymentWebhook(event: WebhookEvent): Promise<Webhook
 
   if (payment.orderId) {
     const orderId = payment.orderId;
+
+    // Defense in depth: `payment.amountPaise` was fixed server-side when the
+    // gateway order was created (`initiateOrderPayment`, from the order's
+    // own `totalPaise` — a customer can't reach this amount from the
+    // browser at all, let alone edit it). Under correct operation the
+    // captured amount always matches. If it ever doesn't — a currency/
+    // rounding edge case on the gateway's side, a replayed event against a
+    // stale order — marking the order fully PAID for less than it's worth
+    // would ship goods against a shortfall nobody would otherwise notice.
+    // The payment record itself is still updated (real money did arrive,
+    // that's not in question), just not wired to flip the order.
+    if (amountPaise < payment.amountPaise) {
+      await db.payment.update({
+        where: { id: payment.id },
+        data: {
+          status: 'PAID',
+          gatewayPaymentId: event.gatewayPaymentId || null,
+          gatewayOrderId: event.gatewayOrderId || undefined,
+          signatureVerified: true,
+          rawPayload: event.raw as never,
+        },
+      });
+      await db.auditLog.create({
+        data: {
+          id: newId(ID_PREFIX.auditLog),
+          actorId: null,
+          action: 'webhook.amount_mismatch',
+          entityType: 'Order',
+          entityId: orderId,
+          after: { expectedPaise: payment.amountPaise.toString(), capturedPaise: amountPaise.toString() },
+          ip: null,
+        },
+      });
+      return { handled: true, action: 'AMOUNT_MISMATCH', paymentId: payment.id, orderId };
+    }
+
     return db.$transaction(async (tx) => {
       await tx.payment.update({
         where: { id: payment.id },
