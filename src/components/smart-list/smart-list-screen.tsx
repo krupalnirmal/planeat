@@ -19,8 +19,11 @@ import { ApiClientError, api, qs } from '@/lib/api/client';
  * unavailable, and on a phone with a broken mic or in a house where somebody
  * is asleep it is simply the better option.
  *
- * The voice path shows the transcript for editing before anything reaches a
- * cart: a misheard word costs one tap here instead of a re-recorded minute.
+ * Voice goes straight to the review screen exactly like photo does (user
+ * request, session 2026-09-30 — the extra "what we heard" transcript-edit
+ * step read as a different, longer flow for voice specifically). Fixing a
+ * misheard word now happens the same way a wrong photo-match gets fixed: on
+ * the review screen itself, which already supports removing/adjusting items.
  */
 
 interface VoiceResponse {
@@ -38,7 +41,7 @@ interface SavedListsResponse {
   lists: Array<{ id: string; name: string | null; source: string; itemCount: number }>;
 }
 
-type Mode = 'choose' | 'record' | 'transcript' | 'type';
+type Mode = 'choose' | 'record' | 'type';
 
 export function SmartListScreen() {
   const t = useTranslations('smartList');
@@ -49,9 +52,7 @@ export function SmartListScreen() {
   const { isLoggedIn, isLoading: sessionLoading } = useSession();
 
   const [mode, setMode] = useState<Mode>('choose');
-  const [transcript, setTranscript] = useState('');
   const [typed, setTyped] = useState('');
-  const [pendingListId, setPendingListId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Camera vs gallery choice (session 2026-09-23, client request) — a
   // single `capture="environment"` input launches the camera app directly
@@ -93,10 +94,7 @@ export function SmartListScreen() {
     },
     onSuccess: (data) => {
       setError(null);
-      setPendingListId(data.smartListId);
-      setTranscript(data.transcript);
-      // M4 — the transcript is shown for editing BEFORE the review screen.
-      setMode('transcript');
+      router.push(`/smart-list/${data.smartListId}`);
     },
     onError: handleError,
   });
@@ -113,15 +111,6 @@ export function SmartListScreen() {
       if (!payload.success) throw new ApiClientError(payload.error.code, payload.error.message, response.status);
       return payload.data as CreateResponse;
     },
-    onSuccess: (data) => router.push(`/smart-list/${data.smartListId}`),
-    onError: handleError,
-  });
-
-  const reparse = useMutation({
-    mutationFn: () =>
-      api.post<CreateResponse>(`/api/smart-list/${pendingListId}/reparse${qs({ locale })}`, {
-        transcript,
-      }),
     onSuccess: (data) => router.push(`/smart-list/${data.smartListId}`),
     onError: handleError,
   });
@@ -156,7 +145,7 @@ export function SmartListScreen() {
     );
   }
 
-  const busy = uploadVoice.isPending || uploadPhoto.isPending || reparse.isPending || parseTyped.isPending;
+  const busy = uploadVoice.isPending || uploadPhoto.isPending || parseTyped.isPending;
 
   return (
     <>
@@ -169,49 +158,14 @@ export function SmartListScreen() {
         </p>
       )}
 
-      {busy && mode !== 'transcript' && (
+      {busy && (
         <p className="mb-4 flex items-center gap-2 rounded-[var(--radius)] bg-secondary px-3 py-2.5 text-sm">
           <Loader2 className="size-4 animate-spin text-primary" aria-hidden />
           {uploadVoice.isPending || uploadPhoto.isPending ? t('uploading') : t('processing')}
         </p>
       )}
 
-      {/* ── Transcript editing (M4's editable transcript) */}
-      {mode === 'transcript' ? (
-        <section className="rounded-[var(--radius)] border border-border/60 bg-background p-4">
-          <h2 className="text-sm font-semibold">{t('transcriptTitle')}</h2>
-          <p className="mt-0.5 text-xs text-muted-foreground">{t('transcriptHint')}</p>
-
-          <textarea
-            value={transcript}
-            onChange={(event) => setTranscript(event.target.value.slice(0, 4000))}
-            rows={5}
-            className="input-3d mt-3 w-full resize-none rounded-[var(--radius)] border border-border/60 bg-card px-3 py-2 text-sm leading-relaxed outline-none focus:border-primary"
-          />
-
-          <div className="mt-3 flex gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                setMode('choose');
-                setPendingListId(null);
-              }}
-              className="h-12 flex-1 rounded-[var(--radius)] border border-border text-sm font-medium"
-            >
-              {tc('back')}
-            </button>
-            <button
-              type="button"
-              onClick={() => reparse.mutate()}
-              disabled={transcript.trim().length < 2 || reparse.isPending}
-              className="flex h-12 flex-1 items-center justify-center gap-2 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
-            >
-              {reparse.isPending && <Loader2 className="size-4 animate-spin" aria-hidden />}
-              {t('reparse')}
-            </button>
-          </div>
-        </section>
-      ) : mode === 'type' ? (
+      {mode === 'type' ? (
         <section className="rounded-[var(--radius)] border border-border/60 bg-background p-4">
           <h2 className="text-sm font-semibold">{t('typeTitle')}</h2>
           <textarea
