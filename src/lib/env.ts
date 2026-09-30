@@ -120,7 +120,7 @@ export const env = {
     assumeFeePercent: num('PAYMENT_ASSUME_FEE_PERCENT', 2.4),
     refundDestination: str('REFUND_DESTINATION', 'wallet'),
     pendingReconcileMinutes: num('PAYMENT_PENDING_RECONCILE_MINUTES', 15),
-    minTopupPaise: BigInt(num('MIN_WALLET_TOPUP_PAISE', 10000)),
+    minTopupPaise: BigInt(num('MIN_WALLET_TOPUP_PAISE', 100)),
     topupPresetsPaise: bigints('WALLET_TOPUP_PRESETS_PAISE', [20000n, 50000n, 100000n, 200000n]),
     // Explicit, temporary opt-out of the test-key production guard below —
     // for a deployment (like a client demo) that is NODE_ENV=production but
