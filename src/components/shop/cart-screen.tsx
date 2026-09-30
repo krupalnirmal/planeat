@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import {
   AlertTriangle,
   ArrowRight,
-  ChevronLeft,
   ImageIcon,
   Leaf,
   ShoppingCart,
@@ -39,9 +38,11 @@ import { cn } from '@/lib/utils';
  * and a light-blue total-savings banner pulled out below it, a new
  * cancellation-policy card, and a single solid-green sticky bar (replacing
  * the earlier dashed-border dark card + separate white pill button).
- * Only the happy-path (cart has items) state gets this treatment — the
- * loading/empty/logged-out states below keep the plain shared PageHeader,
- * since the reference itself only ever shows a cart with items in it.
+ * The "Delivery in N minutes" card replaces the reference's own decorative
+ * header art, but PageHeader's sticky title bar stays above all of it —
+ * dropping it here (as the happy-path state briefly did) left this one
+ * screen without the title bar every other screen carries (owner report,
+ * session 2026-10-01).
  */
 
 interface QuoteResponse {
@@ -136,16 +137,22 @@ export function CartScreen() {
   const blocked = (quote.data?.unavailableLines.length ?? 0) > 0;
 
   return (
-    // `lg:grid` (session 2026-09-20, desktop layout plan Part E): items
-    // stack in one column below `lg:`, split into a left items column and
-    // a sticky right bill-summary column above it — the standard cart/
-    // checkout shape once there's room for it.
-    <main className="min-h-dvh space-y-3 bg-page-grey px-4 pt-4 pb-2 lg:grid lg:grid-cols-[1fr_380px] lg:items-start lg:gap-8 lg:space-y-0 lg:px-8 lg:py-8">
-      <div className="space-y-3">
-        <Link href="/" aria-label={tc('back')} className="grid size-9 shrink-0 place-items-center rounded-full">
-          <ChevronLeft className="size-5" aria-hidden />
-        </Link>
+    <>
+      {/* The happy-path state had dropped this during the Blinkit redesign
+          (only the loading/empty/logged-out states above kept it) — every
+          other screen in the app carries this same sticky title bar, and
+          its absence here read as a missing header with the cart floating
+          straight into content with no heading above it (owner report,
+          session 2026-10-01). Replaces the bare back-chevron this state
+          used to render on its own. */}
+      <PageHeader title={t('title')} backHref="/" backLabel={tc('back')} />
 
+      {/* `lg:grid` (session 2026-09-20, desktop layout plan Part E): items
+          stack in one column below `lg:`, split into a left items column and
+          a sticky right bill-summary column above it — the standard cart/
+          checkout shape once there's room for it. */}
+      <main className="min-h-dvh space-y-3 bg-page-grey px-4 pt-4 pb-2 lg:grid lg:grid-cols-[1fr_380px] lg:items-start lg:gap-8 lg:space-y-0 lg:px-8 lg:py-8">
+      <div className="space-y-3">
         {/* "Delivery in N minutes" card — stands in for the earlier
             decorative header (session 2026-09-28, owner's reference). Same
             30-minute promise the rest of the app already makes
@@ -325,6 +332,7 @@ export function CartScreen() {
       </div>
 
       <div aria-hidden className="h-24 lg:hidden" />
-    </main>
+      </main>
+    </>
   );
 }
