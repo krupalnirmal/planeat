@@ -1185,7 +1185,18 @@
       "setStandingRider": "Set a standing rider",
       "changeStandingRider": "Change rider",
       "riderUnavailable": "unavailable",
-      "confirmRider": "Assign"
+      "confirmRider": "Assign",
+      "adjustWallet": "Adjust wallet",
+      "adjustCredit": "Credit (add money)",
+      "adjustDebit": "Debit (remove money)",
+      "adjustAmount": "Amount",
+      "adjustReason": "Reason",
+      "adjustReasonPlaceholder": "e.g. Refund for damaged item in order AC-...",
+      "adjustReasonHint": "Recorded in the audit log — be specific",
+      "adjustConfirm": "Confirm",
+      "adjustSuccess": "Wallet updated",
+      "adjustInsufficientBalance": "This customer's wallet doesn't have that much to debit",
+      "adjustInvalidAmount": "Enter an amount greater than zero"
     },
     "settings": {
       "title": "Settings",

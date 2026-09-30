@@ -1185,7 +1185,18 @@
       "setStandingRider": "कायमचा rider नेमा",
       "changeStandingRider": "Rider बदला",
       "riderUnavailable": "उपलब्ध नाही",
-      "confirmRider": "नेमा"
+      "confirmRider": "नेमा",
+      "adjustWallet": "वॉलेट adjust करा",
+      "adjustCredit": "जमा करा (पैसे टाका)",
+      "adjustDebit": "वजा करा (पैसे काढा)",
+      "adjustAmount": "रक्कम",
+      "adjustReason": "कारण",
+      "adjustReasonPlaceholder": "उदा. Order AC-... मधील खराब वस्तूसाठी refund",
+      "adjustReasonHint": "audit log मध्ये नोंद होईल — नेमकं कारण लिहा",
+      "adjustConfirm": "कन्फर्म करा",
+      "adjustSuccess": "वॉलेट अपडेट झालं",
+      "adjustInsufficientBalance": "या ग्राहकाच्या वॉलेटमध्ये इतकी रक्कम वजा करण्याइतके पैसे नाहीत",
+      "adjustInvalidAmount": "शून्यापेक्षा जास्त रक्कम टाका"
     },
     "settings": {
       "title": "सेटिंग्ज",

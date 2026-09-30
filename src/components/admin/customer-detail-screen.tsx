@@ -16,8 +16,8 @@ import {
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
-import { api, qs } from '@/lib/api/client';
-import { formatPaise, paise } from '@/lib/money';
+import { ApiClientError, api, qs } from '@/lib/api/client';
+import { formatPaise, paise, rupeesToPaise } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
 /**
@@ -204,6 +204,7 @@ export function CustomerDetailScreen({
             {t('joined')}{' '}
             {format.dateTime(new Date(customer.createdAt), { day: 'numeric', month: 'short', year: 'numeric' })}
           </p>
+          <WalletAdjustControl customerId={customerId} />
         </section>
 
         <section className="rounded-[var(--radius-2xl)] bg-tint-yellow p-4">
@@ -464,6 +465,156 @@ export function SubscriptionRiderControl({
       >
         {tc('back')}
       </button>
+    </div>
+  );
+}
+
+interface AdjustWalletResponse {
+  transactionId: string;
+  balancePaise: string;
+}
+
+/**
+ * A manual wallet credit/debit, with a mandatory reason — the UI half of
+ * `POST /api/admin/wallet/adjust` (M7's ledger), which existed with no
+ * screen behind it until now (session 2026-10-01, owner request — a
+ * delivered order with something wrong needs a real way to refund that
+ * doesn't route through order cancellation, which only ever applies
+ * pre-delivery). SUPER_ADMIN-only server-side; shown to every admin the
+ * same way `AdminSettingsScreen` shows its own SUPER_ADMIN-only save
+ * button — the server is the real gate, a STORE_ADMIN just sees the
+ * FORBIDDEN error on submit instead of a guess at the role client-side.
+ */
+function WalletAdjustControl({ customerId }: { customerId: string }) {
+  const t = useTranslations('admin.customers');
+  const tc = useTranslations('admin.common');
+  const queryClient = useQueryClient();
+
+  const [open, setOpen] = useState(false);
+  const [direction, setDirection] = useState<'CREDIT' | 'DEBIT'>('CREDIT');
+  const [amount, setAmount] = useState('');
+  const [reason, setReason] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const adjust = useMutation({
+    mutationFn: () =>
+      api.post<AdjustWalletResponse>('/api/admin/wallet/adjust', {
+        userId: customerId,
+        direction,
+        amountPaise: Number(rupeesToPaise(amount)),
+        reason: reason.trim(),
+      }),
+    onSuccess: () => {
+      setError(null);
+      setSuccess(true);
+      setAmount('');
+      setReason('');
+      void queryClient.invalidateQueries({ queryKey: ['admin-customer', customerId] });
+    },
+    onError: (err) => {
+      setSuccess(false);
+      if (err instanceof ApiClientError) {
+        // The route (src/app/api/admin/wallet/adjust/route.ts) distinguishes
+        // these by HTTP status/code, not a details payload — CONFLICT means
+        // the debit would take the wallet below zero, BAD_REQUEST means a
+        // non-positive amount.
+        if (err.code === 'FORBIDDEN') return setError(t('superAdminOnly'));
+        if (err.code === 'CONFLICT') return setError(t('adjustInsufficientBalance'));
+        if (err.code === 'BAD_REQUEST') return setError(t('adjustInvalidAmount'));
+      }
+      setError(tc('failed'));
+    },
+  });
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          setOpen(true);
+          setSuccess(false);
+          setError(null);
+        }}
+        className="mt-3 text-xs font-bold text-primary-dark underline decoration-dotted underline-offset-2"
+      >
+        {t('adjustWallet')}
+      </button>
+    );
+  }
+
+  const amountPaise = amount.trim() ? rupeesToPaise(amount) : 0n;
+  const canSubmit = amountPaise > 0n && reason.trim().length >= 5 && !adjust.isPending;
+
+  return (
+    <div className="mt-3 space-y-2.5 rounded-[var(--radius)] bg-card p-3">
+      <div className="grid grid-cols-2 gap-2">
+        {(['CREDIT', 'DEBIT'] as const).map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setDirection(value)}
+            aria-pressed={direction === value}
+            className={cn(
+              'h-9 rounded-[var(--radius)] border text-xs font-semibold',
+              direction === value ? 'border-primary bg-tint-green text-primary-dark' : 'border-border',
+            )}
+          >
+            {value === 'CREDIT' ? t('adjustCredit') : t('adjustDebit')}
+          </button>
+        ))}
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-muted-foreground">{t('adjustAmount')}</label>
+        <div className="mt-1 flex items-center gap-1.5 rounded-[var(--radius)] border border-border bg-background px-2.5">
+          <span className="text-sm text-muted-foreground">₹</span>
+          <input
+            inputMode="decimal"
+            value={amount}
+            onChange={(event) => setAmount(event.target.value.replace(/[^\d.]/g, ''))}
+            className="h-9 min-w-0 flex-1 bg-transparent text-sm outline-none"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-muted-foreground">{t('adjustReason')}</label>
+        <textarea
+          value={reason}
+          onChange={(event) => setReason(event.target.value.slice(0, 255))}
+          placeholder={t('adjustReasonPlaceholder')}
+          rows={2}
+          className="mt-1 w-full resize-none rounded-[var(--radius)] border border-border bg-background px-2.5 py-2 text-sm outline-none"
+        />
+        <p className="mt-0.5 text-[11px] text-muted-foreground">{t('adjustReasonHint')}</p>
+      </div>
+
+      {error && <p className="text-xs font-medium text-danger">{error}</p>}
+      {success && <p className="text-xs font-medium text-primary">{t('adjustSuccess')}</p>}
+
+      <div className="flex gap-2">
+        <button
+          type="button"
+          disabled={!canSubmit}
+          onClick={() => {
+            setError(null);
+            setSuccess(false);
+            adjust.mutate();
+          }}
+          className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-[var(--radius)] bg-primary text-xs font-bold text-primary-foreground disabled:opacity-50"
+        >
+          {adjust.isPending && <Loader2 className="size-3.5 animate-spin" aria-hidden />}
+          {t('adjustConfirm')}
+        </button>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="h-9 rounded-[var(--radius)] border border-border px-3 text-xs font-medium"
+        >
+          {tc('back')}
+        </button>
+      </div>
     </div>
   );
 }

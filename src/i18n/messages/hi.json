@@ -1185,7 +1185,18 @@
       "setStandingRider": "स्थायी राइडर तय करें",
       "changeStandingRider": "राइडर बदलें",
       "riderUnavailable": "उपलब्ध नहीं",
-      "confirmRider": "तय करें"
+      "confirmRider": "तय करें",
+      "adjustWallet": "वॉलेट एडजस्ट करें",
+      "adjustCredit": "क्रेडिट (पैसे जोड़ें)",
+      "adjustDebit": "डेबिट (पैसे हटाएं)",
+      "adjustAmount": "राशि",
+      "adjustReason": "कारण",
+      "adjustReasonPlaceholder": "जैसे: ऑर्डर AC-... में खराब सामान के लिए रिफंड",
+      "adjustReasonHint": "ऑडिट लॉग में दर्ज होगा — सटीक कारण लिखें",
+      "adjustConfirm": "कन्फर्म करें",
+      "adjustSuccess": "वॉलेट अपडेट हुआ",
+      "adjustInsufficientBalance": "इस ग्राहक के वॉलेट में इतनी राशि डेबिट करने लायक पैसे नहीं हैं",
+      "adjustInvalidAmount": "शून्य से ज़्यादा राशि डालें"
     },
     "settings": {
       "title": "सेटिंग्स",
