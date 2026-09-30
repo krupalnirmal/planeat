@@ -1,14 +1,14 @@
 'use client';
 
-import { Home, Mic, Salad, Wallet } from 'lucide-react';
+import { Home, Mic, Salad, ShoppingCart, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
 /**
- * PART 5 — the 4-tab bottom navigation.
+ * PART 5 — the 5-tab bottom navigation.
  *
- *   Home | Smart List | My Meal Plan | Wallet
+ *   Home | Smart List | My Meal Plan | Cart | Wallet
  *
  * A floating white rounded card (session 2026-09-17, client reference) —
  * inset from all four edges rather than a bar spanning the screen, with the
@@ -32,24 +32,28 @@ import { cn } from '@/lib/utils';
  * from `NON_HOME_PREFIXES`'s fallback logic below since it is now one of
  * the real tabs, not a "not one of the tab routes" case any more.
  *
- * Home is the fallback active tab on any route that isn't one of the other
- * three sections (cart, checkout, product pages, orders, login, profile, …)
- * — the reference shows Home highlighted on the cart screen even though
- * "/cart" isn't itself one of the tab routes.
+ * Cart added as its own tab (session 2026-10-01, user request). Home is the
+ * fallback active tab on any route that isn't one of the other four
+ * sections (checkout, product pages, orders, login, profile, …) — "/cart"
+ * now highlights itself instead of falling back to Home, same as the other
+ * real tabs.
  *
  * Always visible (session 2026-09-16) — see `CartBar`
  * (src/components/shop/cart-bar.tsx), which always sits above this nav's
- * fixed height instead of reacting to it hiding.
+ * fixed height instead of reacting to it hiding. The two aren't redundant:
+ * `CartBar` only appears while the cart has items and previews them; this
+ * tab is a permanent way in even at zero items.
  */
 
 const TABS = [
   { href: '/', icon: Home, key: 'home' },
   { href: '/smart-list', icon: Mic, key: 'smartList' },
   { href: '/meal-plan', icon: Salad, key: 'mealPlan' },
+  { href: '/cart', icon: ShoppingCart, key: 'cart' },
   { href: '/wallet', icon: Wallet, key: 'wallet' },
 ] as const;
 
-const NON_HOME_PREFIXES = ['/smart-list', '/meal-plan', '/wallet'] as const;
+const NON_HOME_PREFIXES = ['/smart-list', '/meal-plan', '/cart', '/wallet'] as const;
 
 export function BottomNav() {
   const t = useTranslations('nav');
@@ -63,7 +67,7 @@ export function BottomNav() {
       className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] px-3 lg:hidden"
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)' }}
     >
-      <ul className="card-3d grid grid-cols-4 gap-1 rounded-[24px] bg-card px-1.5 py-2">
+      <ul className="card-3d grid grid-cols-5 gap-1 rounded-[24px] bg-card px-1.5 py-2">
         {TABS.map((tab) => {
           const active =
             tab.href === '/'
@@ -85,7 +89,9 @@ export function BottomNav() {
                   // `whitespace-nowrap` and a hair smaller font below —
                   // together they keep the longest label on one line with
                   // a little breathing room either side, instead of either
-                  // extreme.
+                  // extreme. This was tuned against exactly a 5-column grid
+                  // (back then Wallet + Profile were both still tabs) — the
+                  // same 5-column count Cart's addition brings back.
                   'flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-full px-1 py-1.5 transition-colors',
                   active && 'bg-accent',
                 )}
