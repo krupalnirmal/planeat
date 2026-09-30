@@ -35,6 +35,14 @@ const ORDER_STATUS_FOR: Partial<Record<DeliveryAssignmentStatus, OrderStatus>> =
   FAILED: 'FAILED_DELIVERY',
 };
 
+// The delivery OTP has no resend — it's set once at assignment time and only
+// ever read off the customer's own screen. With no rate limit, a rider could
+// otherwise brute-force a 4-digit code in at most 10,000 tries with zero
+// delay between them. Once the cap is hit, OTP entry is refused outright —
+// the rider still has photo proof as an independent way to complete the
+// delivery (found + fixed, session 2026-09-30).
+const MAX_DELIVERY_OTP_ATTEMPTS = 5;
+
 export type AdvanceResult =
   | { ok: true }
   | {
@@ -46,9 +54,19 @@ export type AdvanceResult =
         // the admin has not finished packing.
         | 'ORDER_NOT_READY'
         | 'WRONG_OTP'
+        | 'TOO_MANY_OTP_ATTEMPTS'
         | 'PROOF_REQUIRED'
         | 'REASON_REQUIRED';
     };
+
+/** Same constant-time comparison `verifyOtp` (src/lib/auth/otp.ts) uses for
+    the login code — a doorstep code deserves the same treatment. */
+function safeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
 
 export interface AdvanceInput {
   orderId: string;
@@ -66,6 +84,7 @@ export async function advanceAssignment(input: AdvanceInput): Promise<AdvanceRes
       id: true,
       status: true,
       deliveryOtp: true,
+      deliveryOtpAttempts: true,
       order: { select: { id: true, userId: true, orderNumber: true, status: true } },
     },
   });
@@ -86,7 +105,24 @@ export async function advanceAssignment(input: AdvanceInput): Promise<AdvanceRes
     if (input.proofImageUrl) {
       // Accepted on the photo alone.
     } else if (input.otp) {
-      if (input.otp !== assignment.deliveryOtp) return { ok: false, reason: 'WRONG_OTP' };
+      if (assignment.deliveryOtpAttempts >= MAX_DELIVERY_OTP_ATTEMPTS) {
+        return { ok: false, reason: 'TOO_MANY_OTP_ATTEMPTS' };
+      }
+
+      const correct = assignment.deliveryOtp !== null && safeEqual(input.otp, assignment.deliveryOtp);
+      if (!correct) {
+        await db.deliveryAssignment.update({
+          where: { id: assignment.id },
+          data: { deliveryOtpAttempts: { increment: 1 } },
+        });
+        return {
+          ok: false,
+          reason:
+            assignment.deliveryOtpAttempts + 1 >= MAX_DELIVERY_OTP_ATTEMPTS
+              ? 'TOO_MANY_OTP_ATTEMPTS'
+              : 'WRONG_OTP',
+        };
+      }
     } else {
       return { ok: false, reason: 'PROOF_REQUIRED' };
     }

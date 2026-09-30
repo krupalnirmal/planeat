@@ -113,7 +113,7 @@ export async function unskipDay(
 
 export type PauseResult =
   | { ok: true; days: number }
-  | { ok: false; reason: 'NOT_FOUND' | 'INVALID_RANGE' | 'TOO_LATE' };
+  | { ok: false; reason: 'NOT_FOUND' | 'INVALID_RANGE' | 'OUTSIDE_PERIOD' | 'TOO_LATE' };
 
 /**
  * A pause is a run of SKIP-shaped exceptions plus a status change, rather than
@@ -130,6 +130,16 @@ export async function pauseSubscription(
   const subscription = await ownedSubscription(subscriptionId, userId);
   if (!subscription) return { ok: false, reason: 'NOT_FOUND' };
   if (toDateKey_ < fromDateKey) return { ok: false, reason: 'INVALID_RANGE' };
+
+  // Same bound `skipDay` already enforces for a single date — without it, a
+  // range extending past the subscription's own end date (client validation
+  // is not a server guarantee; this endpoint is callable directly) means one
+  // sequential upsert per day in the loop below, unbounded. Found session
+  // 2026-09-30: a client-supplied `toDate` of "2099-12-31" would either blow
+  // even the 25s transaction timeout or, on a faster connection, commit tens
+  // of thousands of exception rows for dates the subscription never covers.
+  const endKey = toDateKey(subscription.endDate);
+  if (fromDateKey > endKey || toDateKey_ > endKey) return { ok: false, reason: 'OUTSIDE_PERIOD' };
 
   const cutoffHour = await getSettingNumber(SETTING_KEYS.skipCutoffHour);
   if (!canSkipDate(fromDateKey, now, cutoffHour)) return { ok: false, reason: 'TOO_LATE' };

@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { firstImage } from '@/lib/catalog/text';
+import { isUniqueViolation } from '@/lib/db-errors';
 import { ID_PREFIX, newId } from '@/lib/ids';
 import { formatPaise, paise } from '@/lib/money';
 import { parseDateKey } from '@/lib/meal-plan/pricing';
@@ -481,7 +482,11 @@ export async function getAdminOrderDetail(orderId: string): Promise<AdminOrderDe
 
 export type StatusChangeResult =
   | { ok: true; from: OrderStatus; to: OrderStatus }
-  | { ok: false; reason: 'NOT_FOUND' | 'ILLEGAL_TRANSITION'; from?: OrderStatus };
+  | { ok: false; reason: 'NOT_FOUND' | 'ILLEGAL_TRANSITION' | 'CONFLICT'; from?: OrderStatus };
+
+/** Thrown inside the transaction, caught right after — a signal to return
+    the typed `CONFLICT` result, not a real failure to propagate. */
+class StatusConflictError extends Error {}
 
 /**
  * The same state machine the customer app and the rider app use. A separate
@@ -505,31 +510,42 @@ export async function changeOrderStatus(
     return { ok: false, reason: 'ILLEGAL_TRANSITION', from: order.status };
   }
 
-  await db.$transaction(async (tx) => {
-    // Guarded on the status we read, so two admins clicking at once cannot
-    // both apply a transition.
-    const updated = await tx.order.updateMany({
-      where: { id: orderId, status: order.status },
-      data: {
-        status: to,
-        ...(to === 'DELIVERED' ? { deliveredAt: new Date() } : {}),
-        ...(to === 'CANCELLED' ? { cancelledAt: new Date() } : {}),
-      },
-    });
+  try {
+    await db.$transaction(async (tx) => {
+      // Guarded on the status we read, so two admins clicking at once cannot
+      // both apply a transition.
+      const updated = await tx.order.updateMany({
+        where: { id: orderId, status: order.status },
+        data: {
+          status: to,
+          ...(to === 'DELIVERED' ? { deliveredAt: new Date() } : {}),
+          ...(to === 'CANCELLED' ? { cancelledAt: new Date() } : {}),
+        },
+      });
 
-    if (updated.count === 0) throw new Error('Order status changed underneath us');
+      if (updated.count === 0) throw new StatusConflictError('Order status changed underneath us');
 
-    await tx.orderStatusHistory.create({
-      data: {
-        id: newId(ID_PREFIX.orderStatus),
-        orderId,
-        fromStatus: order.status,
-        toStatus: to,
-        changedBy: actorId,
-        reason: reason ?? 'Changed by admin',
-      },
+      await tx.orderStatusHistory.create({
+        data: {
+          id: newId(ID_PREFIX.orderStatus),
+          orderId,
+          fromStatus: order.status,
+          toStatus: to,
+          changedBy: actorId,
+          reason: reason ?? 'Changed by admin',
+        },
+      });
     });
-  });
+  } catch (error) {
+    // Two admins racing to change the same order: the loser gets a clean
+    // "someone else already moved it" result instead of an unhandled 500
+    // (found session 2026-09-30 — this used to throw a bare, untyped Error
+    // that wasn't part of `StatusChangeResult` at all).
+    if (error instanceof StatusConflictError) {
+      return { ok: false, reason: 'CONFLICT', from: order.status };
+    }
+    throw error;
+  }
 
   await audit({
     actorId,
@@ -693,19 +709,30 @@ export async function assignRider(
 
   const assignmentId = newId(ID_PREFIX.deliveryAssignment);
 
-  await db.deliveryAssignment.create({
-    data: {
-      id: assignmentId,
-      orderId,
-      partnerId,
-      status: 'ASSIGNED',
-      // Generated now so it is on the customer's order screen before the
-      // rider ever sets out. It is deliberately never shown to the rider or
-      // printed on the picklist — the whole point is that only the customer
-      // can read it out at the door (M10).
-      deliveryOtp: newDeliveryOtp(),
-    },
-  });
+  try {
+    await db.deliveryAssignment.create({
+      data: {
+        id: assignmentId,
+        orderId,
+        partnerId,
+        status: 'ASSIGNED',
+        // Generated now so it is on the customer's order screen before the
+        // rider ever sets out. It is deliberately never shown to the rider or
+        // printed on the picklist — the whole point is that only the customer
+        // can read it out at the door (M10).
+        deliveryOtp: newDeliveryOtp(),
+      },
+    });
+  } catch (error) {
+    // Two admins racing to assign the same unassigned order: the `if
+    // (order.assignment)` check above reads before either write lands, so
+    // both can pass it — the loser then collides on `orderId`'s unique
+    // constraint instead of the clean ALREADY_ASSIGNED result this
+    // function already models (found session 2026-09-30 — this used to
+    // surface as an unhandled 500).
+    if (isUniqueViolation(error)) return { ok: false, reason: 'ALREADY_ASSIGNED' };
+    throw error;
+  }
 
   await audit({
     actorId,

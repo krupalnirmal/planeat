@@ -241,10 +241,24 @@ export async function updateProduct(
 
   if (!existing) return { ok: false, reason: 'NOT_FOUND' };
 
-  const categorySlug = input.categoryId
-    ? ((await db.category.findUnique({ where: { id: input.categoryId }, select: { slug: true } }))
-        ?.slug ?? existing.category.slug)
-    : existing.category.slug;
+  // `relationMode = "prisma"` (schema.prisma) means there is no real
+  // foreign key here — nothing at the database level would ever catch a
+  // categoryId that doesn't exist. Silently falling back to the old
+  // category's slug used to let the write through anyway (found session
+  // 2026-09-30): the product ended up pointing at a nonexistent category,
+  // and every later read that selects the required `category` relation
+  // (list, detail, even this function's own `existing` fetch) throws at
+  // runtime on that row — a stale admin tab or a category deleted mid-edit
+  // could take down the whole catalogue list page, not just one product.
+  let categorySlug = existing.category.slug;
+  if (input.categoryId !== undefined) {
+    const category = await db.category.findUnique({
+      where: { id: input.categoryId },
+      select: { slug: true },
+    });
+    if (!category) return { ok: false, reason: 'CATEGORY_NOT_FOUND' };
+    categorySlug = category.slug;
+  }
 
   const mealPlanEligible =
     input.isMealPlanEligible !== undefined

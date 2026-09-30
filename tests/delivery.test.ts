@@ -8,7 +8,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  */
 
 const dbMock = vi.hoisted(() => ({
-  deliveryAssignment: { findFirst: vi.fn(), findMany: vi.fn(), groupBy: vi.fn(), updateMany: vi.fn() },
+  deliveryAssignment: {
+    findFirst: vi.fn(),
+    findMany: vi.fn(),
+    groupBy: vi.fn(),
+    updateMany: vi.fn(),
+    update: vi.fn(),
+  },
   order: { updateMany: vi.fn() },
   orderStatusHistory: { create: vi.fn() },
   notification: { create: vi.fn() },
@@ -35,6 +41,7 @@ function baseAssignment(overrides: Partial<Record<string, unknown>> = {}) {
     id: 'das_1',
     status: 'ASSIGNED',
     deliveryOtp: '4821',
+    deliveryOtpAttempts: 0,
     order: {
       id: 'ord_1',
       userId: 'usr_customer',
@@ -52,6 +59,7 @@ describe('rider status machine (advanceAssignment)', () => {
     dbMock.deliveryAssignment.findMany.mockResolvedValue([]);
     dbMock.order.updateMany.mockResolvedValue({ count: 1 });
     dbMock.deliveryAssignment.updateMany.mockResolvedValue({ count: 1 });
+    dbMock.deliveryAssignment.update.mockResolvedValue({});
   });
 
   it('refuses a step that skips the sequence', async () => {
@@ -107,6 +115,50 @@ describe('rider status machine (advanceAssignment)', () => {
 
     expect(result).toEqual({ ok: false, reason: 'WRONG_OTP' });
     expect(dbMock.order.updateMany).not.toHaveBeenCalled();
+    expect(dbMock.deliveryAssignment.update).toHaveBeenCalledWith({
+      where: { id: 'das_1' },
+      data: { deliveryOtpAttempts: { increment: 1 } },
+    });
+  });
+
+  it('locks out OTP entry after 5 wrong attempts, independent of the code guessed', async () => {
+    dbMock.deliveryAssignment.findFirst.mockResolvedValue(
+      baseAssignment({
+        status: 'OUT_FOR_DELIVERY',
+        deliveryOtpAttempts: 5,
+        order: { id: 'ord_1', userId: 'u', orderNumber: 'AC-1', status: 'OUT_FOR_DELIVERY' },
+      }),
+    );
+
+    const result = await advanceAssignment({
+      orderId: 'ord_1',
+      partnerId: 'dpt_1',
+      to: 'DELIVERED',
+      otp: '4821', // the RIGHT code — still refused once the cap is hit.
+    });
+
+    expect(result).toEqual({ ok: false, reason: 'TOO_MANY_OTP_ATTEMPTS' });
+    expect(dbMock.deliveryAssignment.update).not.toHaveBeenCalled();
+    expect(dbMock.order.updateMany).not.toHaveBeenCalled();
+  });
+
+  it('still accepts photo proof once OTP attempts are exhausted', async () => {
+    dbMock.deliveryAssignment.findFirst.mockResolvedValue(
+      baseAssignment({
+        status: 'OUT_FOR_DELIVERY',
+        deliveryOtpAttempts: 5,
+        order: { id: 'ord_1', userId: 'u', orderNumber: 'AC-1', status: 'OUT_FOR_DELIVERY' },
+      }),
+    );
+
+    const result = await advanceAssignment({
+      orderId: 'ord_1',
+      partnerId: 'dpt_1',
+      to: 'DELIVERED',
+      proofImageUrl: 'https://example.com/proof.jpg',
+    });
+
+    expect(result).toEqual({ ok: true });
   });
 
   it('accepts the correct OTP', async () => {

@@ -32,6 +32,21 @@ interface Row {
 class FakeLedgerDb {
   rows: Row[] = [];
 
+  // Stands in for `getBalanceForUpdate`'s raw `FOR UPDATE` query — this fake
+  // has no real transaction/locking semantics to verify (R2, database-free),
+  // it just needs to return the same grouped sums `groupBy` below would, so
+  // debit's sufficiency check sees real data instead of an empty result.
+  $queryRaw = async (_strings: TemplateStringsArray, userId: string) => {
+    const mine = this.rows.filter((row) => row.userId === userId);
+    const directions: Array<'CREDIT' | 'DEBIT'> = ['CREDIT', 'DEBIT'];
+    return directions
+      .map((direction) => ({
+        direction,
+        total: mine.filter((row) => row.direction === direction).reduce((sum, row) => sum + row.amountPaise, 0n),
+      }))
+      .filter((group) => mine.some((row) => row.direction === group.direction));
+  };
+
   walletTransaction = {
     groupBy: async ({ where }: { where: { userId: string } }) => {
       const mine = this.rows.filter((row) => row.userId === where.userId);
@@ -219,6 +234,31 @@ describe('debits', () => {
     ).rejects.toBeInstanceOf(InsufficientBalanceError);
 
     expect(await getBalance(USER, client)).toBe(10_000n);
+  });
+
+  it('reads its sufficiency check through the locking query, not the plain one (session 2026-09-30)', async () => {
+    // The real concurrency-safety fix — a locking `SELECT ... FOR UPDATE`
+    // read instead of the plain `groupBy` — only actually holds against a
+    // real database; this fake has no lock semantics to exercise. What's
+    // pinned here is the wiring: `debit` must go through `$queryRaw`
+    // (`getBalanceForUpdate`), not `walletTransaction.groupBy`, since a
+    // regression back to the plain read would silently reopen the race
+    // confirmed live against TiDB (two concurrent debits both "succeeding"
+    // and overdrawing the wallet) without any test here ever noticing.
+    let queryRawCalls = 0;
+    const originalQueryRaw = fake.$queryRaw.bind(fake);
+    fake.$queryRaw = (...args: Parameters<typeof originalQueryRaw>) => {
+      queryRawCalls++;
+      return originalQueryRaw(...args);
+    };
+
+    await credit(
+      { userId: USER, amountPaise: 10_000n, source: 'TOPUP', refType: 'payment', refId: 'p1' },
+      client,
+    );
+    await debit({ userId: USER, amountPaise: 4_000n, source: 'ORDER', ...LEDGER_REF.order('o1') }, client);
+
+    expect(queryRawCalls).toBeGreaterThan(0);
   });
 
   it('allow spending the balance down to exactly zero', async () => {

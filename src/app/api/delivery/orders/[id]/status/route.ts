@@ -13,6 +13,7 @@ const MESSAGE: Record<string, string> = {
   ILLEGAL_TRANSITION: 'That status change is not allowed from here',
   ORDER_NOT_READY: 'The order has not been packed yet',
   WRONG_OTP: 'That code does not match',
+  TOO_MANY_OTP_ATTEMPTS: 'Too many wrong codes — use a photo instead',
   PROOF_REQUIRED: 'Enter the customer\'s code or attach a proof photo',
   REASON_REQUIRED: 'Give a reason for the failed delivery',
 };

@@ -1104,6 +1104,7 @@
       "active": "For sale",
       "save": "Save changes",
       "saved": "{count} rows saved",
+      "savedWithConflicts": "{count} rows saved — {conflicted} skipped (stock changed since this page loaded, refresh and recheck)",
       "filterLow": "Low stock",
       "filterOut": "Out of stock",
       "lowBadge": "Low",

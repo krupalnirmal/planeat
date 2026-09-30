@@ -29,6 +29,8 @@ export const POST = route(async (request: Request, context: Context) => {
       throw ApiError.notFound('Subscription not found');
     case 'INVALID_RANGE':
       throw ApiError.badRequest('The end date is before the start date');
+    case 'OUTSIDE_PERIOD':
+      throw ApiError.badRequest('That date range is outside your subscription period');
     case 'TOO_LATE':
       throw ApiError.conflict('It is too late to pause from that date');
   }

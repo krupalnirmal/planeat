@@ -62,14 +62,37 @@ export function AdminInventoryScreen() {
       ),
   });
 
+  const rows = inventory.data?.rows ?? [];
+
   const save = useMutation({
     mutationFn: () =>
-      api.patch<{ updated: number }>('/api/admin/inventory', {
-        updates: Object.entries(drafts).map(([variantId, draft]) => ({ variantId, ...draft })),
+      api.patch<{ updated: number; conflicted: string[] }>('/api/admin/inventory', {
+        updates: Object.entries(drafts).map(([variantId, draft]) => ({
+          variantId,
+          ...draft,
+          // The stock this screen showed before the edit — lets the server
+          // refuse a stale save instead of silently overwriting stock a
+          // real order already sold in the meantime.
+          ...(draft.stockQty !== undefined
+            ? { expectedStockQty: rows.find((r) => r.variantId === variantId)?.stockQty }
+            : {}),
+        })),
       }),
     onSuccess: (data) => {
-      setNotice(t('saved', { count: data.updated }));
-      setDrafts({});
+      setNotice(
+        data.conflicted.length > 0
+          ? t('savedWithConflicts', { count: data.updated, conflicted: data.conflicted.length })
+          : t('saved', { count: data.updated }),
+      );
+      setDrafts((current) => {
+        // A conflicted row's draft stays — the admin still sees their typed
+        // number and can decide whether to re-check the shelf and retry,
+        // rather than having it silently vanish along with the successful
+        // rows.
+        const next: Record<string, Draft> = {};
+        for (const id of data.conflicted) if (current[id]) next[id] = current[id];
+        return next;
+      });
       void queryClient.invalidateQueries({ queryKey: ['admin-inventory'] });
       void queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
     },
@@ -81,7 +104,6 @@ export function AdminInventoryScreen() {
   }
 
   const dirtyCount = Object.keys(drafts).length;
-  const rows = inventory.data?.rows ?? [];
 
   return (
     <>

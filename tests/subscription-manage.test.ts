@@ -112,6 +112,24 @@ describe('pauseSubscription', () => {
     expect(result).toEqual({ ok: false, reason: 'TOO_LATE' });
   });
 
+  it('refuses a range extending past the subscription\'s own end date', async () => {
+    // OWNED_SUBSCRIPTION.endDate is 2026-09-08 — one day past it must be
+    // refused server-side, not just hinted at by the date picker's own
+    // `max` (found session 2026-09-30: this endpoint is callable directly,
+    // and an unbounded range meant one sequential upsert per day with no
+    // cap at all).
+    const result = await pauseSubscription('sub_1', 'user_1', '2026-08-13', '2026-09-09', BEFORE_CUTOFF);
+
+    expect(result).toEqual({ ok: false, reason: 'OUTSIDE_PERIOD' });
+    expect(dbMock.subscriptionException.upsert).not.toHaveBeenCalled();
+  });
+
+  it('refuses a range that starts after the subscription has already ended', async () => {
+    const result = await pauseSubscription('sub_1', 'user_1', '2026-09-09', '2026-09-15', BEFORE_CUTOFF);
+
+    expect(result).toEqual({ ok: false, reason: 'OUTSIDE_PERIOD' });
+  });
+
   it('upserts a PAUSE exception for every day in the range and sets status PAUSED', async () => {
     const result = await pauseSubscription('sub_1', 'user_1', '2026-08-13', '2026-08-20', BEFORE_CUTOFF);
 

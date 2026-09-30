@@ -208,6 +208,9 @@ export async function getVariantDetail(
 export interface StockUpdate {
   variantId: string;
   stockQty?: number;
+  /** The stockQty the admin's screen showed when they started editing this
+      row. Only meaningful alongside `stockQty` — see the guard below. */
+  expectedStockQty?: number;
   lowStockThreshold?: number;
   pricePaise?: bigint;
   isActive?: boolean;
@@ -216,12 +219,28 @@ export interface StockUpdate {
 export interface BulkUpdateResult {
   updated: number;
   notFound: string[];
+  /** Variants whose stockQty write was skipped because live orders changed
+      it after the admin's screen loaded — never silently overwritten. */
+  conflicted: string[];
 }
 
 /**
  * One transaction for the whole batch. A bulk update that half-applied would
  * leave the owner unable to tell which rows took, and the picklist they print
  * five minutes later would be built on it.
+ *
+ * stockQty is written as an absolute count (a shelf recount, not a delta) —
+ * but it is also the one field the 00:30 job and live order placement both
+ * decrement concurrently while the admin's screen sits open. A blind
+ * `update()` here used to silently discard whatever stock real orders had
+ * already sold in the meantime, reintroducing phantom stock and risking an
+ * oversell (found session 2026-09-30). When the client sends back the
+ * `expectedStockQty` it loaded the row with, the stockQty write is guarded
+ * with `updateMany` on that exact value — a stale write affects 0 rows
+ * instead of clobbering a real sale, and is reported back as `conflicted`
+ * rather than reported as a silent success. Every other field (price,
+ * threshold, active) has no concurrent writer, so it keeps the plain
+ * unconditional update.
  */
 export async function bulkUpdateStock(
   updates: readonly StockUpdate[],
@@ -245,25 +264,43 @@ export async function bulkUpdateStock(
   const notFound = ids.filter((id) => !byId.has(id));
   const applicable = updates.filter((update) => byId.has(update.variantId));
 
-  await db.$transaction(
-    applicable.map((update) =>
-      db.productVariant.update({
+  const otherFields = (update: StockUpdate) => ({
+    ...(update.lowStockThreshold !== undefined ? { lowStockThreshold: update.lowStockThreshold } : {}),
+    ...(update.pricePaise !== undefined ? { pricePaise: update.pricePaise } : {}),
+    ...(update.isActive !== undefined ? { isActive: update.isActive } : {}),
+  });
+
+  const results = await db.$transaction(
+    applicable.map((update) => {
+      if (update.stockQty !== undefined && update.expectedStockQty !== undefined) {
+        return db.productVariant.updateMany({
+          where: { id: update.variantId, stockQty: update.expectedStockQty },
+          data: { stockQty: update.stockQty, ...otherFields(update) },
+        });
+      }
+      return db.productVariant.update({
         where: { id: update.variantId },
-        data: {
-          ...(update.stockQty !== undefined ? { stockQty: update.stockQty } : {}),
-          ...(update.lowStockThreshold !== undefined
-            ? { lowStockThreshold: update.lowStockThreshold }
-            : {}),
-          ...(update.pricePaise !== undefined ? { pricePaise: update.pricePaise } : {}),
-          ...(update.isActive !== undefined ? { isActive: update.isActive } : {}),
-        },
-      }),
-    ),
+        data: { ...(update.stockQty !== undefined ? { stockQty: update.stockQty } : {}), ...otherFields(update) },
+      });
+    }),
   );
+
+  const conflicted: string[] = [];
+  const applied: StockUpdate[] = [];
+  applicable.forEach((update, i) => {
+    const result = results[i];
+    // Only `updateMany` results carry a `count` — a plain `update()` either
+    // returns the row or throws, never a 0-row miss.
+    if ('count' in result && result.count === 0) {
+      conflicted.push(update.variantId);
+    } else {
+      applied.push(update);
+    }
+  });
 
   // One audit row per variant. A single row saying "12 variants changed" is
   // useless when the question is which one had the wrong price.
-  for (const update of applicable) {
+  for (const update of applied) {
     const before = byId.get(update.variantId);
     await audit({
       actorId,
@@ -276,5 +313,5 @@ export async function bulkUpdateStock(
     });
   }
 
-  return { updated: applicable.length, notFound };
+  return { updated: applied.length, notFound, conflicted };
 }

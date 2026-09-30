@@ -75,6 +75,45 @@ export async function getBalance(userId: string, client: DbClient = db): Promise
   return balance;
 }
 
+interface BalanceGroupRow {
+  direction: 'CREDIT' | 'DEBIT';
+  total: bigint | number | string;
+}
+
+/**
+ * Same balance `getBalance` computes, but as a LOCKING read — every row it
+ * touches is locked, and a locking read always reads the latest committed
+ * version, bypassing MySQL/TiDB's normal REPEATABLE READ snapshot.
+ *
+ * This distinction is the whole fix `debit` relies on below: locking an
+ * unrelated row (tried first, session 2026-09-30) does NOT make a later
+ * plain `SELECT` on this table see fresh data — verified live against real
+ * TiDB, twice, with two genuinely concurrent transactions. Two ₹80 debits
+ * against a ₹100 balance both "succeeded" and left the balance at ₹-60,
+ * because the second transaction's plain `getBalance` call still returned
+ * the pre-first-debit balance even though it had, by then, correctly waited
+ * for a lock on the other row. Only making the balance read ITSELF a
+ * `FOR UPDATE` read — confirmed live to correctly block the second debit
+ * with `InsufficientBalanceError` and leave the balance at the exact right
+ * ₹20 — actually closes the race.
+ */
+async function getBalanceForUpdate(userId: string, client: DbClient): Promise<bigint> {
+  const rows = await client.$queryRaw<BalanceGroupRow[]>`
+    SELECT direction, SUM(amountPaise) as total
+    FROM wallet_transactions
+    WHERE userId = ${userId}
+    GROUP BY direction
+    FOR UPDATE
+  `;
+
+  let balance = 0n;
+  for (const row of rows) {
+    const sum = BigInt(row.total);
+    balance += row.direction === 'CREDIT' ? sum : -sum;
+  }
+  return balance;
+}
+
 /**
  * Appends one entry. Safe to call twice with the same reference — the second
  * call returns the first entry's id and reports `alreadyRecorded`.
@@ -86,12 +125,18 @@ export async function getBalance(userId: string, client: DbClient = db): Promise
 export async function recordEntry(
   entry: LedgerEntry,
   client: DbClient = db,
+  /** `debit` already paid for a `FOR UPDATE` read to check sufficiency —
+      passed through here so the stored `balanceAfterPaise` snapshot is
+      computed from that same locked value instead of a second, separately
+      racy plain read. Omitted by `credit`, which has no sufficiency check
+      of its own to piggyback on. */
+  knownBalanceBefore?: bigint,
 ): Promise<LedgerResult> {
   if (entry.amountPaise <= 0n) {
     throw new Error(`Ledger amount must be positive, got ${entry.amountPaise}`);
   }
 
-  const balanceBefore = await getBalance(entry.userId, client);
+  const balanceBefore = knownBalanceBefore ?? (await getBalance(entry.userId, client));
   const balanceAfter =
     entry.direction === 'CREDIT'
       ? balanceBefore + entry.amountPaise
@@ -147,13 +192,21 @@ export async function recordEntry(
  * The check and the write happen against the same client, so inside a
  * transaction they are consistent. Outside one they are not — always debit
  * inside the transaction that creates the order.
+ *
+ * Every caller of `debit` is documented to run inside a transaction, but
+ * that alone does not stop two concurrent transactions for the SAME user
+ * from both reading the same pre-debit balance and both passing this check
+ * (a double-tapped checkout, or two open tabs, each placing a WALLET order
+ * at once — found and fixed session 2026-09-30, see `getBalanceForUpdate`).
+ * A no-op race-wise when `client` is the plain (non-transactional) `db` —
+ * same caveat this function already documents for that misuse.
  */
 export async function debit(entry: Omit<LedgerEntry, 'direction'>, client: DbClient = db) {
-  const balance = await getBalance(entry.userId, client);
+  const balance = await getBalanceForUpdate(entry.userId, client);
   if (balance < entry.amountPaise) {
     throw new InsufficientBalanceError(entry.amountPaise, balance);
   }
-  return recordEntry({ ...entry, direction: 'DEBIT' }, client);
+  return recordEntry({ ...entry, direction: 'DEBIT' }, client, balance);
 }
 
 export async function credit(entry: Omit<LedgerEntry, 'direction'>, client: DbClient = db) {

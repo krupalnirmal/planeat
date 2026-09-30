@@ -212,15 +212,33 @@ export async function addToCart(
   if (existing) {
     await db.cartItem.update({ where: { id: existing.id }, data: { quantity: desired } });
   } else {
-    await db.cartItem.create({
-      data: {
-        id: newId(ID_PREFIX.cartItem),
-        cartId,
-        productId: variant.productId,
-        variantId: variant.id,
-        quantity: desired,
-      },
-    });
+    try {
+      await db.cartItem.create({
+        data: {
+          id: newId(ID_PREFIX.cartItem),
+          cartId,
+          productId: variant.productId,
+          variantId: variant.id,
+          quantity: desired,
+        },
+      });
+    } catch (error) {
+      // A double-tapped ADD on a not-yet-in-cart item: both requests read
+      // `existing = null` before either write lands, so the second
+      // `create` collides on the (cartId, variantId) unique constraint
+      // instead of silently overwriting it (found session 2026-09-30 — this
+      // used to surface as an unhandled 500 with the second tap's quantity
+      // simply lost). Recover the same way `ensureCart` already does:
+      // whichever request lost the race falls back to an update, adding
+      // its own quantity on top of whatever the winner just wrote.
+      if (!isUniqueViolation(error)) throw error;
+      const raced = await db.cartItem.findUniqueOrThrow({
+        where: { cartId_variantId: { cartId, variantId: variant.id } },
+        select: { id: true, quantity: true },
+      });
+      const mergedQty = Math.min(MAX_QTY_PER_LINE, raced.quantity + input.quantity);
+      await db.cartItem.update({ where: { id: raced.id }, data: { quantity: mergedQty } });
+    }
   }
 
   await db.cart.update({ where: { id: cartId }, data: { updatedAt: new Date() } });

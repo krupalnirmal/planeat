@@ -94,6 +94,10 @@ export const bulkStockSchema = z.object({
       z.object({
         variantId: cuidSchema,
         stockQty: z.coerce.number().int().min(0).max(1_000_000).optional(),
+        // The stockQty the admin's screen showed before editing — guards
+        // against a stale bulk save silently overwriting stock a live order
+        // already decremented in the meantime.
+        expectedStockQty: z.coerce.number().int().min(0).max(1_000_000).optional(),
         lowStockThreshold: z.coerce.number().int().min(0).max(10_000).optional(),
         pricePaise: z.coerce.number().int().min(0).max(100_000_000).optional(),
         isActive: z.boolean().optional(),

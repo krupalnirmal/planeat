@@ -997,6 +997,10 @@ model DeliveryAssignment {
   partnerId     String
   status        DeliveryAssignmentStatus @default(ASSIGNED)
   deliveryOtp   String?                  @db.VarChar(10)
+  /** Wrong-guess counter (M10) — the delivery OTP has no resend, so once this
+      hits its cap the rider falls back to photo proof instead of the code
+      itself ever being lockable out of existence. */
+  deliveryOtpAttempts Int                @default(0)
   proofImageUrl String?                  @db.VarChar(500)
   assignedAt    DateTime                 @default(now())
   pickedAt      DateTime?

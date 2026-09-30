@@ -1,6 +1,6 @@
 import { ApiError, clientIp, parseJson, route } from '@/lib/api/handler';
 import { ok } from '@/lib/api/response';
-import { STORE_ROLES, requireRole } from '@/lib/auth/session';
+import { requireSuperAdmin } from '@/lib/admin/guard';
 import { adjustWallet } from '@/lib/wallet/adjust';
 import { adjustWalletSchema } from '@/lib/validators/wallet';
 
@@ -14,11 +14,15 @@ export const dynamic = 'force-dynamic';
  * as the ledger reference. Every rupee an admin moves is traceable to a person
  * and a sentence.
  *
- * The admin UI for this arrives in Phase 8; the endpoint belongs to the ledger,
- * which is M7.
+ * SUPER_ADMIN-only (found session 2026-09-30 — this used to accept any
+ * STORE_ADMIN with `requireRole(...STORE_ROLES)`, with no section gate at
+ * all, since `wallet` was never one of `ADMIN_PERMISSION_SECTIONS`. That let
+ * a STORE_ADMIN restricted to e.g. only `picklist` still credit/debit any
+ * customer's wallet directly. Matches `settings.ts`'s own precedent — "these
+ * values move real money" — which applies at least as strongly here.
  */
 export const POST = route(async (request: Request) => {
-  const session = await requireRole(...STORE_ROLES);
+  const session = await requireSuperAdmin();
   const input = await parseJson(request, adjustWalletSchema);
 
   const result = await adjustWallet({

@@ -1,12 +1,13 @@
 'use client';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Banknote, ChevronLeft, CreditCard, Loader2, MapPin, Wallet } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { BillSummary, type BillView } from '@/components/shop/bill-summary';
 import { openGatewayCheckout } from '@/components/wallet/gateway-checkout';
+import { CART_QUERY_KEY } from '@/hooks/use-cart';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
@@ -76,6 +77,7 @@ export function CheckoutScreen() {
   const tw = useTranslations('wallet');
   const locale = useLocale();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user, defaultAddress, isLoading: sessionLoading } = useSession();
 
   const [pickedAddressId, setPickedAddressId] = useState<string | null>(null);
@@ -125,25 +127,45 @@ export function CheckoutScreen() {
     enabled: Boolean(user),
   });
 
+  // WALLET is the default selection, but a first-time or low-balance
+  // customer's wallet very often doesn't cover the bill. Derived rather than
+  // synced into state (this file's own convention, see `addressId` above):
+  // once the quote says WALLET doesn't cover it, checkout proceeds as
+  // RAZORPAY — the one method with no gate at all — instead of the
+  // WALLET tile just sitting there disabled with "Place order" dead and no
+  // other tile ever auto-selected (found session 2026-09-30). A customer who
+  // deliberately taps back to WALLET (or to COD) after this is respected:
+  // the fallback only ever applies while `payment` itself is still at its
+  // untouched default.
+  const effectivePayment: PaymentValue =
+    payment === 'WALLET' && quote.data && !quote.data.walletCovers ? 'RAZORPAY' : payment;
+
   const place = useMutation({
     mutationFn: () =>
       api.post<{ orderId: string; orderNumber: string; duplicate: boolean }>(
         `/api/orders${qs({ locale })}`,
         {
           addressId,
-          paymentMethod: payment,
+          paymentMethod: effectivePayment,
           deliverySlot: slot,
           idempotencyKey: idempotencyKey(),
           ...(notes.trim() ? { notes: notes.trim() } : {}),
         },
       ),
     onSuccess: (data) => {
+      // placeOrder empties the cart server-side in the same transaction
+      // regardless of payment method (even RAZORPAY, before payment
+      // settles) — without this, the stale cached cart kept showing
+      // already-ordered items and the floating cart bar on the confirmation
+      // screen (found session 2026-09-30).
+      void queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
+
       // RAZORPAY: the order exists (paymentStatus PENDING) but nothing has
       // been paid yet — stay on this screen and open the gateway. Every
       // other method is already settled by the time the order route
       // returns (WALLET debited in the same transaction; COD needs no
       // payment yet), so those go straight to the confirmation screen.
-      if (payment === 'RAZORPAY') {
+      if (effectivePayment === 'RAZORPAY') {
         setPaymentPhase('initiating');
         payOrder.mutate(data.orderId);
         return;
@@ -276,7 +298,7 @@ export function CheckoutScreen() {
     Boolean(quote.data?.canPlaceOrder) &&
     !place.isPending &&
     paymentPhase === 'idle' &&
-    (payment !== 'WALLET' || walletCovers);
+    (effectivePayment !== 'WALLET' || walletCovers);
 
   return (
     <>
@@ -421,7 +443,7 @@ export function CheckoutScreen() {
                   })
                 : undefined
             }
-            selected={payment === 'WALLET'}
+            selected={effectivePayment === 'WALLET'}
             disabled={!walletCovers}
             disabledHint={!walletCovers ? t('payWalletShort') : undefined}
             onSelect={() => setPayment('WALLET')}
@@ -434,7 +456,7 @@ export function CheckoutScreen() {
             icon={CreditCard}
             label={t('payOnline')}
             hint={t('payOnlineHint')}
-            selected={payment === 'RAZORPAY'}
+            selected={effectivePayment === 'RAZORPAY'}
             onSelect={() => setPayment('RAZORPAY')}
           />
 
@@ -442,7 +464,7 @@ export function CheckoutScreen() {
           <PaymentOption
             icon={Banknote}
             label={t('payCod')}
-            selected={payment === 'COD'}
+            selected={effectivePayment === 'COD'}
             disabled={!methods.includes('COD')}
             disabledHint={
               bill?.codUnavailableReason === 'ABOVE_CAP'

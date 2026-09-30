@@ -70,6 +70,12 @@ export const POST = route(async (request: Request, context: Context) => {
 
   if (!result.ok) {
     if (result.reason === 'NOT_FOUND') throw ApiError.notFound('Order not found');
+    if (result.reason === 'CONFLICT') {
+      throw ApiError.conflict('Someone else already changed this order — refresh and try again', {
+        from: result.from,
+        to: input.status,
+      });
+    }
     throw ApiError.conflict(`An order cannot go from ${result.from} to ${input.status}`, {
       from: result.from,
       to: input.status,

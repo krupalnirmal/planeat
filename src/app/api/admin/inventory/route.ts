@@ -48,6 +48,7 @@ export const PATCH = route(async (request: Request) => {
     updates.map((update) => ({
       variantId: update.variantId,
       stockQty: update.stockQty,
+      expectedStockQty: update.expectedStockQty,
       lowStockThreshold: update.lowStockThreshold,
       pricePaise: update.pricePaise !== undefined ? BigInt(update.pricePaise) : undefined,
       isActive: update.isActive,
