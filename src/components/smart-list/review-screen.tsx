@@ -9,7 +9,6 @@ import { CenteredState, PageHeader } from '@/components/shop/page-header';
 import { QtyStepper } from '@/components/shop/qty-stepper';
 import { api, qs } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
-import { formatQuantity, type QuantityUnit } from '@/lib/quantity';
 import { cn } from '@/lib/utils';
 
 /**
@@ -65,11 +64,18 @@ interface ListResponse {
   };
 }
 
-const TONE: Record<ReviewItem['status'], string> = {
-  MATCHED: 'border-success/40 bg-primary/5',
-  USER_CONFIRMED: 'border-success/40 bg-primary/5',
-  AMBIGUOUS: 'border-warning/40 bg-[#FDF3E3]',
-  UNMATCHED: 'border-border bg-secondary',
+// Compact rows (session 2026-09-30, owner reference — the old full
+// colour-tinted card read as bulky and repeated the item's own name twice).
+// Colour now lives only in a thin left accent and the status word itself,
+// not a full background wash, so a matched row reads as clean/white like
+// every other product row in the app while AMBIGUOUS/UNMATCHED still stay
+// visually distinct at a glance (M4 — colour is never the only signal,
+// which is why the status word and icon stay regardless).
+const STATUS_ACCENT: Record<ReviewItem['status'], string> = {
+  MATCHED: 'border-l-success',
+  USER_CONFIRMED: 'border-l-success',
+  AMBIGUOUS: 'border-l-warning',
+  UNMATCHED: 'border-l-border',
 };
 
 export function SmartListReview({ smartListId }: { smartListId: string }) {
@@ -202,103 +208,106 @@ export function SmartListReview({ smartListId }: { smartListId: string }) {
         </p>
       )}
 
-      <ul className="space-y-3">
+      <ul className="space-y-2">
         {items.map((item) => {
           const matched = item.status === 'MATCHED' || item.status === 'USER_CONFIRMED';
+          // The matched product's own name is the useful headline once
+          // there IS a match — what they said only earns its own line when
+          // it actually differs, instead of repeating the same word twice
+          // (owner report, session 2026-09-30: "Potato" / "Potato").
+          const heard = item.parsedName ?? item.rawText;
+          const headline = item.matchedName ?? heard;
+          const showHeard =
+            !item.matchedName || item.matchedName.trim().toLowerCase() !== heard.trim().toLowerCase();
+
           return (
-            <li key={item.id} className={cn('rounded-[var(--radius)] border p-3', TONE[item.status])}>
-              <div className="flex items-start gap-3">
+            <li
+              key={item.id}
+              className={cn(
+                'rounded-[var(--radius)] border border-border/60 border-l-4 bg-card py-2.5 pr-2.5 pl-3',
+                STATUS_ACCENT[item.status],
+              )}
+            >
+              <div className="flex items-center gap-3">
                 {/* Real product photo (session 2026-09-23, client reference
-                    screenshot) — the matched product's own first image,
-                    same source `ProductCard` reads. A plain icon for an
-                    unmatched row, which has no real product to show. */}
-                <div className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] bg-white">
+                    screenshot) — the matched product's own first image, same
+                    source `ProductCard` reads. A plain icon for an unmatched
+                    row, which has no real product to show. */}
+                <div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius)] bg-secondary">
                   {item.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={item.imageUrl} alt="" className="size-full object-cover" />
                   ) : (
-                    <ImageIcon className="size-6 text-muted-foreground/40" aria-hidden />
+                    <ImageIcon className="size-5 text-muted-foreground/40" aria-hidden />
                   )}
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  {/* What they actually said stays the headline — it is how
-                      they recognise the row; the real matched product name
-                      rides underneath as confirmation. */}
-                  <p className="truncate text-sm font-bold">
-                    {item.parsedName ?? item.rawText}
+                  <p className="truncate text-sm font-bold">{headline}</p>
+                  {showHeard && <p className="truncate text-xs text-muted-foreground">“{heard}”</p>}
+
+                  {/* One compact line: pack size, real per-kg/per-litre/per-
+                      count price (units.ts, not fabricated), and the match
+                      status — colour is never the only signal (M4), so the
+                      status word and icon stay even though the old separate
+                      pill+percentage row is gone. */}
+                  <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
+                    {item.variantLabel && (
+                      <>
+                        {item.variantLabel}
+                        {item.unitRatePaise && (
+                          <> · {formatPaise(paise(item.unitRatePaise), { hidePaise: true })}/{item.unitRateSuffix}</>
+                        )}
+                        {' · '}
+                      </>
+                    )}
+                    <StatusInline status={item.status} confidence={item.confidence} />
                   </p>
-                  {item.matchedName ? (
-                    <p className="truncate text-xs text-muted-foreground">{item.matchedName}</p>
-                  ) : (
-                    <p className="text-[12px] text-muted-foreground">“{item.rawText}”</p>
-                  )}
-
-                  {/* Real per-kg/per-litre/per-count unit pricing, derived
-                      from the matched variant's own price and pack size
-                      (units.ts) — not fabricated. */}
-                  {item.variantLabel && item.unitRatePaise && (
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {item.variantLabel} ·{' '}
-                      {formatPaise(paise(item.unitRatePaise), { hidePaise: true })}/
-                      {item.unitRateSuffix}
-                    </p>
-                  )}
-
-                  <StatusBadge status={item.status} confidence={item.confidence} />
                 </div>
 
                 <div className="flex shrink-0 flex-col items-end gap-1">
-                  <button
-                    type="button"
-                    onClick={() => remove.mutate(item.id)}
-                    aria-label={t('removeItem')}
-                    className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-muted-foreground"
-                  >
-                    <Trash2 className="size-4" aria-hidden />
-                  </button>
-
-                  {matched && item.linePricePaise && (
-                    <>
-                      <p className="text-sm font-bold">
+                  <div className="flex items-center gap-1.5">
+                    {matched && item.linePricePaise && (
+                      <span className="text-sm font-bold">
                         {formatPaise(paise(item.linePricePaise), { hidePaise: true })}
-                      </p>
-                      {item.quantity && item.unit && (
-                        <p className="text-[12px] text-muted-foreground">
-                          ({formatQuantity(item.quantity, item.unit as QuantityUnit)})
-                        </p>
-                      )}
-                    </>
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => remove.mutate(item.id)}
+                      aria-label={t('removeItem')}
+                      className="grid size-7 shrink-0 place-items-center rounded-full text-muted-foreground"
+                    >
+                      <Trash2 className="size-3.5" aria-hidden />
+                    </button>
+                  </div>
+
+                  {/* Pack-count stepper — real quantity editing, PATCHing the
+                      same endpoint the alternatives picker below already uses. */}
+                  {matched && item.variantBaseQuantity && (
+                    <QtyStepper
+                      size="sm"
+                      tone="tint"
+                      quantity={item.packCount}
+                      label={item.matchedName ?? undefined}
+                      disabled={setPackCount.isPending}
+                      onDecrement={() =>
+                        item.packCount > 1 &&
+                        setPackCount.mutate({
+                          itemId: item.id,
+                          quantity: (item.packCount - 1) * item.variantBaseQuantity!,
+                        })
+                      }
+                      onIncrement={() =>
+                        setPackCount.mutate({
+                          itemId: item.id,
+                          quantity: (item.packCount + 1) * item.variantBaseQuantity!,
+                        })
+                      }
+                    />
                   )}
                 </div>
               </div>
-
-              {/* Pack-count stepper — real quantity editing, PATCHing the
-                  same endpoint the alternatives picker below already uses. */}
-              {matched && item.variantBaseQuantity && (
-                <div className="mt-2 flex justify-end">
-                  <QtyStepper
-                    size="sm"
-                    tone="tint"
-                    quantity={item.packCount}
-                    label={item.matchedName ?? undefined}
-                    disabled={setPackCount.isPending}
-                    onDecrement={() =>
-                      item.packCount > 1 &&
-                      setPackCount.mutate({
-                        itemId: item.id,
-                        quantity: (item.packCount - 1) * item.variantBaseQuantity!,
-                      })
-                    }
-                    onIncrement={() =>
-                      setPackCount.mutate({
-                        itemId: item.id,
-                        quantity: (item.packCount + 1) * item.variantBaseQuantity!,
-                      })
-                    }
-                  />
-                </div>
-              )}
 
               {/* M4 — ambiguous rows offer the top 3. */}
               {item.status === 'AMBIGUOUS' && item.alternatives.length > 0 && (
@@ -446,30 +455,27 @@ function ListNameEditor({ smartListId, name }: { smartListId: string; name: stri
     word too, restyled (session 2026-09-23, client reference screenshot)
     from a plain icon+text line into a pill badge, with the real confidence
     score alongside it for matched rows. */
-function StatusBadge({ status, confidence }: { status: ReviewItem['status']; confidence: number }) {
+/** Same signal `StatusBadge` used to carry (colour is never the only one —
+    M4), folded into the compact row's own single subtitle line instead of a
+    separate pill+percentage row (session 2026-09-30). */
+function StatusInline({ status, confidence }: { status: ReviewItem['status']; confidence: number }) {
   const t = useTranslations('smartList');
 
   const Icon = status === 'AMBIGUOUS' ? HelpCircle : status === 'UNMATCHED' ? AlertCircle : Check;
   const label =
     status === 'AMBIGUOUS' ? t('ambiguous') : status === 'UNMATCHED' ? t('unmatched') : t('matched');
   const tone =
-    status === 'AMBIGUOUS'
-      ? 'bg-warning/10 text-warning'
-      : status === 'UNMATCHED'
-        ? 'bg-secondary text-muted-foreground'
-        : 'bg-success/10 text-success';
+    status === 'AMBIGUOUS' ? 'text-warning' : status === 'UNMATCHED' ? 'text-muted-foreground' : 'text-success';
 
   return (
-    <p className="mt-1 flex items-center gap-1.5">
-      <span className={cn('flex items-center gap-1 rounded-full px-2 py-0.5 text-[12px] font-bold', tone)}>
-        <Icon className="size-3 shrink-0" aria-hidden />
-        {label}
-      </span>
+    <span className={cn('flex shrink-0 items-center gap-1 font-semibold', tone)}>
+      <Icon className="size-3 shrink-0" aria-hidden />
+      {label}
       {status !== 'UNMATCHED' && (
-        <span className="text-[12px] text-muted-foreground">
-          {t('matchPercent', { percent: Math.round(confidence * 100) })}
+        <span className="font-normal text-muted-foreground">
+          · {t('matchPercent', { percent: Math.round(confidence * 100) })}
         </span>
       )}
-    </p>
+    </span>
   );
 }
