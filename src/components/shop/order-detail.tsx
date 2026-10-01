@@ -2,10 +2,12 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  AlertTriangle,
   Check,
   ChevronLeft,
   CircleAlert,
   ImageIcon,
+  Loader2,
   Map,
   MapPin,
   ShieldCheck,
@@ -16,6 +18,7 @@ import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { CenteredState, PageHeader } from '@/components/shop/page-header';
 import { ReportIssueForm } from '@/components/shop/report-issue-form';
+import { openGatewayCheckout } from '@/components/wallet/gateway-checkout';
 import { useSession } from '@/hooks/use-session';
 import { ApiClientError, api } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
@@ -33,6 +36,29 @@ import type { OrderStatusValue } from '@/components/shop/order-status-badge';
  * this reuses the same pale leaf.png the cart screen's header already
  * established, for a consistent decorative language until one is supplied.
  */
+
+/**
+ * Resume-payment sub-flow (session 2026-10-01): placeOrder reserves stock and
+ * creates the order before a RAZORPAY checkout ever opens, so a customer who
+ * abandons that checkout lands back here on a real order stuck
+ * paymentStatus PENDING. Mirrors checkout-screen.tsx's own phase machine —
+ * same reasoning: the widget's onSuccess is never trusted (P2), only our
+ * server's /pay/status answer is.
+ */
+type PaymentPhase = 'idle' | 'initiating' | 'awaiting-gateway' | 'polling' | 'failed';
+
+interface InitiateOrderPayResponse {
+  paymentId: string;
+  provider: string;
+  gatewayOrderId: string;
+  publicKey: string;
+  amountPaise: string;
+  currency: string;
+  isMock: boolean;
+}
+
+const POLL_INTERVAL_MS = 2_000;
+const POLL_ATTEMPTS = 60;
 
 const TIMELINE: OrderStatusValue[] = [
   'PLACED',
@@ -106,12 +132,16 @@ export function OrderDetail({ orderId }: { orderId: string }) {
   const tCart = useTranslations('cart');
   const tc = useTranslations('common');
   const te = useTranslations('errors');
+  const tw = useTranslations('wallet');
   const format = useFormatter();
   const queryClient = useQueryClient();
-  const { isLoading: sessionLoading } = useSession();
+  const { user, isLoading: sessionLoading } = useSession();
 
   const [notice, setNotice] = useState<string | null>(null);
   const [reporting, setReporting] = useState(false);
+  const [paymentPhase, setPaymentPhase] = useState<PaymentPhase>('idle');
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [mockGatewayOrderId, setMockGatewayOrderId] = useState<string | null>(null);
 
   const detail = useQuery({
     queryKey: ['order', orderId],
@@ -132,6 +162,87 @@ export function OrderDetail({ orderId }: { orderId: string }) {
     },
     onError: (err) => {
       setNotice(err instanceof ApiClientError ? err.message : te('generic'));
+    },
+  });
+
+  async function pollOrderPayment() {
+    setPaymentPhase('polling');
+
+    for (let attempt = 0; attempt < POLL_ATTEMPTS; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+
+      try {
+        const status = await api.get<{ status: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED' }>(
+          `/api/orders/${orderId}/pay/status`,
+        );
+        if (status.status === 'PAID') {
+          setPaymentPhase('idle');
+          setNotice(t('paymentCompleted'));
+          void queryClient.invalidateQueries({ queryKey: ['order', orderId] });
+          void queryClient.invalidateQueries({ queryKey: ['orders-pending-payment'] });
+          return;
+        }
+        if (status.status === 'FAILED') {
+          setPaymentPhase('failed');
+          setPaymentError(tw('topupFailed'));
+          return;
+        }
+      } catch {
+        // A dropped poll is not a failed payment; keep watching.
+      }
+    }
+
+    // Still pending after the poll window — the webhook can still land later
+    // (P2). Drop back to idle and let the order's own paymentStatus (refreshed
+    // below) speak for itself rather than implying anything failed.
+    setPaymentPhase('idle');
+    void queryClient.invalidateQueries({ queryKey: ['order', orderId] });
+  }
+
+  const payOrder = useMutation({
+    mutationFn: () => api.post<InitiateOrderPayResponse>(`/api/orders/${orderId}/pay/initiate`),
+    onSuccess: async (data) => {
+      if (data.isMock) {
+        setMockGatewayOrderId(data.gatewayOrderId);
+        setPaymentPhase('awaiting-gateway');
+        return;
+      }
+
+      try {
+        await openGatewayCheckout({
+          gatewayOrderId: data.gatewayOrderId,
+          publicKey: data.publicKey,
+          amountPaise: data.amountPaise,
+          currency: data.currency,
+          appName: 'Get Frresh',
+          description: t('title'),
+          prefill: { name: user?.name ?? undefined, contact: user?.phone },
+          onSuccess: () => void pollOrderPayment(),
+          onDismiss: () => setPaymentPhase('idle'),
+          onFailure: (text) => {
+            setPaymentPhase('failed');
+            setPaymentError(text);
+          },
+        });
+        setPaymentPhase('awaiting-gateway');
+      } catch (error) {
+        setPaymentPhase('failed');
+        setPaymentError(error instanceof Error ? error.message : te('generic'));
+      }
+    },
+    onError: () => {
+      setPaymentPhase('failed');
+      setPaymentError(te('generic'));
+    },
+  });
+
+  const simulateOrderPayment = useMutation({
+    mutationFn: () =>
+      api.post('/api/dev/simulate-payment', { gatewayOrderId: mockGatewayOrderId, outcome: 'captured' }),
+    onSuccess: () => void pollOrderPayment(),
+    onError: () => {
+      setPaymentPhase('failed');
+      setPaymentError(te('generic'));
     },
   });
 
@@ -215,6 +326,33 @@ export function OrderDetail({ orderId }: { orderId: string }) {
         <div className="card-3d rounded-[var(--radius-2xl)] bg-card px-4 py-3.5">
           <p className="rounded-[var(--radius)] bg-secondary px-3 py-2.5 text-sm">{notice}</p>
         </div>
+      )}
+
+      {/* ── Resume payment (session 2026-10-01) — a RAZORPAY order whose
+          checkout was abandoned: items are reserved, nothing is paid. Shown
+          above the timeline since "Placed" progress is misleading here —
+          nothing moves forward until this is resolved. */}
+      {order.paymentMethod === 'RAZORPAY' && order.paymentStatus === 'PENDING' && (
+        <section className="card-3d rounded-[var(--radius-2xl)] border-2 border-warning/30 bg-[#FDF3E3] px-4 py-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 size-5 shrink-0 text-warning" aria-hidden />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-primary-dark">{t('completePaymentTitle')}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t('completePaymentBody')}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setPaymentPhase('initiating');
+              payOrder.mutate();
+            }}
+            disabled={paymentPhase !== 'idle'}
+            className="mt-3 flex h-12 w-full items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+          >
+            {t('completePayment')}
+          </button>
+        </section>
       )}
 
       {/* ── Status timeline */}
@@ -443,6 +581,52 @@ export function OrderDetail({ orderId }: { orderId: string }) {
               />
             </div>
           )}
+        </div>
+      )}
+
+      {/* Online-payment overlay — same phase machine and visual language as
+          checkout-screen.tsx's own (and TopupSheet's). Nothing here is
+          trusted as "paid" until /pay/status says so (P2). */}
+      {paymentPhase !== 'idle' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="max-h-[85vh] w-full max-w-[480px] overflow-y-auto rounded-[calc(var(--radius)*1.6)] bg-background p-5 [-ms-overflow-style:none] [scrollbar-width:none] sm:max-w-md [&::-webkit-scrollbar]:hidden">
+            {(paymentPhase === 'initiating' ||
+              paymentPhase === 'awaiting-gateway' ||
+              paymentPhase === 'polling') && (
+              <div className="py-6 text-center">
+                <Loader2 className="mx-auto size-8 animate-spin text-primary" aria-hidden />
+                <p className="mt-3 text-sm font-medium">{tw('processing')}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{tw('processingHint')}</p>
+
+                {mockGatewayOrderId && paymentPhase === 'awaiting-gateway' && (
+                  <button
+                    type="button"
+                    onClick={() => simulateOrderPayment.mutate()}
+                    disabled={simulateOrderPayment.isPending}
+                    className="mt-6 h-12 w-full rounded-[var(--radius)] border border-dashed border-primary text-sm font-semibold text-primary disabled:opacity-50"
+                  >
+                    {tw('simulatePayment')}
+                  </button>
+                )}
+              </div>
+            )}
+
+            {paymentPhase === 'failed' && (
+              <div className="py-6 text-center">
+                <p className="text-sm font-semibold text-danger">{paymentError}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentError(null);
+                    setPaymentPhase('idle');
+                  }}
+                  className="mt-6 h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+                >
+                  {tc('retry')}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </main>

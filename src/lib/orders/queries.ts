@@ -154,6 +154,33 @@ export async function listOrders(
   };
 }
 
+export interface PendingPaymentOrderView {
+  id: string;
+  orderNumber: string;
+  totalPaise: bigint;
+}
+
+/**
+ * A RAZORPAY order the customer never actually paid for — placeOrder
+ * (src/lib/orders/create.ts) reserves stock and creates the order row
+ * immediately, before the gateway checkout ever opens, so abandoning that
+ * checkout (closing the tab, backing out of the widget) leaves a real order
+ * sitting PLACED/PENDING with the customer's stock locked inside it and no
+ * trace in their cart, which is now empty (found session 2026-10-01 — a
+ * customer who exited mid-payment and came back later saw an empty cart
+ * with no explanation). Surfaced wherever an empty cart is shown, so there
+ * is always a way back to either finish paying or cancel and get the stock
+ * released.
+ */
+export async function getPendingPaymentOrder(userId: string): Promise<PendingPaymentOrderView | null> {
+  const order = await db.order.findFirst({
+    where: { userId, paymentMethod: 'RAZORPAY', paymentStatus: 'PENDING', status: { notIn: ['CANCELLED', 'REFUNDED'] } },
+    orderBy: { placedAt: 'desc' },
+    select: { id: true, orderNumber: true, totalPaise: true },
+  });
+  return order;
+}
+
 /** One query. Ownership is the caller's responsibility — see the route (R9). */
 export async function getOrderDetail(
   orderId: string,

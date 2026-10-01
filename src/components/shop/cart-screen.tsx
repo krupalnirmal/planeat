@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   AlertTriangle,
   ArrowRight,
+  ChevronRight,
   ImageIcon,
   Leaf,
   ShoppingCart,
@@ -51,6 +52,10 @@ interface QuoteResponse {
   unavailableLines: Array<{ id: string; name: string; reason: string; availableQty: number }>;
 }
 
+interface PendingPaymentResponse {
+  order: { id: string; orderNumber: string; totalPaise: string } | null;
+}
+
 export function CartScreen() {
   const t = useTranslations('cart');
   const tc = useTranslations('common');
@@ -62,6 +67,17 @@ export function CartScreen() {
     queryKey: ['checkout-quote', locale, cart.itemCount, cart.itemTotalPaise],
     queryFn: () => api.post<QuoteResponse>(`/api/checkout/quote${qs({ locale })}`, {}),
     enabled: isLoggedIn && cart.lines.length > 0,
+  });
+
+  // An empty cart with no explanation is exactly what a customer sees after
+  // abandoning a RAZORPAY checkout — placeOrder already reserved the stock
+  // and cleared the cart before the gateway widget ever opened (found
+  // session 2026-10-01). Only worth asking once the cart genuinely looks
+  // empty, not on every visit to this screen.
+  const pendingPayment = useQuery({
+    queryKey: ['orders-pending-payment'],
+    queryFn: () => api.get<PendingPaymentResponse>('/api/orders/pending-payment'),
+    enabled: isLoggedIn && !cart.isLoading && cart.lines.length === 0,
   });
 
   // MRP minus price, per sellable line. The quote does not carry MRP — only
@@ -87,10 +103,34 @@ export function CartScreen() {
   }
 
   if (cart.lines.length === 0) {
+    const pending = pendingPayment.data?.order;
     return (
       <>
         <PageHeader title={t('title')} backHref="/" backLabel={tc('back')} />
         <main className="pb-2">
+          {/* An order already exists for these items, just unpaid — never
+              silently hidden behind a plain "cart is empty" with no trail
+              back to it (found session 2026-10-01). */}
+          {pending && (
+            <Link
+              href={`/orders/${pending.id}`}
+              className="flex items-center gap-3 border-b border-border bg-[#FDF3E3] px-4 py-3"
+            >
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-card text-warning">
+                <AlertTriangle className="size-5" aria-hidden />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-bold">{t('pendingPaymentTitle')}</span>
+                <span className="block text-xs text-muted-foreground">
+                  {t('pendingPaymentBody', {
+                    orderNumber: pending.orderNumber,
+                    amount: formatPaise(paise(pending.totalPaise)),
+                  })}
+                </span>
+              </span>
+              <ChevronRight className="size-4 shrink-0 text-warning" aria-hidden />
+            </Link>
+          )}
           <div className="bg-card">
             <CenteredState>
               <ShoppingCart className="size-12 text-muted-foreground/30" aria-hidden />
