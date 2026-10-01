@@ -21,7 +21,11 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
  * state most riders will be in every day after the first.
  */
 
-const DISMISSED_FLAG = 'getfresh.rider.install_dismissed';
+// Snoozed, not permanent (session 2026-10-01 — same fix as the shop tree's
+// own install prompt, see its comment for the full reasoning): reappears
+// after a week if the app still isn't actually installed by then.
+const DISMISSED_UNTIL_KEY = 'getfresh.rider.install_dismissed_until';
+const DISMISS_SNOOZE_MS = 7 * 24 * 60 * 60 * 1000;
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -50,7 +54,8 @@ function isIos(): boolean {
 function wasDismissed(): boolean {
   if (typeof window === 'undefined') return true;
   try {
-    return localStorage.getItem(DISMISSED_FLAG) === '1';
+    const until = Number(localStorage.getItem(DISMISSED_UNTIL_KEY) ?? 0);
+    return Date.now() < until;
   } catch {
     return false;
   }
@@ -110,7 +115,7 @@ export function InstallPrompt() {
   function dismiss() {
     setDismissed(true);
     try {
-      localStorage.setItem(DISMISSED_FLAG, '1');
+      localStorage.setItem(DISMISSED_UNTIL_KEY, String(Date.now() + DISMISS_SNOOZE_MS));
     } catch {
       // Private mode — it just reappears next visit, which is harmless.
     }
