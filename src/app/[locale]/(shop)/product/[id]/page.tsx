@@ -11,6 +11,7 @@ import { ProductInfoAccordion } from '@/components/shop/product-info-accordion';
 import { ProductWishlistButton } from '@/components/shop/product-wishlist-button';
 import { VariantPicker } from '@/components/shop/variant-picker';
 import { getProductDetail } from '@/lib/catalog/queries';
+import { alternatesFor } from '@/lib/seo';
 import type { Metadata } from 'next';
 import type { AppLocale } from '@/i18n/routing';
 
@@ -53,6 +54,7 @@ export async function generateMetadata({
     // exists — more specific, and never word-for-word identical to every
     // other product's page the way the fallback necessarily is.
     description: product.description || t('productDescription', { product: product.nameEn }),
+    alternates: alternatesFor(locale as AppLocale, `/product/${id}`),
   };
 }
 

@@ -1,5 +1,8 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PageHeader } from '@/components/shop/page-header';
+import { DEFAULT_LOCALE } from '@/i18n/routing';
+import { localePath } from '@/lib/seo';
+import type { Metadata } from 'next';
 
 /**
  * A real Terms & Conditions page (session 2026-09-22, new client
@@ -8,7 +11,18 @@ import { PageHeader } from '@/components/shop/page-header';
  * Describes this app's own real, current service — a single-city delivery
  * operation with pincode-based serviceability, not a multi-city claim the
  * app doesn't back. English only, same reasoning as the privacy page.
+ *
+ * SEO audit (session 2026-10-02) — same canonical-to-default-locale
+ * reasoning as privacy/page.tsx: the content doesn't vary by locale prefix,
+ * so all three URLs point at the one copy instead of each other.
  */
+export function generateMetadata(): Metadata {
+  return {
+    title: 'Terms & Conditions',
+    alternates: { canonical: localePath(DEFAULT_LOCALE, '/terms') },
+  };
+}
+
 export default async function TermsPage({
   params,
 }: {

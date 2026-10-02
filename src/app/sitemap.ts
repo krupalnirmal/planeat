@@ -1,8 +1,8 @@
 import type { MetadataRoute } from 'next';
-import { DEFAULT_LOCALE, LOCALES, type AppLocale } from '@/i18n/routing';
+import { LOCALES } from '@/i18n/routing';
 import { getCategories } from '@/lib/catalog/queries';
 import { db } from '@/lib/db';
-import { env } from '@/lib/env';
+import { languageAlternates, localePath } from '@/lib/seo';
 
 /**
  * SEO audit (session 2026-10-02) — getfrresh.com had no sitemap.xml at all
@@ -27,17 +27,6 @@ const STATIC_PATHS: Array<{
   { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/terms', priority: 0.3, changeFrequency: 'yearly' },
 ];
-
-// `localePrefix: 'as-needed'` (src/i18n/routing.ts) — the default locale
-// ('en') is unprefixed at `/...`; mr/hi get an explicit `/mr/...`, `/hi/...`.
-function localePath(locale: AppLocale, path: string): string {
-  const prefix = locale === DEFAULT_LOCALE ? '' : `/${locale}`;
-  return `${env.appUrl}${prefix}${path}`;
-}
-
-function languageAlternates(path: string): Record<string, string> {
-  return Object.fromEntries(LOCALES.map((locale) => [locale, localePath(locale, path)]));
-}
 
 function entriesFor(
   path: string,

@@ -5,6 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { CategoryHeader } from '@/components/shop/category-header';
 import { CategoryProductList, type CategoryProduct } from '@/components/shop/category-product-list';
 import { getCategories, getCategoryProducts } from '@/lib/catalog/queries';
+import { alternatesFor } from '@/lib/seo';
 import type { Metadata } from 'next';
 import type { AppLocale } from '@/i18n/routing';
 
@@ -25,22 +26,34 @@ const getCachedCategoryProducts = cache(getCategoryProducts);
  */
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam ?? '1') || 1);
+
   const [result, t] = await Promise.all([
-    getCachedCategoryProducts(slug, locale as AppLocale, { skip: 0, take: PER_PAGE }).catch(
-      () => null,
-    ),
+    getCachedCategoryProducts(slug, locale as AppLocale, {
+      skip: (page - 1) * PER_PAGE,
+      take: PER_PAGE,
+    }).catch(() => null),
     getTranslations({ locale, namespace: 'seo' }),
   ]);
 
   if (!result) return {};
 
+  // Self-referencing, not collapsed to page 1 — page 2+ genuinely has
+  // different products, so canonicalizing it away from itself would tell
+  // Google to drop it from the index entirely rather than just de-duplicate.
+  const path = `/category/${slug}${page > 1 ? `?page=${page}` : ''}`;
+
   return {
     title: t('categoryTitle', { category: result.category.name }),
     description: t('categoryDescription', { category: result.category.name }),
+    alternates: alternatesFor(locale as AppLocale, path),
   };
 }
 

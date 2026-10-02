@@ -1,5 +1,8 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PageHeader } from '@/components/shop/page-header';
+import { DEFAULT_LOCALE } from '@/i18n/routing';
+import { localePath } from '@/lib/seo';
+import type { Metadata } from 'next';
 
 /**
  * A real Privacy Policy page (session 2026-09-22, new client reference) —
@@ -11,7 +14,20 @@ import { PageHeader } from '@/components/shop/page-header';
  * collects — nothing here is a stand-in for a feature that doesn't exist.
  * English only, not run through next-intl's mr/hi catalogues — legal text
  * carries real precision risk in translation, unlike ordinary UI copy.
+ *
+ * SEO audit (session 2026-10-02) — because the content really is identical
+ * at every locale prefix (no hreflang alternates, unlike the catalogue
+ * pages), all three locale URLs canonicalize to the one default-locale copy
+ * instead of each other — three URLs serving byte-for-byte the same English
+ * text is exactly the duplicate-content case canonical tags exist for.
  */
+export function generateMetadata(): Metadata {
+  return {
+    title: 'Privacy Policy',
+    alternates: { canonical: localePath(DEFAULT_LOCALE, '/privacy') },
+  };
+}
+
 export default async function PrivacyPage({
   params,
 }: {

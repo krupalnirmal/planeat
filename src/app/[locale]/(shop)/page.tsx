@@ -8,6 +8,7 @@ import { HomeSection } from '@/components/shop/home-section';
 import { OrderAgainRow } from '@/components/shop/order-again-row';
 import { ProductCard } from '@/components/shop/product-card';
 import { getHomePayload } from '@/lib/catalog/queries';
+import { alternatesFor } from '@/lib/seo';
 import type { Metadata } from 'next';
 import type { AppLocale } from '@/i18n/routing';
 import type { HomePayload } from '@/lib/catalog/queries';
@@ -26,7 +27,11 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'seo' });
 
-  return { title: t('homeTitle'), description: t('homeDescription') };
+  return {
+    title: t('homeTitle'),
+    description: t('homeDescription'),
+    alternates: alternatesFor(locale as AppLocale, '/'),
+  };
 }
 
 /**

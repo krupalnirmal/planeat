@@ -4,10 +4,24 @@ import { Link } from '@/i18n/navigation';
 import { HeaderCartLink } from '@/components/shop/header-cart-link';
 import { PageHeader } from '@/components/shop/page-header';
 import { getCategories } from '@/lib/catalog/queries';
+import { alternatesFor } from '@/lib/seo';
+import type { Metadata } from 'next';
 import type { AppLocale } from '@/i18n/routing';
 
 /** All-categories browse screen — the client's reference screen 6. */
 export const revalidate = 60;
+
+/** SEO audit (session 2026-10-02) — canonical/hreflang, same as the other catalogue pages. */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'categories' });
+
+  return { title: t('title'), alternates: alternatesFor(locale as AppLocale, '/categories') };
+}
 
 export default async function CategoriesPage({
   params,

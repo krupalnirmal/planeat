@@ -8,6 +8,7 @@ import NextTopLoader from 'nextjs-toploader';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { LocaleSync } from '@/components/shop/locale-sync';
 import { routing } from '@/i18n/routing';
+import { env } from '@/lib/env';
 import '../globals.css';
 
 /**
@@ -41,6 +42,9 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: 'app' });
 
   return {
+    // Lets every page's `alternates.canonical`/relative image URLs resolve
+    // to an absolute one without each page repeating the host itself.
+    metadataBase: new URL(env.appUrl),
     title: { default: t('name'), template: `%s · ${t('name')}` },
     description: t('tagline'),
     manifest: '/manifest.json',
