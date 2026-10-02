@@ -3,6 +3,14 @@
     "name": "Get Frresh",
     "tagline": "Fresh Vegetables\nDelivered to Your Home"
   },
+  "seo": {
+    "homeTitle": "Fresh Vegetables Delivered Daily in Nashik",
+    "homeDescription": "Order fresh vegetables online in Nashik with Get Frresh. Handpicked produce, daily delivery, and personalised weekly meal plans — no preservatives, always fresh.",
+    "categoryTitle": "{category} — Fresh {category} Online in Nashik",
+    "categoryDescription": "Buy fresh {category} online in Nashik. Quality handpicked produce, delivered daily with Get Frresh.",
+    "productTitle": "{product} — Buy Online in Nashik",
+    "productDescription": "{product}, fresh and handpicked. Daily delivery in Nashik with Get Frresh."
+  },
   "install": {
     "title": "Install Get Frresh on this phone",
     "action": "Install",

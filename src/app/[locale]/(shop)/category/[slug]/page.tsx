@@ -1,15 +1,48 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
 import { Link } from '@/i18n/navigation';
 import { CategoryHeader } from '@/components/shop/category-header';
 import { CategoryProductList, type CategoryProduct } from '@/components/shop/category-product-list';
 import { getCategories, getCategoryProducts } from '@/lib/catalog/queries';
+import type { Metadata } from 'next';
 import type { AppLocale } from '@/i18n/routing';
 
 /** Category listing (M2). Server-rendered, cached for a minute. */
 export const revalidate = 60;
 
 const PER_PAGE = 24;
+
+// React's per-request memoization (not a cross-request cache — `revalidate`
+// above already covers that) — `generateMetadata` and the page component
+// both need the category's name, and without this they'd each run their own
+// DB query for it (PART 12).
+const getCachedCategoryProducts = cache(getCategoryProducts);
+
+/**
+ * SEO audit (session 2026-10-02) — category pages had no metadata of their
+ * own; every one of them showed the same generic site-wide title.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const [result, t] = await Promise.all([
+    getCachedCategoryProducts(slug, locale as AppLocale, { skip: 0, take: PER_PAGE }).catch(
+      () => null,
+    ),
+    getTranslations({ locale, namespace: 'seo' }),
+  ]);
+
+  if (!result) return {};
+
+  return {
+    title: t('categoryTitle', { category: result.category.name }),
+    description: t('categoryDescription', { category: result.category.name }),
+  };
+}
 
 export default async function CategoryPage({
   params,
@@ -27,7 +60,7 @@ export default async function CategoryPage({
   const page = Math.max(1, Number(pageParam ?? '1') || 1);
 
   const [result, categories] = await Promise.all([
-    getCategoryProducts(slug, locale as AppLocale, {
+    getCachedCategoryProducts(slug, locale as AppLocale, {
       skip: (page - 1) * PER_PAGE,
       take: PER_PAGE,
     }).catch(() => null),

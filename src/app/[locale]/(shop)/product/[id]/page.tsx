@@ -1,6 +1,7 @@
 import { Activity, ChevronLeft, Leaf, Search } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
 import { Link } from '@/i18n/navigation';
 import { HeaderCartLink } from '@/components/shop/header-cart-link';
 import { ProductCard } from '@/components/shop/product-card';
@@ -10,6 +11,7 @@ import { ProductInfoAccordion } from '@/components/shop/product-info-accordion';
 import { ProductWishlistButton } from '@/components/shop/product-wishlist-button';
 import { VariantPicker } from '@/components/shop/variant-picker';
 import { getProductDetail } from '@/lib/catalog/queries';
+import type { Metadata } from 'next';
 import type { AppLocale } from '@/i18n/routing';
 
 /**
@@ -20,6 +22,39 @@ import type { AppLocale } from '@/i18n/routing';
  * and a meal plan exist to say anything meaningful about.
  */
 export const revalidate = 60;
+
+// Per-request memoization (PART 12) — `generateMetadata` and the page
+// component both need the product, so without this they'd each run their
+// own DB query for it.
+const getCachedProductDetail = cache(getProductDetail);
+
+/**
+ * SEO audit (session 2026-10-02) — product pages had no metadata of their
+ * own; every one of them showed the same generic site-wide title, so a
+ * search for a specific product's name never had a matching page title to
+ * rank on.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}): Promise<Metadata> {
+  const { locale, id } = await params;
+  const [product, t] = await Promise.all([
+    getCachedProductDetail(id, locale as AppLocale).catch(() => null),
+    getTranslations({ locale, namespace: 'seo' }),
+  ]);
+
+  if (!product) return {};
+
+  return {
+    title: t('productTitle', { product: product.nameEn }),
+    // A real product description beats the generic template whenever one
+    // exists — more specific, and never word-for-word identical to every
+    // other product's page the way the fallback necessarily is.
+    description: product.description || t('productDescription', { product: product.nameEn }),
+  };
+}
 
 export default async function ProductPage({
   params,
@@ -32,7 +67,7 @@ export default async function ProductPage({
   const t = await getTranslations('product');
   const tc = await getTranslations('common');
 
-  const product = await getProductDetail(id, locale as AppLocale).catch(() => null);
+  const product = await getCachedProductDetail(id, locale as AppLocale).catch(() => null);
   if (!product) notFound();
 
   const nutrition =

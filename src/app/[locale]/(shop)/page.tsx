@@ -8,8 +8,26 @@ import { HomeSection } from '@/components/shop/home-section';
 import { OrderAgainRow } from '@/components/shop/order-again-row';
 import { ProductCard } from '@/components/shop/product-card';
 import { getHomePayload } from '@/lib/catalog/queries';
+import type { Metadata } from 'next';
 import type { AppLocale } from '@/i18n/routing';
 import type { HomePayload } from '@/lib/catalog/queries';
+
+/**
+ * SEO audit (session 2026-10-02) — every page on the site shared the one
+ * generic title/description from the root layout (`src/app/[locale]/layout.tsx`),
+ * including this one. A real, Nashik-specific title/description here is what
+ * actually shows up as the blue link + snippet in Google search results.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'seo' });
+
+  return { title: t('homeTitle'), description: t('homeDescription') };
+}
 
 /**
  * Home (M2) — now data-driven from the catalogue.
