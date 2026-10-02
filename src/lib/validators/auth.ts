@@ -19,6 +19,19 @@ export const verifyOtpSchema = z.object({
 });
 export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
 
+/**
+ * MSG91 OTP Widget path (session 2026-10-02) — the widget generates and
+ * verifies the code itself client-side (no DLT needed, unlike the Flow API),
+ * and hands back a signed access-token instead of a code. See
+ * src/app/api/auth/otp/verify-widget/route.ts.
+ */
+export const verifyWidgetOtpSchema = z.object({
+  phone: phoneSchema,
+  accessToken: z.string().trim().min(10),
+  context: z.enum(['staff']).optional(),
+});
+export type VerifyWidgetOtpInput = z.infer<typeof verifyWidgetOtpSchema>;
+
 export const updateMeSchema = z.object({
   name: z.string().trim().min(2).max(120).optional(),
   email: z.email().max(190).optional().or(z.literal('')),

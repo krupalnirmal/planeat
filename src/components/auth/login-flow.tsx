@@ -22,9 +22,26 @@ import { Link, useRouter } from '@/i18n/navigation';
 import { useInvalidateSession } from '@/hooks/use-session';
 import { CART_QUERY_KEY } from '@/hooks/use-cart';
 import { ApiClientError, api } from '@/lib/api/client';
-import { WHATSAPP_FALLBACK_SECONDS } from '@/lib/auth/otp-constants';
+import {
+  CAPTCHA_RENDER_ID,
+  ensureWidgetReady,
+  isWidgetConfigured,
+  widgetRetryOtp,
+  widgetSendOtp,
+  widgetVerifyOtp,
+} from '@/lib/auth/msg91-widget';
+import { RESEND_COOLDOWN_SECONDS, WHATSAPP_FALLBACK_SECONDS } from '@/lib/auth/otp-constants';
 import { useGuestCart } from '@/stores/cart';
 import { cn } from '@/lib/utils';
+
+/**
+ * MSG91 OTP Widget mode (session 2026-10-02) — on when NEXT_PUBLIC_MSG91_WIDGET_ID/
+ * TOKEN are set. Sends/verifies the OTP through the widget's own JS (no DLT
+ * needed yet) instead of /api/auth/otp/send; verification goes through
+ * /api/auth/otp/verify-widget instead of /verify. Everything else on this
+ * screen — the 6-box UI, resend cooldown, WhatsApp fallback — is unchanged.
+ */
+const WIDGET_MODE = isWidgetConfigured();
 
 /**
  * M1 — phone → OTP → (new user) profile.
@@ -108,8 +125,18 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
     if (step === 'otp') otpRefs.current[0]?.focus();
   }, [step]);
 
+  // Pre-load the widget script as soon as this screen mounts, so the phone
+  // step's submit never has to wait on it.
+  useEffect(() => {
+    if (WIDGET_MODE) void ensureWidgetReady().catch(() => {});
+  }, []);
+
   function messageFor(err: unknown): string {
-    if (!(err instanceof ApiClientError)) return te('generic');
+    if (!(err instanceof ApiClientError)) {
+      // A raw MSG91 widget SDK error (not our own backend) — its message is
+      // the most useful thing we have, short of a reason code to map.
+      return err instanceof Error && err.message ? err.message : te('generic');
+    }
     const reason =
       err.details && typeof err.details === 'object' && 'reason' in err.details
         ? String((err.details as { reason: unknown }).reason)
@@ -135,12 +162,39 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
     setError(null);
     setBusy(true);
     try {
-      const result = await api.post<SendResult>('/api/auth/otp/send', { phone, channel });
-      setDevCode(result.devCode);
-      setSecondsLeft(result.resendAfterSeconds);
+      if (WIDGET_MODE) {
+        await widgetSendOtp(`91${phone}`);
+        setDevCode(null);
+      } else {
+        const result = await api.post<SendResult>('/api/auth/otp/send', { phone, channel });
+        setDevCode(result.devCode);
+      }
+      setSecondsLeft(RESEND_COOLDOWN_SECONDS);
       setElapsed(0);
       setCode('');
       setStep('otp');
+    } catch (err) {
+      setError(messageFor(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** The OTP screen's "Resend"/"Resend via WhatsApp" — a widget resend uses
+      retryOtp (keeps the same widget session) rather than sending fresh. */
+  async function resend(channel: 'sms' | 'whatsapp') {
+    setError(null);
+    setBusy(true);
+    try {
+      if (WIDGET_MODE) {
+        await widgetRetryOtp(channel);
+      } else {
+        const result = await api.post<SendResult>('/api/auth/otp/send', { phone, channel });
+        setDevCode(result.devCode);
+      }
+      setSecondsLeft(RESEND_COOLDOWN_SECONDS);
+      setElapsed(0);
+      setCode('');
     } catch (err) {
       setError(messageFor(err));
     } finally {
@@ -152,11 +206,20 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
     setError(null);
     setBusy(true);
     try {
-      const result = await api.post<VerifyResult>('/api/auth/otp/verify', {
-        phone,
-        code: submitted,
-        ...(isStaff ? { context: 'staff' as const } : {}),
-      });
+      const result = WIDGET_MODE
+        ? await (async () => {
+            const accessToken = await widgetVerifyOtp(submitted);
+            return api.post<VerifyResult>('/api/auth/otp/verify-widget', {
+              phone,
+              accessToken,
+              ...(isStaff ? { context: 'staff' as const } : {}),
+            });
+          })()
+        : await api.post<VerifyResult>('/api/auth/otp/verify', {
+            phone,
+            code: submitted,
+            ...(isStaff ? { context: 'staff' as const } : {}),
+          });
 
       if (isStaff) {
         // No guest cart, no `?next=`, no profile-completion step — a staff
@@ -252,6 +315,10 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
       // one soft field rather than a stack of panels the way the shop
       // screens deliberately do.
       <main className="flex min-h-dvh flex-col bg-background px-6 pt-7 pb-6">
+        {/* Empty unless the MSG91 widget's own dashboard has captcha turned
+            on for this widget, in which case it renders here. */}
+        {WIDGET_MODE && <div id={CAPTCHA_RENDER_ID} />}
+
         <div className="flex items-center justify-between gap-2">
           {/* Left-aligned, not centred in the full row — on a narrow phone
               a centred logo at this size runs directly under the Skip
@@ -484,7 +551,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
               ) : (
                 <button
                   type="button"
-                  onClick={() => void sendCode('sms')}
+                  onClick={() => void resend('sms')}
                   disabled={busy}
                   className="text-sm font-bold text-primary"
                 >
@@ -502,7 +569,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
                 <p className="text-xs font-medium text-muted-foreground">{t('otpFallbackBody')}</p>
                 <button
                   type="button"
-                  onClick={() => void sendCode('whatsapp')}
+                  onClick={() => void resend('whatsapp')}
                   disabled={busy}
                   className="mt-2.5 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-card text-sm font-bold shadow-sm"
                 >
