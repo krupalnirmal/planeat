@@ -84,6 +84,22 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   const messages = await getMessages();
+  const tApp = await getTranslations({ locale, namespace: 'app' });
+
+  // SEO audit (session 2026-10-02) — `Organization`, not `LocalBusiness`:
+  // getFrresh is delivery-only with no walk-in storefront, so claiming a
+  // street address here (the field `LocalBusiness` wants) would mislead
+  // Google Maps/the knowledge panel into treating it as a visitable place.
+  // No phone/address until the client confirms a public support number.
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: tApp('name'),
+    url: env.appUrl,
+    logo: `${env.appUrl}/icons/icon-512.png`,
+    description: tApp('tagline').replace(/\n/g, ' '),
+    areaServed: { '@type': 'City', name: 'Nashik' },
+  };
 
   return (
     <html lang={locale} className={`${appFont.variable} h-full`} suppressHydrationWarning>
@@ -92,6 +108,10 @@ export default async function LocaleLayout({
           which is a false-positive mismatch, not an app bug — dev-only,
           never shown in a production build. */}
       <body className="min-h-full" suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         {/* P10 — registers the offline shell (`public/sw.js`, M11, B18) as
             early as possible: `beforeInteractive` runs the registration
             before React hydrates, rather than waiting on a client

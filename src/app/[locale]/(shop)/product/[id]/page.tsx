@@ -11,9 +11,11 @@ import { ProductInfoAccordion } from '@/components/shop/product-info-accordion';
 import { ProductWishlistButton } from '@/components/shop/product-wishlist-button';
 import { VariantPicker } from '@/components/shop/variant-picker';
 import { getProductDetail } from '@/lib/catalog/queries';
-import { alternatesFor } from '@/lib/seo';
+import { paiseToRupees } from '@/lib/money';
+import { alternatesFor, localePath } from '@/lib/seo';
 import type { Metadata } from 'next';
 import type { AppLocale } from '@/i18n/routing';
+import type { ProductDetailView } from '@/lib/catalog/queries';
 
 /**
  * Product detail (M2): gallery, description, variants, nutrition, similar
@@ -79,6 +81,14 @@ export default async function ProductPage({
 
   return (
     <>
+      {/* SEO audit (session 2026-10-02) — Product structured data is what
+          lets a price/availability snippet show up directly in Google's
+          search results instead of a bare blue link. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product, locale as AppLocale, id)) }}
+      />
+
       <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-accent-faint px-3 py-3">
         <Link
           href={`/category/${product.categorySlug}`}
@@ -248,4 +258,29 @@ export default async function ProductPage({
       </main>
     </>
   );
+}
+
+/** schema.org Product + Offer — see the call site's own comment. */
+function productJsonLd(product: ProductDetailView, locale: AppLocale, id: string) {
+  const variant = product.variant;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.nameEn,
+    description: product.description || undefined,
+    image: product.images.length > 0 ? product.images : undefined,
+    url: localePath(locale, `/product/${id}`),
+    ...(variant && {
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'INR',
+        price: paiseToRupees(variant.pricePaise).toFixed(2),
+        availability: product.inStock
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+        url: localePath(locale, `/product/${id}`),
+      },
+    }),
+  };
 }

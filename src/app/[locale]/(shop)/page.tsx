@@ -53,6 +53,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   const t = await getTranslations('home');
   const tc = await getTranslations('common');
+  const tSeo = await getTranslations('seo');
 
   let payload: HomePayload | null = null;
   try {
@@ -77,6 +78,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           green background at all — near-white, with the white cards on top
           carrying the structure. */}
       <main className="bg-page-grey pb-2">
+        {/* SEO audit (session 2026-10-02) — the homepage had no H1 at all,
+            just `<h2>` section headers; Google uses H1 as its strongest
+            signal for what a page is actually about. Visually hidden, not
+            a redesign: the hero carousel already carries the visual
+            headline (baked into its own art), this is purely the
+            machine-readable one. */}
+        <h1 className="sr-only">{tSeo('homeTitle')}</h1>
+
         {/* `HeroBanner` is unconditional now (session 2026-09-22, new
             client reference) — it used to be the fallback shown only
             while no admin banner existed, with `BannerCarousel` taking
