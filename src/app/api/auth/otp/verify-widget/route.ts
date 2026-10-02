@@ -39,7 +39,16 @@ export const POST = route(async (request: Request) => {
 
   const json = (await res.json()) as VerifyAccessTokenResponse;
 
-  if (!res.ok || json.type !== 'success') {
+  // Same success check src/lib/services/sms/providers/msg91.ts already uses
+  // for every other MSG91 endpoint — MSG91's error responses are consistently
+  // `type: "error"`, but a *successful* response's shape isn't documented
+  // the same way everywhere, so requiring an exact `type === 'success'` match
+  // here (the earlier version of this check) rejected genuinely-valid
+  // tokens: MSG91's own verifyOtp had just confirmed the code was right, yet
+  // this endpoint still came back UNAUTHORIZED for it (found live, session
+  // 2026-10-03).
+  if (!res.ok || json.type === 'error') {
+    console.error('[verify-widget] MSG91 verifyAccessToken rejected:', res.status, json);
     throw new ApiError('UNAUTHORIZED', 'That verification could not be confirmed', 401, {
       reason: 'MISMATCH',
     });
