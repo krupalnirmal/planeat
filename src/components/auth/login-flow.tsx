@@ -660,10 +660,10 @@ function ErrorBanner({
           (client feedback, session 2026-10-03). Hugs its own content now,
           wrapping up to the card's width only once the message is long
           enough to need it. */}
-      <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-danger/25 bg-danger/10 py-1.5 pr-2 pl-2.5">
-        <XCircle className="size-4 shrink-0 text-danger" aria-hidden />
+      <div className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-danger/25 bg-danger/10 py-1 pr-3 pl-3.5">
+        <XCircle className="size-3.5 shrink-0 text-danger" aria-hidden />
         <p className="min-w-0 text-sm font-medium text-danger">{message}</p>
-        <span aria-hidden className="h-4 w-px shrink-0 bg-danger/20" />
+        <span aria-hidden className="h-3.5 w-px shrink-0 bg-danger/20" />
         <button
           type="button"
           onClick={onClose}
