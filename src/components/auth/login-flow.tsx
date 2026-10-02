@@ -653,20 +653,26 @@ function ErrorBanner({
   closeLabel: string;
 }) {
   return (
-    <div className="mt-3 flex items-center gap-2.5 rounded-2xl border border-danger/25 bg-danger/10 px-3 py-2.5">
-      <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-danger text-white">
-        <XCircle className="size-4" aria-hidden />
-      </span>
-      <p className="min-w-0 flex-1 text-sm font-medium text-danger">{message}</p>
-      <span aria-hidden className="h-5 w-px shrink-0 bg-danger/20" />
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label={closeLabel}
-        className="shrink-0 text-danger/50"
-      >
-        <X className="size-4" aria-hidden />
-      </button>
+    <div className="mt-3 flex justify-center">
+      {/* `inline-flex` + `max-w-full`, not a block spanning the card's full
+          width — a short message ("invalid otp") in a full-width pill left
+          a wall of empty space either side of it and read as oversized
+          (client feedback, session 2026-10-03). Hugs its own content now,
+          wrapping up to the card's width only once the message is long
+          enough to need it. */}
+      <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-danger/25 bg-danger/10 py-1.5 pr-2 pl-2.5">
+        <XCircle className="size-4 shrink-0 text-danger" aria-hidden />
+        <p className="min-w-0 text-sm font-medium text-danger">{message}</p>
+        <span aria-hidden className="h-4 w-px shrink-0 bg-danger/20" />
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={closeLabel}
+          className="shrink-0 text-danger/50"
+        >
+          <X className="size-3.5" aria-hidden />
+        </button>
+      </div>
     </div>
   );
 }
