@@ -12,6 +12,8 @@ import {
   Settings,
   ShieldCheck,
   Smartphone,
+  X,
+  XCircle,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -96,6 +98,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
   const t = useTranslations('auth');
   const ta = useTranslations('app');
   const te = useTranslations('errors');
+  const tc = useTranslations('common');
   const router = useRouter();
   const searchParams = useSearchParams();
   const invalidateSession = useInvalidateSession();
@@ -409,7 +412,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
             />
           </div>
 
-          {error && <p className="mt-2 text-left text-sm text-danger">{error}</p>}
+          {error && <ErrorBanner message={error} onClose={() => setError(null)} closeLabel={tc('close')} />}
 
           <button
             type="submit"
@@ -546,7 +549,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
               </p>
             )}
 
-            {error && <p className="mt-2 text-sm text-danger">{error}</p>}
+            {error && <ErrorBanner message={error} onClose={() => setError(null)} closeLabel={tc('close')} />}
 
             <div className="mt-3 text-center">
               {secondsLeft > 0 ? (
@@ -634,5 +637,36 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
         </div>
       </main>
     </>
+  );
+}
+
+/** A dismissible error banner (session 2026-10-03, client reference) — centred
+    icon + message + close, replacing a plain line of red text that looked
+    like an afterthought next to the rest of this screen's cards. */
+function ErrorBanner({
+  message,
+  onClose,
+  closeLabel,
+}: {
+  message: string;
+  onClose: () => void;
+  closeLabel: string;
+}) {
+  return (
+    <div className="mt-3 flex items-center gap-2.5 rounded-2xl border border-danger/25 bg-danger/10 px-3 py-2.5">
+      <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-danger text-white">
+        <XCircle className="size-4" aria-hidden />
+      </span>
+      <p className="min-w-0 flex-1 text-sm font-medium text-danger">{message}</p>
+      <span aria-hidden className="h-5 w-px shrink-0 bg-danger/20" />
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label={closeLabel}
+        className="shrink-0 text-danger/50"
+      >
+        <X className="size-4" aria-hidden />
+      </button>
+    </div>
   );
 }
