@@ -51,7 +51,12 @@ const WIDGET_MODE = isWidgetConfigured();
  * between two pages would put that state in the URL or in storage for no gain.
  */
 
-const OTP_LENGTH = 6;
+// The MSG91 widget's OTP length is set in its own dashboard (currently 4
+// digits, "Widget Settings" → OTP Length) — independent of the local
+// code-based flow's own 6-digit codes (src/lib/auth/otp.ts's
+// `randomSixDigits`), so this has to switch with `WIDGET_MODE` rather than
+// being a fixed constant.
+const OTP_LENGTH = WIDGET_MODE ? 4 : 6;
 const FEATURES = [
   { titleKey: 'featureFreshHandpicked', bodyKey: 'featureFreshHandpickedBody' },
   { titleKey: 'featureNoPreservatives', bodyKey: 'featureNoPreservativesBody' },

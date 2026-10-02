@@ -57,7 +57,16 @@ declare global {
 
 let initPromise: Promise<void> | null = null;
 
-/** Loads the widget script once (idempotent) and calls initSendOTP. */
+/** How long to wait for `initSendOTP`'s own internal (undocumented, async)
+    bootstrap to finish exposing `window.sendOtp` before giving up. Without
+    this, a failed/slow bootstrap left every call silently no-op'd via
+    optional chaining — the UI just hung on "Sending…" forever with no
+    error at all (found session 2026-10-03, live). */
+const READY_TIMEOUT_MS = 10_000;
+const READY_POLL_MS = 100;
+
+/** Loads the widget script once (idempotent), calls initSendOTP, and waits
+    for it to actually expose `window.sendOtp` before resolving. */
 export function ensureWidgetReady(): Promise<void> {
   if (!isWidgetConfigured()) {
     return Promise.reject(new Error('MSG91 widget is not configured.'));
@@ -79,12 +88,29 @@ export function ensureWidgetReady(): Promise<void> {
         success: () => {},
         failure: () => {},
       });
-      resolve();
+
+      const startedAt = Date.now();
+      const poll = setInterval(() => {
+        if (typeof window.sendOtp === 'function') {
+          clearInterval(poll);
+          resolve();
+        } else if (Date.now() - startedAt > READY_TIMEOUT_MS) {
+          clearInterval(poll);
+          reject(new Error('The OTP widget did not become ready in time.'));
+        }
+      }, READY_POLL_MS);
     });
     script.addEventListener('error', () =>
       reject(new Error('Could not load the MSG91 widget script.')),
     );
     document.body.appendChild(script);
+  });
+
+  // A failed attempt must not stay cached — the next tap should retry from
+  // scratch (a fresh script tag, a fresh initSendOTP call) instead of
+  // forever replaying the same rejection.
+  initPromise.catch(() => {
+    initPromise = null;
   });
 
   return initPromise;
