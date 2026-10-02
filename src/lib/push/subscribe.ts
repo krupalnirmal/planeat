@@ -11,8 +11,8 @@ import { api } from '@/lib/api/client';
  * Firebase's JS SDK is only used for `getToken()`, which mints an FCM
  * registration token bound to a real browser PushSubscription — the exact
  * format `src/lib/services/push/providers/fcm.ts` sends to. Passing our own
- * `serviceWorkerRegistration` (already registered by
- * `ServiceWorkerRegistration`, src/components/providers) means Firebase
+ * `serviceWorkerRegistration` (already registered by the inline
+ * `beforeInteractive` script in `src/app/[locale]/layout.tsx`) means Firebase
  * reuses the existing `public/sw.js` instead of requiring its own
  * `firebase-messaging-sw.js` — that file's generic `push` handler already
  * displays whatever arrives, with no idea who the recipient is.

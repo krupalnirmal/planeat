@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import { Mukta } from 'next/font/google';
 import { notFound } from 'next/navigation';
+import Script from 'next/script';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import NextTopLoader from 'nextjs-toploader';
 import { QueryProvider } from '@/components/providers/query-provider';
-import { ServiceWorkerRegistration } from '@/components/providers/service-worker-registration';
 import { LocaleSync } from '@/components/shop/locale-sync';
 import { routing } from '@/i18n/routing';
 import '../globals.css';
@@ -88,13 +88,24 @@ export default async function LocaleLayout({
           which is a false-positive mismatch, not an app bug — dev-only,
           never shown in a production build. */}
       <body className="min-h-full" suppressHydrationWarning>
+        {/* P10 — registers the offline shell (`public/sw.js`, M11, B18) as
+            early as possible: `beforeInteractive` runs the registration
+            before React hydrates, rather than waiting on a client
+            component's effect. PWA auditors (Lighthouse, PWABuilder) that
+            only wait for first paint were missing the effect-based
+            registration and under-scoring an otherwise-correct PWA (found
+            session 2026-10-02, while packaging for the Play Store). */}
+        {process.env.NODE_ENV === 'production' && (
+          <Script id="sw-register" strategy="beforeInteractive">
+            {"if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){});}"}
+          </Script>
+        )}
         {/* A visible loading bar on every navigation — without it, tapping a
             link during the round trip to the database (Singapore, on rural
             4G) looked like the tap did nothing. */}
         <NextTopLoader color="#1b7a3a" height={3} showSpinner={false} shadow={false} />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <QueryProvider>{children}</QueryProvider>
-          <ServiceWorkerRegistration />
           <LocaleSync />
         </NextIntlClientProvider>
       </body>
