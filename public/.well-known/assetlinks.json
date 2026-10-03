@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.getfrresh.app",
+      "sha256_cert_fingerprints": [
+        "ED:2F:DB:58:59:B5:E6:41:FB:FF:97:75:AC:DF:67:AE:32:F2:DA:3C:38:DD:8A:6F:28:3D:8C:CB:8D:E1:13:B2"
+      ]
+    }
+  }
+]
