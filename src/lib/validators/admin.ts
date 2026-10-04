@@ -217,3 +217,26 @@ export const updateDeliveryPartnerSchema = z.object({
   serviceAreaId: cuidSchema.nullable().optional(),
   isAvailable: z.boolean().optional(),
 });
+
+/** The owner adding a new supplier (session 2026-10-04). */
+export const createVendorSchema = z.object({
+  phone: phoneSchema,
+  name: z.string().trim().min(2).max(120),
+  businessName: z.string().trim().min(2).max(160),
+});
+
+export const updateVendorSchema = z.object({
+  isActive: z.boolean().optional(),
+});
+
+export const confirmSupplySchema = z.object({
+  action: z.enum(['confirm', 'reject']),
+  rejectionReason: z.string().trim().min(3).max(300).optional(),
+});
+
+/** M7's wallet-adjust reasoning, reused for the vendor ledger. */
+export const vendorLedgerAdjustSchema = z.object({
+  direction: z.enum(['CREDIT', 'DEBIT']),
+  amountPaise: z.coerce.number().int().min(1).max(100_000_000),
+  reason: z.string().trim().min(5, 'Give a reason an auditor could follow').max(300),
+});

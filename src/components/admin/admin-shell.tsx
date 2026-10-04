@@ -53,6 +53,7 @@ const SECTIONS = [
   { href: '/admin/customers', key: 'customers', icon: Users },
   { href: '/admin/meal-plans', key: 'mealPlans', icon: Salad },
   { href: '/admin/delivery-partners', key: 'deliveryPartners', icon: Bike },
+  { href: '/admin/vendors', key: 'vendors', icon: Sprout },
   { href: '/admin/waitlist', key: 'waitlist', icon: MapPinned },
   { href: '/admin/settings', key: 'settings', icon: Settings },
   { href: '/admin/audit-log', key: 'auditLog', icon: FileClock },

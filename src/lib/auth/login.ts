@@ -3,7 +3,7 @@ import { startSession } from '@/lib/auth/session';
 import { db } from '@/lib/db';
 import { ID_PREFIX, newId } from '@/lib/ids';
 
-const STAFF_ROLES = ['STORE_ADMIN', 'SUPER_ADMIN', 'DELIVERY_PARTNER'] as const;
+const STAFF_ROLES = ['STORE_ADMIN', 'SUPER_ADMIN', 'DELIVERY_PARTNER', 'VENDOR'] as const;
 
 export interface LoginResult {
   user: { id: string; phone: string; name: string | null; role: string };

@@ -24,6 +24,7 @@ enum UserRole {
   GUEST
   CUSTOMER
   DELIVERY_PARTNER
+  VENDOR
   STORE_ADMIN
   SUPER_ADMIN
 }
@@ -219,6 +220,23 @@ enum VehicleType {
   WALK
 }
 
+enum VendorSupplyStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+enum VendorLedgerDirection {
+  CREDIT
+  DEBIT
+}
+
+enum VendorLedgerSource {
+  SUPPLY
+  PAYMENT
+  ADJUSTMENT
+}
+
 enum NotificationChannel {
   SMS
   WHATSAPP
@@ -293,6 +311,7 @@ model User {
   notifications      Notification[]
   pushTokens         PushToken[]
   deliveryPartner    DeliveryPartner?
+  vendor             Vendor?
   aiLogs             AiGenerationLog[]
   auditLogs          AuditLog[]               @relation("AuditActor")
   otpRequests        OtpRequest[]
@@ -474,6 +493,7 @@ model ProductVariant {
   cartItems     CartItem[]
   orderItems    OrderItem[]
   mealPlanItems MealPlanItem[]
+  vendorSupplies VendorSupply[]
 
   @@index([productId])
   @@index([isActive])
@@ -1013,6 +1033,73 @@ model DeliveryAssignment {
   @@index([orderId])
   @@index([partnerId, status])
   @@map("delivery_assignments")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Vendors (suppliers) — stock IN, mirroring DeliveryPartner's shape
+// for stock OUT. A Vendor reports a supply; an admin confirms it
+// before it touches stock or the ledger ("suggest, never auto-assign"
+// reasoning, same as rider assignment — a human always confirms).
+// ─────────────────────────────────────────────────────────────
+
+model Vendor {
+  id           String   @id
+  userId       String   @unique
+  businessName String   @db.VarChar(160)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user     User                @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  supplies VendorSupply[]
+  ledger   VendorLedgerEntry[]
+
+  @@index([userId])
+  @@map("vendors")
+}
+
+model VendorSupply {
+  id              String             @id
+  vendorId        String
+  variantId       String
+  quantity        Int
+  costPricePaise  BigInt
+  status          VendorSupplyStatus @default(PENDING)
+  rejectionReason String?            @db.VarChar(300)
+  confirmedAt     DateTime?
+  createdAt       DateTime           @default(now())
+
+  vendor  Vendor         @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([vendorId])
+  @@index([status])
+  @@index([variantId])
+  @@map("vendor_supplies")
+}
+
+/// Append-only, same shape as WalletTransaction (src/lib/wallet/ledger.ts) —
+/// balance is always a derived sum, never a stored counter, and
+/// `[source, refType, refId]` is the idempotency key that stops a confirm
+/// (or a double-click on a payment) from double-crediting/debiting.
+model VendorLedgerEntry {
+  id                String                @id
+  vendorId          String
+  direction         VendorLedgerDirection
+  amountPaise       BigInt
+  source            VendorLedgerSource
+  refType           String                @db.VarChar(40)
+  refId             String                @db.VarChar(60)
+  balanceAfterPaise BigInt
+  reason            String?               @db.VarChar(300)
+  createdAt         DateTime              @default(now())
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  // Idempotency key, same reasoning as WalletTransaction's.
+  @@unique([source, refType, refId])
+  @@index([vendorId, createdAt])
+  @@map("vendor_ledger_entries")
 }
 
 // ─────────────────────────────────────────────────────────────

@@ -234,7 +234,13 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
         // account is pre-created from the admin panel with a name already
         // set, and always lands on its own panel, never the storefront.
         await invalidateSession();
-        router.replace(result.user.role === 'DELIVERY_PARTNER' ? '/delivery' : '/admin');
+        router.replace(
+          result.user.role === 'DELIVERY_PARTNER'
+            ? '/delivery'
+            : result.user.role === 'VENDOR'
+              ? '/vendor'
+              : '/admin',
+        );
         return;
       }
 
