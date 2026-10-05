@@ -3,6 +3,8 @@
 import { useMutation } from '@tanstack/react-query';
 import {
   Bell,
+  BellOff,
+  BellRing,
   ChevronRight,
   Download,
   FileText,
@@ -20,6 +22,7 @@ import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/shop/language-switcher';
 import { PageHeader } from '@/components/shop/page-header';
+import { usePushAlerts } from '@/hooks/use-push-alerts';
 import { useInvalidateSession, useSession } from '@/hooks/use-session';
 import { api } from '@/lib/api/client';
 
@@ -77,7 +80,6 @@ export function ProfileScreen() {
 
   const laterRows = [
     { key: 'healthProfile', icon: HeartPulse },
-    { key: 'notifications', icon: Bell },
     { key: 'medicalDisclaimer', icon: Stethoscope },
   ] as const;
 
@@ -125,6 +127,8 @@ export function ProfileScreen() {
             </Link>
           </li>
         ))}
+
+        {isLoggedIn && <NotificationsRow />}
 
         {laterRows.map(({ key, icon: Icon }) => (
           <li key={key}>
@@ -181,5 +185,60 @@ export function ProfileScreen() {
       )}
       </main>
     </>
+  );
+}
+
+/**
+ * Push notifications (session 2026-10-05) — a customer was never actually
+ * asked for notification permission anywhere; this was a disabled "coming
+ * soon" row with no real toggle behind it, which is why a push (e.g. an
+ * admin's reply to a complaint) never arrived even on a closed app — there
+ * was simply no registered `PushToken` for any customer to send to. Same
+ * `usePushAlerts()` hook the vendor/delivery/admin headers already use
+ * (`src/components/vendor/header.tsx`).
+ */
+function NotificationsRow() {
+  const t = useTranslations('profile');
+  const { status, enable } = usePushAlerts();
+
+  if (status === 'unsupported') return null;
+
+  if (status === 'enabled') {
+    return (
+      <li>
+        <div className="flex items-center gap-3 px-4 py-3.5">
+          <BellRing className="size-5 shrink-0 text-primary" aria-hidden />
+          <span className="flex-1 text-sm font-medium">{t('notifications')}</span>
+          <span className="text-[11px] font-semibold text-primary">{t('notificationsEnabled')}</span>
+        </div>
+      </li>
+    );
+  }
+
+  if (status === 'denied') {
+    return (
+      <li>
+        <div className="flex items-center gap-3 px-4 py-3.5 opacity-70">
+          <BellOff className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+          <span className="flex-1 text-sm font-medium">{t('notifications')}</span>
+          <span className="text-[11px] text-muted-foreground">{t('notificationsBlocked')}</span>
+        </div>
+      </li>
+    );
+  }
+
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={() => void enable()}
+        disabled={status === 'enabling'}
+        className="flex w-full items-center gap-3 px-4 py-3.5 text-left disabled:opacity-50"
+      >
+        <Bell className="size-5 shrink-0 text-primary" aria-hidden />
+        <span className="flex-1 text-sm font-medium">{t('notifications')}</span>
+        <span className="text-[11px] font-semibold text-primary">{t('enableNotifications')}</span>
+      </button>
+    </li>
   );
 }
