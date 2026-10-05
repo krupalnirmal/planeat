@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Plus, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
-import { AdminPageHeader, AdminTable } from '@/components/admin/admin-shell';
+import { AdminPageHeader, AdminResponsiveTable } from '@/components/admin/admin-shell';
 import { useRouter } from '@/i18n/navigation';
 import { ApiClientError, api } from '@/lib/api/client';
 import { formatPaise, paise, rupeesToPaise } from '@/lib/money';
@@ -498,34 +498,49 @@ function VariantsSection({ productId, variants }: { productId: string; variants:
       )}
 
       {variants.length > 0 && (
-        <AdminTable>
-          <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
-            <tr>
-              <th className="px-2 py-2 font-medium">{t('label')}</th>
-              <th className="px-2 py-2 font-medium">{t('quantity')}</th>
-              <th className="px-2 py-2 text-right font-medium">{t('mrp')}</th>
-              <th className="px-2 py-2 text-right font-medium">{t('price')}</th>
-              <th className="px-2 py-2 text-right font-medium">{t('stock')}</th>
-              <th className="px-2 py-2 text-right font-medium">{t('threshold')}</th>
-              <th className="px-2 py-2 text-center font-medium">{t('default')}</th>
-              <th className="px-2 py-2 text-center font-medium">{t('active')}</th>
-              <th className="px-2 py-2" />
-            </tr>
-          </thead>
-          <tbody>
-            {variants.map((variant) => (
-              <VariantRowEditor
-                key={variant.id}
-                productId={productId}
-                variant={variant}
-                onSaved={(message) => {
-                  setNotice(message);
-                  refresh();
-                }}
-              />
-            ))}
-          </tbody>
-        </AdminTable>
+        <AdminResponsiveTable
+          table={
+            <>
+              <thead className="border-b border-border bg-secondary/60 text-left text-xs text-muted-foreground">
+                <tr>
+                  <th className="px-2 py-2 font-medium">{t('label')}</th>
+                  <th className="px-2 py-2 font-medium">{t('quantity')}</th>
+                  <th className="px-2 py-2 text-right font-medium">{t('mrp')}</th>
+                  <th className="px-2 py-2 text-right font-medium">{t('price')}</th>
+                  <th className="px-2 py-2 text-right font-medium">{t('stock')}</th>
+                  <th className="px-2 py-2 text-right font-medium">{t('threshold')}</th>
+                  <th className="px-2 py-2 text-center font-medium">{t('default')}</th>
+                  <th className="px-2 py-2 text-center font-medium">{t('active')}</th>
+                  <th className="px-2 py-2" />
+                </tr>
+              </thead>
+              <tbody>
+                {variants.map((variant) => (
+                  <VariantRowEditor
+                    key={variant.id}
+                    productId={productId}
+                    variant={variant}
+                    onSaved={(message) => {
+                      setNotice(message);
+                      refresh();
+                    }}
+                  />
+                ))}
+              </tbody>
+            </>
+          }
+          cards={variants.map((variant) => (
+            <VariantCardEditor
+              key={variant.id}
+              productId={productId}
+              variant={variant}
+              onSaved={(message) => {
+                setNotice(message);
+                refresh();
+              }}
+            />
+          ))}
+        />
       )}
 
       <div className="mt-4 rounded-[var(--radius)] border border-dashed border-border p-3">
@@ -657,15 +672,11 @@ function AddVariantButton({
   );
 }
 
-function VariantRowEditor({
-  productId,
-  variant,
-  onSaved,
-}: {
-  productId: string;
-  variant: VariantRow;
-  onSaved: (message: string) => void;
-}) {
+/** Shared by `VariantRowEditor` (desktop `<tr>`, `lg:` and up) and
+    `VariantCardEditor` (phone card, below `lg:` — `AdminResponsiveTable`'s
+    mobile fallback) so the same draft state and save mutation back both
+    renderings of the exact same editable variant. */
+function useVariantDraft(productId: string, variant: VariantRow, onSaved: (message: string) => void) {
   const t = useTranslations('admin.catalogue');
   const tc = useTranslations('admin.common');
 
@@ -702,6 +713,20 @@ function VariantRowEditor({
     },
     onError: (err) => setError(err instanceof ApiClientError ? err.message : tc('failed')),
   });
+
+  return { t, draft, setDraft, error, save };
+}
+
+function VariantRowEditor({
+  productId,
+  variant,
+  onSaved,
+}: {
+  productId: string;
+  variant: VariantRow;
+  onSaved: (message: string) => void;
+}) {
+  const { t, draft, setDraft, error, save } = useVariantDraft(productId, variant, onSaved);
 
   return (
     <tr className={cn('border-b border-border last:border-0', save.isPending && 'opacity-60')}>
@@ -793,5 +818,116 @@ function VariantRowEditor({
         </button>
       </td>
     </tr>
+  );
+}
+
+function VariantCardEditor({
+  productId,
+  variant,
+  onSaved,
+}: {
+  productId: string;
+  variant: VariantRow;
+  onSaved: (message: string) => void;
+}) {
+  const { t, draft, setDraft, error, save } = useVariantDraft(productId, variant, onSaved);
+
+  return (
+    <li className="card-3d rounded-[var(--radius)] border border-border/60 bg-card p-3">
+      <div className="flex items-center gap-2">
+        <input
+          value={draft.label}
+          onChange={(e) => setDraft((d) => ({ ...d, label: e.target.value }))}
+          placeholder={t('label')}
+          className="h-9 min-w-0 flex-1 rounded border border-border bg-background px-2 text-sm outline-none"
+        />
+        <label className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
+          <input
+            type="checkbox"
+            checked={draft.isActive}
+            onChange={(e) => setDraft((d) => ({ ...d, isActive: e.target.checked }))}
+            className="size-4 accent-[var(--primary)]"
+          />
+          {t('active')}
+        </label>
+      </div>
+
+      <div className="mt-2 flex items-center gap-2">
+        <div className="flex min-w-0 flex-1 gap-1.5">
+          <input
+            type="number"
+            value={draft.quantity}
+            onChange={(e) => setDraft((d) => ({ ...d, quantity: e.target.value }))}
+            placeholder={t('quantity')}
+            className="h-9 w-20 rounded border border-border bg-background px-2 text-sm outline-none"
+          />
+          <select
+            value={draft.unit}
+            onChange={(e) => setDraft((d) => ({ ...d, unit: e.target.value as UnitType }))}
+            className="h-9 rounded border border-border bg-background px-1.5 text-sm outline-none"
+          >
+            {UNIT_TYPES.map((unit) => (
+              <option key={unit} value={unit}>
+                {unit}
+              </option>
+            ))}
+          </select>
+        </div>
+        <label className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
+          <input
+            type="checkbox"
+            checked={draft.isDefault}
+            onChange={(e) => setDraft((d) => ({ ...d, isDefault: e.target.checked }))}
+            className="size-4 accent-[var(--primary)]"
+          />
+          {t('default')}
+        </label>
+      </div>
+
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <input
+          inputMode="decimal"
+          value={draft.mrp}
+          onChange={(e) => setDraft((d) => ({ ...d, mrp: e.target.value.replace(/[^\d.]/g, '') }))}
+          placeholder={t('mrp')}
+          className="h-9 rounded border border-border bg-background px-2 text-sm tabular-nums outline-none"
+        />
+        <input
+          inputMode="decimal"
+          value={draft.price}
+          onChange={(e) => setDraft((d) => ({ ...d, price: e.target.value.replace(/[^\d.]/g, '') }))}
+          placeholder={t('price')}
+          className="h-9 rounded border border-border bg-background px-2 text-sm tabular-nums outline-none"
+        />
+      </div>
+
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <input
+          type="number"
+          value={draft.stockQty}
+          onChange={(e) => setDraft((d) => ({ ...d, stockQty: e.target.value }))}
+          placeholder={t('stock')}
+          className="h-9 rounded border border-border bg-background px-2 text-sm tabular-nums outline-none"
+        />
+        <input
+          type="number"
+          value={draft.lowStockThreshold}
+          onChange={(e) => setDraft((d) => ({ ...d, lowStockThreshold: e.target.value }))}
+          placeholder={t('threshold')}
+          className="h-9 rounded border border-border bg-background px-2 text-sm tabular-nums outline-none"
+        />
+      </div>
+
+      {error && <p className="mt-2 text-xs text-danger">{error}</p>}
+
+      <button
+        type="button"
+        disabled={save.isPending}
+        onClick={() => save.mutate()}
+        className="mt-3 flex h-9 w-full items-center justify-center rounded border border-primary text-xs font-bold text-primary disabled:opacity-50"
+      >
+        {save.isPending ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : t('save')}
+      </button>
+    </li>
   );
 }
