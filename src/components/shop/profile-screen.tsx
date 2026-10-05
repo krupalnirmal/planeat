@@ -9,6 +9,7 @@ import {
   HeartPulse,
   LogOut,
   MapPin,
+  MessageSquareWarning,
   Package,
   ShieldCheck,
   Stethoscope,
@@ -67,6 +68,7 @@ export function ProfileScreen() {
   const liveRows = [
     { key: 'myOrders', icon: Package, href: '/orders' },
     { key: 'addresses', icon: MapPin, href: '/addresses' },
+    { key: 'complaints', icon: MessageSquareWarning, href: '/complaints' },
     // Real pages now (session 2026-09-22, new client reference) — were
     // disabled "coming soon" rows below with no page behind them.
     { key: 'terms', icon: FileText, href: '/terms' },

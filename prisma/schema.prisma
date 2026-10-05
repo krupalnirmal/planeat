@@ -312,6 +312,7 @@ model User {
   pushTokens         PushToken[]
   deliveryPartner    DeliveryPartner?
   vendor             Vendor?
+  complaints         Complaint[]
   aiLogs             AiGenerationLog[]
   auditLogs          AuditLog[]               @relation("AuditActor")
   otpRequests        OtpRequest[]
@@ -660,6 +661,30 @@ model OrderIssue {
   @@index([resolvedBy])
   @@index([status])
   @@map("order_issues")
+}
+
+/// General, non-order-scoped complaint/feedback (session 2026-10-05) —
+/// mirrors OrderIssue's status/resolvedBy/resolvedAt shape, stripped of
+/// anything order- or money-specific. Private: only the submitting
+/// customer and admin staff ever see a row.
+model Complaint {
+  id          String    @id
+  userId      String
+  category    String    @db.VarChar(40)
+  description String    @db.Text
+  photoUrls   Json?
+  status      String    @default("OPEN") @db.VarChar(30)
+  adminReply  String?   @db.Text
+  resolvedBy  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([userId])
+  @@index([resolvedBy])
+  @@index([status])
+  @@map("complaints")
 }
 
 // ─────────────────────────────────────────────────────────────

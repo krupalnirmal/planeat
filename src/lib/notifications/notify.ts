@@ -30,6 +30,7 @@ export const TEMPLATE = {
   mealPlanReady: 'meal_plan.ready',
   orderPlacedAdmin: 'order.placed_admin',
   orderAssignedRider: 'order.assigned_rider',
+  complaintResolved: 'complaint.resolved',
 } as const;
 
 export type TemplateKey = (typeof TEMPLATE)[keyof typeof TEMPLATE];
@@ -56,6 +57,7 @@ export const CHANNELS_BY_TEMPLATE: Record<TemplateKey, readonly NotificationChan
   [TEMPLATE.subscriptionCancelled]: ['IN_APP'],
   [TEMPLATE.orderPlacedAdmin]: ['IN_APP', 'PUSH'],
   [TEMPLATE.orderAssignedRider]: ['IN_APP', 'PUSH'],
+  [TEMPLATE.complaintResolved]: ['IN_APP', 'PUSH'],
 };
 
 export interface NotifyInput {

@@ -409,6 +409,32 @@
     "autoCredited": "{amount} तुमच्या वॉलेटमध्ये जमा केले",
     "underReview": "आम्ही तपासून लवकर कळवतो"
   },
+  "complaints": {
+    "title": "तक्रार आणि फीडबॅक",
+    "loginBandSubtitle": "तक्रार नोंदवा किंवा फीडबॅक द्या",
+    "loginDescription": "तक्रार नोंदवण्यासाठी, फीडबॅक देण्यासाठी आणि आमच्या टीमचं उत्तर बघण्यासाठी लॉगिन करा.",
+    "newComplaint": "तक्रार नोंदवा",
+    "history": "तुमच्या तक्रारी",
+    "noneYet": "तुम्ही अजून कोणतीही तक्रार नोंदवलेली नाही",
+    "submitted": "तुमची तक्रार नोंदवली गेली आहे — आम्ही लवकरच उत्तर देऊ",
+    "description": "काय झालं ते आम्हाला सांगा",
+    "photo": "फोटो जोडा (ऐच्छिक)",
+    "photoHint": "फोटोमुळे आम्हाला समस्या लवकर समजते",
+    "submit": "तक्रार पाठवा",
+    "category": {
+      "label": "प्रकार",
+      "PRODUCT_QUALITY": "प्रॉडक्ट क्वालिटी",
+      "DELIVERY": "डिलिव्हरी",
+      "APP_ISSUE": "अॅप समस्या",
+      "BILLING": "बिलिंग",
+      "STAFF_BEHAVIOUR": "स्टाफचं वर्तन",
+      "OTHER": "इतर"
+    },
+    "status": {
+      "OPEN": "उघडी",
+      "RESOLVED": "सोडवली"
+    }
+  },
   "wallet": {
     "title": "वॉलेट",
     "loginBandSubtitle": "तुमची शिल्लक आणि व्यवहार व्यवस्थापित करा",
@@ -857,6 +883,7 @@
     "genderUndisclosed": "सांगू इच्छित नाही",
     "myOrders": "माझ्या ऑर्डर",
     "addresses": "पत्ते",
+    "complaints": "तक्रार आणि फीडबॅक",
     "healthProfile": "आरोग्य माहिती",
     "notifications": "सूचना",
     "help": "मदत",
@@ -886,6 +913,7 @@
       "waitlist": "प्रतीक्षा यादी",
       "deliveryPartners": "रायडर",
       "vendors": "वेंडर्स",
+      "complaints": "तक्रारी",
       "settings": "सेटिंग्ज",
       "auditLog": "नोंदवही",
       "more": "अधिक",
@@ -1089,6 +1117,34 @@
       "adjustSuccess": "नोंदवलं",
       "superAdminOnly": "फक्त Super Admin वेंडरला पेमेंट नोंदवू शकतो",
       "adjustInvalidAmount": "रक्कम शून्यापेक्षा जास्त हवी"
+    },
+    "complaints": {
+      "title": "तक्रारी",
+      "hint": "ग्राहकांच्या सर्वसाधारण तक्रारी आणि फीडबॅक",
+      "customer": "ग्राहक",
+      "categoryColumn": "प्रकार",
+      "description": "तपशील",
+      "status": "स्थिती",
+      "open": "उघडी",
+      "resolved": "सोडवली",
+      "filter": {
+        "OPEN": "उघडी",
+        "RESOLVED": "सोडवली",
+        "ALL": "सर्व"
+      },
+      "category": {
+        "PRODUCT_QUALITY": "प्रॉडक्ट क्वालिटी",
+        "DELIVERY": "डिलिव्हरी",
+        "APP_ISSUE": "अॅप समस्या",
+        "BILLING": "बिलिंग",
+        "STAFF_BEHAVIOUR": "स्टाफचं वर्तन",
+        "OTHER": "इतर"
+      },
+      "yourReply": "तुमचं उत्तर",
+      "replyAndResolve": "उत्तर द्या आणि सोडवा",
+      "replyPlaceholder": "ग्राहकाला काय सांगायचं आहे?",
+      "sendReply": "उत्तर पाठवा",
+      "noPermission": "तक्रारींना उत्तर देण्याची परवानगी तुम्हाला नाही"
     },
     "mealPlans": {
       "title": "मील प्लॅन्स",
@@ -1438,6 +1494,10 @@
     "orderAssignedRider": {
       "title": "नवीन डिलिव्हरी मिळाली",
       "body": "ऑर्डर {orderNumber} — {area}"
+    },
+    "complaintResolved": {
+      "title": "तुमच्या तक्रारीला उत्तर दिलं आहे",
+      "body": "उत्तर वाचण्यासाठी अॅपमध्ये तक्रार आणि फीडबॅक उघडा"
     }
   },
   "safety": {

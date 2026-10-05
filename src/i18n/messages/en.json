@@ -409,6 +409,32 @@
     "autoCredited": "{amount} has been added to your wallet",
     "underReview": "We'll check and get back to you soon"
   },
+  "complaints": {
+    "title": "Complaints & Feedback",
+    "loginBandSubtitle": "Raise a complaint or share feedback",
+    "loginDescription": "Log in to raise a complaint, share feedback, and track replies from our team.",
+    "newComplaint": "Raise a Complaint",
+    "history": "Your Complaints",
+    "noneYet": "You haven't raised any complaints yet",
+    "submitted": "Your complaint has been submitted — we'll get back to you soon",
+    "description": "Tell us what happened",
+    "photo": "Add a photo (optional)",
+    "photoHint": "A photo helps us understand the issue faster",
+    "submit": "Submit Complaint",
+    "category": {
+      "label": "Category",
+      "PRODUCT_QUALITY": "Product Quality",
+      "DELIVERY": "Delivery",
+      "APP_ISSUE": "App Issue",
+      "BILLING": "Billing",
+      "STAFF_BEHAVIOUR": "Staff Behaviour",
+      "OTHER": "Other"
+    },
+    "status": {
+      "OPEN": "Open",
+      "RESOLVED": "Resolved"
+    }
+  },
   "wallet": {
     "title": "Wallet",
     "loginBandSubtitle": "Manage your balance & transactions",
@@ -857,6 +883,7 @@
     "genderUndisclosed": "Prefer not to say",
     "myOrders": "My orders",
     "addresses": "Addresses",
+    "complaints": "Complaints & Feedback",
     "healthProfile": "Health profile",
     "notifications": "Notifications",
     "help": "Help",
@@ -886,6 +913,7 @@
       "waitlist": "Waitlist",
       "deliveryPartners": "Delivery partners",
       "vendors": "Vendors",
+      "complaints": "Complaints",
       "settings": "Settings",
       "auditLog": "Audit log",
       "more": "More",
@@ -1089,6 +1117,34 @@
       "adjustSuccess": "Recorded",
       "superAdminOnly": "Only a super admin can record vendor payments",
       "adjustInvalidAmount": "Amount must be greater than zero"
+    },
+    "complaints": {
+      "title": "Complaints",
+      "hint": "General feedback and complaints from customers",
+      "customer": "Customer",
+      "categoryColumn": "Category",
+      "description": "Description",
+      "status": "Status",
+      "open": "Open",
+      "resolved": "Resolved",
+      "filter": {
+        "OPEN": "Open",
+        "RESOLVED": "Resolved",
+        "ALL": "All"
+      },
+      "category": {
+        "PRODUCT_QUALITY": "Product Quality",
+        "DELIVERY": "Delivery",
+        "APP_ISSUE": "App Issue",
+        "BILLING": "Billing",
+        "STAFF_BEHAVIOUR": "Staff Behaviour",
+        "OTHER": "Other"
+      },
+      "yourReply": "Your reply",
+      "replyAndResolve": "Reply & resolve",
+      "replyPlaceholder": "What should the customer know?",
+      "sendReply": "Send reply",
+      "noPermission": "You don't have permission to reply to complaints"
     },
     "mealPlans": {
       "title": "Meal Plans",
@@ -1438,6 +1494,10 @@
     "orderAssignedRider": {
       "title": "New delivery assigned",
       "body": "Order {orderNumber} — {area}"
+    },
+    "complaintResolved": {
+      "title": "We've replied to your complaint",
+      "body": "Open Complaints & Feedback in the app to read our reply"
     }
   },
   "safety": {

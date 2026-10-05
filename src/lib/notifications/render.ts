@@ -38,6 +38,7 @@ const MESSAGE_ID: Record<TemplateKey, string> = {
   [TEMPLATE.mealPlanReady]: 'mealPlanReady',
   [TEMPLATE.orderPlacedAdmin]: 'orderPlacedAdmin',
   [TEMPLATE.orderAssignedRider]: 'orderAssignedRider',
+  [TEMPLATE.complaintResolved]: 'complaintResolved',
 };
 
 export interface RenderedNotification {
@@ -129,6 +130,8 @@ function variablesFor(
         orderNumber: String(payload.orderNumber ?? ''),
         area: String(payload.area ?? ''),
       };
+    case TEMPLATE.complaintResolved:
+      return {};
     default:
       return {};
   }
@@ -207,6 +210,9 @@ export function urlFor(
       break;
     case TEMPLATE.lowWalletBalance:
       pathname = '/wallet';
+      break;
+    case TEMPLATE.complaintResolved:
+      pathname = '/complaints';
       break;
     default:
       return undefined;

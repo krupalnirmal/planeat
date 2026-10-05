@@ -29,6 +29,7 @@ export const ID_PREFIX = {
   orderItem: 'ori',
   orderStatus: 'osh',
   orderIssue: 'oiu',
+  complaint: 'cmp',
   healthProfile: 'hpr',
   healthAccess: 'hpa',
   familyMember: 'fam',

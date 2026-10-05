@@ -409,6 +409,32 @@
     "autoCredited": "{amount} आपके वॉलेट में जमा कर दिए",
     "underReview": "हम जाँच कर जल्द बताते हैं"
   },
+  "complaints": {
+    "title": "शिकायत और फ़ीडबैक",
+    "loginBandSubtitle": "शिकायत दर्ज करें या फ़ीडबैक दें",
+    "loginDescription": "शिकायत दर्ज करने, फ़ीडबैक देने और हमारी टीम के जवाब देखने के लिए लॉगिन करें।",
+    "newComplaint": "शिकायत दर्ज करें",
+    "history": "आपकी शिकायतें",
+    "noneYet": "आपने अभी तक कोई शिकायत दर्ज नहीं की है",
+    "submitted": "आपकी शिकायत दर्ज हो गई है — हम जल्द जवाब देंगे",
+    "description": "क्या हुआ, हमें बताएं",
+    "photo": "फ़ोटो जोड़ें (वैकल्पिक)",
+    "photoHint": "फ़ोटो से हमें समस्या जल्दी समझ आती है",
+    "submit": "शिकायत भेजें",
+    "category": {
+      "label": "श्रेणी",
+      "PRODUCT_QUALITY": "प्रोडक्ट क्वालिटी",
+      "DELIVERY": "डिलीवरी",
+      "APP_ISSUE": "ऐप की समस्या",
+      "BILLING": "बिलिंग",
+      "STAFF_BEHAVIOUR": "स्टाफ़ का व्यवहार",
+      "OTHER": "अन्य"
+    },
+    "status": {
+      "OPEN": "खुली",
+      "RESOLVED": "सुलझाई गई"
+    }
+  },
   "wallet": {
     "title": "वॉलेट",
     "loginBandSubtitle": "अपना बैलेंस और लेन-देन प्रबंधित करें",
@@ -857,6 +883,7 @@
     "genderUndisclosed": "बताना नहीं चाहते",
     "myOrders": "मेरे ऑर्डर",
     "addresses": "पते",
+    "complaints": "शिकायत और फ़ीडबैक",
     "healthProfile": "स्वास्थ्य जानकारी",
     "notifications": "सूचनाएँ",
     "help": "मदद",
@@ -886,6 +913,7 @@
       "waitlist": "प्रतीक्षा सूची",
       "deliveryPartners": "राइडर",
       "vendors": "वेंडर्स",
+      "complaints": "शिकायतें",
       "settings": "सेटिंग्स",
       "auditLog": "रिकॉर्ड बही",
       "more": "और",
@@ -1089,6 +1117,34 @@
       "adjustSuccess": "दर्ज किया गया",
       "superAdminOnly": "केवल Super Admin वेंडर को पेमेंट दर्ज कर सकता है",
       "adjustInvalidAmount": "राशि शून्य से अधिक होनी चाहिए"
+    },
+    "complaints": {
+      "title": "शिकायतें",
+      "hint": "ग्राहकों की सामान्य शिकायतें और फ़ीडबैक",
+      "customer": "ग्राहक",
+      "categoryColumn": "श्रेणी",
+      "description": "विवरण",
+      "status": "स्थिति",
+      "open": "खुली",
+      "resolved": "सुलझाई गई",
+      "filter": {
+        "OPEN": "खुली",
+        "RESOLVED": "सुलझाई गई",
+        "ALL": "सभी"
+      },
+      "category": {
+        "PRODUCT_QUALITY": "प्रोडक्ट क्वालिटी",
+        "DELIVERY": "डिलीवरी",
+        "APP_ISSUE": "ऐप की समस्या",
+        "BILLING": "बिलिंग",
+        "STAFF_BEHAVIOUR": "स्टाफ़ का व्यवहार",
+        "OTHER": "अन्य"
+      },
+      "yourReply": "आपका जवाब",
+      "replyAndResolve": "जवाब दें और सुलझाएं",
+      "replyPlaceholder": "ग्राहक को क्या बताना चाहिए?",
+      "sendReply": "जवाब भेजें",
+      "noPermission": "आपको शिकायतों का जवाब देने की अनुमति नहीं है"
     },
     "mealPlans": {
       "title": "मील प्लान",
@@ -1438,6 +1494,10 @@
     "orderAssignedRider": {
       "title": "नई डिलीवरी मिली",
       "body": "ऑर्डर {orderNumber} — {area}"
+    },
+    "complaintResolved": {
+      "title": "आपकी शिकायत का जवाब दिया गया है",
+      "body": "जवाब पढ़ने के लिए ऐप में शिकायत और फ़ीडबैक खोलें"
     }
   },
   "safety": {
