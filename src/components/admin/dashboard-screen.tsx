@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   BarChart3,
+  ChevronRight,
   CreditCard,
   IndianRupee,
   Loader2,
@@ -233,10 +234,37 @@ export function AdminDashboard() {
           <PlansExplorerTab />
         ) : tab === 'inventory' ? (
           <InventoryExplorerTab />
+        ) : tab === 'complaints' ? (
+          <ComplaintsTabRedirect />
         ) : (
           <ExplorerEmpty label={te('comingSoon')} />
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * Complaints (session 2026-10-05) shipped as its own full page
+ * (`/admin/complaints` — list + a separate detail page, not an inline
+ * split-panel Explorer like the other 7 tabs) rather than a `*ExplorerTab`
+ * component, since a reply-and-resolve action reads better on its own
+ * screen than squeezed into the split-panel's narrow detail column. This
+ * tab is a doorway to that real page instead of ever showing "coming soon"
+ * again now that the feature exists.
+ */
+function ComplaintsTabRedirect() {
+  const t = useTranslations('admin.complaints');
+  return (
+    <Link
+      href="/admin/complaints"
+      className="card-3d flex items-center justify-between gap-2 rounded-[var(--radius)] border border-border/60 bg-card p-4"
+    >
+      <div>
+        <p className="text-sm font-bold">{t('title')}</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">{t('hint')}</p>
+      </div>
+      <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+    </Link>
   );
 }
