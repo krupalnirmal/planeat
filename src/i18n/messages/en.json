@@ -889,6 +889,7 @@
     "enableNotifications": "Turn on",
     "notificationsEnabled": "Turned on",
     "notificationsBlocked": "Blocked in browser settings",
+    "notificationsUnavailable": "Not available right now",
     "help": "Help",
     "terms": "Terms",
     "privacy": "Privacy Policy",

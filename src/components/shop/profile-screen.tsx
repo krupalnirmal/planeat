@@ -199,6 +199,7 @@ export function ProfileScreen() {
  */
 function NotificationsRow() {
   const t = useTranslations('profile');
+  const tc = useTranslations('common');
   const { status, enable } = usePushAlerts();
 
   if (status === 'unsupported') return null;
@@ -227,6 +228,25 @@ function NotificationsRow() {
     );
   }
 
+  // 'not-configured'/'error' previously fell through to the same tappable
+  // "Turn on" row as 'promptable' — a retap silently failed again with no
+  // visible sign anything went wrong (no permission popup even shows for
+  // 'not-configured', since `enablePush()` returns before ever calling
+  // `Notification.requestPermission()`). Surfaced explicitly instead, since
+  // it means a real deploy problem (missing `NEXT_PUBLIC_FIREBASE_*` env
+  // vars at build time), not something retapping fixes.
+  if (status === 'not-configured' || status === 'error') {
+    return (
+      <li>
+        <div className="flex items-center gap-3 px-4 py-3.5 opacity-70">
+          <BellOff className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+          <span className="flex-1 text-sm font-medium">{t('notifications')}</span>
+          <span className="text-[11px] text-muted-foreground">{t('notificationsUnavailable')}</span>
+        </div>
+      </li>
+    );
+  }
+
   return (
     <li>
       <button
@@ -237,7 +257,9 @@ function NotificationsRow() {
       >
         <Bell className="size-5 shrink-0 text-primary" aria-hidden />
         <span className="flex-1 text-sm font-medium">{t('notifications')}</span>
-        <span className="text-[11px] font-semibold text-primary">{t('enableNotifications')}</span>
+        <span className="text-[11px] font-semibold text-primary">
+          {status === 'enabling' ? tc('loading') : t('enableNotifications')}
+        </span>
       </button>
     </li>
   );
