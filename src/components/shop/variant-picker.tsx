@@ -3,7 +3,7 @@
 import { Clock, ShoppingCart } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { useRouter } from '@/i18n/navigation';
+import { usePathname, useRouter } from '@/i18n/navigation';
 import { useCart } from '@/hooks/use-cart';
 import { useSession } from '@/hooks/use-session';
 import { formatPaise, paise } from '@/lib/money';
@@ -56,6 +56,7 @@ export function VariantPicker({
   const t = useTranslations('product');
   const ta = useTranslations('auth');
   const router = useRouter();
+  const pathname = usePathname();
   const { isLoggedIn } = useSession();
 
   const [selectedId, setSelectedId] = useState(
@@ -77,7 +78,7 @@ export function VariantPicker({
 
   function handleAdd() {
     if (!selected || !isLoggedIn) {
-      router.push(`/login?next=/product/${productId}`);
+      router.push(`/login?next=${pathname}`);
       return;
     }
     cart.add({ productId, variantId: selected.id });

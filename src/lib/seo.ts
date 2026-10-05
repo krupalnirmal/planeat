@@ -16,7 +16,12 @@ export function localePath(locale: AppLocale, path: string): string {
 }
 
 export function languageAlternates(path: string): Record<string, string> {
-  return Object.fromEntries(LOCALES.map((locale) => [locale, localePath(locale, path)]));
+  return {
+    ...Object.fromEntries(LOCALES.map((locale) => [locale, localePath(locale, path)])),
+    // Shown to a searcher whose browser language matches none of mr/hi/en —
+    // falls back to the default locale rather than making Google guess.
+    'x-default': localePath(DEFAULT_LOCALE, path),
+  };
 }
 
 /** A page's own `generateMetadata` — its canonical self plus its siblings in the other two locales. */

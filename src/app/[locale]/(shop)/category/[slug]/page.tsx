@@ -86,6 +86,7 @@ export default async function CategoryPage({
 
   const products: CategoryProduct[] = result.products.map((product) => ({
     id: product.id,
+    slug: product.slug,
     name: product.name,
     nameEn: product.nameEn,
     localName: product.localName,

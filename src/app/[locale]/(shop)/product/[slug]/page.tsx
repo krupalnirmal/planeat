@@ -40,11 +40,11 @@ const getCachedProductDetail = cache(getProductDetail);
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ locale: string; id: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { locale, id } = await params;
+  const { locale, slug } = await params;
   const [product, t] = await Promise.all([
-    getCachedProductDetail(id, locale as AppLocale).catch(() => null),
+    getCachedProductDetail(slug, locale as AppLocale).catch(() => null),
     getTranslations({ locale, namespace: 'seo' }),
   ]);
 
@@ -56,22 +56,22 @@ export async function generateMetadata({
     // exists — more specific, and never word-for-word identical to every
     // other product's page the way the fallback necessarily is.
     description: product.description || t('productDescription', { product: product.nameEn }),
-    alternates: alternatesFor(locale as AppLocale, `/product/${id}`),
+    alternates: alternatesFor(locale as AppLocale, `/product/${slug}`),
   };
 }
 
 export default async function ProductPage({
   params,
 }: {
-  params: Promise<{ locale: string; id: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { locale, id } = await params;
+  const { locale, slug } = await params;
   setRequestLocale(locale);
 
   const t = await getTranslations('product');
   const tc = await getTranslations('common');
 
-  const product = await getCachedProductDetail(id, locale as AppLocale).catch(() => null);
+  const product = await getCachedProductDetail(slug, locale as AppLocale).catch(() => null);
   if (!product) notFound();
 
   const nutrition =
@@ -86,7 +86,7 @@ export default async function ProductPage({
           search results instead of a bare blue link. */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product, locale as AppLocale, id)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product, locale as AppLocale)) }}
       />
 
       <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-accent-faint px-3 py-3">
@@ -234,6 +234,7 @@ export default async function ProductPage({
                     compact
                     product={{
                       id: item.id,
+                      slug: item.slug,
                       name: item.name,
                       nameEn: item.nameEn,
                       localName: item.localName,
@@ -261,8 +262,9 @@ export default async function ProductPage({
 }
 
 /** schema.org Product + Offer — see the call site's own comment. */
-function productJsonLd(product: ProductDetailView, locale: AppLocale, id: string) {
+function productJsonLd(product: ProductDetailView, locale: AppLocale) {
   const variant = product.variant;
+  const url = localePath(locale, `/product/${product.slug}`);
 
   return {
     '@context': 'https://schema.org',
@@ -270,7 +272,7 @@ function productJsonLd(product: ProductDetailView, locale: AppLocale, id: string
     name: product.nameEn,
     description: product.description || undefined,
     image: product.images.length > 0 ? product.images : undefined,
-    url: localePath(locale, `/product/${id}`),
+    url,
     ...(variant && {
       offers: {
         '@type': 'Offer',
@@ -279,7 +281,7 @@ function productJsonLd(product: ProductDetailView, locale: AppLocale, id: string
         availability: product.inStock
           ? 'https://schema.org/InStock'
           : 'https://schema.org/OutOfStock',
-        url: localePath(locale, `/product/${id}`),
+        url,
       },
     }),
   };

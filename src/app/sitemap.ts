@@ -52,7 +52,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getCategories('en'),
     db.product.findMany({
       where: { isActive: true },
-      select: { id: true, updatedAt: true },
+      // SEO audit (session 2026-10-05) — `sku` is the real page URL now
+      // (`toProductCard`'s `slug: sku.toLowerCase()`), not `id`.
+      select: { sku: true, updatedAt: true },
     }),
   ]);
 
@@ -66,7 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       entriesFor(`/category/${category.slug}`, now, 'weekly', 0.7),
     ),
     ...products.flatMap((product) =>
-      entriesFor(`/product/${product.id}`, product.updatedAt, 'weekly', 0.6),
+      entriesFor(`/product/${product.sku.toLowerCase()}`, product.updatedAt, 'weekly', 0.6),
     ),
   ];
 }

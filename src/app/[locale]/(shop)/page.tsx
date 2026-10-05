@@ -169,6 +169,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   <ProductCard
                     product={{
                       id: product.id,
+                      slug: product.slug,
                       name: product.name,
                       nameEn: product.nameEn,
                       localName: product.localName,

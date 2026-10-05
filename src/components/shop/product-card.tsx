@@ -44,6 +44,10 @@ import { VariantPickerSheet } from './variant-picker-sheet';
 
 export interface ProductCardData {
   id: string;
+  /** SEO audit (session 2026-10-05) — the URL-friendly identifier every
+      product link uses instead of `id`; derived from the SKU server-side
+      (`toProductCard`, `src/lib/catalog/queries.ts`), never the raw id. */
+  slug: string;
   name: string;
   /** English name — shown together with `localName` as "English (local)"
       (session 2026-09-01). Optional so any caller that hasn't been updated
@@ -199,7 +203,7 @@ export function ProductCard({
     activeVariant && product.inStock && activeVariant.stockQty <= activeVariant.lowStockThreshold;
 
   function goToLogin() {
-    router.push(`/login?next=/product/${product.id}`);
+    router.push(`/login?next=/product/${product.slug}`);
   }
 
   function handleAdd() {
@@ -240,7 +244,7 @@ export function ProductCard({
         !compact && 'h-full',
       )}
     >
-      <Link href={`/product/${product.id}`} aria-label={product.name} tabIndex={-1}>
+      <Link href={`/product/${product.slug}`} aria-label={product.name} tabIndex={-1}>
         <div
           className={cn(
             'relative grid aspect-square place-items-center bg-white',
@@ -284,7 +288,7 @@ export function ProductCard({
       </button>
 
       <Link
-        href={`/product/${product.id}`}
+        href={`/product/${product.slug}`}
         // No `min-h` reservation here at all any more (session 2026-09-20
         // follow-up — client screenshot: too much white space between name
         // and price in the category grid too, not just the compact rail).
@@ -416,6 +420,7 @@ export function ProductCard({
       {pickerOpen && multiVariant && (
         <VariantPickerSheet
           productId={product.id}
+          productSlug={product.slug}
           productName={product.name}
           productUnitType={product.unitType}
           variants={variants!}

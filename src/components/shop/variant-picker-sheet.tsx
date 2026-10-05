@@ -23,12 +23,14 @@ import { VoiceQuantitySheet } from './voice-quantity-sheet';
  */
 export function VariantPickerSheet({
   productId,
+  productSlug,
   productName,
   productUnitType,
   variants,
   onClose,
 }: {
   productId: string;
+  productSlug: string;
   productName: string;
   productUnitType: string;
   variants: ProductRowVariant[];
@@ -44,7 +46,7 @@ export function VariantPickerSheet({
   const activeVariantIds = variants.filter((v) => cart.quantityOf(v.id) > 0).map((v) => v.id);
 
   function goToLogin() {
-    router.push(`/login?next=/product/${productId}`);
+    router.push(`/login?next=/product/${productSlug}`);
   }
 
   function selectVariant(variant: ProductRowVariant) {

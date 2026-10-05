@@ -435,13 +435,23 @@ export interface ProductDetailView extends ProductCardView {
   similar: ProductCardView[];
 }
 
-/** Two queries: the product with everything attached, then its siblings. */
+/**
+ * Two queries: the product with everything attached, then its siblings.
+ *
+ * SEO audit (session 2026-10-05) — looked up by `slug` (the URL-friendly
+ * `sku.toLowerCase()`, see `toProductCard`), not the raw id, so the product
+ * page's own URL carries the product's name instead of an opaque id.
+ * `sku` relies on MySQL/MariaDB's default case-insensitive collation to
+ * match regardless of how the admin capitalised it — no `mode: 'insensitive'`
+ * needed (and MySQL's Prisma connector doesn't expose that option, since the
+ * database already behaves this way).
+ */
 export async function getProductDetail(
-  id: string,
+  slug: string,
   locale: Locale,
 ): Promise<ProductDetailView | null> {
-  const product = await db.product.findUnique({
-    where: { id },
+  const product = await db.product.findFirst({
+    where: { sku: slug },
     select: {
       ...productCardSelect,
       description: true,
