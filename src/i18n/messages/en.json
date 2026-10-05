@@ -466,6 +466,16 @@
       "7": "Sun"
     },
     "loginDescription": "Log in to build your own weekly plan and pick real products for each day.",
+    "intro": {
+      "title": "My Meal Plan",
+      "body": "Plan your vegetables, fruits, milk and other daily essentials for the week in advance. We'll take care of the deliveries for you.",
+      "benefit1": "Plan once and avoid ordering every day",
+      "benefit2": "Get the right items on the right day",
+      "benefit3": "Choose Daily or Weekly delivery",
+      "benefit4": "Skip, pause or change your plan anytime",
+      "cta": "Create My Meal Plan",
+      "later": "Maybe Later"
+    },
     "builder": {
       "dayColumn": "Day",
       "hint": "Tap a product to pick a weight for that day. Tap it again to change or remove it.",

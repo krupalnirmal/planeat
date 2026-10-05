@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useInvalidateSession, useSession } from '@/hooks/use-session';
 import { api } from '@/lib/api/client';
+import { MealPlanIntroPopup } from '@/components/meal-plan/meal-plan-intro-popup';
 
 /**
  * M1 profile step: name only (session 2026-09-27, user request — dob and
@@ -21,6 +22,13 @@ import { api } from '@/lib/api/client';
  * full-width page, the same modal treatment `QuantityModal`/
  * `DeliveryModePopup` already use elsewhere, without needing to change
  * either of those two call sites.
+ *
+ * Once the name step is done (saved or skipped), a brand-new user sees one
+ * more screen — `MealPlanIntroPopup` — before landing on `next` (session
+ * 2026-10-05, client request: introduce "My Meal Plan" right after
+ * onboarding, before the person starts shopping). This route is only ever
+ * reached `if (result.isNewUser)` (`login-flow.tsx`), so it naturally fires
+ * exactly once per customer with no extra "seen it" flag needed.
  */
 export function ProfileForm() {
   const t = useTranslations('profile');
@@ -36,6 +44,7 @@ export function ProfileForm() {
   const [name, setName] = useState(user?.name ?? '');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [showMealPlanIntro, setShowMealPlanIntro] = useState(false);
 
   async function save() {
     setError(null);
@@ -43,12 +52,21 @@ export function ProfileForm() {
     try {
       await api.patch('/api/me', { name: name.trim() });
       await invalidateSession();
-      router.replace(next);
+      setShowMealPlanIntro(true);
     } catch {
       setError(te('generic'));
     } finally {
       setBusy(false);
     }
+  }
+
+  if (showMealPlanIntro) {
+    return (
+      <MealPlanIntroPopup
+        onCreatePlan={() => router.replace('/meal-plan/build/summary')}
+        onDismiss={() => router.replace(next)}
+      />
+    );
   }
 
   return (
@@ -91,7 +109,7 @@ export function ProfileForm() {
 
           <button
             type="button"
-            onClick={() => router.replace(next)}
+            onClick={() => setShowMealPlanIntro(true)}
             className="h-11 w-full text-sm text-muted-foreground"
           >
             {tc('skip')}
