@@ -45,6 +45,14 @@ import { cn } from '@/lib/utils';
  */
 const WIDGET_MODE = isWidgetConfigured();
 
+/** Play Store review (session 2026-10-15) — this one number always uses the
+    code-based flow below instead of the MSG91 widget, even when
+    `WIDGET_MODE` is on, since Google's reviewer has no way to receive a
+    real widget-issued OTP. `src/lib/auth/otp.ts`'s `generateOtpCode` gives
+    it a fixed, known code instead. Public (not a secret) — the actual
+    boundary is the server-only `REVIEW_TEST_OTP`. */
+const REVIEW_TEST_PHONE = process.env.NEXT_PUBLIC_REVIEW_TEST_PHONE;
+
 /**
  * M1 — phone → OTP → (new user) profile.
  *
@@ -53,12 +61,6 @@ const WIDGET_MODE = isWidgetConfigured();
  * between two pages would put that state in the URL or in storage for no gain.
  */
 
-// The MSG91 widget's OTP length is set in its own dashboard (currently 4
-// digits, "Widget Settings" → OTP Length) — independent of the local
-// code-based flow's own 6-digit codes (src/lib/auth/otp.ts's
-// `randomSixDigits`), so this has to switch with `WIDGET_MODE` rather than
-// being a fixed constant.
-const OTP_LENGTH = WIDGET_MODE ? 4 : 6;
 const FEATURES = [
   { titleKey: 'featureFreshHandpicked', bodyKey: 'featureFreshHandpickedBody' },
   { titleKey: 'featureNoPreservatives', bodyKey: 'featureNoPreservativesBody' },
@@ -116,6 +118,16 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [elapsed, setElapsed] = useState(0);
 
+  // Flips to the code-based flow for the one designated review phone, even
+  // while WIDGET_MODE is globally on — see REVIEW_TEST_PHONE's own comment.
+  const useWidget = WIDGET_MODE && phone !== REVIEW_TEST_PHONE;
+  // The MSG91 widget's OTP length is set in its own dashboard (currently 4
+  // digits, "Widget Settings" → OTP Length) — independent of the local
+  // code-based flow's own 6-digit codes (src/lib/auth/otp.ts's
+  // `randomSixDigits`), so this has to switch with `useWidget` rather than
+  // being a fixed constant.
+  const otpLength = useWidget ? 4 : 6;
+
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   // One interval drives both the resend cooldown and the WhatsApp fallback
@@ -170,7 +182,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
     setError(null);
     setBusy(true);
     try {
-      if (WIDGET_MODE) {
+      if (useWidget) {
         await widgetSendOtp(`91${phone}`);
         setDevCode(null);
       } else {
@@ -194,7 +206,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
     setError(null);
     setBusy(true);
     try {
-      if (WIDGET_MODE) {
+      if (useWidget) {
         await widgetRetryOtp(channel);
       } else {
         const result = await api.post<SendResult>('/api/auth/otp/send', { phone, channel });
@@ -214,7 +226,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
     setError(null);
     setBusy(true);
     try {
-      const result = WIDGET_MODE
+      const result = useWidget
         ? await (async () => {
             const accessToken = await widgetVerifyOtp(submitted);
             return api.post<VerifyResult>('/api/auth/otp/verify-widget', {
@@ -280,19 +292,19 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
     // focused rather than one digit at a time — spread it from there instead
     // of treating it as a single (invalid) character.
     if (digits.length > 1) {
-      const merged = (code.slice(0, index) + digits).slice(0, OTP_LENGTH);
+      const merged = (code.slice(0, index) + digits).slice(0, otpLength);
       setCode(merged);
-      if (merged.length === OTP_LENGTH && !busy) void verify(merged);
-      else otpRefs.current[Math.min(merged.length, OTP_LENGTH - 1)]?.focus();
+      if (merged.length === otpLength && !busy) void verify(merged);
+      else otpRefs.current[Math.min(merged.length, otpLength - 1)]?.focus();
       return;
     }
 
     const chars = code.split('');
     chars[index] = digits;
-    const next6 = chars.join('').slice(0, OTP_LENGTH);
+    const next6 = chars.join('').slice(0, otpLength);
     setCode(next6);
-    if (digits && index < OTP_LENGTH - 1) otpRefs.current[index + 1]?.focus();
-    if (next6.length === OTP_LENGTH && !busy) void verify(next6);
+    if (digits && index < otpLength - 1) otpRefs.current[index + 1]?.focus();
+    if (next6.length === otpLength && !busy) void verify(next6);
   }
 
   function handleOtpKeyDown(index: number, event: KeyboardEvent<HTMLInputElement>) {
@@ -302,12 +314,12 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
   }
 
   function handleOtpPaste(event: ClipboardEvent<HTMLDivElement>) {
-    const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH);
+    const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, otpLength);
     if (pasted.length === 0) return;
     event.preventDefault();
     setCode(pasted);
-    if (pasted.length === OTP_LENGTH && !busy) void verify(pasted);
-    else otpRefs.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus();
+    if (pasted.length === otpLength && !busy) void verify(pasted);
+    else otpRefs.current[Math.min(pasted.length, otpLength - 1)]?.focus();
   }
 
   const phoneValid = /^[6-9]\d{9}$/.test(phone.replace(/\D/g, ''));
@@ -331,7 +343,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
       <main className="flex min-h-dvh flex-col bg-background px-6 pt-7 pb-6">
         {/* Empty unless the MSG91 widget's own dashboard has captcha turned
             on for this widget, in which case it renders here. */}
-        {WIDGET_MODE && <div id={CAPTCHA_RENDER_ID} />}
+        {useWidget && <div id={CAPTCHA_RENDER_ID} />}
 
         <div className="flex items-center justify-between gap-2">
           {/* Left-aligned, not centred in the full row — on a narrow phone
@@ -516,7 +528,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
             className="mt-6"
             onSubmit={(event) => {
               event.preventDefault();
-              if (code.length === OTP_LENGTH && !busy) void verify(code);
+              if (code.length === otpLength && !busy) void verify(code);
             }}
           >
             <div
@@ -525,7 +537,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
               onPaste={handleOtpPaste}
               className="flex justify-center gap-2.5"
             >
-              {Array.from({ length: OTP_LENGTH }).map((_, index) => (
+              {Array.from({ length: otpLength }).map((_, index) => (
                 <input
                   key={index}
                   ref={(el) => {
@@ -595,7 +607,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
 
             <button
               type="submit"
-              disabled={code.length !== OTP_LENGTH || busy}
+              disabled={code.length !== otpLength || busy}
               className="mt-6 flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-[16px] font-bold text-primary-foreground shadow-sm disabled:opacity-50 disabled:shadow-none"
             >
               {busy ? (

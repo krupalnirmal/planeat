@@ -4,6 +4,7 @@ import {
   RESEND_COOLDOWN_SECONDS,
   WHATSAPP_FALLBACK_SECONDS,
   issueOtp,
+  normalisePhone,
 } from '@/lib/auth/otp';
 import { env } from '@/lib/env';
 import { getSmsProvider, isMockSms } from '@/lib/services/sms';
@@ -32,18 +33,27 @@ export const POST = route(async (request: Request) => {
     );
   }
 
-  const sms = getSmsProvider();
-  const result = await sms.sendOtp({
-    phone,
-    code: issued.code,
-    ttlSeconds: env.auth.otpTtlSeconds,
-    locale,
-  });
+  // Play Store review (session 2026-10-15) — the designated review test
+  // number never gets a real SMS (nobody at Google can receive one); its
+  // code is already the fixed REVIEW_TEST_OTP from `issueOtp`/
+  // `generateOtpCode`, known in advance from the Play Console listing.
+  const isReviewTestPhone =
+    Boolean(env.auth.reviewTestPhone) && normalisePhone(phone) === normalisePhone(env.auth.reviewTestPhone);
 
-  if (!result.accepted) {
-    // The code is already issued and valid, so the user can still retry the
-    // send. Surfacing the provider failure beats pretending it worked.
-    throw new ApiError('PROVIDER_ERROR', result.error ?? 'Could not send the code', 502);
+  if (!isReviewTestPhone) {
+    const sms = getSmsProvider();
+    const result = await sms.sendOtp({
+      phone,
+      code: issued.code,
+      ttlSeconds: env.auth.otpTtlSeconds,
+      locale,
+    });
+
+    if (!result.accepted) {
+      // The code is already issued and valid, so the user can still retry the
+      // send. Surfacing the provider failure beats pretending it worked.
+      throw new ApiError('PROVIDER_ERROR', result.error ?? 'Could not send the code', 502);
+    }
   }
 
   return ok({

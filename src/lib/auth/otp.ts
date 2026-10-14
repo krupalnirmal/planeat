@@ -50,9 +50,16 @@ function randomSixDigits(): string {
 
 /**
  * While SMS_PROVIDER=mock the code is the fixed development OTP, so a
- * developer or a demo never has to read a log line to log in.
+ * developer or a demo never has to read a log line to log in. The review
+ * test phone (`REVIEW_TEST_PHONE`) gets the same fixed-code treatment
+ * regardless of SMS_PROVIDER — Google's Play Store reviewer has no way to
+ * receive a real SMS, so this one designated, non-customer number always
+ * gets a known code instead.
  */
-export function generateOtpCode(): string {
+export function generateOtpCode(phone: string): string {
+  if (env.auth.reviewTestPhone && phone === normalisePhone(env.auth.reviewTestPhone)) {
+    return env.auth.reviewTestOtp;
+  }
   return isMockSms() ? env.sms.devFixedOtp : randomSixDigits();
 }
 
@@ -122,7 +129,7 @@ export async function issueOtp(
     }
   }
 
-  const code = generateOtpCode();
+  const code = generateOtpCode(phone);
   const expiresAt = new Date(now.getTime() + env.auth.otpTtlSeconds * 1000);
 
   // Any earlier live code for this number is spent: two valid codes at once
