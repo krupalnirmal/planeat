@@ -26,6 +26,7 @@ const STATIC_PATHS: Array<{
   { path: '/categories', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/terms', priority: 0.3, changeFrequency: 'yearly' },
+  { path: '/delete-account', priority: 0.3, changeFrequency: 'yearly' },
 ];
 
 function entriesFor(
