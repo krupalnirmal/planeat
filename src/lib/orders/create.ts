@@ -122,6 +122,20 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
         });
       }
 
+      // Vendor order-packing (session 2026-10-16) — the Vendor whose
+      // service area covers this address packs the order. Nullable: an
+      // area with no active vendor still places normally, just unclaimed
+      // (today's fully-admin-driven packing, unaffected). If an area ever
+      // has more than one active vendor, the oldest one always wins — no
+      // load-balancing in this phase.
+      const vendor = serviceability.area
+        ? await tx.vendor.findFirst({
+            where: { serviceAreaId: serviceability.area.id, isActive: true },
+            orderBy: { createdAt: 'asc' },
+            select: { id: true },
+          })
+        : null;
+
       // ── Cart, read inside the transaction so nothing shifts underneath us.
       const cart = await tx.cart.findUnique({
         where: { userId: input.userId },
@@ -235,6 +249,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
           id: orderId,
           orderNumber: newOrderNumber(now),
           userId: input.userId,
+          vendorId: vendor?.id ?? null,
           // A snapshot, not a reference: the customer editing this address next
           // month must not rewrite where last month's order went.
           addressSnapshot: {

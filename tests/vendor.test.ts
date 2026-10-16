@@ -20,7 +20,7 @@ const dbMock = vi.hoisted(() => ({
 
 vi.mock('@/lib/db', () => ({ db: dbMock }));
 
-import { confirmSupply, createVendor, rejectSupply } from '@/lib/admin/vendors';
+import { confirmSupply, createVendor, rejectSupply, updateVendor } from '@/lib/admin/vendors';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -62,6 +62,60 @@ describe('vendor CRUD', () => {
       }),
     );
     expect(dbMock.auditLog.create).toHaveBeenCalled();
+  });
+
+  it('passes a service area through to the vendor row, when given', async () => {
+    dbMock.user.findUnique.mockResolvedValue(null);
+    dbMock.user.create.mockResolvedValue({ id: 'usr_new' });
+    dbMock.vendor.create.mockResolvedValue({});
+
+    await createVendor(
+      { phone: '9999900098', name: 'Priya', businessName: 'Priya Farms', serviceAreaId: 'sva_1' },
+      'usr_admin',
+      null,
+    );
+
+    expect(dbMock.vendor.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ serviceAreaId: 'sva_1' }) }),
+    );
+  });
+});
+
+describe('updateVendor', () => {
+  it('is not found for a missing vendor', async () => {
+    dbMock.vendor.findUnique.mockResolvedValue(null);
+
+    const result = await updateVendor('vnd_missing', { serviceAreaId: 'sva_1' }, 'usr_admin', null);
+
+    expect(result).toEqual({ ok: false, reason: 'NOT_FOUND' });
+    expect(dbMock.vendor.update).not.toHaveBeenCalled();
+  });
+
+  it('changes the service area and audits it', async () => {
+    dbMock.vendor.findUnique.mockResolvedValue({ serviceAreaId: null });
+    dbMock.vendor.update.mockResolvedValue({});
+
+    const result = await updateVendor('vnd_1', { serviceAreaId: 'sva_2' }, 'usr_admin', null);
+
+    expect(result).toEqual({ ok: true });
+    expect(dbMock.vendor.update).toHaveBeenCalledWith({
+      where: { id: 'vnd_1' },
+      data: { serviceAreaId: 'sva_2' },
+    });
+    expect(dbMock.auditLog.create).toHaveBeenCalled();
+  });
+
+  it('can clear the service area back to null', async () => {
+    dbMock.vendor.findUnique.mockResolvedValue({ serviceAreaId: 'sva_2' });
+    dbMock.vendor.update.mockResolvedValue({});
+
+    const result = await updateVendor('vnd_1', { serviceAreaId: null }, 'usr_admin', null);
+
+    expect(result).toEqual({ ok: true });
+    expect(dbMock.vendor.update).toHaveBeenCalledWith({
+      where: { id: 'vnd_1' },
+      data: { serviceAreaId: null },
+    });
   });
 });
 

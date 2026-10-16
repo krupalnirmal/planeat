@@ -1095,6 +1095,8 @@
       "businessName": "Business name",
       "phone": "Phone",
       "contact": "Contact",
+      "area": "Packing area",
+      "noArea": "No area",
       "balanceOwed": "Balance owed",
       "pending": "Pending",
       "status": "Status",
@@ -1191,6 +1193,7 @@
       "grandTotal": "Total",
       "paymentMethod": "Payment method",
       "paymentStatus": "Payment status",
+      "packingVendor": "Packed by",
       "deliverTo": "Deliver to",
       "notes": "Notes",
       "riderTitle": "Rider",
@@ -1420,6 +1423,8 @@
     "installIosHint": "Share → Add to Home Screen",
     "installAndroidHint": "Chrome menu → Install app",
     "installDismiss": "Not now",
+    "ordersTab": "Orders",
+    "suppliesTab": "Supplies",
     "balanceOwed": "Balance owed to you",
     "reportDelivery": "Report a delivery",
     "product": "Product",
@@ -1436,6 +1441,17 @@
       "PENDING": "Pending",
       "CONFIRMED": "Confirmed",
       "REJECTED": "Rejected"
+    },
+    "orders": {
+      "noOrders": "No orders to pack right now",
+      "markAsPacked": "Mark as packed",
+      "awaitingPickup": "Packed — waiting for a rider to pick it up",
+      "pickedUpBy": "Picked up by {name}",
+      "status": {
+        "PLACED": "New",
+        "CONFIRMED": "Ready to pack",
+        "PACKED": "Packed"
+      }
     }
   },
   "notifications": {

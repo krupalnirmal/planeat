@@ -1095,6 +1095,8 @@
       "businessName": "व्यवसायाचं नाव",
       "phone": "फोन",
       "contact": "संपर्क",
+      "area": "पॅकिंग क्षेत्र",
+      "noArea": "क्षेत्र नाही",
       "balanceOwed": "देय रक्कम",
       "pending": "प्रलंबित",
       "status": "स्थिती",
@@ -1191,6 +1193,7 @@
       "grandTotal": "एकूण",
       "paymentMethod": "पेमेंट पद्धत",
       "paymentStatus": "पेमेंट स्थिती",
+      "packingVendor": "पॅक केले",
       "deliverTo": "पत्ता",
       "notes": "टीप",
       "riderTitle": "रायडर",
@@ -1420,6 +1423,8 @@
     "installIosHint": "Share → Add to Home Screen निवडा",
     "installAndroidHint": "Chrome चे ⋮ मेनू → Install app निवडा",
     "installDismiss": "आत्ता नको",
+    "ordersTab": "ऑर्डर्स",
+    "suppliesTab": "पुरवठा",
     "balanceOwed": "तुम्हाला देय रक्कम",
     "reportDelivery": "डिलिव्हरी नोंदवा",
     "product": "उत्पादन",
@@ -1436,6 +1441,17 @@
       "PENDING": "प्रलंबित",
       "CONFIRMED": "कन्फर्म झालं",
       "REJECTED": "नाकारलं"
+    },
+    "orders": {
+      "noOrders": "सध्या पॅक करायला कुठलाही ऑर्डर नाही",
+      "markAsPacked": "पॅक झालं",
+      "awaitingPickup": "पॅक झालं — रायडर येण्याची वाट बघतोय",
+      "pickedUpBy": "{name} ने घेतलं",
+      "status": {
+        "PLACED": "नवीन",
+        "CONFIRMED": "पॅक करायला तयार",
+        "PACKED": "पॅक झालं"
+      }
     }
   },
   "notifications": {

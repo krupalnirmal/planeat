@@ -82,6 +82,7 @@ interface OrderDetail {
     createdAt: string;
   }>;
   nextStatuses: OrderStatus[];
+  vendorName: string | null;
 }
 
 interface PartnerOption {
@@ -398,6 +399,12 @@ export function OrderDetailPanel({
                 {order.paymentMethod} · {order.paymentStatus}
               </dd>
             </div>
+            {order.vendorName && (
+              <div className="flex justify-between pt-1 text-xs text-muted-foreground">
+                <dt>{t('packingVendor')}</dt>
+                <dd className="font-medium text-foreground">{order.vendorName}</dd>
+              </div>
+            )}
           </dl>
         </section>
 

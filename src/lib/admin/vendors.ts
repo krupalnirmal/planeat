@@ -24,6 +24,8 @@ export interface VendorRow {
   phone: string;
   businessName: string;
   isActive: boolean;
+  serviceAreaId: string | null;
+  serviceAreaName: string | null;
   balancePaise: bigint;
   pendingSupplies: number;
 }
@@ -37,6 +39,8 @@ export async function listVendors(): Promise<VendorRow[]> {
         userId: true,
         businessName: true,
         isActive: true,
+        serviceAreaId: true,
+        serviceArea: { select: { name: true } },
         user: { select: { name: true, phone: true } },
       },
     }),
@@ -57,6 +61,8 @@ export async function listVendors(): Promise<VendorRow[]> {
       phone: vendor.user.phone,
       businessName: vendor.businessName,
       isActive: vendor.isActive,
+      serviceAreaId: vendor.serviceAreaId,
+      serviceAreaName: vendor.serviceArea?.name ?? null,
       balancePaise: await getVendorBalance(vendor.id),
       pendingSupplies: pendingByVendor.get(vendor.id) ?? 0,
     })),
@@ -69,6 +75,7 @@ export interface CreateVendorInput {
   phone: string;
   name: string;
   businessName: string;
+  serviceAreaId?: string | null;
 }
 
 export type CreateVendorResult = { ok: true; vendorId: string } | { ok: false; reason: 'PHONE_IN_USE' };
@@ -94,7 +101,12 @@ export async function createVendor(
     });
 
     await tx.vendor.create({
-      data: { id: vendorId, userId: user.id, businessName: input.businessName },
+      data: {
+        id: vendorId,
+        userId: user.id,
+        businessName: input.businessName,
+        serviceAreaId: input.serviceAreaId ?? null,
+      },
     });
   });
 
@@ -137,12 +149,47 @@ export async function setVendorActive(
   return { ok: true };
 }
 
+export interface UpdateVendorInput {
+  serviceAreaId?: string | null;
+}
+
+/** Changes the vendor's packing service area, mirroring
+    `updateDeliveryPartner` (src/lib/admin/delivery-partners.ts). */
+export async function updateVendor(
+  vendorId: string,
+  input: UpdateVendorInput,
+  actorId: string,
+  ip: string | null,
+): Promise<UpdateVendorResult> {
+  const before = await db.vendor.findUnique({
+    where: { id: vendorId },
+    select: { serviceAreaId: true },
+  });
+  if (!before) return { ok: false, reason: 'NOT_FOUND' };
+
+  await db.vendor.update({ where: { id: vendorId }, data: input });
+
+  await audit({
+    actorId,
+    action: 'vendor.update',
+    entityType: 'Vendor',
+    entityId: vendorId,
+    before,
+    after: input,
+    ip,
+  });
+
+  return { ok: true };
+}
+
 export interface VendorDetail {
   id: string;
   name: string;
   phone: string;
   businessName: string;
   isActive: boolean;
+  serviceAreaId: string | null;
+  serviceAreaName: string | null;
   balancePaise: bigint;
 }
 
@@ -153,6 +200,8 @@ export async function getVendorDetail(vendorId: string): Promise<VendorDetail | 
       id: true,
       businessName: true,
       isActive: true,
+      serviceAreaId: true,
+      serviceArea: { select: { name: true } },
       user: { select: { name: true, phone: true } },
     },
   });
@@ -164,6 +213,8 @@ export async function getVendorDetail(vendorId: string): Promise<VendorDetail | 
     phone: vendor.user.phone,
     businessName: vendor.businessName,
     isActive: vendor.isActive,
+    serviceAreaId: vendor.serviceAreaId,
+    serviceAreaName: vendor.serviceArea?.name ?? null,
     balancePaise: await getVendorBalance(vendor.id),
   };
 }

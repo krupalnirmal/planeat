@@ -23,7 +23,15 @@ interface VendorDetail {
   phone: string;
   businessName: string;
   isActive: boolean;
+  serviceAreaId: string | null;
+  serviceAreaName: string | null;
   balancePaise: string;
+}
+
+interface ServiceArea {
+  id: string;
+  name: string;
+  pincode: string;
 }
 
 interface SupplyRow {
@@ -48,6 +56,11 @@ export function VendorDetailScreen({ vendorId }: { vendorId: string }) {
     queryKey: ['admin-vendor', vendorId],
     queryFn: () =>
       api.get<{ vendor: VendorDetail; supplies: SupplyRow[] }>(`/api/admin/vendors/${vendorId}`),
+  });
+
+  const areas = useQuery({
+    queryKey: ['admin-service-areas'],
+    queryFn: () => api.get<{ areas: ServiceArea[] }>('/api/admin/service-areas'),
   });
 
   const review = useMutation({
@@ -100,6 +113,14 @@ export function VendorDetailScreen({ vendorId }: { vendorId: string }) {
           <p className="text-2xl font-bold tabular-nums">{formatPaise(paise(vendor.balancePaise))}</p>
         </div>
         <VendorLedgerControl vendorId={vendorId} />
+      </section>
+
+      <section className="mb-4 rounded-[var(--radius-2xl)] border border-border bg-card p-4">
+        <VendorAreaControl
+          vendorId={vendorId}
+          serviceAreaId={vendor.serviceAreaId}
+          areas={areas.data?.areas ?? []}
+        />
       </section>
 
       {pending.length > 0 && (
@@ -233,6 +254,47 @@ function SupplyReviewRow({
         </div>
       )}
     </li>
+  );
+}
+
+/** The packing area this vendor covers — orders in it auto-route here
+    (`placeOrder()`, session 2026-10-16). Auto-saves on change, same
+    immediate-effect pattern as the delivery-partner availability checkbox. */
+function VendorAreaControl({
+  vendorId,
+  serviceAreaId,
+  areas,
+}: {
+  vendorId: string;
+  serviceAreaId: string | null;
+  areas: ServiceArea[];
+}) {
+  const t = useTranslations('admin.vendors');
+  const queryClient = useQueryClient();
+
+  const update = useMutation({
+    mutationFn: (nextAreaId: string) =>
+      api.patch(`/api/admin/vendors/${vendorId}`, { serviceAreaId: nextAreaId || null }),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['admin-vendor', vendorId] }),
+  });
+
+  return (
+    <label className="flex items-center justify-between gap-3">
+      <span className="text-sm font-medium">{t('area')}</span>
+      <select
+        defaultValue={serviceAreaId ?? ''}
+        disabled={update.isPending}
+        onChange={(event) => update.mutate(event.target.value)}
+        className="h-9 rounded border border-border bg-background px-2 text-sm outline-none disabled:opacity-50"
+      >
+        <option value="">{t('noArea')}</option>
+        {areas.map((area) => (
+          <option key={area.id} value={area.id}>
+            {area.name} ({area.pincode})
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 

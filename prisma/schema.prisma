@@ -396,6 +396,7 @@ model ServiceArea {
   updatedAt                  DateTime @updatedAt
 
   deliveryPartners DeliveryPartner[]
+  vendors          Vendor[]
 
   @@index([isActive])
   @@map("service_areas")
@@ -562,6 +563,10 @@ model Order {
   addressSnapshot  Json
   type             OrderType     @default(INSTANT)
   status           OrderStatus   @default(PLACED)
+  /// The Vendor whose service area covers this order's delivery address,
+  /// resolved once at placement time (`placeOrder()`). Null when no active
+  /// vendor covers that area — the order still places normally.
+  vendorId         String?
   subtotalPaise    BigInt        @default(0)
   deliveryFeePaise BigInt        @default(0)
   handlingFeePaise BigInt        @default(0)
@@ -581,6 +586,7 @@ model Order {
 
   user          User                 @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   subscription  Subscription?        @relation(fields: [subscriptionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  vendor        Vendor?              @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   items         OrderItem[]
   statusHistory OrderStatusHistory[]
   assignment    DeliveryAssignment?
@@ -594,6 +600,7 @@ model Order {
   @@index([status])
   @@index([type, scheduledDate])
   @@index([placedAt])
+  @@index([vendorId])
   @@map("orders")
 }
 
@@ -1065,21 +1072,32 @@ model DeliveryAssignment {
 // for stock OUT. A Vendor reports a supply; an admin confirms it
 // before it touches stock or the ledger ("suggest, never auto-assign"
 // reasoning, same as rider assignment — a human always confirms).
+//
+// A Vendor also optionally covers a ServiceArea (session 2026-10-16) —
+// every order whose delivery address falls in that area is auto-routed
+// to this vendor to pack (`Order.vendorId`, set at placement time in
+// `placeOrder()`). Unlike supply confirmation, packing needs no admin
+// approval — it's an operational checkpoint like a rider's pickup scan,
+// not a money/stock event.
 // ─────────────────────────────────────────────────────────────
 
 model Vendor {
-  id           String   @id
-  userId       String   @unique
-  businessName String   @db.VarChar(160)
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String   @id
+  userId        String   @unique
+  businessName  String   @db.VarChar(160)
+  isActive      Boolean  @default(true)
+  serviceAreaId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  user     User                @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  supplies VendorSupply[]
-  ledger   VendorLedgerEntry[]
+  user        User                @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  serviceArea ServiceArea?        @relation(fields: [serviceAreaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  supplies    VendorSupply[]
+  ledger      VendorLedgerEntry[]
+  orders      Order[]
 
   @@index([userId])
+  @@index([serviceAreaId])
   @@map("vendors")
 }
 

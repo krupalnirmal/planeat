@@ -24,8 +24,16 @@ interface VendorRow {
   phone: string;
   businessName: string;
   isActive: boolean;
+  serviceAreaId: string | null;
+  serviceAreaName: string | null;
   balancePaise: string;
   pendingSupplies: number;
+}
+
+interface ServiceArea {
+  id: string;
+  name: string;
+  pincode: string;
 }
 
 export function AdminVendorsScreen() {
@@ -39,6 +47,11 @@ export function AdminVendorsScreen() {
   const vendors = useQuery({
     queryKey: ['admin-vendors'],
     queryFn: () => api.get<{ vendors: VendorRow[] }>('/api/admin/vendors'),
+  });
+
+  const areas = useQuery({
+    queryKey: ['admin-service-areas'],
+    queryFn: () => api.get<{ areas: ServiceArea[] }>('/api/admin/service-areas'),
   });
 
   const rows = vendors.data?.vendors ?? [];
@@ -66,6 +79,7 @@ export function AdminVendorsScreen() {
 
       {showForm && (
         <AddVendorForm
+          areas={areas.data?.areas ?? []}
           onDone={(message) => {
             setNotice(message);
             setShowForm(false);
@@ -88,6 +102,7 @@ export function AdminVendorsScreen() {
                 <tr>
                   <th className="px-3 py-2 font-medium">{t('businessName')}</th>
                   <th className="px-3 py-2 font-medium">{t('contact')}</th>
+                  <th className="px-3 py-2 font-medium">{t('area')}</th>
                   <th className="px-3 py-2 text-right font-medium">{t('balanceOwed')}</th>
                   <th className="px-3 py-2 text-right font-medium">{t('pending')}</th>
                   <th className="px-3 py-2 text-center font-medium">{t('status')}</th>
@@ -105,6 +120,9 @@ export function AdminVendorsScreen() {
                       {vendor.name}
                       <br />
                       <span className="font-mono">{vendor.phone}</span>
+                    </td>
+                    <td className="px-3 py-2 text-xs text-muted-foreground">
+                      {vendor.serviceAreaName ?? '—'}
                     </td>
                     <td className="px-3 py-2 text-right text-sm font-bold tabular-nums">
                       {formatPaise(paise(vendor.balancePaise))}
@@ -136,6 +154,9 @@ export function AdminVendorsScreen() {
                   <p className="truncate text-sm font-medium">{vendor.businessName}</p>
                   <p className="text-xs text-muted-foreground">{vendor.name}</p>
                   <p className="font-mono text-xs text-muted-foreground">{vendor.phone}</p>
+                  <p className="mt-0.5 text-[12px] text-muted-foreground">
+                    {vendor.serviceAreaName ?? '—'}
+                  </p>
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1">
                   <p className="text-sm font-bold tabular-nums">{formatPaise(paise(vendor.balancePaise))}</p>
@@ -154,17 +175,30 @@ export function AdminVendorsScreen() {
   );
 }
 
-function AddVendorForm({ onDone }: { onDone: (message: string) => void }) {
+function AddVendorForm({
+  areas,
+  onDone,
+}: {
+  areas: ServiceArea[];
+  onDone: (message: string) => void;
+}) {
   const t = useTranslations('admin.vendors');
   const tc = useTranslations('admin.common');
 
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
   const [businessName, setBusinessName] = useState('');
+  const [serviceAreaId, setServiceAreaId] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const create = useMutation({
-    mutationFn: () => api.post('/api/admin/vendors', { phone, name, businessName }),
+    mutationFn: () =>
+      api.post('/api/admin/vendors', {
+        phone,
+        name,
+        businessName,
+        serviceAreaId: serviceAreaId || null,
+      }),
     onSuccess: () => onDone(t('added')),
     onError: (err) => {
       setError(
@@ -209,6 +243,21 @@ function AddVendorForm({ onDone }: { onDone: (message: string) => void }) {
           onChange={(event) => setPhone(event.target.value)}
           className="h-9 w-32 rounded border border-border bg-background px-2 text-sm outline-none"
         />
+      </label>
+      <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+        {t('area')}
+        <select
+          value={serviceAreaId}
+          onChange={(event) => setServiceAreaId(event.target.value)}
+          className="h-9 rounded border border-border bg-background px-2 text-sm outline-none"
+        >
+          <option value="">{t('noArea')}</option>
+          {areas.map((area) => (
+            <option key={area.id} value={area.id}>
+              {area.name} ({area.pincode})
+            </option>
+          ))}
+        </select>
       </label>
       <button
         type="submit"

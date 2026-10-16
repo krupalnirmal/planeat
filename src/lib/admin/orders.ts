@@ -361,6 +361,10 @@ export interface AdminOrderDetailView {
   /** Drives which status-change buttons the detail page can show — the
       frontend never re-derives the transition graph in `status.ts`. */
   nextStatuses: OrderStatus[];
+  /** The Vendor whose service area covers this order, auto-resolved at
+      placement (session 2026-10-16) — `null` when no active vendor covers
+      that area. Read-only here; admin's cross-vendor oversight. */
+  vendorName: string | null;
 }
 
 export async function getAdminOrderDetail(orderId: string): Promise<AdminOrderDetailView | null> {
@@ -384,6 +388,7 @@ export async function getAdminOrderDetail(orderId: string): Promise<AdminOrderDe
       cancelledAt: true,
       userId: true,
       user: { select: { name: true, phone: true } },
+      vendor: { select: { businessName: true } },
       items: {
         select: {
           id: true,
@@ -473,6 +478,7 @@ export async function getAdminOrderDetail(orderId: string): Promise<AdminOrderDe
       createdAt: h.createdAt,
     })),
     nextStatuses: [...legalNextStatuses(order.status)],
+    vendorName: order.vendor?.businessName ?? null,
   };
 }
 

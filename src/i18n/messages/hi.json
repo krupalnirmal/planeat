@@ -1095,6 +1095,8 @@
       "businessName": "व्यवसाय का नाम",
       "phone": "फ़ोन",
       "contact": "संपर्क",
+      "area": "पैकिंग क्षेत्र",
+      "noArea": "कोई क्षेत्र नहीं",
       "balanceOwed": "देय राशि",
       "pending": "लंबित",
       "status": "स्थिति",
@@ -1191,6 +1193,7 @@
       "grandTotal": "कुल",
       "paymentMethod": "भुगतान का तरीका",
       "paymentStatus": "भुगतान स्थिति",
+      "packingVendor": "पैक किया",
       "deliverTo": "पता",
       "notes": "नोट",
       "riderTitle": "राइडर",
@@ -1420,6 +1423,8 @@
     "installIosHint": "Share → Add to Home Screen चुनें",
     "installAndroidHint": "Chrome के ⋮ मेनू → Install app चुनें",
     "installDismiss": "अभी नहीं",
+    "ordersTab": "ऑर्डर",
+    "suppliesTab": "सप्लाई",
     "balanceOwed": "आपको देय राशि",
     "reportDelivery": "डिलीवरी दर्ज करें",
     "product": "उत्पाद",
@@ -1436,6 +1441,17 @@
       "PENDING": "लंबित",
       "CONFIRMED": "कन्फर्म हुआ",
       "REJECTED": "अस्वीकृत"
+    },
+    "orders": {
+      "noOrders": "अभी पैक करने के लिए कोई ऑर्डर नहीं है",
+      "markAsPacked": "पैक हो गया",
+      "awaitingPickup": "पैक हो गया — राइडर के आने का इंतज़ार है",
+      "pickedUpBy": "{name} ने उठाया",
+      "status": {
+        "PLACED": "नया",
+        "CONFIRMED": "पैक करने के लिए तैयार",
+        "PACKED": "पैक हो गया"
+      }
     }
   },
   "notifications": {

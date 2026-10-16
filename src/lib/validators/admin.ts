@@ -223,10 +223,12 @@ export const createVendorSchema = z.object({
   phone: phoneSchema,
   name: z.string().trim().min(2).max(120),
   businessName: z.string().trim().min(2).max(160),
+  serviceAreaId: cuidSchema.nullable().optional(),
 });
 
 export const updateVendorSchema = z.object({
   isActive: z.boolean().optional(),
+  serviceAreaId: cuidSchema.nullable().optional(),
 });
 
 export const confirmSupplySchema = z.object({

@@ -5,6 +5,7 @@ import { Package, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { SupplyForm } from '@/components/vendor/supply-form';
+import { VendorOrdersPanel } from '@/components/vendor/orders-panel';
 import { api } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -29,6 +30,7 @@ export function VendorDashboard() {
   const tc = useTranslations('common');
   const queryClient = useQueryClient();
 
+  const [tab, setTab] = useState<'orders' | 'supplies'>('orders');
   const [showForm, setShowForm] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -47,55 +49,78 @@ export function VendorDashboard() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-[var(--radius)] bg-card p-4">
-        <p className="text-xs text-muted-foreground">{t('balanceOwed')}</p>
-        <p className="text-2xl font-black tabular-nums">
-          {me.data ? formatPaise(paise(me.data.balancePaise)) : '—'}
-        </p>
+      <div className="grid grid-cols-2 gap-2">
+        {(['orders', 'supplies'] as const).map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setTab(value)}
+            aria-pressed={tab === value}
+            className={cn(
+              'h-10 rounded-[var(--radius)] border text-sm font-bold',
+              tab === value ? 'border-primary bg-tint-green text-primary-dark' : 'border-border text-muted-foreground',
+            )}
+          >
+            {t(value === 'orders' ? 'ordersTab' : 'suppliesTab')}
+          </button>
+        ))}
       </div>
 
-      {notice && (
-        <p className="rounded-[var(--radius)] bg-primary/5 px-3 py-2.5 text-sm">{notice}</p>
-      )}
-
-      {showForm ? (
-        <SupplyForm
-          onDone={(message) => {
-            setNotice(message);
-            setShowForm(false);
-            void queryClient.invalidateQueries({ queryKey: ['vendor-me'] });
-          }}
-        />
+      {tab === 'orders' ? (
+        <VendorOrdersPanel />
       ) : (
-        <button
-          type="button"
-          onClick={() => {
-            setShowForm(true);
-            setNotice(null);
-          }}
-          className="flex h-11 w-full items-center justify-center gap-1.5 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
-        >
-          <Plus className="size-4" aria-hidden />
-          {t('reportDelivery')}
-        </button>
-      )}
+        <>
+          <div className="rounded-[var(--radius)] bg-card p-4">
+            <p className="text-xs text-muted-foreground">{t('balanceOwed')}</p>
+            <p className="text-2xl font-black tabular-nums">
+              {me.data ? formatPaise(paise(me.data.balancePaise)) : '—'}
+            </p>
+          </div>
 
-      <section>
-        <h2 className="mb-2 text-sm font-bold">{t('supplyHistory')}</h2>
-        {supplies.isLoading ? (
-          <p className="text-sm text-muted-foreground">{tc('loading')}</p>
-        ) : rows.length === 0 ? (
-          <p className="rounded-[var(--radius)] border border-dashed border-border bg-card px-4 py-10 text-center text-sm text-muted-foreground">
-            {t('noSuppliesYet')}
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {rows.map((row) => (
-              <SupplyRowItem key={row.id} row={row} />
-            ))}
-          </ul>
-        )}
-      </section>
+          {notice && (
+            <p className="rounded-[var(--radius)] bg-primary/5 px-3 py-2.5 text-sm">{notice}</p>
+          )}
+
+          {showForm ? (
+            <SupplyForm
+              onDone={(message) => {
+                setNotice(message);
+                setShowForm(false);
+                void queryClient.invalidateQueries({ queryKey: ['vendor-me'] });
+              }}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setShowForm(true);
+                setNotice(null);
+              }}
+              className="flex h-11 w-full items-center justify-center gap-1.5 rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+            >
+              <Plus className="size-4" aria-hidden />
+              {t('reportDelivery')}
+            </button>
+          )}
+
+          <section>
+            <h2 className="mb-2 text-sm font-bold">{t('supplyHistory')}</h2>
+            {supplies.isLoading ? (
+              <p className="text-sm text-muted-foreground">{tc('loading')}</p>
+            ) : rows.length === 0 ? (
+              <p className="rounded-[var(--radius)] border border-dashed border-border bg-card px-4 py-10 text-center text-sm text-muted-foreground">
+                {t('noSuppliesYet')}
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {rows.map((row) => (
+                  <SupplyRowItem key={row.id} row={row} />
+                ))}
+              </ul>
+            )}
+          </section>
+        </>
+      )}
     </div>
   );
 }
