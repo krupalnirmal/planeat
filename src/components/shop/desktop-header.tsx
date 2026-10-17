@@ -99,19 +99,28 @@ export function DesktopHeader({ categories }: { categories: { slug: string; name
             <img src="/brand/logo.png" alt="getFrresh" className="h-16 w-auto" />
           </Link>
 
-          <nav aria-label={t('categories')} className="flex shrink-0 items-center gap-5">
+          {/* `min-w-0 shrink` + its own horizontal scroll (not `shrink-0`,
+              found session 2026-10-17) — at 1024-1280px the category list's
+              unshrinkable natural width alone pushed the wallet/cart/account
+              cluster off the right edge of the viewport; this lets it give
+              up space first, scrolling internally instead of forcing the
+              row wider than the page. */}
+          <nav
+            aria-label={t('categories')}
+            className="flex min-w-0 shrink items-center gap-5 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
             {categories.map((category) => (
               <Link
                 key={category.slug}
                 href={`/category/${category.slug}`}
-                className="text-sm font-semibold text-foreground hover:text-primary"
+                className="shrink-0 text-sm font-semibold text-foreground hover:text-primary"
               >
                 {category.name}
               </Link>
             ))}
           </nav>
 
-          <SearchBar showMic className="max-w-xl flex-1" />
+          <SearchBar showMic className="min-w-0 max-w-xl flex-1" />
 
           {/* Location selector (session 2026-09-22) — same real address
               source as the mobile header's own "Deliver to" row. */}
