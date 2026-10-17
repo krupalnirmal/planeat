@@ -1446,6 +1446,7 @@
       "noOrders": "सध्या पॅक करायला कुठलाही ऑर्डर नाही",
       "markAsPacked": "पॅक झालं",
       "awaitingPickup": "पॅक झालं — रायडर येण्याची वाट बघतोय",
+      "assignedTo": "{name} कडे सोपवलं — अजून घेतलेलं नाही",
       "pickedUpBy": "{name} ने घेतलं",
       "status": {
         "PLACED": "नवीन",

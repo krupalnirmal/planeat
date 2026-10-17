@@ -121,7 +121,9 @@ function OrderRow({
       {order.status === 'PACKED' && (
         <p className="mt-2 text-xs text-muted-foreground">
           {order.assignment
-            ? t('pickedUpBy', { name: order.assignment.partnerName })
+            ? order.assignment.status === 'ASSIGNED'
+              ? t('assignedTo', { name: order.assignment.partnerName })
+              : t('pickedUpBy', { name: order.assignment.partnerName })
             : t('awaitingPickup')}
         </p>
       )}

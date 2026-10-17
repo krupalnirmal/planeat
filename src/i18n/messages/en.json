@@ -1446,6 +1446,7 @@
       "noOrders": "No orders to pack right now",
       "markAsPacked": "Mark as packed",
       "awaitingPickup": "Packed — waiting for a rider to pick it up",
+      "assignedTo": "Assigned to {name} — not picked up yet",
       "pickedUpBy": "Picked up by {name}",
       "status": {
         "PLACED": "New",
