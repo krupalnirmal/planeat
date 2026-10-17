@@ -63,11 +63,16 @@ export const env = {
     refreshTokenTtl: str('REFRESH_TOKEN_TTL', '30d'),
     otpTtlSeconds: num('OTP_TTL_SECONDS', 300),
     otpMaxAttempts: num('OTP_MAX_ATTEMPTS', 5),
-    /** Play Store review (session 2026-10-15) — the one phone number that
-        gets a fixed OTP instead of a real SMS, so Google's reviewer can log
-        in without a real MSG91-delivered code. Empty = feature off (the
-        default everywhere except the production env this was set for). */
-    reviewTestPhone: str('REVIEW_TEST_PHONE', ''),
+    /** Play Store review (session 2026-10-15), generalized to a short list
+        (session 2026-10-17) — these designated, non-customer phone numbers
+        get a fixed OTP instead of a real SMS, so Google's reviewer (and the
+        owner, testing vendor/delivery-partner/admin logins with made-up
+        numbers) can log in without a real MSG91-delivered code. Deliberately
+        a finite list, not a pattern/wildcard — a blanket bypass would let
+        anyone log into a REAL customer's number by guessing the fixed code.
+        Empty = feature off (the default everywhere except the production
+        env this was set for). */
+    reviewTestPhones: csv('REVIEW_TEST_PHONES', []),
     reviewTestOtp: str('REVIEW_TEST_OTP', ''),
   },
 

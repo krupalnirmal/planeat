@@ -45,13 +45,18 @@ import { cn } from '@/lib/utils';
  */
 const WIDGET_MODE = isWidgetConfigured();
 
-/** Play Store review (session 2026-10-15) — this one number always uses the
+/** Play Store review (session 2026-10-15), generalized to a short list
+    (session 2026-10-17) — these designated numbers always use the
     code-based flow below instead of the MSG91 widget, even when
-    `WIDGET_MODE` is on, since Google's reviewer has no way to receive a
-    real widget-issued OTP. `src/lib/auth/otp.ts`'s `generateOtpCode` gives
-    it a fixed, known code instead. Public (not a secret) — the actual
-    boundary is the server-only `REVIEW_TEST_OTP`. */
-const REVIEW_TEST_PHONE = process.env.NEXT_PUBLIC_REVIEW_TEST_PHONE;
+    `WIDGET_MODE` is on, since Google's reviewer (and the owner, testing a
+    made-up staff number) has no way to receive a real widget-issued OTP.
+    `src/lib/auth/otp.ts`'s `generateOtpCode` gives them a fixed, known code
+    instead. Public (not a secret) — the actual boundary is the
+    server-only `REVIEW_TEST_OTP`. */
+const REVIEW_TEST_PHONES = (process.env.NEXT_PUBLIC_REVIEW_TEST_PHONES ?? '')
+  .split(',')
+  .map((p) => p.trim())
+  .filter(Boolean);
 
 /**
  * M1 — phone → OTP → (new user) profile.
@@ -118,9 +123,9 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [elapsed, setElapsed] = useState(0);
 
-  // Flips to the code-based flow for the one designated review phone, even
-  // while WIDGET_MODE is globally on — see REVIEW_TEST_PHONE's own comment.
-  const useWidget = WIDGET_MODE && phone !== REVIEW_TEST_PHONE;
+  // Flips to the code-based flow for a designated review/test phone, even
+  // while WIDGET_MODE is globally on — see REVIEW_TEST_PHONES's own comment.
+  const useWidget = WIDGET_MODE && !REVIEW_TEST_PHONES.includes(phone);
   // The MSG91 widget's OTP length is set in its own dashboard (currently 4
   // digits, "Widget Settings" → OTP Length) — independent of the local
   // code-based flow's own 6-digit codes (src/lib/auth/otp.ts's

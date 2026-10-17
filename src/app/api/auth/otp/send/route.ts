@@ -33,12 +33,12 @@ export const POST = route(async (request: Request) => {
     );
   }
 
-  // Play Store review (session 2026-10-15) — the designated review test
-  // number never gets a real SMS (nobody at Google can receive one); its
-  // code is already the fixed REVIEW_TEST_OTP from `issueOtp`/
-  // `generateOtpCode`, known in advance from the Play Console listing.
-  const isReviewTestPhone =
-    Boolean(env.auth.reviewTestPhone) && normalisePhone(phone) === normalisePhone(env.auth.reviewTestPhone);
+  // Play Store review (session 2026-10-15), generalized to a short list
+  // (session 2026-10-17) — designated test numbers never get a real SMS
+  // (nobody at Google, or the owner testing a made-up number, can receive
+  // one); the code is already the fixed REVIEW_TEST_OTP from `issueOtp`/
+  // `generateOtpCode`.
+  const isReviewTestPhone = env.auth.reviewTestPhones.includes(normalisePhone(phone));
 
   if (!isReviewTestPhone) {
     const sms = getSmsProvider();

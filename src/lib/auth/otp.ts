@@ -51,13 +51,13 @@ function randomSixDigits(): string {
 /**
  * While SMS_PROVIDER=mock the code is the fixed development OTP, so a
  * developer or a demo never has to read a log line to log in. The review
- * test phone (`REVIEW_TEST_PHONE`) gets the same fixed-code treatment
- * regardless of SMS_PROVIDER — Google's Play Store reviewer has no way to
- * receive a real SMS, so this one designated, non-customer number always
- * gets a known code instead.
+ * test phones (`REVIEW_TEST_PHONES`) get the same fixed-code treatment
+ * regardless of SMS_PROVIDER — Google's Play Store reviewer (and the owner,
+ * testing staff logins) has no way to receive a real SMS, so these
+ * designated, non-customer numbers always get a known code instead.
  */
 export function generateOtpCode(phone: string): string {
-  if (env.auth.reviewTestPhone && phone === normalisePhone(env.auth.reviewTestPhone)) {
+  if (env.auth.reviewTestPhones.includes(normalisePhone(phone))) {
     return env.auth.reviewTestOtp;
   }
   return isMockSms() ? env.sms.devFixedOtp : randomSixDigits();
