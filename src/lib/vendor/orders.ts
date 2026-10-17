@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import type { OrderStatus, DeliveryAssignmentStatus } from '@/generated/prisma/enums';
+import type { OrderStatus, OrderType, DeliveryAssignmentStatus } from '@/generated/prisma/enums';
 
 /**
  * Vendor order-packing reads (session 2026-10-16) — the second half of the
@@ -27,6 +27,10 @@ export interface VendorOrderRow {
   id: string;
   orderNumber: string;
   status: OrderStatus;
+  /** Lets the vendor tell a meal-plan subscriber's order apart from a
+      one-off purchase — packed exactly the same way, but worth knowing
+      (session 2026-10-17). */
+  type: OrderType;
   placedAt: Date;
   items: VendorOrderItemView[];
   /** Who picked this up, once admin assigns a rider — the "which delivery
@@ -38,6 +42,7 @@ const ORDER_SELECT = {
   id: true,
   orderNumber: true,
   status: true,
+  type: true,
   placedAt: true,
   items: { select: { nameSnapshot: true, quantity: true } },
   assignment: {
@@ -52,6 +57,7 @@ function toRow(order: {
   id: string;
   orderNumber: string;
   status: OrderStatus;
+  type: OrderType;
   placedAt: Date;
   items: Array<{ nameSnapshot: string; quantity: number }>;
   assignment: { status: DeliveryAssignmentStatus; partner: { user: { name: string | null } } } | null;
@@ -60,6 +66,7 @@ function toRow(order: {
     id: order.id,
     orderNumber: order.orderNumber,
     status: order.status,
+    type: order.type,
     placedAt: order.placedAt,
     items: order.items.map((item) => ({ name: item.nameSnapshot, quantity: item.quantity })),
     assignment: order.assignment

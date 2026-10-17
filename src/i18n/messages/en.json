@@ -1444,6 +1444,7 @@
     },
     "orders": {
       "noOrders": "No orders to pack right now",
+      "mealPlanBadge": "Meal Plan",
       "markAsPacked": "Mark as packed",
       "awaitingPickup": "Packed — waiting for a rider to pick it up",
       "assignedTo": "Assigned to {name} — not picked up yet",

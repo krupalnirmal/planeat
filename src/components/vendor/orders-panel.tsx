@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
  */
 
 type OrderStatus = 'PLACED' | 'CONFIRMED' | 'PACKED';
+type OrderType = 'INSTANT' | 'MEAL_PLAN_DAILY' | 'MEAL_PLAN_WEEKLY';
 
 interface VendorOrderItem {
   name: string;
@@ -32,6 +33,7 @@ interface VendorOrderRow {
   id: string;
   orderNumber: string;
   status: OrderStatus;
+  type: OrderType;
   placedAt: string;
   items: VendorOrderItem[];
   assignment: VendorOrderAssignment | null;
@@ -98,6 +100,11 @@ function OrderRow({
         <span className="flex items-center gap-1.5">
           <span className="font-mono text-sm font-semibold">{order.orderNumber}</span>
           <StatusPill status={order.status} />
+          {order.type !== 'INSTANT' && (
+            <span className="shrink-0 rounded-full bg-secondary px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
+              {t('mealPlanBadge')}
+            </span>
+          )}
         </span>
       </div>
       <ul className="mt-1.5 space-y-0.5 text-xs text-muted-foreground">

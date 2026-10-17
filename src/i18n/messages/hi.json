@@ -1444,6 +1444,7 @@
     },
     "orders": {
       "noOrders": "अभी पैक करने के लिए कोई ऑर्डर नहीं है",
+      "mealPlanBadge": "मील प्लान",
       "markAsPacked": "पैक हो गया",
       "awaitingPickup": "पैक हो गया — राइडर के आने का इंतज़ार है",
       "assignedTo": "{name} को सौंपा — अभी उठाया नहीं",

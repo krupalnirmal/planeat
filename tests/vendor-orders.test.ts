@@ -23,6 +23,7 @@ const baseOrder = {
   id: 'ord_1',
   orderNumber: 'AC-1',
   status: 'CONFIRMED' as const,
+  type: 'INSTANT' as const,
   placedAt: new Date('2026-10-16T10:00:00Z'),
   items: [{ nameSnapshot: 'Onion', quantity: 2 }],
   assignment: null,
@@ -51,11 +52,20 @@ describe('listVendorOrders', () => {
         id: 'ord_1',
         orderNumber: 'AC-1',
         status: 'CONFIRMED',
+        type: 'INSTANT',
         placedAt: baseOrder.placedAt,
         items: [{ name: 'Onion', quantity: 2 }],
         assignment: null,
       },
     ]);
+  });
+
+  it('passes the meal-plan order type through, for the vendor-side badge', async () => {
+    dbMock.order.findMany.mockResolvedValue([{ ...baseOrder, type: 'MEAL_PLAN_DAILY' }]);
+
+    const [row] = await listVendorOrders('vnd_1');
+
+    expect(row.type).toBe('MEAL_PLAN_DAILY');
   });
 
   it('surfaces the delivery partner once an assignment exists', async () => {
