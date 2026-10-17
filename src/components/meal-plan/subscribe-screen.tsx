@@ -130,6 +130,13 @@ export function SubscribeScreen() {
   );
   const [addressId, setAddressId] = useState<string | null>(defaultAddress?.id ?? null);
   const [addressExpanded, setAddressExpanded] = useState(false);
+  // Session 2026-10-17, client request — the customer's own chosen daily
+  // delivery time. "06:30" matches the slot's own old hardcoded default, so
+  // a customer who never touches this picker gets exactly what they always
+  // got. Floored at "06:00" (the `<input>`'s own `min`, re-enforced
+  // server-side by `preferredDeliveryTimeSchema`) — riders don't start
+  // morning rounds any earlier.
+  const [preferredDeliveryTime, setPreferredDeliveryTime] = useState('06:30');
   const [error, setError] = useState<string | null>(null);
 
   const [topupAmountPaise, setTopupAmountPaise] = useState<string>('0');
@@ -180,6 +187,7 @@ export function SubscribeScreen() {
         durationDays,
         startDate: startDateKey,
         deliveryMode,
+        preferredDeliveryTime,
       }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['meal-plan-current'] });
@@ -342,6 +350,8 @@ export function SubscribeScreen() {
             addresses={user?.addresses ?? []}
             addressExpanded={addressExpanded}
             resolvedAddressId={resolvedAddressId}
+            preferredDeliveryTime={preferredDeliveryTime}
+            onChangeDeliveryTime={setPreferredDeliveryTime}
             onExpandAddress={() => setAddressExpanded((v) => !v)}
             onPickAddress={(id) => {
               setAddressId(id);
@@ -565,6 +575,8 @@ function SummaryStep({
   addresses,
   addressExpanded,
   resolvedAddressId,
+  preferredDeliveryTime,
+  onChangeDeliveryTime,
   onExpandAddress,
   onPickAddress,
   onNeedsTopup,
@@ -579,6 +591,8 @@ function SummaryStep({
   addresses: Array<{ id: string; label: string; line1: string; line2: string | null; landmark: string | null; city: string; pincode: string }>;
   addressExpanded: boolean;
   resolvedAddressId: string | null;
+  preferredDeliveryTime: string;
+  onChangeDeliveryTime: (value: string) => void;
   onExpandAddress: () => void;
   onPickAddress: (id: string) => void;
   onNeedsTopup: () => void;
@@ -710,6 +724,18 @@ function SummaryStep({
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="bg-card px-4 py-4">
+        <h2 className="text-sm font-bold">{t('deliveryTimeTitle')}</h2>
+        <p className="mt-0.5 text-xs text-muted-foreground">{t('deliveryTimeHint')}</p>
+        <input
+          type="time"
+          min="06:00"
+          value={preferredDeliveryTime}
+          onChange={(event) => onChangeDeliveryTime(event.target.value)}
+          className="input-3d mt-3 h-12 w-full rounded-[var(--radius)] border border-border/60 bg-background px-3 text-sm outline-none focus:border-primary"
+        />
       </section>
 
       <div

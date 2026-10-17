@@ -23,6 +23,7 @@ export const PATCH = route(async (request: Request, context: Context) => {
   const result = await updateSubscription(id, session.userId, {
     addressId: input.addressId,
     deliverySlot: input.deliverySlot,
+    preferredDeliveryTime: input.preferredDeliveryTime,
   });
 
   if (result.ok) return ok({ updated: true });

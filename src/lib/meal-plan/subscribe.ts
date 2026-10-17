@@ -80,6 +80,11 @@ export async function getSubscriptionQuote(
   };
 }
 
+/** The slot's own old hardcoded window — kept as the default so a customer
+    who never touches the new time picker gets exactly the behaviour they
+    always got. */
+const DEFAULT_PREFERRED_DELIVERY_TIME = '06:30';
+
 export interface ActivateInput {
   addressId: string;
   durationDays: number;
@@ -87,6 +92,8 @@ export interface ActivateInput {
   /** DAILY (default): one delivery every day. WEEKLY: all 7 days' picks
       combined into one delivery, recurring every 7 days. */
   deliveryMode?: 'DAILY' | 'WEEKLY';
+  /** "HH:mm" — defaults to `DEFAULT_PREFERRED_DELIVERY_TIME` when omitted. */
+  preferredDeliveryTime?: string;
 }
 
 export type ActivateResult =
@@ -166,6 +173,7 @@ export async function activateSubscription(userId: string, input: ActivateInput)
             mealPlanId: plan.id,
             addressId: input.addressId,
             deliverySlot: 'SUBSCRIPTION_0630_0900',
+            preferredDeliveryTime: input.preferredDeliveryTime ?? DEFAULT_PREFERRED_DELIVERY_TIME,
             deliveryMode: input.deliveryMode ?? 'DAILY',
             startDate,
             endDate,

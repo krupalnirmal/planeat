@@ -576,6 +576,11 @@ model Order {
   subscriptionId   String?
   scheduledDate    DateTime?     @db.Date
   deliverySlot     DeliverySlot?
+  /// Snapshot of the subscription's `preferredDeliveryTime` at the moment
+  /// this order was generated (session 2026-10-17) — "HH:mm", 24-hour,
+  /// never earlier than "06:00". Null for instant orders and for any
+  /// meal-plan order generated before this field existed.
+  preferredDeliveryTime String?  @db.VarChar(5)
   idempotencyKey   String        @unique @db.VarChar(120)
   notes            String?       @db.Text
   placedAt         DateTime      @default(now())
@@ -864,6 +869,14 @@ model Subscription {
   mealPlanId        String
   addressId         String
   deliverySlot      DeliverySlot       @default(SUBSCRIPTION_0630_0900)
+  /// The customer's own chosen daily delivery time (session 2026-10-17,
+  /// client request) — "HH:mm", 24-hour, never earlier than "06:00".
+  /// Layered on top of `deliverySlot` rather than replacing it: the slot
+  /// still drives billing/COD-trial logic untouched, this is purely the
+  /// display/scheduling-of-the-actual-round value. Defaults to "06:30" at
+  /// activation (`activateSubscription`) to match the slot's own old
+  /// hardcoded window; changeable later via `updateSubscription`.
+  preferredDeliveryTime String?         @db.VarChar(5)
   deliveryMode      DeliveryMode       @default(DAILY)
   startDate         DateTime           @db.Date
   endDate           DateTime           @db.Date

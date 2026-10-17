@@ -37,6 +37,17 @@ export const longitudeSchema = z.coerce.number().min(-180).max(180);
 
 export const cuidSchema = z.string().trim().min(3).max(60);
 
+/** "HH:mm", 24-hour — a meal-plan customer's chosen daily delivery time
+    (session 2026-10-17, client request). Floored at "06:00": riders don't
+    start morning rounds earlier than that, so the picker must never
+    promise a time the business can't keep. Plain string comparison works
+    here because both sides are zero-padded "HH:mm". */
+export const preferredDeliveryTimeSchema = z
+  .string()
+  .trim()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Enter a valid time (HH:mm)')
+  .refine((value) => value >= '06:00', { message: 'Delivery time cannot be before 6:00 AM' });
+
 /** Cursor-free pagination: TiDB handles OFFSET fine at our page depths. */
 export const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).max(500).default(1),

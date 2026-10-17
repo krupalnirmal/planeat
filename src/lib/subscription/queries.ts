@@ -16,6 +16,7 @@ export interface SubscriptionView {
   startDate: string;
   endDate: string;
   deliverySlot: DeliverySlot;
+  preferredDeliveryTime: string | null;
   planFeePaise: bigint;
   prepaidPaise: bigint;
   mealPlanId: string;
@@ -43,6 +44,7 @@ export async function getCurrentSubscription(
       startDate: true,
       endDate: true,
       deliverySlot: true,
+      preferredDeliveryTime: true,
       planFeePaise: true,
       prepaidPaise: true,
       mealPlanId: true,
@@ -69,6 +71,7 @@ export async function getCurrentSubscription(
     startDate: toDateKey(subscription.startDate),
     endDate: endKey,
     deliverySlot: subscription.deliverySlot,
+    preferredDeliveryTime: subscription.preferredDeliveryTime,
     planFeePaise: subscription.planFeePaise,
     prepaidPaise: subscription.prepaidPaise,
     mealPlanId: subscription.mealPlanId,

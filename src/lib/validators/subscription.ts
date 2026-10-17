@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { cuidSchema } from './common';
+import { cuidSchema, preferredDeliveryTimeSchema } from './common';
 
 /** M6 — skip, pause, resume, cancel, and change slot or address. */
 
@@ -23,10 +23,19 @@ export const updateSubscriptionSchema = z
     // member on purpose: a second delivery would double rider cost for no
     // customer benefit.
     deliverySlot: z.enum(['SUBSCRIPTION_0630_0900']).optional(),
+    // Session 2026-10-17, client request — the customer's own chosen daily
+    // delivery time, layered on top of the single `deliverySlot` above
+    // rather than replacing it (see `Subscription.preferredDeliveryTime`'s
+    // own doc comment in schema.prisma).
+    preferredDeliveryTime: preferredDeliveryTimeSchema.optional(),
   })
-  .refine((value) => value.addressId !== undefined || value.deliverySlot !== undefined, {
-    message: 'Nothing to change',
-  });
+  .refine(
+    (value) =>
+      value.addressId !== undefined ||
+      value.deliverySlot !== undefined ||
+      value.preferredDeliveryTime !== undefined,
+    { message: 'Nothing to change' },
+  );
 export type UpdateSubscriptionInput = z.infer<typeof updateSubscriptionSchema>;
 
 export const scheduleQuerySchema = z.object({

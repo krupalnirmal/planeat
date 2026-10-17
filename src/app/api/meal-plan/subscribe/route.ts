@@ -5,7 +5,7 @@ import { requireUser } from '@/lib/auth/session';
 import { db } from '@/lib/db';
 import { DURATION_OPTIONS } from '@/lib/meal-plan/pricing';
 import { activateSubscription, getSubscriptionQuote } from '@/lib/meal-plan/subscribe';
-import { cuidSchema } from '@/lib/validators/common';
+import { cuidSchema, preferredDeliveryTimeSchema } from '@/lib/validators/common';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,6 +39,7 @@ const activateSchema = z.object({
   durationDays: z.coerce.number().int().refine((n) => (DURATION_OPTIONS as readonly number[]).includes(n)),
   startDate: z.iso.date(),
   deliveryMode: z.enum(['DAILY', 'WEEKLY']).default('DAILY'),
+  preferredDeliveryTime: preferredDeliveryTimeSchema.optional(),
 });
 
 /**
@@ -55,6 +56,7 @@ export const POST = route(async (request: Request) => {
     durationDays: input.durationDays,
     startDateKey: input.startDate,
     deliveryMode: input.deliveryMode,
+    preferredDeliveryTime: input.preferredDeliveryTime,
   });
 
   if (result.ok) {

@@ -13,6 +13,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const dbMock = vi.hoisted(() => ({
   subscription: { findUnique: vi.fn(), update: vi.fn() },
+  address: { findUnique: vi.fn() },
   order: { findFirst: vi.fn() },
   subscriptionException: { upsert: vi.fn(), deleteMany: vi.fn() },
   $transaction: vi.fn(async (fn: (tx: unknown) => unknown) => fn(dbMock)),
@@ -36,7 +37,7 @@ vi.mock('@/lib/notifications/notify', () => ({
 }));
 
 import { credit } from '@/lib/wallet/ledger';
-import { cancelSubscription, pauseSubscription, resumeSubscription, skipDay } from '@/lib/subscription/manage';
+import { cancelSubscription, pauseSubscription, resumeSubscription, skipDay, updateSubscription } from '@/lib/subscription/manage';
 
 /** 19:30 IST on 2026-08-11 — before the 20:00 skip cutoff. */
 const BEFORE_CUTOFF = new Date('2026-08-11T14:00:00Z');
@@ -171,6 +172,39 @@ describe('resumeSubscription', () => {
     expect(dbMock.subscription.update).toHaveBeenCalledWith({
       where: { id: 'sub_1' },
       data: { status: 'ACTIVE' },
+    });
+  });
+});
+
+describe('updateSubscription — preferredDeliveryTime (session 2026-10-17)', () => {
+  it("refuses a subscription that isn't the caller's own", async () => {
+    dbMock.subscription.findUnique.mockResolvedValue({ ...OWNED_SUBSCRIPTION, userId: 'someone_else' });
+
+    const result = await updateSubscription('sub_1', 'user_1', { preferredDeliveryTime: '07:00' });
+
+    expect(result).toEqual({ ok: false, reason: 'NOT_FOUND' });
+    expect(dbMock.subscription.update).not.toHaveBeenCalled();
+  });
+
+  it('writes the new preferred delivery time for future deliveries', async () => {
+    const result = await updateSubscription('sub_1', 'user_1', { preferredDeliveryTime: '07:00' });
+
+    expect(result).toEqual({ ok: true });
+    expect(dbMock.subscription.update).toHaveBeenCalledWith({
+      where: { id: 'sub_1' },
+      data: { preferredDeliveryTime: '07:00' },
+    });
+  });
+
+  it('leaves the delivery time untouched when only the address changes', async () => {
+    dbMock.address.findUnique.mockResolvedValue({ userId: 'user_1' });
+
+    const result = await updateSubscription('sub_1', 'user_1', { addressId: 'addr_1' });
+
+    expect(result).toEqual({ ok: true });
+    expect(dbMock.subscription.update).toHaveBeenCalledWith({
+      where: { id: 'sub_1' },
+      data: { addressId: 'addr_1' },
     });
   });
 });

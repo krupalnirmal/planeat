@@ -290,7 +290,7 @@ export type UpdateSubscriptionResult =
 export async function updateSubscription(
   subscriptionId: string,
   userId: string,
-  changes: { addressId?: string; deliverySlot?: DeliverySlot },
+  changes: { addressId?: string; deliverySlot?: DeliverySlot; preferredDeliveryTime?: string },
 ): Promise<UpdateSubscriptionResult> {
   const subscription = await ownedSubscription(subscriptionId, userId);
   if (!subscription) return { ok: false, reason: 'NOT_FOUND' };
@@ -312,6 +312,7 @@ export async function updateSubscription(
     data: {
       ...(changes.addressId ? { addressId: changes.addressId } : {}),
       ...(changes.deliverySlot ? { deliverySlot: changes.deliverySlot } : {}),
+      ...(changes.preferredDeliveryTime ? { preferredDeliveryTime: changes.preferredDeliveryTime } : {}),
     },
   });
 

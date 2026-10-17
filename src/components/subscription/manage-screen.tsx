@@ -60,6 +60,7 @@ interface SubscriptionResponse {
     endDate: string;
     daysUntilEnd: number;
     address: { id: string; label: string; line1: string; city: string; pincode: string };
+    preferredDeliveryTime: string | null;
   } | null;
   /** M6's "My Week" — already bundled into this same response
       (`src/app/api/subscriptions/current/route.ts`: "two round trips to
@@ -77,6 +78,10 @@ export function SubscriptionManageScreen() {
 
   const [pauseFrom, setPauseFrom] = useState('');
   const [pauseTo, setPauseTo] = useState('');
+  // Session 2026-10-17, client request — `null` means "not touched yet",
+  // so the field reads straight from the server value below instead of
+  // needing an effect to seed it once the query resolves.
+  const [deliveryTimeOverride, setDeliveryTimeOverride] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [topupOpen, setTopupOpen] = useState(false);
@@ -87,6 +92,7 @@ export function SubscriptionManageScreen() {
   });
 
   const subscription = current.data?.subscription ?? null;
+  const deliveryTime = deliveryTimeOverride ?? subscription?.preferredDeliveryTime ?? '06:30';
 
   const wallet = useQuery({
     queryKey: ['wallet'],
@@ -147,6 +153,18 @@ export function SubscriptionManageScreen() {
       api.patch(`/api/subscriptions/${subscription?.id}`, { addressId }),
     onSuccess: () => {
       setError(null);
+      refresh();
+    },
+    onError: handleError,
+  });
+
+  const changeDeliveryTime = useMutation({
+    mutationFn: (preferredDeliveryTime: string) =>
+      api.patch(`/api/subscriptions/${subscription?.id}`, { preferredDeliveryTime }),
+    onSuccess: () => {
+      setError(null);
+      setNotice(t('deliveryTimeSaved'));
+      setDeliveryTimeOverride(null);
       refresh();
     },
     onError: handleError,
@@ -270,6 +288,31 @@ export function SubscriptionManageScreen() {
             </li>
           ))}
         </ul>
+      </section>
+
+      {/* ── Delivery time (session 2026-10-17, client request) */}
+      <section className="bg-card px-4 py-4">
+        <h2 className="text-sm font-semibold">{t('deliveryTimeTitle')}</h2>
+        <p className="mt-0.5 text-[12px] text-muted-foreground">{t('deliveryTimeNote')}</p>
+
+        <div className="mt-3 flex gap-2">
+          <input
+            type="time"
+            min="06:00"
+            value={deliveryTime}
+            onChange={(event) => setDeliveryTimeOverride(event.target.value)}
+            disabled={isOver}
+            className="input-3d h-12 flex-1 rounded-[var(--radius)] border border-border/60 bg-background px-3 text-sm outline-none focus:border-primary disabled:opacity-60"
+          />
+          <button
+            type="button"
+            onClick={() => changeDeliveryTime.mutate(deliveryTime)}
+            disabled={isOver || changeDeliveryTime.isPending || deliveryTime === subscription.preferredDeliveryTime}
+            className="h-12 shrink-0 rounded-[var(--radius)] bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-50"
+          >
+            {t('saveDeliveryTime')}
+          </button>
+        </div>
       </section>
 
       {/* ── Pause / resume */}

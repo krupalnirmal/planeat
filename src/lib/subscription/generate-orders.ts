@@ -129,6 +129,7 @@ export async function generateDailyOrders(
       userId: true,
       mealPlanId: true,
       deliverySlot: true,
+      preferredDeliveryTime: true,
       deliveryMode: true,
       startDate: true,
       codTrialEligible: true,
@@ -203,6 +204,7 @@ interface PerSubscriptionInput {
     userId: string;
     mealPlanId: string;
     deliverySlot: string;
+    preferredDeliveryTime: string | null;
     deliveryMode: string;
     startDate: Date;
     codTrialEligible: boolean;
@@ -433,6 +435,7 @@ async function generateForSubscription(
           subscriptionId: subscription.id,
           scheduledDate,
           deliverySlot: 'SUBSCRIPTION_0630_0900',
+          preferredDeliveryTime: subscription.preferredDeliveryTime,
           // R5 — the natural idempotency key for this job.
           idempotencyKey: `sub:${subscription.id}:${targetDate}`,
           items: {

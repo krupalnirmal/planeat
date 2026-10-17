@@ -152,3 +152,34 @@ describe('activateSubscription — first-time COD trial (session 2026-09-27)', (
     expect(result).toEqual({ ok: false, reason: 'INSUFFICIENT_BALANCE', shortfallPaise: expect.any(BigInt) });
   });
 });
+
+describe('activateSubscription — preferredDeliveryTime (session 2026-10-17)', () => {
+  beforeEach(() => {
+    dbMock.mealPlan.findFirst.mockResolvedValue(PLAN_WITH_ITEMS);
+    dbMock.subscription.findFirst.mockResolvedValue(null);
+    dbMock.subscription.count.mockResolvedValue(0); // first-ever — skips the wallet gate
+    dbMock.address.findUnique.mockResolvedValue({ userId: 'user_1' });
+    dbMock.mealPlanDay.findMany.mockResolvedValue([
+      { dayOfWeek: 1, items: [{ variant: { pricePaise: 100_000n } }] },
+    ]);
+    vi.mocked(getBalance).mockResolvedValue(0n);
+  });
+
+  it('defaults to 06:30 — the slot\'s own old hardcoded window — when the customer never touches the picker', async () => {
+    const result = await activateSubscription('user_1', INPUT);
+
+    expect(result.ok).toBe(true);
+    expect(dbMock.subscription.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ preferredDeliveryTime: '06:30' }) }),
+    );
+  });
+
+  it("passes the customer's own chosen time through, when given", async () => {
+    const result = await activateSubscription('user_1', { ...INPUT, preferredDeliveryTime: '07:15' });
+
+    expect(result.ok).toBe(true);
+    expect(dbMock.subscription.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ preferredDeliveryTime: '07:15' }) }),
+    );
+  });
+});
