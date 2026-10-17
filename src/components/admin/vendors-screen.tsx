@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { MapPin, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AdminPageHeader, AdminResponsiveTable } from '@/components/admin/admin-shell';
@@ -16,6 +16,16 @@ import { cn } from '@/lib/utils';
  * riders: a list with an inline "Add Vendor" form, each row linking to its
  * own detail page (`/admin/vendors/[id]`) where supplies get confirmed or
  * rejected and payments are recorded.
+ *
+ * The vendor's pin (session 2026-10-17, replacing a same-day ServiceArea
+ * version on client feedback — "assign to whichever vendor is nearest the
+ * customer") drives `findNearestVendor()` (`src/lib/vendor/match.ts`), not
+ * an area match. There's no map UI or forward-geocoding anywhere in this
+ * app yet, so the admin enters raw coordinates — read off Google Maps
+ * (long-press a pin → the numbers at the bottom), or captured on the spot
+ * with the "Use my current location" button below, same
+ * `getCurrentPosition` call `address-manager.tsx`'s customer-facing one
+ * already uses.
  */
 
 interface VendorRow {
@@ -24,16 +34,10 @@ interface VendorRow {
   phone: string;
   businessName: string;
   isActive: boolean;
-  serviceAreaId: string | null;
-  serviceAreaName: string | null;
+  latitude: number | null;
+  longitude: number | null;
   balancePaise: string;
   pendingSupplies: number;
-}
-
-interface ServiceArea {
-  id: string;
-  name: string;
-  pincode: string;
 }
 
 export function AdminVendorsScreen() {
@@ -47,11 +51,6 @@ export function AdminVendorsScreen() {
   const vendors = useQuery({
     queryKey: ['admin-vendors'],
     queryFn: () => api.get<{ vendors: VendorRow[] }>('/api/admin/vendors'),
-  });
-
-  const areas = useQuery({
-    queryKey: ['admin-service-areas'],
-    queryFn: () => api.get<{ areas: ServiceArea[] }>('/api/admin/service-areas'),
   });
 
   const rows = vendors.data?.vendors ?? [];
@@ -79,7 +78,6 @@ export function AdminVendorsScreen() {
 
       {showForm && (
         <AddVendorForm
-          areas={areas.data?.areas ?? []}
           onDone={(message) => {
             setNotice(message);
             setShowForm(false);
@@ -102,7 +100,7 @@ export function AdminVendorsScreen() {
                 <tr>
                   <th className="px-3 py-2 font-medium">{t('businessName')}</th>
                   <th className="px-3 py-2 font-medium">{t('contact')}</th>
-                  <th className="px-3 py-2 font-medium">{t('area')}</th>
+                  <th className="px-3 py-2 font-medium">{t('location')}</th>
                   <th className="px-3 py-2 text-right font-medium">{t('balanceOwed')}</th>
                   <th className="px-3 py-2 text-right font-medium">{t('pending')}</th>
                   <th className="px-3 py-2 text-center font-medium">{t('status')}</th>
@@ -122,7 +120,7 @@ export function AdminVendorsScreen() {
                       <span className="font-mono">{vendor.phone}</span>
                     </td>
                     <td className="px-3 py-2 text-xs text-muted-foreground">
-                      {vendor.serviceAreaName ?? '—'}
+                      <VendorMapLink vendor={vendor} label={t('viewOnMap')} noPin={t('noPin')} />
                     </td>
                     <td className="px-3 py-2 text-right text-sm font-bold tabular-nums">
                       {formatPaise(paise(vendor.balancePaise))}
@@ -155,7 +153,7 @@ export function AdminVendorsScreen() {
                   <p className="text-xs text-muted-foreground">{vendor.name}</p>
                   <p className="font-mono text-xs text-muted-foreground">{vendor.phone}</p>
                   <p className="mt-0.5 text-[12px] text-muted-foreground">
-                    {vendor.serviceAreaName ?? '—'}
+                    <VendorMapLink vendor={vendor} label={t('viewOnMap')} noPin={t('noPin')} />
                   </p>
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1">
@@ -175,20 +173,108 @@ export function AdminVendorsScreen() {
   );
 }
 
-function AddVendorForm({
-  areas,
-  onDone,
+/** A plain `maps.google.com/?q=lat,lng` link — no API key, same
+    zero-dependency approach this codebase already uses for geocoding
+    (`/api/geocode/reverse`). `null` when the vendor has no pin yet. */
+function VendorMapLink({
+  vendor,
+  label,
+  noPin,
 }: {
-  areas: ServiceArea[];
-  onDone: (message: string) => void;
+  vendor: { latitude: number | null; longitude: number | null };
+  label: string;
+  noPin: string;
 }) {
+  if (vendor.latitude == null || vendor.longitude == null) return <>{noPin}</>;
+  return (
+    <a
+      href={`https://www.google.com/maps?q=${vendor.latitude},${vendor.longitude}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 text-primary hover:underline"
+    >
+      <MapPin className="size-3" aria-hidden />
+      {label}
+    </a>
+  );
+}
+
+/** Latitude/longitude pair + a "use my current location" convenience —
+    the primary path is still typing coordinates read off Google Maps,
+    since there's no forward-geocoding or map-click UI in this app yet.
+    Exported — `VendorDetailScreen`'s own edit control reuses it. */
+export function LocationFields({
+  latitude,
+  longitude,
+  onChange,
+}: {
+  latitude: string;
+  longitude: string;
+  onChange: (next: { latitude: string; longitude: string }) => void;
+}) {
+  const t = useTranslations('admin.vendors');
+  const [locating, setLocating] = useState(false);
+
+  function useCurrentLocation() {
+    if (!('geolocation' in navigator)) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        onChange({
+          latitude: String(position.coords.latitude),
+          longitude: String(position.coords.longitude),
+        });
+        setLocating(false);
+      },
+      () => setLocating(false),
+      { enableHighAccuracy: true, timeout: 10_000 },
+    );
+  }
+
+  return (
+    <>
+      <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+        {t('latitude')}
+        <input
+          type="number"
+          step="any"
+          value={latitude}
+          onChange={(event) => onChange({ latitude: event.target.value, longitude })}
+          className="h-9 w-28 rounded border border-border bg-background px-2 text-sm outline-none"
+        />
+      </label>
+      <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+        {t('longitude')}
+        <input
+          type="number"
+          step="any"
+          value={longitude}
+          onChange={(event) => onChange({ latitude, longitude: event.target.value })}
+          className="h-9 w-28 rounded border border-border bg-background px-2 text-sm outline-none"
+        />
+      </label>
+      <button
+        type="button"
+        onClick={useCurrentLocation}
+        disabled={locating}
+        className="flex h-9 items-center gap-1 rounded-[var(--radius)] border border-border px-2.5 text-xs font-semibold text-foreground disabled:opacity-50"
+      >
+        <MapPin className="size-3.5" aria-hidden />
+        {locating ? '…' : t('useCurrentLocation')}
+      </button>
+    </>
+  );
+}
+
+function AddVendorForm({ onDone }: { onDone: (message: string) => void }) {
   const t = useTranslations('admin.vendors');
   const tc = useTranslations('admin.common');
 
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
   const [businessName, setBusinessName] = useState('');
-  const [serviceAreaId, setServiceAreaId] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const create = useMutation({
@@ -197,7 +283,8 @@ function AddVendorForm({
         phone,
         name,
         businessName,
-        serviceAreaId: serviceAreaId || null,
+        latitude: latitude ? Number(latitude) : null,
+        longitude: longitude ? Number(longitude) : null,
       }),
     onSuccess: () => onDone(t('added')),
     onError: (err) => {
@@ -244,21 +331,14 @@ function AddVendorForm({
           className="h-9 w-32 rounded border border-border bg-background px-2 text-sm outline-none"
         />
       </label>
-      <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-        {t('area')}
-        <select
-          value={serviceAreaId}
-          onChange={(event) => setServiceAreaId(event.target.value)}
-          className="h-9 rounded border border-border bg-background px-2 text-sm outline-none"
-        >
-          <option value="">{t('noArea')}</option>
-          {areas.map((area) => (
-            <option key={area.id} value={area.id}>
-              {area.name} ({area.pincode})
-            </option>
-          ))}
-        </select>
-      </label>
+      <LocationFields
+        latitude={latitude}
+        longitude={longitude}
+        onChange={(next) => {
+          setLatitude(next.latitude);
+          setLongitude(next.longitude);
+        }}
+      />
       <button
         type="submit"
         disabled={create.isPending}

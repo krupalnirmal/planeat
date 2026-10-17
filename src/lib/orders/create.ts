@@ -5,6 +5,7 @@ import { pickName } from '@/lib/catalog/text';
 import { TEMPLATE } from '@/lib/notifications/notify';
 import { notifyEventNow } from '@/lib/notifications/notify-now';
 import { checkServiceability } from '@/lib/serviceability';
+import { findNearestVendor } from '@/lib/vendor/match';
 import { InsufficientBalanceError, LEDGER_REF, debit } from '@/lib/wallet/ledger';
 import { computeBill, isPaymentMethodAllowed, loadFeeConfig } from './pricing';
 import type { Locale, DeliverySlot, PaymentMethod } from '@/generated/prisma/enums';
@@ -122,19 +123,11 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
         });
       }
 
-      // Vendor order-packing (session 2026-10-16) — the Vendor whose
-      // service area covers this address packs the order. Nullable: an
-      // area with no active vendor still places normally, just unclaimed
-      // (today's fully-admin-driven packing, unaffected). If an area ever
-      // has more than one active vendor, the oldest one always wins — no
-      // load-balancing in this phase.
-      const vendor = serviceability.area
-        ? await tx.vendor.findFirst({
-            where: { serviceAreaId: serviceability.area.id, isActive: true },
-            orderBy: { createdAt: 'asc' },
-            select: { id: true },
-          })
-        : null;
+      // Vendor order-packing (session 2026-10-17) — the nearest pinned,
+      // active vendor packs the order (`src/lib/vendor/match.ts`). Nullable:
+      // no coordinates, or no vendor pinned nearby, still places normally,
+      // just unclaimed (fully-admin-driven packing, unaffected).
+      const vendor = await findNearestVendor(address.latitude, address.longitude);
 
       // ── Cart, read inside the transaction so nothing shifts underneath us.
       const cart = await tx.cart.findUnique({

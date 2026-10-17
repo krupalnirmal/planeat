@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { cuidSchema, localeSchema, paginationSchema, phoneSchema } from './common';
+import { cuidSchema, latitudeSchema, localeSchema, longitudeSchema, paginationSchema, phoneSchema } from './common';
 
 const vehicleTypeSchema = z.enum(['BICYCLE', 'BIKE', 'SCOOTER', 'EV', 'WALK']);
 
@@ -223,12 +223,14 @@ export const createVendorSchema = z.object({
   phone: phoneSchema,
   name: z.string().trim().min(2).max(120),
   businessName: z.string().trim().min(2).max(160),
-  serviceAreaId: cuidSchema.nullable().optional(),
+  latitude: latitudeSchema.nullable().optional(),
+  longitude: longitudeSchema.nullable().optional(),
 });
 
 export const updateVendorSchema = z.object({
   isActive: z.boolean().optional(),
-  serviceAreaId: cuidSchema.nullable().optional(),
+  latitude: latitudeSchema.nullable().optional(),
+  longitude: longitudeSchema.nullable().optional(),
 });
 
 export const confirmSupplySchema = z.object({

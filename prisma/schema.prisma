@@ -396,7 +396,6 @@ model ServiceArea {
   updatedAt                  DateTime @updatedAt
 
   deliveryPartners DeliveryPartner[]
-  vendors          Vendor[]
 
   @@index([isActive])
   @@map("service_areas")
@@ -1073,31 +1072,32 @@ model DeliveryAssignment {
 // before it touches stock or the ledger ("suggest, never auto-assign"
 // reasoning, same as rider assignment — a human always confirms).
 //
-// A Vendor also optionally covers a ServiceArea (session 2026-10-16) —
-// every order whose delivery address falls in that area is auto-routed
-// to this vendor to pack (`Order.vendorId`, set at placement time in
-// `placeOrder()`). Unlike supply confirmation, packing needs no admin
-// approval — it's an operational checkpoint like a rider's pickup scan,
-// not a money/stock event.
+// A Vendor also optionally carries its own pinned shop location (session
+// 2026-10-17, replacing an earlier ServiceArea-based version from the same
+// day) — every order is auto-routed to whichever active, pinned vendor is
+// physically nearest to the delivery address (`findNearestVendor()`,
+// `src/lib/vendor/match.ts`), set on `Order.vendorId` at placement time.
+// Unlike supply confirmation, packing needs no admin approval — it's an
+// operational checkpoint like a rider's pickup scan, not a money/stock
+// event.
 // ─────────────────────────────────────────────────────────────
 
 model Vendor {
-  id            String   @id
-  userId        String   @unique
-  businessName  String   @db.VarChar(160)
-  isActive      Boolean  @default(true)
-  serviceAreaId String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id
+  userId       String   @unique
+  businessName String   @db.VarChar(160)
+  isActive     Boolean  @default(true)
+  latitude     Float?
+  longitude    Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  user        User                @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  serviceArea ServiceArea?        @relation(fields: [serviceAreaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  supplies    VendorSupply[]
-  ledger      VendorLedgerEntry[]
-  orders      Order[]
+  user     User                @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  supplies VendorSupply[]
+  ledger   VendorLedgerEntry[]
+  orders   Order[]
 
   @@index([userId])
-  @@index([serviceAreaId])
   @@map("vendors")
 }
 

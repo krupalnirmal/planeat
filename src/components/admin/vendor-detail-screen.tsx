@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AdminPageHeader } from '@/components/admin/admin-shell';
+import { LocationFields } from '@/components/admin/vendors-screen';
 import { ApiClientError, api } from '@/lib/api/client';
 import { formatPaise, paise, rupeesToPaise } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -23,15 +24,9 @@ interface VendorDetail {
   phone: string;
   businessName: string;
   isActive: boolean;
-  serviceAreaId: string | null;
-  serviceAreaName: string | null;
+  latitude: number | null;
+  longitude: number | null;
   balancePaise: string;
-}
-
-interface ServiceArea {
-  id: string;
-  name: string;
-  pincode: string;
 }
 
 interface SupplyRow {
@@ -56,11 +51,6 @@ export function VendorDetailScreen({ vendorId }: { vendorId: string }) {
     queryKey: ['admin-vendor', vendorId],
     queryFn: () =>
       api.get<{ vendor: VendorDetail; supplies: SupplyRow[] }>(`/api/admin/vendors/${vendorId}`),
-  });
-
-  const areas = useQuery({
-    queryKey: ['admin-service-areas'],
-    queryFn: () => api.get<{ areas: ServiceArea[] }>('/api/admin/service-areas'),
   });
 
   const review = useMutation({
@@ -116,10 +106,10 @@ export function VendorDetailScreen({ vendorId }: { vendorId: string }) {
       </section>
 
       <section className="mb-4 rounded-[var(--radius-2xl)] border border-border bg-card p-4">
-        <VendorAreaControl
+        <VendorLocationControl
           vendorId={vendorId}
-          serviceAreaId={vendor.serviceAreaId}
-          areas={areas.data?.areas ?? []}
+          latitude={vendor.latitude}
+          longitude={vendor.longitude}
         />
       </section>
 
@@ -260,41 +250,49 @@ function SupplyReviewRow({
 /** The packing area this vendor covers — orders in it auto-route here
     (`placeOrder()`, session 2026-10-16). Auto-saves on change, same
     immediate-effect pattern as the delivery-partner availability checkbox. */
-function VendorAreaControl({
+function VendorLocationControl({
   vendorId,
-  serviceAreaId,
-  areas,
+  latitude,
+  longitude,
 }: {
   vendorId: string;
-  serviceAreaId: string | null;
-  areas: ServiceArea[];
+  latitude: number | null;
+  longitude: number | null;
 }) {
   const t = useTranslations('admin.vendors');
   const queryClient = useQueryClient();
+  const [lat, setLat] = useState(latitude != null ? String(latitude) : '');
+  const [lng, setLng] = useState(longitude != null ? String(longitude) : '');
 
   const update = useMutation({
-    mutationFn: (nextAreaId: string) =>
-      api.patch(`/api/admin/vendors/${vendorId}`, { serviceAreaId: nextAreaId || null }),
+    mutationFn: () =>
+      api.patch(`/api/admin/vendors/${vendorId}`, {
+        latitude: lat ? Number(lat) : null,
+        longitude: lng ? Number(lng) : null,
+      }),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['admin-vendor', vendorId] }),
   });
 
   return (
-    <label className="flex items-center justify-between gap-3">
-      <span className="text-sm font-medium">{t('area')}</span>
-      <select
-        defaultValue={serviceAreaId ?? ''}
+    <div className="flex flex-wrap items-end gap-2">
+      <LocationFields
+        latitude={lat}
+        longitude={lng}
+        onChange={(next) => {
+          setLat(next.latitude);
+          setLng(next.longitude);
+        }}
+      />
+      <button
+        type="button"
+        onClick={() => update.mutate()}
         disabled={update.isPending}
-        onChange={(event) => update.mutate(event.target.value)}
-        className="h-9 rounded border border-border bg-background px-2 text-sm outline-none disabled:opacity-50"
+        className="h-9 rounded-[var(--radius)] bg-primary px-3 text-xs font-bold text-primary-foreground disabled:opacity-50"
       >
-        <option value="">{t('noArea')}</option>
-        {areas.map((area) => (
-          <option key={area.id} value={area.id}>
-            {area.name} ({area.pincode})
-          </option>
-        ))}
-      </select>
-    </label>
+        {t('saveLocation')}
+      </button>
+      {update.isSuccess && <p className="text-xs font-medium text-primary">{t('adjustSuccess')}</p>}
+    </div>
   );
 }
 

@@ -25,7 +25,7 @@ export const GET = route(async (_request: Request, context: Context) => {
 });
 
 /** PATCH /api/admin/vendors/:id — deactivate/reactivate a supplier, and/or
-    change its packing service area. */
+    change its pinned shop location. */
 export const PATCH = route(async (request: Request, context: Context) => {
   const session = await requireStoreAdmin();
   const { id } = await context.params;
@@ -37,8 +37,13 @@ export const PATCH = route(async (request: Request, context: Context) => {
     if (!result.ok) throw ApiError.notFound('Vendor not found');
   }
 
-  if (input.serviceAreaId !== undefined) {
-    const result = await updateVendor(id, { serviceAreaId: input.serviceAreaId }, session.userId, ip);
+  if (input.latitude !== undefined || input.longitude !== undefined) {
+    const result = await updateVendor(
+      id,
+      { latitude: input.latitude, longitude: input.longitude },
+      session.userId,
+      ip,
+    );
     if (!result.ok) throw ApiError.notFound('Vendor not found');
   }
 

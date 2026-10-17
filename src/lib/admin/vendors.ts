@@ -24,8 +24,8 @@ export interface VendorRow {
   phone: string;
   businessName: string;
   isActive: boolean;
-  serviceAreaId: string | null;
-  serviceAreaName: string | null;
+  latitude: number | null;
+  longitude: number | null;
   balancePaise: bigint;
   pendingSupplies: number;
 }
@@ -39,8 +39,8 @@ export async function listVendors(): Promise<VendorRow[]> {
         userId: true,
         businessName: true,
         isActive: true,
-        serviceAreaId: true,
-        serviceArea: { select: { name: true } },
+        latitude: true,
+        longitude: true,
         user: { select: { name: true, phone: true } },
       },
     }),
@@ -61,8 +61,8 @@ export async function listVendors(): Promise<VendorRow[]> {
       phone: vendor.user.phone,
       businessName: vendor.businessName,
       isActive: vendor.isActive,
-      serviceAreaId: vendor.serviceAreaId,
-      serviceAreaName: vendor.serviceArea?.name ?? null,
+      latitude: vendor.latitude,
+      longitude: vendor.longitude,
       balancePaise: await getVendorBalance(vendor.id),
       pendingSupplies: pendingByVendor.get(vendor.id) ?? 0,
     })),
@@ -75,7 +75,8 @@ export interface CreateVendorInput {
   phone: string;
   name: string;
   businessName: string;
-  serviceAreaId?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export type CreateVendorResult = { ok: true; vendorId: string } | { ok: false; reason: 'PHONE_IN_USE' };
@@ -105,7 +106,8 @@ export async function createVendor(
         id: vendorId,
         userId: user.id,
         businessName: input.businessName,
-        serviceAreaId: input.serviceAreaId ?? null,
+        latitude: input.latitude ?? null,
+        longitude: input.longitude ?? null,
       },
     });
   });
@@ -150,10 +152,11 @@ export async function setVendorActive(
 }
 
 export interface UpdateVendorInput {
-  serviceAreaId?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
-/** Changes the vendor's packing service area, mirroring
+/** Changes the vendor's pinned shop location, mirroring
     `updateDeliveryPartner` (src/lib/admin/delivery-partners.ts). */
 export async function updateVendor(
   vendorId: string,
@@ -163,7 +166,7 @@ export async function updateVendor(
 ): Promise<UpdateVendorResult> {
   const before = await db.vendor.findUnique({
     where: { id: vendorId },
-    select: { serviceAreaId: true },
+    select: { latitude: true, longitude: true },
   });
   if (!before) return { ok: false, reason: 'NOT_FOUND' };
 
@@ -188,8 +191,8 @@ export interface VendorDetail {
   phone: string;
   businessName: string;
   isActive: boolean;
-  serviceAreaId: string | null;
-  serviceAreaName: string | null;
+  latitude: number | null;
+  longitude: number | null;
   balancePaise: bigint;
 }
 
@@ -200,8 +203,8 @@ export async function getVendorDetail(vendorId: string): Promise<VendorDetail | 
       id: true,
       businessName: true,
       isActive: true,
-      serviceAreaId: true,
-      serviceArea: { select: { name: true } },
+      latitude: true,
+      longitude: true,
       user: { select: { name: true, phone: true } },
     },
   });
@@ -213,8 +216,8 @@ export async function getVendorDetail(vendorId: string): Promise<VendorDetail | 
     phone: vendor.user.phone,
     businessName: vendor.businessName,
     isActive: vendor.isActive,
-    serviceAreaId: vendor.serviceAreaId,
-    serviceAreaName: vendor.serviceArea?.name ?? null,
+    latitude: vendor.latitude,
+    longitude: vendor.longitude,
     balancePaise: await getVendorBalance(vendor.id),
   };
 }

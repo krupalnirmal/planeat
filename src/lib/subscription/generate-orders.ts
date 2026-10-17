@@ -7,7 +7,7 @@ import { buildCandidates } from '@/lib/meal-plan/candidates';
 import { parseDateKey, weekdayNumber } from '@/lib/meal-plan/pricing';
 import { TEMPLATE, notifyEvent } from '@/lib/notifications/notify';
 import { notifyEventNow } from '@/lib/notifications/notify-now';
-import { checkServiceability } from '@/lib/serviceability';
+import { findNearestVendor } from '@/lib/vendor/match';
 import { InsufficientBalanceError, LEDGER_REF, debit } from '@/lib/wallet/ledger';
 import type { Locale } from '@/generated/prisma/enums';
 import { findSubstitute } from './substitute';
@@ -392,22 +392,10 @@ async function generateForSubscription(
   // wallet balance the customer hasn't had a chance to build up yet.
   const cod = isWithinCodTrial(subscription.codTrialEligible, subscription.startDate, scheduledDate);
 
-  // Vendor order-packing (session 2026-10-17) — same area-match `placeOrder()`
-  // uses, so a meal-plan day's order lands in a vendor's packing queue too,
-  // not just an admin-driven one. Resolved once up front (not worth
-  // re-matching per retry inside the transaction below).
-  const serviceability = await checkServiceability({
-    pincode: subscription.address.pincode,
-    latitude: subscription.address.latitude ?? undefined,
-    longitude: subscription.address.longitude ?? undefined,
-  });
-  const vendor = serviceability.area
-    ? await db.vendor.findFirst({
-        where: { serviceAreaId: serviceability.area.id, isActive: true },
-        orderBy: { createdAt: 'asc' },
-        select: { id: true },
-      })
-    : null;
+  // Vendor order-packing (session 2026-10-17) — same nearest-vendor match
+  // `placeOrder()` uses, so a meal-plan day's order lands in a vendor's
+  // packing queue too, not just an admin-driven one.
+  const vendor = await findNearestVendor(subscription.address.latitude, subscription.address.longitude);
 
   try {
     await db.$transaction(async (tx) => {
