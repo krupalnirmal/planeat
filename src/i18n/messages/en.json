@@ -1435,6 +1435,7 @@
     "installAndroidHint": "Chrome menu → Install app",
     "installDismiss": "Not now",
     "ordersTab": "Orders",
+    "requirementTab": "Tomorrow",
     "suppliesTab": "Supplies",
     "balanceOwed": "Balance owed to you",
     "reportDelivery": "Report a delivery",
@@ -1465,6 +1466,11 @@
         "CONFIRMED": "Ready to pack",
         "PACKED": "Packed"
       }
+    },
+    "requirement": {
+      "hint": "Estimated total for tomorrow's meal-plan deliveries — an estimate, may change slightly by morning",
+      "empty": "No meal-plan deliveries routed to you for tomorrow yet",
+      "forCustomers": "For {count} customers"
     }
   },
   "notifications": {

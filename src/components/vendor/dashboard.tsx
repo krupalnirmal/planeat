@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { SupplyForm } from '@/components/vendor/supply-form';
 import { VendorOrdersPanel } from '@/components/vendor/orders-panel';
+import { VendorRequirementPanel } from '@/components/vendor/requirement-panel';
 import { api } from '@/lib/api/client';
 import { formatPaise, paise } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -30,7 +31,7 @@ export function VendorDashboard() {
   const tc = useTranslations('common');
   const queryClient = useQueryClient();
 
-  const [tab, setTab] = useState<'orders' | 'supplies'>('orders');
+  const [tab, setTab] = useState<'orders' | 'requirement' | 'supplies'>('orders');
   const [showForm, setShowForm] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -49,8 +50,8 @@ export function VendorDashboard() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-2">
-        {(['orders', 'supplies'] as const).map((value) => (
+      <div className="grid grid-cols-3 gap-2">
+        {(['orders', 'requirement', 'supplies'] as const).map((value) => (
           <button
             key={value}
             type="button"
@@ -61,13 +62,15 @@ export function VendorDashboard() {
               tab === value ? 'border-primary bg-tint-green text-primary-dark' : 'border-border text-muted-foreground',
             )}
           >
-            {t(value === 'orders' ? 'ordersTab' : 'suppliesTab')}
+            {t(value === 'orders' ? 'ordersTab' : value === 'requirement' ? 'requirementTab' : 'suppliesTab')}
           </button>
         ))}
       </div>
 
       {tab === 'orders' ? (
         <VendorOrdersPanel />
+      ) : tab === 'requirement' ? (
+        <VendorRequirementPanel />
       ) : (
         <>
           <div className="rounded-[var(--radius)] bg-card p-4">

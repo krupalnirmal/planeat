@@ -1435,6 +1435,7 @@
     "installAndroidHint": "Chrome चे ⋮ मेनू → Install app निवडा",
     "installDismiss": "आत्ता नको",
     "ordersTab": "ऑर्डर्स",
+    "requirementTab": "उद्या",
     "suppliesTab": "पुरवठा",
     "balanceOwed": "तुम्हाला देय रक्कम",
     "reportDelivery": "डिलिव्हरी नोंदवा",
@@ -1465,6 +1466,11 @@
         "CONFIRMED": "पॅक करायला तयार",
         "PACKED": "पॅक झालं"
       }
+    },
+    "requirement": {
+      "hint": "उद्याच्या मील-प्लान डिलिव्हरीसाठी अंदाजे एकूण प्रमाण — हा अंदाज आहे, सकाळपर्यंत थोडा बदलू शकतो",
+      "empty": "उद्यासाठी अजून कुठलीही मील-प्लान डिलिव्हरी तुमच्याकडे आलेली नाही",
+      "forCustomers": "{count} ग्राहकांसाठी"
     }
   },
   "notifications": {

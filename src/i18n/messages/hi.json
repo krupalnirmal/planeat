@@ -1435,6 +1435,7 @@
     "installAndroidHint": "Chrome के ⋮ मेनू → Install app चुनें",
     "installDismiss": "अभी नहीं",
     "ordersTab": "ऑर्डर",
+    "requirementTab": "कल",
     "suppliesTab": "सप्लाई",
     "balanceOwed": "आपको देय राशि",
     "reportDelivery": "डिलीवरी दर्ज करें",
@@ -1465,6 +1466,11 @@
         "CONFIRMED": "पैक करने के लिए तैयार",
         "PACKED": "पैक हो गया"
       }
+    },
+    "requirement": {
+      "hint": "कल की मील-प्लान डिलीवरी के लिए अनुमानित कुल मात्रा — यह अंदाज़ा है, सुबह तक थोड़ा बदल सकता है",
+      "empty": "कल के लिए अभी तक कोई मील-प्लान डिलीवरी आपको नहीं सौंपी गई",
+      "forCustomers": "{count} ग्राहकों के लिए"
     }
   },
   "notifications": {
