@@ -130,10 +130,11 @@ export function DesktopHeader({ categories }: { categories: { slug: string; name
             ))}
           </nav>
 
-          <SearchBar showMic className="min-w-0 max-w-xl flex-1" />
-
           {/* Location selector (session 2026-09-22) — same real address
-              source as the mobile header's own "Deliver to" row. */}
+              source as the mobile header's own "Deliver to" row. Moved
+              ahead of the search bar (session 2026-10-20, user request) —
+              the delivery address is picked first, search happens within
+              it, not the other way round. */}
           <Link
             href={user ? '/addresses' : '/serviceability'}
             className="flex min-w-0 shrink-0 items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold"
@@ -142,6 +143,8 @@ export function DesktopHeader({ categories }: { categories: { slug: string; name
             <span className="max-w-[140px] truncate">{addressLine}</span>
             <ChevronDown className="size-3 shrink-0 text-muted-foreground" aria-hidden />
           </Link>
+
+          <SearchBar showMic className="min-w-0 max-w-xl flex-1" />
 
           <div className="flex shrink-0 items-center gap-2">
             <Link
