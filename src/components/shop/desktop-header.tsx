@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ChevronDown, MapPin, Package, Salad, ShoppingCart, UserRound, Wallet } from 'lucide-react';
+import { ChevronDown, MapPin, Package, ShoppingCart, UserRound, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -85,9 +85,18 @@ export function DesktopHeader({ categories }: { categories: { slug: string; name
       <div className="hidden border-b border-border bg-tint-green lg:block">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between px-8 py-1.5 text-xs">
           <p className="font-medium text-primary-dark">{t('tagline')}</p>
-          <Link href="/orders" className="font-semibold text-primary-dark hover:underline">
-            {t('trackOrder')}
-          </Link>
+          <div className="flex items-center gap-4">
+            {/* My Meal Plan moved here (session 2026-10-20, user report) —
+                in the main row below it ate into the category nav's own
+                space and cut "Masala" off mid-word. This bar has room to
+                spare, so it costs the category nav nothing. */}
+            <Link href="/meal-plan" className="font-semibold text-primary-dark hover:underline">
+              {tNav('mealPlan')}
+            </Link>
+            <Link href="/orders" className="font-semibold text-primary-dark hover:underline">
+              {t('trackOrder')}
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -135,18 +144,6 @@ export function DesktopHeader({ categories }: { categories: { slug: string; name
           </Link>
 
           <div className="flex shrink-0 items-center gap-2">
-            {/* My Meal Plan (session 2026-10-20, user report) — mobile's
-                bottom nav always had this as one of its primary tabs, but
-                the desktop header never grew an equivalent; it had simply
-                been missing since this header was first built. */}
-            <Link
-              href="/meal-plan"
-              className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm font-bold text-foreground hover:text-primary"
-            >
-              <Salad className="size-4 shrink-0" aria-hidden />
-              {tNav('mealPlan')}
-            </Link>
-
             <Link
               href="/wallet"
               className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm font-bold text-primary"
