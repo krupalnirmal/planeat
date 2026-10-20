@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ChevronDown, MapPin, Package, ShoppingCart, UserRound, Wallet } from 'lucide-react';
+import { ChevronDown, MapPin, Package, Salad, ShoppingCart, UserRound, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -45,6 +45,7 @@ export function DesktopHeader({ categories }: { categories: { slug: string; name
   const t = useTranslations('home');
   const tCart = useTranslations('cart');
   const tp = useTranslations('profile');
+  const tNav = useTranslations('nav');
   const { user, isLoggedIn, defaultAddress } = useSession();
   const cart = useCart();
   const router = useRouter();
@@ -134,6 +135,18 @@ export function DesktopHeader({ categories }: { categories: { slug: string; name
           </Link>
 
           <div className="flex shrink-0 items-center gap-2">
+            {/* My Meal Plan (session 2026-10-20, user report) — mobile's
+                bottom nav always had this as one of its primary tabs, but
+                the desktop header never grew an equivalent; it had simply
+                been missing since this header was first built. */}
+            <Link
+              href="/meal-plan"
+              className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm font-bold text-foreground hover:text-primary"
+            >
+              <Salad className="size-4 shrink-0" aria-hidden />
+              {tNav('mealPlan')}
+            </Link>
+
             <Link
               href="/wallet"
               className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm font-bold text-primary"
