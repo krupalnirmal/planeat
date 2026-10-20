@@ -1,14 +1,17 @@
 'use client';
 
-import { Home, Mic, Salad, ShoppingCart, Wallet } from 'lucide-react';
+import { Home, Salad, ShoppingCart, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
 /**
- * PART 5 — the 5-tab bottom navigation.
+ * PART 5 — the bottom navigation.
  *
- *   Home | Smart List | My Meal Plan | Cart | Wallet
+ *   Home | My Meal Plan | Cart | Wallet
+ *
+ * Was a 5th tab, Smart List — hidden (session 2026-10-20, user request); see
+ * the `TABS` comment below.
  *
  * A floating white rounded card (session 2026-09-17, client reference) —
  * inset from all four edges rather than a bar spanning the screen, with the
@@ -45,9 +48,11 @@ import { cn } from '@/lib/utils';
  * tab is a permanent way in even at zero items.
  */
 
+// Smart List hidden from the bar (session 2026-10-20, user request) — the
+// route and its own entry points (search bar, etc.) stay live, so it's kept
+// in `NON_HOME_PREFIXES` below; just not one of the tabs here any more.
 const TABS = [
   { href: '/', icon: Home, key: 'home' },
-  { href: '/smart-list', icon: Mic, key: 'smartList' },
   { href: '/meal-plan', icon: Salad, key: 'mealPlan' },
   { href: '/cart', icon: ShoppingCart, key: 'cart' },
   { href: '/wallet', icon: Wallet, key: 'wallet' },
@@ -67,7 +72,7 @@ export function BottomNav() {
       className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] px-3 lg:hidden"
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)' }}
     >
-      <ul className="card-3d grid grid-cols-5 gap-1 rounded-[24px] bg-card px-1.5 py-2">
+      <ul className="card-3d grid grid-cols-4 gap-1 rounded-[24px] bg-card px-1.5 py-2">
         {TABS.map((tab) => {
           const active =
             tab.href === '/'
