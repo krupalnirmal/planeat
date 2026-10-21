@@ -278,9 +278,18 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
       await invalidateSession();
       void queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
 
-      router.replace(
-        result.isNewUser ? `/profile/complete?next=${encodeURIComponent(next)}` : next,
-      );
+      // Client feedback (session 2026-10-21): a brand-new customer sees the
+      // "set your location" check before anything else, even before the
+      // name step — delivery coverage decides whether the rest of
+      // onboarding is worth doing at all. Returning customers skip straight
+      // to `next` as before; this chain only ever fires once per customer,
+      // same as `ProfileForm`'s own `MealPlanIntroPopup` step it leads into.
+      if (result.isNewUser) {
+        const afterLocation = `/profile/complete?next=${encodeURIComponent(next)}`;
+        router.replace(`/serviceability?next=${encodeURIComponent(afterLocation)}`);
+      } else {
+        router.replace(next);
+      }
     } catch (err) {
       setError(messageFor(err));
       setCode('');

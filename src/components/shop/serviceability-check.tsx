@@ -25,6 +25,11 @@ export function ServiceabilityCheck() {
   const te = useTranslations('errors');
   const searchParams = useSearchParams();
 
+  // The post-onboarding chain `login-flow.tsx` builds for a new customer
+  // (session 2026-10-21) — defaults to home for the ordinary anonymous
+  // "check my area" visit, same as always.
+  const next = searchParams.get('next') ?? '/';
+
   const [pincode, setPincode] = useState(searchParams.get('pincode') ?? '');
   const [phone, setPhone] = useState('');
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -145,7 +150,7 @@ export function ServiceabilityCheck() {
             {result.area ? t('availableIn', { area: result.area.name }) : t('available')}
           </p>
           <Link
-            href="/"
+            href={next}
             className="mt-4 flex h-11 items-center justify-center rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
           >
             {tc('next')}
@@ -204,7 +209,7 @@ export function ServiceabilityCheck() {
           )}
 
           <Link
-            href="/"
+            href={next}
             className="mt-3 flex min-h-11 items-center justify-center text-sm font-medium text-primary"
           >
             {t('browseAnyway')}
