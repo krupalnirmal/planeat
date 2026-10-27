@@ -21,6 +21,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ClipboardEvent, KeyboardEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, useRouter } from '@/i18n/navigation';
+import { IntroBackground } from '@/components/auth/intro-background';
 import { useInvalidateSession } from '@/hooks/use-session';
 import { CART_QUERY_KEY } from '@/hooks/use-cart';
 import { ApiClientError, api } from '@/lib/api/client';
@@ -103,7 +104,6 @@ function formatCountdown(totalSeconds: number): string {
  */
 export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
   const t = useTranslations('auth');
-  const ta = useTranslations('app');
   const te = useTranslations('errors');
   const tc = useTranslations('common');
   const router = useRouter();
@@ -349,119 +349,154 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
     : ['', ''];
 
   if (step === 'phone') {
-    return (
-      // bg-background, not the page's usual white-card-on-white — a premium
-      // onboarding screen (session 2026-08-28, client's reference) reads as
-      // one soft field rather than a stack of panels the way the shop
-      // screens deliberately do.
-      <main className="flex min-h-dvh flex-col bg-background px-6 pt-7 pb-6">
-        {/* Empty unless the MSG91 widget's own dashboard has captcha turned
-            on for this widget, in which case it renders here. */}
-        {useWidget && <div id={CAPTCHA_RENDER_ID} />}
+    // Staff keeps the old plain, flat layout — no marketing hero/decorative
+    // backdrop belongs on an internal sign-in page. Only the customer flow
+    // got the client's restyle (session 2026-10-27).
+    if (isStaff) {
+      return (
+        <main className="flex min-h-dvh flex-col bg-background px-6 pt-7 pb-6">
+          {useWidget && <div id={CAPTCHA_RENDER_ID} />}
 
-        <div className="flex items-center justify-between gap-2">
-          {/* Left-aligned, not centred in the full row — on a narrow phone
-              a centred logo at this size runs directly under the Skip
-              pill's right-aligned position and the two collide. Real logo
-              (session 2026-09-22) — was a text wordmark. */}
           <div className="min-w-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/brand/logo.png" alt="getFrresh" className="h-16 w-auto" />
           </div>
 
-          {/* B17 — the catalogue is public, so a customer who lands here by
-              accident must have a way back out that is not the OS back button.
-              Skipped entirely on the staff variant — there's nothing on this
-              page to "skip past" into browsing. */}
-          {!isStaff && (
-            <Link
-              href="/"
-              className="shrink-0 rounded-full bg-card px-4 py-2 text-[14px] font-bold shadow-sm"
-            >
-              {t('skipLogin')}
-            </Link>
-          )}
-        </div>
-
-        <h1 className="mt-4 text-center text-xl leading-snug font-bold whitespace-pre-line">
-          {isStaff ? t('staffHeading') : ta('tagline')}
-        </h1>
-
-        {/* The customer marketing hero/feature list has no place on a plain
-            staff sign-in page — swapped for one short subtitle instead. */}
-        {isStaff ? (
+          <h1 className="mt-4 text-center text-xl leading-snug font-bold whitespace-pre-line">
+            {t('staffHeading')}
+          </h1>
           <p className="mt-2 text-center text-sm text-muted-foreground">{t('staffSubtitle')}</p>
-        ) : (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/promo/veg-basket-hero.png"
-              alt=""
-              aria-hidden
-              className="mx-auto mt-6 w-full max-w-[260px] drop-shadow-lg"
-            />
 
-            {/* Icon left, title + a short subtitle stacked to its right — a
-                proper feature list (client's reference) rather than a row of
-                single-line checkmarks. */}
-            <ul className="mt-7 flex flex-col gap-3.5">
-              {FEATURES.map(({ titleKey, bodyKey }) => (
-                <li key={titleKey} className="flex items-start gap-3">
-                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
-                    <Check className="size-4.5" aria-hidden />
-                  </span>
-                  <span className="min-w-0 pt-0.5">
-                    <span className="block text-sm font-bold">{t(titleKey)}</span>
-                    <span className="block text-xs text-muted-foreground">{t(bodyKey)}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-
-        <form
-          className={cn('w-full', isStaff ? 'mt-8' : 'mt-7')}
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (phoneValid && !busy) void sendCode('sms');
-          }}
-        >
-          <div className="input-3d flex h-13 items-center gap-3 rounded-2xl border border-border/60 bg-card px-4 focus-within:border-primary">
-            <span className="text-base font-bold">+91</span>
-            <span aria-hidden className="h-6 w-px bg-border" />
-            <input
-              id="phone"
-              type="tel"
-              inputMode="numeric"
-              autoComplete="tel-national"
-              maxLength={10}
-              value={phone}
-              onChange={(event) => setPhone(event.target.value.replace(/\D/g, '').slice(0, 10))}
-              placeholder={t('phonePlaceholder')}
-              aria-label={t('phoneLabel')}
-              className="min-w-0 flex-1 bg-transparent text-base tracking-wide outline-none"
-            />
-          </div>
-
-          {error && <ErrorBanner message={error} onClose={() => setError(null)} closeLabel={tc('close')} />}
-
-          <button
-            type="submit"
-            disabled={!phoneValid || busy}
-            className="mt-4 h-13 w-full rounded-2xl bg-primary text-[16px] font-bold text-primary-foreground shadow-sm transition-colors disabled:bg-muted-foreground/45 disabled:text-white disabled:shadow-none"
+          <form
+            className="mt-8 w-full"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (phoneValid && !busy) void sendCode('sms');
+            }}
           >
-            {busy ? t('sending') : t('sendOtp')}
-          </button>
-        </form>
+            <div className="input-3d flex h-13 items-center gap-3 rounded-2xl border border-border/60 bg-card px-4 focus-within:border-primary">
+              <span className="text-base font-bold">+91</span>
+              <span aria-hidden className="h-6 w-px bg-border" />
+              <input
+                id="phone"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel-national"
+                maxLength={10}
+                value={phone}
+                onChange={(event) => setPhone(event.target.value.replace(/\D/g, '').slice(0, 10))}
+                placeholder={t('phonePlaceholder')}
+                aria-label={t('phoneLabel')}
+                className="min-w-0 flex-1 bg-transparent text-base tracking-wide outline-none"
+              />
+            </div>
+
+            {error && <ErrorBanner message={error} onClose={() => setError(null)} closeLabel={tc('close')} />}
+
+            <button
+              type="submit"
+              disabled={!phoneValid || busy}
+              className="mt-4 h-13 w-full rounded-2xl bg-primary text-[16px] font-bold text-primary-foreground shadow-sm transition-colors disabled:bg-muted-foreground/45 disabled:text-white disabled:shadow-none"
+            >
+              {busy ? t('sending') : t('sendOtp')}
+            </button>
+          </form>
+        </main>
+      );
+    }
+
+    // Customer flow — same green-gradient-and-leaves backdrop as
+    // Onboarding/SelectLanguage (`IntroBackground`), logo + basket floating
+    // free above a raised white card holding the feature checklist and the
+    // phone form, matching the client's reference exactly.
+    return (
+      <main className="relative flex min-h-dvh flex-col items-center px-6 pt-8 pb-6">
+        <IntroBackground />
+
+        {/* Empty unless the MSG91 widget's own dashboard has captcha turned
+            on for this widget, in which case it renders here. */}
+        {useWidget && <div id={CAPTCHA_RENDER_ID} />}
+
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/logo.png" alt="getFrresh" className="h-16 w-auto" />
+
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/promo/veg-basket-hero.png"
+          alt=""
+          aria-hidden
+          className="mt-4 w-full max-w-[220px] drop-shadow-xl"
+        />
+
+        <div className="card-3d mt-4 w-full rounded-[28px] bg-card px-6 py-6">
+          {/* Icon left, title + a short subtitle stacked to its right — a
+              proper feature list (client's reference) rather than a row of
+              single-line checkmarks. */}
+          <ul className="flex flex-col gap-3.5">
+            {FEATURES.map(({ titleKey, bodyKey }) => (
+              <li key={titleKey} className="flex items-start gap-3">
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-tint-green text-primary">
+                  <Check className="size-4.5" aria-hidden />
+                </span>
+                <span className="min-w-0 pt-0.5">
+                  <span className="block text-sm font-bold">{t(titleKey)}</span>
+                  <span className="block text-xs text-muted-foreground">{t(bodyKey)}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <form
+            className="mt-6 w-full"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (phoneValid && !busy) void sendCode('sms');
+            }}
+          >
+            <div className="input-3d flex h-13 items-center gap-3 rounded-2xl border border-border/60 bg-background px-4 focus-within:border-primary">
+              <span className="text-base font-bold">+91</span>
+              <span aria-hidden className="h-6 w-px bg-border" />
+              <input
+                id="phone"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel-national"
+                maxLength={10}
+                value={phone}
+                onChange={(event) => setPhone(event.target.value.replace(/\D/g, '').slice(0, 10))}
+                placeholder={t('phonePlaceholder')}
+                aria-label={t('phoneLabel')}
+                className="min-w-0 flex-1 bg-transparent text-base tracking-wide outline-none"
+              />
+            </div>
+
+            {error && <ErrorBanner message={error} onClose={() => setError(null)} closeLabel={tc('close')} />}
+
+            <button
+              type="submit"
+              disabled={!phoneValid || busy}
+              className="mt-4 h-13 w-full rounded-2xl bg-primary text-[16px] font-bold text-primary-foreground shadow-sm transition-colors disabled:bg-muted-foreground/45 disabled:text-white disabled:shadow-none"
+            >
+              {busy ? t('sending') : t('sendOtp')}
+            </button>
+          </form>
+        </div>
 
         {/* A fixed gap, not `mt-auto` — stretching this to the very bottom of
             the viewport left a large dead gap under the button on anything
             taller than the shortest phones, with the top and bottom margins
             reading as mismatched. */}
-        <p className="mt-8 text-center text-[12px] leading-relaxed text-muted-foreground">
+        <p className="mt-6 text-center text-[12px] leading-relaxed text-muted-foreground">
           {t('termsNote')}
         </p>
+
+        {/* B17 — the catalogue is public, so a customer who lands here by
+            accident must have a way back out that is not the OS back
+            button. Moved below the fold (was a top-right pill) — the
+            reference's centred logo has no room for it up there any more. */}
+        <Link href="/" className="mt-2 text-center text-xs font-semibold text-primary-dark underline-offset-2 hover:underline">
+          {t('skipLogin')}
+        </Link>
       </main>
     );
   }
