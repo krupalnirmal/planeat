@@ -54,6 +54,14 @@ export async function generateMetadata({
       apple: [{ url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
     },
     formatDetection: { telephone: false },
+    // Client feedback (session 2026-10-28, screenshot from the Play Store
+    // TWA build) — Chrome's own "Translate page?" infobar popped up over
+    // the app on every reload once the TWA opened fullscreen (the browser
+    // chrome that used to hide it is gone now that assetlinks.json is
+    // fixed). The app already offers mr/hi/en itself; Chrome auto-offering
+    // a second, unrelated translation on top breaks the native-app feel a
+    // fullscreen TWA is supposed to have.
+    other: { google: 'notranslate' },
   };
 }
 
