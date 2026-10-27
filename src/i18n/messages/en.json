@@ -1550,6 +1550,7 @@
     "title": "Do we deliver here?",
     "useCurrentLocation": "Use my current location",
     "checking": "Checking whether we deliver to your area…",
+    "detectedAddress": "Detected: {address}",
     "available": "Good news — we deliver to your area.",
     "availableIn": "We deliver in {area}",
     "unavailable": "Sorry, we haven't started delivering in your area yet.",

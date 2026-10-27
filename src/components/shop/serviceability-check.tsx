@@ -36,6 +36,14 @@ export function ServiceabilityCheck() {
   const [result, setResult] = useState<ServiceabilityResult | null>(null);
   const [joined, setJoined] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Client feedback (session 2026-10-28) — "use current location" only ever
+  // showed the matched *service area*'s own name ("We deliver in Nashik
+  // (GPO)"), a coarse admin-configured zone, never the customer's actual
+  // street. Resolved separately (not blocking the serviceability check
+  // itself, and silently skipped on failure) via the same reverse-geocode
+  // endpoint `address-manager.tsx`'s form uses, so the confirmation reads as
+  // "here's where we found you", not just "here's the zone you're in".
+  const [detectedAddress, setDetectedAddress] = useState<string | null>(null);
 
   const check = useMutation({
     mutationFn: (query: { pincode?: string; lat?: number; lng?: number }) =>
@@ -79,11 +87,17 @@ export function ServiceabilityCheck() {
 
   function useCurrentLocation() {
     if (!('geolocation' in navigator)) return;
+    setDetectedAddress(null);
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const next = { lat: position.coords.latitude, lng: position.coords.longitude };
         setCoords(next);
         check.mutate({ ...next, ...(pincode ? { pincode } : {}) });
+
+        void api
+          .get<{ displayName: string }>(`/api/geocode/reverse?lat=${next.lat}&lng=${next.lng}`)
+          .then((resolved) => setDetectedAddress(resolved.displayName || null))
+          .catch(() => {});
       },
       () => setError(te('generic')),
       { enableHighAccuracy: true, timeout: 10_000 },
@@ -142,6 +156,13 @@ export function ServiceabilityCheck() {
       </button>
 
       {error && <p className="mt-4 text-sm text-danger">{error}</p>}
+
+      {detectedAddress && (
+        <p className="mt-4 flex items-start gap-1.5 text-xs text-muted-foreground">
+          <LocateFixed className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden />
+          <span>{t('detectedAddress', { address: detectedAddress })}</span>
+        </p>
+      )}
 
       {result?.serviceable && (
         <section className="mt-6 rounded-[var(--radius)] border border-success/30 bg-primary/5 p-4">
