@@ -16,27 +16,35 @@ import { IntroBackground } from '@/components/auth/intro-background';
  * leaves backdrop (`IntroBackground`, shared with `SelectLanguageScreen` and
  * the login phone step) with the logo and basket floating free above a
  * raised white card, instead of everything sitting loose on a flat tint.
+ *
+ * Centred as one block (client feedback, session 2026-10-27 follow-up —
+ * "bottom la khup sara space distoy", a screenshot of the live page showing
+ * a large dead gap under the card) rather than pinning the logo to the top
+ * and pushing the card toward the bottom with a `flex-1` spacer: on a
+ * viewport taller than this content's natural height, that top/bottom split
+ * left the leftover space stranded below the card instead of shared evenly
+ * around the whole group. `justify-center` + a fixed `gap` centres the
+ * logo+basket+card as a single unit, so any extra space lands equally above
+ * and below it instead of pooling at one end.
  */
 export function OnboardingScreen() {
   const t = useTranslations('intro');
   const router = useRouter();
 
   return (
-    <main className="relative flex min-h-dvh flex-col items-center px-6 pt-10 pb-8">
+    <main className="relative flex min-h-dvh flex-col items-center justify-center gap-6 px-6 py-10">
       <IntroBackground />
 
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/brand/logo.png" alt="getFrresh" className="h-16 w-auto" />
 
-      <div className="flex flex-1 flex-col items-center justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/promo/veg-basket-hero.png"
-          alt=""
-          aria-hidden
-          className="w-full max-w-[280px] drop-shadow-xl"
-        />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/promo/veg-basket-hero.png"
+        alt=""
+        aria-hidden
+        className="w-full max-w-[260px] drop-shadow-xl"
+      />
 
       <div className="card-3d w-full rounded-[28px] bg-card px-6 py-7 text-center">
         <h1 className="text-xl leading-snug font-black text-balance">

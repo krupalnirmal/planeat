@@ -409,8 +409,14 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
     // Onboarding/SelectLanguage (`IntroBackground`), logo + basket floating
     // free above a raised white card holding the feature checklist and the
     // phone form, matching the client's reference exactly.
+    //
+    // Centred as one block (client feedback, session 2026-10-27 follow-up),
+    // same reasoning as `OnboardingScreen` — `justify-center` on the column
+    // instead of a top-pinned `pt-8 pb-6`, so leftover vertical space splits
+    // evenly above and below the whole group instead of reading as an
+    // uneven gap between the logo and the card.
     return (
-      <main className="relative flex min-h-dvh flex-col items-center px-6 pt-8 pb-6">
+      <main className="relative flex min-h-dvh flex-col items-center justify-center px-6 py-8">
         <IntroBackground />
 
         {/* Empty unless the MSG91 widget's own dashboard has captcha turned
