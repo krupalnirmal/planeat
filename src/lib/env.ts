@@ -112,6 +112,15 @@ export const env = {
     devFixedOtp: str('DEV_FIXED_OTP', '123456'),
   },
 
+  geocoding: {
+    /** "Use current location" reverse-geocoding (session 2026-10-27, client
+        feedback — Nominatim/OpenStreetMap's Indian address coverage was too
+        sparse, filling in wrong/blank street and locality). Empty = falls
+        back to the free Nominatim lookup `src/app/api/geocode/reverse/route.ts`
+        already had, so a fresh clone with no key still runs end to end. */
+    googleMapsApiKey: str('GOOGLE_MAPS_API_KEY', ''),
+  },
+
   storage: {
     cloudinaryCloudName: str('CLOUDINARY_CLOUD_NAME', ''),
     cloudinaryApiKey: str('CLOUDINARY_API_KEY', ''),
