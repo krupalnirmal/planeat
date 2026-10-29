@@ -58,23 +58,14 @@ const CATEGORY_ICONS: Record<string, typeof Leaf> = {
   __chopped_vegetables__: Salad,
 };
 
-// Per-category chip colour (session 2026-09-23, client reference
-// screenshot) — a distinct pastel background + icon tint per category,
-// sampled from the reference image rather than guessed, same "colour per
-// category" idea the home page's own `CategoryCollageTile` already uses
-// (though not the same palette — that one's keyed to real category slugs
-// only, this row also has the builder's synthetic `__sprouts__`-style
-// slugs, which need their own colours).
-const CATEGORY_CHIP_STYLE: Record<string, { bg: string; icon: string }> = {
-  __sprouts__: { bg: '#DFF6E6', icon: '#2fa355' },
-  __daily_essentials__: { bg: '#FDEEDB', icon: '#f2811d' },
-  vegetables: { bg: '#EFF9F0', icon: '#2fa355' },
-  __chopped_vegetables__: { bg: '#E8F3F7', icon: '#1a4d33' },
-  fruits: { bg: '#FDEEF1', icon: '#e0518a' },
-  dairy: { bg: '#EAF2FE', icon: '#2a78d6' },
-  'bakery-biscuits': { bg: '#FCEEF3', icon: '#c9578e' },
-};
-const DEFAULT_CHIP_STYLE = { bg: '#F1F5F1', icon: '#2fa355' };
+// One flat tint for every category chip (client feedback, session
+// 2026-10-29 — a different pastel per category, session 2026-09-23's own
+// choice, read as inconsistent once the chip row had no icon left to tell
+// the colours apart; "Sprouts" vs "Vegetables" vs "Fruits" should look like
+// the same kind of control, distinguished only by which one is selected).
+// Sprouts' own old tint, kept as the one shared background rather than
+// inventing a new colour.
+const CHIP_BG = '#DFF6E6';
 
 // Roughly this screen's own sticky `PageHeader`'s height (title + subtitle
 // line, `py-3` padding) — same approach as `category-product-list.tsx`'s own
@@ -268,7 +259,6 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
               className="flex gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               {columns.map((column) => {
-                const style = CATEGORY_CHIP_STYLE[column.slug] ?? DEFAULT_CHIP_STYLE;
                 const active = (activeColumn?.slug ?? columns[0]?.slug) === column.slug;
                 return (
                   <button
@@ -283,7 +273,7 @@ export function DayBuilderScreen({ dayOfWeek }: { dayOfWeek: number }) {
                       'shrink-0 rounded-2xl border-2 px-3.5 py-2.5 text-center text-[12.5px] font-bold whitespace-nowrap text-foreground transition-colors',
                       active ? 'border-primary' : 'border-transparent',
                     )}
-                    style={{ backgroundColor: style.bg }}
+                    style={{ backgroundColor: CHIP_BG }}
                   >
                     {categoryLabel(column)}
                   </button>
