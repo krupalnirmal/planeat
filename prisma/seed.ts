@@ -1252,6 +1252,11 @@ const SERVICE_AREAS = [
   // Dwarka), not guessed.
   { name: 'Mumbai Naka', pincode: '422002', ...NASHIK_CENTER, radius: 15000 },
   { name: 'Dwarka', pincode: '422011', ...NASHIK_CENTER, radius: 15000 },
+  // Client-supplied area list (session 2026-10-29) — "growing residential
+  // societies"; pincode confirmed via this app's own reverse-geocode
+  // endpoint (not the unrelated "Pathardi" 414102 already in this list,
+  // which is a different town in Ahmednagar district).
+  { name: 'Pathardi Phata', pincode: '422010', ...NASHIK_CENTER, radius: 15000 },
   { name: 'Panchavati', pincode: '422003', ...NASHIK_CENTER, radius: 15000 },
   { name: 'College Road', pincode: '422005', ...NASHIK_CENTER, radius: 15000 },
   { name: 'Satpur', pincode: '422007', ...NASHIK_CENTER, radius: 15000 },
