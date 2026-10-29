@@ -89,6 +89,19 @@ function componentFor(components: GoogleAddressComponent[], type: string): strin
   return components.find((c) => c.types.includes(type))?.long_name ?? '';
 }
 
+// Google's Open Location Code ("Plus Code") short form — 4-8 base-20 chars,
+// a '+', then 2-3 more (e.g. "XQRJ+33V"). Google prepends this to
+// `formatted_address` itself (not just a separate plus_code-typed result)
+// whenever a point has no named street to anchor on, which is common in
+// newer Nashik residential layouts — accurate, but meaningless to a
+// customer. Stripped from the front of whichever address text is shown.
+const PLUS_CODE_PREFIX = /^[23456789CFGHJMPQRVWX]{4,8}\+[23456789CFGHJMPQRVWX]{2,3},?\s*/i;
+
+function stripPlusCode(address: string): string {
+  const stripped = address.replace(PLUS_CODE_PREFIX, '').trim();
+  return stripped || address;
+}
+
 /** Google's Geocoding API — client feedback (session 2026-10-27): Nominatim
     was leaving "use current location" with the wrong/blank street and
     locality for Nashik addresses. Google's India coverage is far denser
@@ -140,7 +153,7 @@ async function resolveViaGoogle(lat: number, lng: number): Promise<ResolvedAddre
     city,
     state: state || 'Maharashtra',
     pincode: postcode,
-    displayName: best.formatted_address,
+    displayName: stripPlusCode(best.formatted_address),
   };
 }
 
