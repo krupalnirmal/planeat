@@ -66,7 +66,13 @@ export async function generateMetadata({
 }
 
 export const viewport: Viewport = {
-  themeColor: '#2FA355',
+  // Client feedback (session 2026-10-29) — the dark primary green here was
+  // painting the Android system nav bar / TWA chrome a jarring solid dark
+  // green under the app's own light floating bottom nav; switched to
+  // `--brand-tint-green`, the same pale green the home screen's "Fast
+  // Delivery" banner already uses, for a softer match with the rest of the
+  // UI instead of a hard primary-colour band at the very bottom.
+  themeColor: '#E8F5EA',
   width: 'device-width',
   initialScale: 1,
   // Zooming stays enabled: disabling it is an accessibility failure, and the
