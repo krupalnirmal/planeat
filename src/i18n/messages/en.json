@@ -522,6 +522,8 @@
       "dayRowHint": "Plan your healthy meals",
       "dayListTagline": "Good Food\nGood Mood",
       "itemCount": "{count} items",
+      "dayPlannedTag": "Planned",
+      "dayAddPlanTag": "Add plan",
       "planWeekTip": "Plan your week, eat healthy!",
       "planWeekTipSubtitle": "Better food · More energy · Happier you",
       "summaryHeroSubtitle": "Choose your plan and stay healthy",

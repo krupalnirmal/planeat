@@ -522,6 +522,8 @@
       "dayRowHint": "अपना सेहतमंद खाना प्लान करें",
       "dayListTagline": "अच्छा खाना\nअच्छा मूड",
       "itemCount": "{count} आइटम",
+      "dayPlannedTag": "प्लान हो गया",
+      "dayAddPlanTag": "प्लान जोड़ें",
       "planWeekTip": "अपना हफ्ता प्लान करें, सेहतमंद रहें!",
       "planWeekTipSubtitle": "बेहतर खाना · ज़्यादा ऊर्जा · ख़ुशहाल आप",
       "summaryHeroSubtitle": "अपना प्लान चुनें और सेहतमंद रहें",

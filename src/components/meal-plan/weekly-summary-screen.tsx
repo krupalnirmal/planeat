@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { CalendarDays, ChevronRight, Leaf, Package, PartyPopper, Save, ShoppingBasket, Wallet } from 'lucide-react';
+import { CalendarDays, Check, ChevronRight, Leaf, Package, PartyPopper, Plus, Save, ShoppingBasket, Wallet } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -174,9 +174,15 @@ function DayTile({ dayOfWeek }: { dayOfWeek: number }) {
     // one instead of a calendar. The real food photo (badge on the right)
     // replaces the plain lucide icon this tile used before, cropped
     // straight out of the client's own reference image (`day-style.ts`).
+    //
+    // Top-right status pill (client reference, same session) — a filled
+    // green "Planned" badge once a day has at least one item, an outlined
+    // "+ Add plan" badge otherwise, so which days still need picks is
+    // obvious at a glance across the whole week instead of having to read
+    // each tile's item count individually.
     <Link
       href={`/meal-plan/build/${dayOfWeek}`}
-      className="relative flex items-center justify-between gap-2 overflow-hidden rounded-[var(--radius-2xl)] border-2 p-3.5"
+      className="relative flex items-start justify-between gap-2 overflow-hidden rounded-[var(--radius-2xl)] border-2 p-3.5"
       style={{ backgroundColor: style.bg, borderColor: style.solid }}
     >
       <div className="min-w-0 flex-1">
@@ -188,8 +194,21 @@ function DayTile({ dayOfWeek }: { dayOfWeek: number }) {
           </p>
         )}
       </div>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={style.photo} alt="" className="size-16 shrink-0 object-contain" />
+      <div className="flex shrink-0 flex-col items-end gap-2">
+        {count > 0 ? (
+          <span className="flex items-center gap-1 rounded-full bg-primary px-2 py-1 text-[10px] font-bold text-primary-foreground">
+            <Check className="size-3 shrink-0" aria-hidden />
+            {tw('dayPlannedTag')}
+          </span>
+        ) : (
+          <span className="flex items-center gap-1 rounded-full border border-border bg-card px-2 py-1 text-[10px] font-bold text-foreground">
+            <Plus className="size-3 shrink-0" aria-hidden />
+            {tw('dayAddPlanTag')}
+          </span>
+        )}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={style.photo} alt="" className="size-16 shrink-0 object-contain" />
+      </div>
     </Link>
   );
 }
