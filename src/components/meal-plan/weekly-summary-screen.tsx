@@ -10,7 +10,6 @@ import { PageHeader } from '@/components/shop/page-header';
 import { useDeliveryModePreference } from '@/hooks/use-delivery-mode-preference';
 import { ApiClientError, api, qs } from '@/lib/api/client';
 import { formatPaise } from '@/lib/money';
-import { cn } from '@/lib/utils';
 import { DAY_STYLE } from './day-style';
 import { DeliveryModeTag } from './delivery-mode-tag';
 import { MealPlanHero } from './meal-plan-hero';
@@ -166,32 +165,31 @@ function DayTile({ dayOfWeek }: { dayOfWeek: number }) {
   const draft = usePlanDraft();
   const count = draft.itemCount(dayOfWeek);
   const style = DAY_STYLE[dayOfWeek];
-  const Icon = style.icon;
 
   return (
+    // Every day gets its own full-card tint and a colour-matched border,
+    // whether or not it has items yet (client feedback, session
+    // 2026-10-29) — the earlier version only coloured a day once it had
+    // picks, which read as six near-identical white cards and one green
+    // one instead of a calendar. The real food photo (badge on the right)
+    // replaces the plain lucide icon this tile used before, cropped
+    // straight out of the client's own reference image (`day-style.ts`).
     <Link
       href={`/meal-plan/build/${dayOfWeek}`}
-      className={cn(
-        'flex items-center gap-2 rounded-[var(--radius)] border p-3',
-        count > 0 ? 'border-primary bg-tint-green' : 'border-border bg-card',
-      )}
+      className="relative flex items-center justify-between gap-2 overflow-hidden rounded-[var(--radius-2xl)] border-2 p-3.5"
+      style={{ backgroundColor: style.bg, borderColor: style.solid }}
     >
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-bold">{t(`daysShort.${dayOfWeek}`)}</p>
+        <p className="text-lg font-black">{t(`daysShort.${dayOfWeek}`)}</p>
         <p className="mt-1 text-xs text-muted-foreground">{tw('itemCount', { count })}</p>
-        {count > 0 && <p className="mt-1 text-sm font-bold">{formatPaise(draft.dayTotalPaise(dayOfWeek))}</p>}
+        {count > 0 && (
+          <p className="mt-1 text-sm font-black" style={{ color: style.solid }}>
+            {formatPaise(draft.dayTotalPaise(dayOfWeek))}
+          </p>
+        )}
       </div>
-      {/* Colour-badged icon (session 2026-09-23, client reference) — was a
-          plain text-only tile; reuses the day-list screen's own `DAY_STYLE`
-          palette so both screens read as one consistent system, standing
-          in for the reference's own per-day food photo (see `day-style.ts`
-          on why a real icon rather than a sourced stock photo). */}
-      <span
-        className="grid size-12 shrink-0 place-items-center rounded-full"
-        style={{ backgroundColor: style.bg }}
-      >
-        <Icon className="size-6 shrink-0" style={{ color: style.solid }} aria-hidden />
-      </span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={style.photo} alt="" className="size-16 shrink-0 object-contain" />
     </Link>
   );
 }
