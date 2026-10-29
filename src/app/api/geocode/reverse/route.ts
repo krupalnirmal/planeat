@@ -77,6 +77,7 @@ interface GoogleAddressComponent {
 interface GoogleGeocodeResult {
   formatted_address: string;
   address_components: GoogleAddressComponent[];
+  types: string[];
 }
 
 interface GoogleGeocodeResponse {
@@ -110,10 +111,15 @@ async function resolveViaGoogle(lat: number, lng: number): Promise<ResolvedAddre
   const json = (await res.json()) as GoogleGeocodeResponse;
   if (json.status !== 'OK' || json.results.length === 0) return null;
 
-  // The first result is Google's own best (most specific) match for this
-  // exact point — a rooftop/street-address match when one exists, falling
-  // back to the nearest named place otherwise.
-  const components = json.results[0].address_components;
+  // Client feedback (session 2026-10-29) — the raw first result for a point
+  // with no precise street-level coverage (common in newer Nashik layouts
+  // like Dnyaneshwar Nagar) is a "plus_code" result: a Google geocode
+  // (e.g. "XQRJ+33V"), accurate but meaningless to a customer typing an
+  // address. Skip past any plus_code-only result to the next, more human
+  // one (sublocality/locality) when one exists, rather than showing the
+  // code as the detected address.
+  const best = json.results.find((r) => !r.types.includes('plus_code')) ?? json.results[0];
+  const components = best.address_components;
   const streetNumber = componentFor(components, 'street_number');
   const route = componentFor(components, 'route');
   const sublocality =
@@ -134,7 +140,7 @@ async function resolveViaGoogle(lat: number, lng: number): Promise<ResolvedAddre
     city,
     state: state || 'Maharashtra',
     pincode: postcode,
-    displayName: json.results[0].formatted_address,
+    displayName: best.formatted_address,
   };
 }
 
