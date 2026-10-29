@@ -415,7 +415,10 @@ const CATEGORIES: CategorySeed[] = [
         unitType: UnitType.G,
         tags: ['protein', 'sprouts', 'high-fiber'],
         aliases: ['moong sprouts', 'mug sprouts', 'मूग स्प्राऊट्स', 'मूंग स्प्राउट्स'],
-        variants: pack('200 g', 200, UnitType.G, 25, 28),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 25, mrp: 28, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 60, mrp: 69, stock: 25 },
+        ],
       },
       {
         sku: 'VEG-SPROUT-MATKI',
@@ -425,7 +428,10 @@ const CATEGORIES: CategorySeed[] = [
         unitType: UnitType.G,
         tags: ['protein', 'sprouts', 'high-fiber'],
         aliases: ['matki sprouts', 'moth bean sprouts', 'मटकी स्प्राऊट्स'],
-        variants: pack('200 g', 200, UnitType.G, 25, 28),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 25, mrp: 28, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 60, mrp: 69, stock: 25 },
+        ],
       },
       {
         sku: 'VEG-SPROUT-CHANA',
@@ -435,7 +441,10 @@ const CATEGORIES: CategorySeed[] = [
         unitType: UnitType.G,
         tags: ['protein', 'sprouts', 'high-fiber'],
         aliases: ['chana sprouts', 'harbhara sprouts', 'chickpea sprouts', 'हरभरा स्प्राऊट्स'],
-        variants: pack('200 g', 200, UnitType.G, 30, 34),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 30, mrp: 34, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 70, mrp: 84, stock: 25 },
+        ],
       },
       {
         sku: 'VEG-SPROUT-COWPEA',
@@ -445,7 +454,10 @@ const CATEGORIES: CategorySeed[] = [
         unitType: UnitType.G,
         tags: ['protein', 'sprouts', 'high-fiber'],
         aliases: ['chawli sprouts', 'cowpea sprouts', 'lobia sprouts', 'चवळी स्प्राऊट्स'],
-        variants: pack('200 g', 200, UnitType.G, 30, 34),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 30, mrp: 34, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 70, mrp: 84, stock: 25 },
+        ],
       },
       {
         sku: 'VEG-SPROUT-MASOOR',
@@ -455,7 +467,10 @@ const CATEGORIES: CategorySeed[] = [
         unitType: UnitType.G,
         tags: ['protein', 'sprouts', 'iron'],
         aliases: ['masoor sprouts', 'lentil sprouts', 'मसूर स्प्राऊट्स'],
-        variants: pack('200 g', 200, UnitType.G, 35, 39),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 35, mrp: 39, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 80, mrp: 94, stock: 25 },
+        ],
       },
       {
         sku: 'VEG-SPROUT-ALFALFA',
@@ -465,7 +480,10 @@ const CATEGORIES: CategorySeed[] = [
         unitType: UnitType.G,
         tags: ['protein', 'sprouts', 'low-calorie'],
         aliases: ['alfalfa sprouts', 'अल्फाल्फा स्प्राऊट्स'],
-        variants: pack('200 g', 200, UnitType.G, 60, 66),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 60, mrp: 66, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 140, mrp: 154, stock: 25 },
+        ],
       },
       {
         sku: 'VEG-SPROUT-SOYBEAN',
@@ -475,7 +493,10 @@ const CATEGORIES: CategorySeed[] = [
         unitType: UnitType.G,
         tags: ['protein', 'sprouts', 'high-fiber'],
         aliases: ['soybean sprouts', 'soya sprouts', 'सोयाबीन स्प्राऊट्स'],
-        variants: pack('200 g', 200, UnitType.G, 35, 39),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 35, mrp: 39, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 80, mrp: 94, stock: 25 },
+        ],
       },
       {
         sku: 'VEG-SPROUT-MOONG-MATKI-MIX',
@@ -485,7 +506,10 @@ const CATEGORIES: CategorySeed[] = [
         unitType: UnitType.G,
         tags: ['protein', 'sprouts', 'high-fiber'],
         aliases: ['moong matki mix sprouts', 'mixed sprouts', 'मूग मटकी मिक्स स्प्राऊट्स'],
-        variants: pack('200 g', 200, UnitType.G, 28, 32),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 28, mrp: 32, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 65, mrp: 79, stock: 25 },
+        ],
       },
       {
         sku: 'VEG-SPROUT-MIXED-DAL',
@@ -495,7 +519,10 @@ const CATEGORIES: CategorySeed[] = [
         unitType: UnitType.G,
         tags: ['protein', 'sprouts', 'high-fiber'],
         aliases: ['mixed dal sprouts', 'मिक्स डाळ स्प्राऊट्स'],
-        variants: pack('200 g', 200, UnitType.G, 32, 36),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 32, mrp: 36, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 75, mrp: 89, stock: 25 },
+        ],
       },
       {
         sku: 'VEG-SPROUT-BLACK-CHANA',
@@ -505,7 +532,10 @@ const CATEGORIES: CategorySeed[] = [
         unitType: UnitType.G,
         tags: ['protein', 'sprouts', 'iron'],
         aliases: ['black chana sprouts', 'kala chana sprouts', 'काळा हरभरा स्प्राऊट्स'],
-        variants: pack('200 g', 200, UnitType.G, 32, 36),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 32, mrp: 36, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 75, mrp: 89, stock: 25 },
+        ],
       },
       {
         sku: 'VEG-SPROUT-GREEN-PEA',
@@ -515,7 +545,10 @@ const CATEGORIES: CategorySeed[] = [
         unitType: UnitType.G,
         tags: ['protein', 'sprouts', 'high-fiber'],
         aliases: ['green pea sprouts', 'vatana sprouts', 'हिरवा वाटाणा स्प्राऊट्स'],
-        variants: pack('200 g', 200, UnitType.G, 30, 34),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 30, mrp: 34, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 70, mrp: 84, stock: 25 },
+        ],
       },
     ],
   },
@@ -698,7 +731,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'import',
         tags: ['exotic', 'antioxidant'],
         aliases: ['blueberry', 'ब्लूबेरी'],
-        variants: pack('125 g', 125, UnitType.G, 199, 230, 15),
+        variants: [
+          { label: '125 g', quantity: 125, unit: UnitType.G, price: 199, mrp: 230, stock: 15, isDefault: true },
+          { label: '250 g', quantity: 250, unit: UnitType.G, price: 380, mrp: 439, stock: 15 },
+        ],
       },
       {
         sku: 'FRT-ALMOND',
@@ -710,7 +746,10 @@ const CATEGORIES: CategorySeed[] = [
         mealPlanEligible: false,
         tags: ['dry-fruit', 'protein', 'healthy-fat'],
         aliases: ['badam', 'almond', 'बादाम'],
-        variants: pack('250 g', 250, UnitType.G, 210, 235, 25),
+        variants: [
+          { label: '250 g', quantity: 250, unit: UnitType.G, price: 210, mrp: 235, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 400, mrp: 449, stock: 25 },
+        ],
       },
       {
         sku: 'FRT-CASHEW',
@@ -722,7 +761,10 @@ const CATEGORIES: CategorySeed[] = [
         mealPlanEligible: false,
         tags: ['dry-fruit', 'protein', 'healthy-fat'],
         aliases: ['kaju', 'cashew', 'काजू'],
-        variants: pack('250 g', 250, UnitType.G, 240, 270, 25),
+        variants: [
+          { label: '250 g', quantity: 250, unit: UnitType.G, price: 240, mrp: 270, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 455, mrp: 519, stock: 25 },
+        ],
       },
       {
         sku: 'FRT-WALNUT',
@@ -734,7 +776,10 @@ const CATEGORIES: CategorySeed[] = [
         mealPlanEligible: false,
         tags: ['dry-fruit', 'omega-3', 'healthy-fat'],
         aliases: ['akhrot', 'walnut', 'अखरोट'],
-        variants: pack('250 g', 250, UnitType.G, 260, 290, 20),
+        variants: [
+          { label: '250 g', quantity: 250, unit: UnitType.G, price: 260, mrp: 290, stock: 20, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 495, mrp: 554, stock: 20 },
+        ],
       },
       {
         sku: 'FRT-RAISINS',
@@ -746,7 +791,10 @@ const CATEGORIES: CategorySeed[] = [
         mealPlanEligible: false,
         tags: ['dry-fruit', 'iron'],
         aliases: ['manuka', 'kishmish', 'raisins', 'किशमिश'],
-        variants: pack('250 g', 250, UnitType.G, 65, 78, 30),
+        variants: [
+          { label: '250 g', quantity: 250, unit: UnitType.G, price: 65, mrp: 78, stock: 30, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 125, mrp: 154, stock: 30 },
+        ],
       },
     ],
   },
@@ -767,7 +815,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'milk',
         tags: ['dairy', 'protein', 'allergen:milk'],
         aliases: ['dudh', 'milk', 'दूध'],
-        variants: pack('500 ml', 500, UnitType.ML, 28, 30, 60),
+        variants: [
+          { label: '500 ml', quantity: 500, unit: UnitType.ML, price: 28, mrp: 30, stock: 60, isDefault: true },
+          { label: '1 L', quantity: 1000, unit: UnitType.ML, price: 55, mrp: 59, stock: 60 },
+        ],
       },
       {
         sku: 'DRY-CURD-400',
@@ -778,7 +829,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'curd',
         tags: ['dairy', 'probiotic', 'allergen:milk'],
         aliases: ['dahi', 'curd', 'yogurt', 'दही'],
-        variants: pack('400 g', 400, UnitType.G, 35, 40, 40),
+        variants: [
+          { label: '400 g', quantity: 400, unit: UnitType.G, price: 35, mrp: 40, stock: 40, isDefault: true },
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 80, mrp: 94, stock: 40 },
+        ],
       },
       {
         sku: 'DRY-PANEER-200',
@@ -789,7 +843,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'paneer',
         tags: ['dairy', 'protein', 'allergen:milk'],
         aliases: ['paneer', 'cottage cheese', 'पनीर'],
-        variants: pack('200 g', 200, UnitType.G, 95, 105, 20),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 95, mrp: 105, stock: 20, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 220, mrp: 244, stock: 20 },
+        ],
       },
       {
         sku: 'DRY-GHEE-500',
@@ -800,7 +857,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'ghee',
         tags: ['dairy', 'fat', 'allergen:milk'],
         aliases: ['tup', 'ghee', 'घी'],
-        variants: pack('500 ml', 500, UnitType.ML, 340, 375, 15),
+        variants: [
+          { label: '500 ml', quantity: 500, unit: UnitType.ML, price: 340, mrp: 375, stock: 15, isDefault: true },
+          { label: '1 L', quantity: 1000, unit: UnitType.ML, price: 645, mrp: 719, stock: 15 },
+        ],
       },
       // Client-requested sub-groups (session 2026-08-26): Milk & Buttermilk,
       // Curd & Yogurt, Paneer & Cheese, Ghee & Butter — the four products
@@ -816,7 +876,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'milk',
         tags: ['dairy', 'probiotic', 'allergen:milk'],
         aliases: ['taak', 'chaas', 'buttermilk', 'ताक'],
-        variants: pack('500 ml', 500, UnitType.ML, 18, 22, 40),
+        variants: [
+          { label: '500 ml', quantity: 500, unit: UnitType.ML, price: 18, mrp: 22, stock: 40, isDefault: true },
+          { label: '1 L', quantity: 1000, unit: UnitType.ML, price: 35, mrp: 44, stock: 40 },
+        ],
       },
       {
         sku: 'DRY-YOGURT-100',
@@ -827,7 +890,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'curd',
         tags: ['dairy', 'probiotic', 'allergen:milk'],
         aliases: ['yogurt', 'flavoured curd', 'योगर्ट'],
-        variants: pack('100 g', 100, UnitType.G, 45, 52, 25),
+        variants: [
+          { label: '100 g', quantity: 100, unit: UnitType.G, price: 45, mrp: 52, stock: 25, isDefault: true },
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 85, mrp: 104, stock: 25 },
+        ],
       },
       {
         sku: 'DRY-CHEESESLICE-200',
@@ -838,7 +904,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'paneer',
         tags: ['dairy', 'protein', 'allergen:milk'],
         aliases: ['cheese slice', 'चीज स्लाइस'],
-        variants: pack('200 g', 200, UnitType.G, 120, 135, 20),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 120, mrp: 135, stock: 20, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 275, mrp: 314, stock: 20 },
+        ],
       },
       {
         sku: 'DRY-CHEESECUBE-200',
@@ -849,7 +918,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'paneer',
         tags: ['dairy', 'protein', 'allergen:milk'],
         aliases: ['cheese cubes', 'processed cheese', 'चीज क्यूब्स'],
-        variants: pack('200 g', 200, UnitType.G, 140, 155, 20),
+        variants: [
+          { label: '200 g', quantity: 200, unit: UnitType.G, price: 140, mrp: 155, stock: 20, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 320, mrp: 359, stock: 20 },
+        ],
       },
       {
         sku: 'DRY-BUTTER-100',
@@ -860,7 +932,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'ghee',
         tags: ['dairy', 'fat', 'allergen:milk'],
         aliases: ['loni', 'makhan', 'butter', 'लोणी'],
-        variants: pack('100 g', 100, UnitType.G, 55, 62, 25),
+        variants: [
+          { label: '100 g', quantity: 100, unit: UnitType.G, price: 55, mrp: 62, stock: 25, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 250, mrp: 284, stock: 25 },
+        ],
       },
     ],
   },
@@ -1036,7 +1111,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'grains',
         tags: ['staple', 'breakfast'],
         aliases: ['poha', 'pohe', 'flattened rice', 'पोहे'],
-        variants: pack('500 g', 500, UnitType.G, 35, 40, 30),
+        variants: [
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 35, mrp: 40, stock: 30, isDefault: true },
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 65, mrp: 79, stock: 30 },
+        ],
       },
       {
         sku: 'GRC-RAVA-500',
@@ -1047,7 +1125,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'grains',
         tags: ['staple', 'breakfast', 'allergen:gluten'],
         aliases: ['rava', 'sooji', 'suji', 'रवा', 'सूजी'],
-        variants: pack('500 g', 500, UnitType.G, 28, 32, 30),
+        variants: [
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 28, mrp: 32, stock: 30, isDefault: true },
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 55, mrp: 64, stock: 30 },
+        ],
       },
       {
         sku: 'GRC-BESAN-500',
@@ -1058,7 +1139,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'pulses',
         tags: ['staple', 'breakfast', 'protein'],
         aliases: ['besan', 'gram flour', 'बेसन'],
-        variants: pack('500 g', 500, UnitType.G, 48, 55, 25),
+        variants: [
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 48, mrp: 55, stock: 25, isDefault: true },
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 90, mrp: 109, stock: 25 },
+        ],
       },
       {
         sku: 'GRC-CORNFLAKES-500',
@@ -1069,7 +1153,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'grains',
         tags: ['breakfast'],
         aliases: ['cornflakes', 'corn flakes', 'कॉर्नफ्लेक्स'],
-        variants: pack('500 g', 500, UnitType.G, 145, 165, 20),
+        variants: [
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 145, mrp: 165, stock: 20, isDefault: true },
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 275, mrp: 319, stock: 20 },
+        ],
       },
       {
         sku: 'GRC-RICE-5KG',
@@ -1080,7 +1167,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'grains',
         tags: ['staple', 'grain'],
         aliases: ['tandul', 'chawal', 'rice', 'चावल'],
-        variants: pack('5 kg', 5000, UnitType.G, 380, 420, 20),
+        variants: [
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 80, mrp: 94, stock: 20 },
+          { label: '5 kg', quantity: 5000, unit: UnitType.G, price: 380, mrp: 420, stock: 20, isDefault: true },
+        ],
       },
       {
         sku: 'GRC-OIL-1L',
@@ -1091,7 +1181,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'pantry',
         tags: ['oil'],
         aliases: ['tel', 'oil', 'sunflower oil', 'तेल'],
-        variants: pack('1 L', 1000, UnitType.ML, 145, 160, 25),
+        variants: [
+          { label: '1 L', quantity: 1000, unit: UnitType.ML, price: 145, mrp: 160, stock: 25, isDefault: true },
+          { label: '5 L', quantity: 5000, unit: UnitType.ML, price: 655, mrp: 724, stock: 25 },
+        ],
       },
       {
         sku: 'GRC-TEA-250',
@@ -1102,7 +1195,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'pantry',
         tags: ['beverage'],
         aliases: ['chaha', 'chai patti', 'tea', 'चाय'],
-        variants: pack('250 g', 250, UnitType.G, 140, 155, 30),
+        variants: [
+          { label: '250 g', quantity: 250, unit: UnitType.G, price: 140, mrp: 155, stock: 30, isDefault: true },
+          { label: '500 g', quantity: 500, unit: UnitType.G, price: 265, mrp: 299, stock: 30 },
+        ],
       },
       {
         sku: 'GRC-SUGAR-1KG',
@@ -1113,7 +1209,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'pulses',
         tags: ['staple'],
         aliases: ['sakhar', 'chini', 'sugar', 'चीनी'],
-        variants: pack('1 kg', 1000, UnitType.G, 48, 52, 40),
+        variants: [
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 48, mrp: 52, stock: 40, isDefault: true },
+          { label: '5 kg', quantity: 5000, unit: UnitType.G, price: 215, mrp: 239, stock: 40 },
+        ],
       },
       {
         sku: 'GRC-TOORDAL-1KG',
@@ -1124,7 +1223,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'pulses',
         tags: ['pulse', 'protein'],
         aliases: ['toor dal', 'tur dal', 'arhar', 'डाळ', 'दाल'],
-        variants: pack('1 kg', 1000, UnitType.G, 165, 180, 30),
+        variants: [
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 165, mrp: 180, stock: 30, isDefault: true },
+          { label: '5 kg', quantity: 5000, unit: UnitType.G, price: 745, mrp: 814, stock: 30 },
+        ],
       },
       {
         sku: 'GRC-ATTA-5KG',
@@ -1135,7 +1237,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'grains',
         tags: ['staple', 'grain'],
         aliases: ['atta', 'gahu peeth', 'wheat flour', 'आटा'],
-        variants: pack('5 kg', 5000, UnitType.G, 235, 260, 20),
+        variants: [
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 50, mrp: 59, stock: 20 },
+          { label: '5 kg', quantity: 5000, unit: UnitType.G, price: 235, mrp: 260, stock: 20, isDefault: true },
+        ],
       },
     ],
   },
@@ -1165,7 +1270,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'multigrain',
         tags: ['aata', 'flour'],
         aliases: ['multigrain atta', 'multi grain flour', 'मल्टी ग्रेन आटा'],
-        variants: pack('5 kg', 5000, UnitType.G, 320, 350, 20),
+        variants: [
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 70, mrp: 79, stock: 20 },
+          { label: '5 kg', quantity: 5000, unit: UnitType.G, price: 320, mrp: 350, stock: 20, isDefault: true },
+        ],
       },
       {
         sku: 'AATA-JWARI-5KG',
@@ -1176,7 +1284,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'jwari',
         tags: ['aata', 'flour'],
         aliases: ['jwari atta', 'jowar flour', 'ज्वारी आटा', 'ज्वार आटा'],
-        variants: pack('5 kg', 5000, UnitType.G, 275, 300, 20),
+        variants: [
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 60, mrp: 69, stock: 20 },
+          { label: '5 kg', quantity: 5000, unit: UnitType.G, price: 275, mrp: 300, stock: 20, isDefault: true },
+        ],
       },
       {
         // Session 2026-09-27, owner request. Not a duplicate of the
@@ -1193,7 +1304,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'gahu',
         tags: ['aata', 'flour'],
         aliases: ['ghau atta', 'gahu peeth', 'wheat flour', 'गहू आटा', 'गेहूं आटा'],
-        variants: pack('5 kg', 5000, UnitType.G, 245, 270, 20),
+        variants: [
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 55, mrp: 64, stock: 20 },
+          { label: '5 kg', quantity: 5000, unit: UnitType.G, price: 245, mrp: 270, stock: 20, isDefault: true },
+        ],
       },
       {
         sku: 'AATA-BAJRI-5KG',
@@ -1204,7 +1318,10 @@ const CATEGORIES: CategorySeed[] = [
         vegetableType: 'bajri',
         tags: ['aata', 'flour'],
         aliases: ['bajri atta', 'bajra flour', 'pearl millet flour', 'बाजरी आटा', 'बाजरा आटा'],
-        variants: pack('5 kg', 5000, UnitType.G, 260, 285, 20),
+        variants: [
+          { label: '1 kg', quantity: 1000, unit: UnitType.G, price: 55, mrp: 64, stock: 20 },
+          { label: '5 kg', quantity: 5000, unit: UnitType.G, price: 260, mrp: 285, stock: 20, isDefault: true },
+        ],
       },
     ],
   },
