@@ -1243,6 +1243,15 @@ const SERVICE_AREAS = [
   { name: 'Shevgaon', pincode: '414502', lat: 19.3494, lng: 75.2296, radius: 8000 },
   { name: 'Tisgaon', pincode: '414105', lat: 19.2201, lng: 75.0894, radius: 8000 },
   { name: 'Nashik (GPO)', pincode: '422001', ...NASHIK_CENTER, radius: 15000 },
+  // Client feedback (session 2026-10-29) — Mumbai Naka is one of Nashik's
+  // busiest, most society-dense areas (Gole Colony, Matoshree Nagar,
+  // Dnyaneshwar Nagar), and Dwarka Circle is the same kind of dense major
+  // junction; neither was covered yet. Pincodes confirmed via this app's
+  // own reverse-geocode endpoint against each area's real coordinates
+  // (422002 for Gole Colony/Mumbai Naka's residential layouts, 422011 for
+  // Dwarka), not guessed.
+  { name: 'Mumbai Naka', pincode: '422002', ...NASHIK_CENTER, radius: 15000 },
+  { name: 'Dwarka', pincode: '422011', ...NASHIK_CENTER, radius: 15000 },
   { name: 'Panchavati', pincode: '422003', ...NASHIK_CENTER, radius: 15000 },
   { name: 'College Road', pincode: '422005', ...NASHIK_CENTER, radius: 15000 },
   { name: 'Satpur', pincode: '422007', ...NASHIK_CENTER, radius: 15000 },
