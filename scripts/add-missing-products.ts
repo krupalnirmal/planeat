@@ -20,7 +20,19 @@ import { UnitType } from '../src/generated/prisma/enums';
  *   vegetable.
  */
 
-function weightLadder(pricePerKg: number, stock = 30) {
+interface VariantSeed {
+  label: string;
+  quantity: number;
+  unit: UnitType;
+  pricePaise: bigint;
+  mrpPaise: bigint;
+  stockQty: number;
+  lowStockThreshold: number;
+  isDefault: boolean;
+  isActive: boolean;
+}
+
+function weightLadder(pricePerKg: number, stock = 30): VariantSeed[] {
   const half = Math.round(pricePerKg / 2);
   const quarter = Math.round(pricePerKg / 4);
   return [
@@ -30,13 +42,13 @@ function weightLadder(pricePerKg: number, stock = 30) {
   ];
 }
 
-function bunch(price: number, stock = 25) {
+function bunch(price: number, stock = 25): VariantSeed[] {
   return [
     { label: '1 जुडी', quantity: 1, unit: UnitType.BUNCH, pricePaise: BigInt(price * 100), mrpPaise: BigInt((price + 3) * 100), stockQty: stock, lowStockThreshold: 5, isDefault: true, isActive: true },
   ];
 }
 
-function smallPack(stock = 20) {
+function smallPack(stock = 20): VariantSeed[] {
   return [
     { label: '200 g', quantity: 200, unit: UnitType.G, pricePaise: BigInt(4500), mrpPaise: BigInt(5200), stockQty: stock, lowStockThreshold: 5, isDefault: true, isActive: true },
   ];
