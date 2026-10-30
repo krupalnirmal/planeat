@@ -19,18 +19,23 @@ export interface VegetableType {
 // Stem/Fruit/Pod/Flower/Seed/Chopped split down to just these 2. Every
 // existing product that isn't literally chopped now has no subgroup and
 // falls into the page's existing "Other" bucket — accepted deliberately,
-// not a bug. `organic` ships empty: nothing in the catalogue has real
-// organic-certification data, so nothing gets tagged into it until a real
-// organic SKU exists. `chopped` keeps its id from last session's 10 real
+// not a bug. `chopped` keeps its id from last session's 10 real
 // chopped-vegetable products — only the label changed, so none of them
 // needed re-tagging.
-// Order (session 2026-09-27, owner request): Chopping before Organic, so the
-// rail reads Fresh (the "rest" bucket, moved ahead of both — see
-// `category-product-list.tsx`'s vegetables-only `restFirst`) → Chopping →
-// Organic.
+// Order (session 2026-09-27, owner request): Chopping before the second
+// group, so the rail reads Fresh (the "rest" bucket, moved ahead of both —
+// see `category-product-list.tsx`'s vegetables-only `restFirst`) → Chopping
+// → second group.
+// `organic` → `daily-use` (session 2026-10-30, client request): `organic`
+// had shipped empty since session 2026-09-19 — nothing in the catalogue
+// ever got real organic-certification data — so the client asked for the
+// slot to carry the 5 real "Daily Use Vegetables" variant products
+// (VEG-REDCARROT, VEG-THICKGREENCHILLI, VEG-THINGREENCHILLI,
+// VEG-WHITESALADCUCUMBER, VEG-GREENCUCUMBER) instead, rather than leave an
+// always-empty tab on the live rail.
 export const VEGETABLE_TYPES: VegetableType[] = [
   { id: 'chopped', emoji: '🔪', labelEn: 'Chopping Vegetable', labelMr: 'चिरलेली भाजी', labelHi: 'कटी हुई सब्ज़ी' },
-  { id: 'organic', emoji: '🌿', labelEn: 'Organic Vegetable', labelMr: 'ऑरगॅनिक भाजी', labelHi: 'जैविक सब्ज़ी' },
+  { id: 'daily-use', emoji: '🧺', labelEn: 'Daily Use Vegetables', labelMr: 'रोजच्या वापरातील भाज्या', labelHi: 'रोज़ इस्तेमाल की सब्ज़ियाँ' },
 ];
 
 export function vegetableTypeLabel(type: VegetableType, locale: AppLocale): string {
