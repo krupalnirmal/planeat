@@ -357,7 +357,7 @@ export function LoginFlow({ variant }: { variant?: 'staff' } = {}) {
         <main className="flex min-h-dvh flex-col bg-background px-6 pt-7 pb-6">
           {useWidget && <div id={CAPTCHA_RENDER_ID} />}
 
-          <div className="min-w-0">
+          <div className="flex min-w-0 justify-center py-6">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/brand/logo.png" alt="getFrresh" className="h-16 w-auto" />
           </div>
