@@ -1,0 +1,1252 @@
+[
+  {
+    "id": "var_01m3f6d7gny64tdek6azxhgnkg",
+    "sku": "DRY-BUTTERMILK-500",
+    "pricePaise": "1800"
+  },
+  {
+    "id": "var_01m637fzpacq464mnpdj2z7wnt",
+    "sku": "DRY-BUTTERMILK-500",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m3f6d7j2r9yc8cn7dp8ss46q",
+    "sku": "DRY-YOGURT-100",
+    "pricePaise": "4500"
+  },
+  {
+    "id": "var_01m637fzpj3esbx1xcfb75ccqn",
+    "sku": "DRY-YOGURT-100",
+    "pricePaise": "8500"
+  },
+  {
+    "id": "var_01m3f6d7k0xp8ahc0n8j0911k7",
+    "sku": "DRY-CHEESESLICE-200",
+    "pricePaise": "12000"
+  },
+  {
+    "id": "var_01m637fzpv6epg2shxgxcnz0ey",
+    "sku": "DRY-CHEESESLICE-200",
+    "pricePaise": "27500"
+  },
+  {
+    "id": "var_01m3f6d7kz9cq3kc566ftcjk8x",
+    "sku": "DRY-CHEESECUBE-200",
+    "pricePaise": "14000"
+  },
+  {
+    "id": "var_01m637fzq65nhpt1rdmvwe0tr6",
+    "sku": "DRY-CHEESECUBE-200",
+    "pricePaise": "32000"
+  },
+  {
+    "id": "var_01m3f6d7mx5qwsfa62v2dnt807",
+    "sku": "DRY-BUTTER-100",
+    "pricePaise": "5500"
+  },
+  {
+    "id": "var_01m637fzqs9p818hd1yzr1wnrv",
+    "sku": "DRY-BUTTER-100",
+    "pricePaise": "25000"
+  },
+  {
+    "id": "var_01m3f6d7prnfsyxrrrha9xzjw7",
+    "sku": "BKY-BREAD-400",
+    "pricePaise": "4500"
+  },
+  {
+    "id": "var_01m3f6d7s0t946mjsvgqd1j9ky",
+    "sku": "BKY-PAV-6",
+    "pricePaise": "2500"
+  },
+  {
+    "id": "var_01m3f6d7zarz1ws2wmkys9f5e3",
+    "sku": "BKY-CREAMBISCUIT-150",
+    "pricePaise": "3000"
+  },
+  {
+    "id": "var_01m3f6d80271by6ehyat7w65j4",
+    "sku": "BKY-GLUCOSE-200",
+    "pricePaise": "2500"
+  },
+  {
+    "id": "var_01m3f6d811mrpebky885xgqjbs",
+    "sku": "BKY-RUSK-200",
+    "pricePaise": "5500"
+  },
+  {
+    "id": "var_01m3f6d821ap3g9rm1v2jjbmv8",
+    "sku": "BKY-CAKE-300",
+    "pricePaise": "9000"
+  },
+  {
+    "id": "var_01m3f6d834wnv0mgn0cgvwp5dh",
+    "sku": "ICE-VANILLA-700",
+    "pricePaise": "18500"
+  },
+  {
+    "id": "var_01m3f6d8530fk40yngkrzbm2pq",
+    "sku": "ICE-KULFI-4",
+    "pricePaise": "9000"
+  },
+  {
+    "id": "var_01m3f6d86m5986pex14s2rqqx1",
+    "sku": "GRC-POHA-500",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m637fzr99s8qb84f7jvc99kj",
+    "sku": "GRC-POHA-500",
+    "pricePaise": "6500"
+  },
+  {
+    "id": "var_01m3f6d87sbzjy8agjrqk9tey2",
+    "sku": "GRC-RAVA-500",
+    "pricePaise": "2800"
+  },
+  {
+    "id": "var_01m637fzryc6fqnznjfekecc9s",
+    "sku": "GRC-RAVA-500",
+    "pricePaise": "5500"
+  },
+  {
+    "id": "var_01m3f6d88rrxme3t403zjf6mx8",
+    "sku": "GRC-BESAN-500",
+    "pricePaise": "4800"
+  },
+  {
+    "id": "var_01m637fzt3n69kcn3ne3ns2naf",
+    "sku": "GRC-BESAN-500",
+    "pricePaise": "9000"
+  },
+  {
+    "id": "var_01m3f6d89p4xa4j9kyc6gt9kkt",
+    "sku": "GRC-CORNFLAKES-500",
+    "pricePaise": "14500"
+  },
+  {
+    "id": "var_01m637fzy2q87zyvhjmrgs1wad",
+    "sku": "GRC-CORNFLAKES-500",
+    "pricePaise": "27500"
+  },
+  {
+    "id": "var_01m3hz34yyqze1qhccjyygq0mx",
+    "sku": "AATA-MULTIGRAIN-5KG",
+    "pricePaise": "32000"
+  },
+  {
+    "id": "var_01m637g014yn003cj0cbaf5j5x",
+    "sku": "AATA-MULTIGRAIN-5KG",
+    "pricePaise": "7000"
+  },
+  {
+    "id": "var_01m3hz34zv899a52yyztvc9jg5",
+    "sku": "AATA-JWARI-5KG",
+    "pricePaise": "27500"
+  },
+  {
+    "id": "var_01m637g01pgncf9sxyzxxm0s8j",
+    "sku": "AATA-JWARI-5KG",
+    "pricePaise": "6000"
+  },
+  {
+    "id": "var_01m3j19es0qm7q7ppeanjcmn6g",
+    "sku": "AATA-GHAU-5KG",
+    "pricePaise": "24500"
+  },
+  {
+    "id": "var_01m637g022m5f1vtpsfc0dyy9w",
+    "sku": "AATA-GHAU-5KG",
+    "pricePaise": "5500"
+  },
+  {
+    "id": "var_01m3j19etbq39fqb66zvtqhxnz",
+    "sku": "AATA-BAJRI-5KG",
+    "pricePaise": "26000"
+  },
+  {
+    "id": "var_01m637g02drjgvsx6e8fckzcwa",
+    "sku": "AATA-BAJRI-5KG",
+    "pricePaise": "5500"
+  },
+  {
+    "id": "var_01m3f6d3q7bvad897d9rat0ggh",
+    "sku": "VEG-ONION",
+    "pricePaise": "800"
+  },
+  {
+    "id": "var_01m3f6d3qg40kw2b3na9fx36hb",
+    "sku": "VEG-ONION",
+    "pricePaise": "1600"
+  },
+  {
+    "id": "var_01m3f6d3qte1syf3njcab21ns1",
+    "sku": "VEG-ONION",
+    "pricePaise": "3200"
+  },
+  {
+    "id": "var_01m3f6d3wcnz508b1evjv47c1s",
+    "sku": "VEG-TOMATO",
+    "pricePaise": "1000"
+  },
+  {
+    "id": "var_01m3f6d3wkb8wg7te5mn47pyd6",
+    "sku": "VEG-TOMATO",
+    "pricePaise": "2000"
+  },
+  {
+    "id": "var_01m3f6d3wxp28jn2wwqg5t5dxr",
+    "sku": "VEG-TOMATO",
+    "pricePaise": "4000"
+  },
+  {
+    "id": "var_01m3f6d3zee9xp25fm3nf7h6az",
+    "sku": "VEG-POTATO",
+    "pricePaise": "900"
+  },
+  {
+    "id": "var_01m3f6d3zp2acyqcbrcq7jvh7g",
+    "sku": "VEG-POTATO",
+    "pricePaise": "1800"
+  },
+  {
+    "id": "var_01m3f6d401n3naqpkcd5wkh5wv",
+    "sku": "VEG-POTATO",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m3f6d43cpw9809psmcne166m",
+    "sku": "VEG-BRINJAL",
+    "pricePaise": "1100"
+  },
+  {
+    "id": "var_01m3f6d43mfgr4cjngfmb6yrwg",
+    "sku": "VEG-BRINJAL",
+    "pricePaise": "2300"
+  },
+  {
+    "id": "var_01m3f6d43wmasr2977t9ac1kyr",
+    "sku": "VEG-BRINJAL",
+    "pricePaise": "4500"
+  },
+  {
+    "id": "var_01m3f6d475h295jqrddp0gp7j1",
+    "sku": "VEG-OKRA",
+    "pricePaise": "1400"
+  },
+  {
+    "id": "var_01m3f6d47d2y18jn5b6x8s7e88",
+    "sku": "VEG-OKRA",
+    "pricePaise": "2800"
+  },
+  {
+    "id": "var_01m3f6d47pcmzeqbq68zeewgej",
+    "sku": "VEG-OKRA",
+    "pricePaise": "5500"
+  },
+  {
+    "id": "var_01m3f6d4azdzdhj4e3ekabdmn5",
+    "sku": "VEG-BOTTLEGOURD",
+    "pricePaise": "900"
+  },
+  {
+    "id": "var_01m3f6d4b7mw50hqp70fz1xjxb",
+    "sku": "VEG-BOTTLEGOURD",
+    "pricePaise": "1800"
+  },
+  {
+    "id": "var_01m3f6d4bft5g8t30bcwetqr41",
+    "sku": "VEG-BOTTLEGOURD",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m3f6d4egrzef81gvfyn85gz8",
+    "sku": "VEG-RIDGEGOURD",
+    "pricePaise": "1300"
+  },
+  {
+    "id": "var_01m3f6d4eq7mpv4kc8dezd69hw",
+    "sku": "VEG-RIDGEGOURD",
+    "pricePaise": "2500"
+  },
+  {
+    "id": "var_01m3f6d4eyc4hwc0t37jx4c0qv",
+    "sku": "VEG-RIDGEGOURD",
+    "pricePaise": "5000"
+  },
+  {
+    "id": "var_01m3f6d4hprk5hpcsfx5pmmq89",
+    "sku": "VEG-CLUSTERBEANS",
+    "pricePaise": "1500"
+  },
+  {
+    "id": "var_01m3f6d4hw13wf5wqeeevnfg18",
+    "sku": "VEG-CLUSTERBEANS",
+    "pricePaise": "3000"
+  },
+  {
+    "id": "var_01m3f6d4j3f8wkytngpfjkgw1h",
+    "sku": "VEG-CLUSTERBEANS",
+    "pricePaise": "6000"
+  },
+  {
+    "id": "var_01m3f6d4mx308z69mwk7g8829y",
+    "sku": "VEG-FENUGREEK",
+    "pricePaise": "2000"
+  },
+  {
+    "id": "var_01m3f6d4qqhqnempzj717ah009",
+    "sku": "VEG-FRESHPEANUT",
+    "pricePaise": "2300"
+  },
+  {
+    "id": "var_01m3f6d4r28jhtchaw6zv488xc",
+    "sku": "VEG-FRESHPEANUT",
+    "pricePaise": "4500"
+  },
+  {
+    "id": "var_01m3f6d4rdpp6nc54et372y6yq",
+    "sku": "VEG-FRESHPEANUT",
+    "pricePaise": "9000"
+  },
+  {
+    "id": "var_01m3f6d4wqjr3wzjg9gszgk16r",
+    "sku": "VEG-SPINACH",
+    "pricePaise": "1800"
+  },
+  {
+    "id": "var_01m3f6d4yvdj1g0rqhz440zaq4",
+    "sku": "VEG-CORIANDER",
+    "pricePaise": "1500"
+  },
+  {
+    "id": "var_01m3f6d5204yzthag935a06ncd",
+    "sku": "VEG-CURRYLEAVES",
+    "pricePaise": "1000"
+  },
+  {
+    "id": "var_01m3f6d5459ccwaq6fw75z1nwe",
+    "sku": "VEG-CABBAGE",
+    "pricePaise": "800"
+  },
+  {
+    "id": "var_01m3f6d54dye2gnt4zebq313nx",
+    "sku": "VEG-CABBAGE",
+    "pricePaise": "1500"
+  },
+  {
+    "id": "var_01m3f6d54m4z3r370r1twpnqyp",
+    "sku": "VEG-CABBAGE",
+    "pricePaise": "3000"
+  },
+  {
+    "id": "var_01m3f6d57c2gg9yc9nv5ptwapm",
+    "sku": "VEG-CAULIFLOWER",
+    "pricePaise": "1000"
+  },
+  {
+    "id": "var_01m3f6d57pc60tczxbqgh5qyef",
+    "sku": "VEG-CAULIFLOWER",
+    "pricePaise": "2000"
+  },
+  {
+    "id": "var_01m3f6d5850rnm3s7k8px4rhsk",
+    "sku": "VEG-CAULIFLOWER",
+    "pricePaise": "4000"
+  },
+  {
+    "id": "var_01m3f6d5ba8k1c1wbdza716ksr",
+    "sku": "VEG-CARROT",
+    "pricePaise": "1300"
+  },
+  {
+    "id": "var_01m3f6d5c1eadabktydmwqgsh3",
+    "sku": "VEG-CARROT",
+    "pricePaise": "2500"
+  },
+  {
+    "id": "var_01m3f6d5cfygwxpgzvqknwzmjy",
+    "sku": "VEG-CARROT",
+    "pricePaise": "5000"
+  },
+  {
+    "id": "var_01m3f6d5etvrewmnydr4m5eftn",
+    "sku": "VEG-GREENCHILLI",
+    "pricePaise": "800"
+  },
+  {
+    "id": "var_01m3f6d5f0zrjkv4gceknce32x",
+    "sku": "VEG-GREENCHILLI",
+    "pricePaise": "2000"
+  },
+  {
+    "id": "var_01m3f6d5k374k5nm4nfxhqdf4g",
+    "sku": "VEG-GINGER",
+    "pricePaise": "1200"
+  },
+  {
+    "id": "var_01m3f6d5kepdfnrmjray6a82bt",
+    "sku": "VEG-GINGER",
+    "pricePaise": "3000"
+  },
+  {
+    "id": "var_01m3f6d5nep8b350cwqjjdf61k",
+    "sku": "VEG-GARLIC",
+    "pricePaise": "1500"
+  },
+  {
+    "id": "var_01m3f6d5nm26zmt9rxr3yr9vat",
+    "sku": "VEG-GARLIC",
+    "pricePaise": "3800"
+  },
+  {
+    "id": "var_01m3f6d5qd8y1hrche5czef08e",
+    "sku": "VEG-PUMPKIN",
+    "pricePaise": "800"
+  },
+  {
+    "id": "var_01m3f6d5qmc3wcds4hhqfesr7b",
+    "sku": "VEG-PUMPKIN",
+    "pricePaise": "1500"
+  },
+  {
+    "id": "var_01m3f6d5qw4jp4zwgnwwy5v8jh",
+    "sku": "VEG-PUMPKIN",
+    "pricePaise": "3000"
+  },
+  {
+    "id": "var_01m3f6d5t2wp93n5r1rtbbak6z",
+    "sku": "VEG-BEETROOT",
+    "pricePaise": "1100"
+  },
+  {
+    "id": "var_01m3f6d5t926mey3f10xs9yapa",
+    "sku": "VEG-BEETROOT",
+    "pricePaise": "2300"
+  },
+  {
+    "id": "var_01m3f6d5tfec23qd7203d0gvxa",
+    "sku": "VEG-BEETROOT",
+    "pricePaise": "4500"
+  },
+  {
+    "id": "var_01m3f6d5w17nveyrmaxmwfeqtc",
+    "sku": "VEG-CAPSICUM",
+    "pricePaise": "1800"
+  },
+  {
+    "id": "var_01m3f6d5w6j70ch1qbcedn0arz",
+    "sku": "VEG-CAPSICUM",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m3f6d5wcvysbpe7v2va2hqts",
+    "sku": "VEG-CAPSICUM",
+    "pricePaise": "7000"
+  },
+  {
+    "id": "var_01m3f6d5yerdmgban7m3rrad5p",
+    "sku": "VEG-CUCUMBER",
+    "pricePaise": "1000"
+  },
+  {
+    "id": "var_01m3f6d5ysmvj8k8d0b2rkv4s9",
+    "sku": "VEG-CUCUMBER",
+    "pricePaise": "2000"
+  },
+  {
+    "id": "var_01m3f6d5z2t9gbp6fc4v5egcpg",
+    "sku": "VEG-CUCUMBER",
+    "pricePaise": "4000"
+  },
+  {
+    "id": "var_01m3f6d60sqksj40qqbg3fc4js",
+    "sku": "VEG-SPROUT-MOONG",
+    "pricePaise": "2500"
+  },
+  {
+    "id": "var_01m637fzavsahwcqbmkv7mzpxe",
+    "sku": "VEG-SPROUT-MOONG",
+    "pricePaise": "6000"
+  },
+  {
+    "id": "var_01m3f6d61v63m2pwsc6bdyzhps",
+    "sku": "VEG-SPROUT-MATKI",
+    "pricePaise": "2500"
+  },
+  {
+    "id": "var_01m637fzc15h2fr0zy1xakrrg1",
+    "sku": "VEG-SPROUT-MATKI",
+    "pricePaise": "6000"
+  },
+  {
+    "id": "var_01m3f6d62q9fpzsk2yw7hhpvj7",
+    "sku": "VEG-SPROUT-CHANA",
+    "pricePaise": "3000"
+  },
+  {
+    "id": "var_01m637fzcd79wnp8fps8krdeww",
+    "sku": "VEG-SPROUT-CHANA",
+    "pricePaise": "7000"
+  },
+  {
+    "id": "var_01m3f6d63h0wwnev3jb2k1q6r1",
+    "sku": "VEG-SPROUT-COWPEA",
+    "pricePaise": "3000"
+  },
+  {
+    "id": "var_01m637fzcx1zzeb1b8kkt5z3ev",
+    "sku": "VEG-SPROUT-COWPEA",
+    "pricePaise": "7000"
+  },
+  {
+    "id": "var_01m3f6d64tphv2cy0pfpqpznjz",
+    "sku": "VEG-SPROUT-MASOOR",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m637fzdkbfmxcmweac63h6qf",
+    "sku": "VEG-SPROUT-MASOOR",
+    "pricePaise": "8000"
+  },
+  {
+    "id": "var_01m3f6d66b8my1kats4njmey1p",
+    "sku": "VEG-SPROUT-ALFALFA",
+    "pricePaise": "6000"
+  },
+  {
+    "id": "var_01m637fze1j8qvym1rqdrmfpvd",
+    "sku": "VEG-SPROUT-ALFALFA",
+    "pricePaise": "14000"
+  },
+  {
+    "id": "var_01m3f6d67kyar207115z8n8fjf",
+    "sku": "VEG-SPROUT-SOYBEAN",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m637fzer88pt3q42kmazkf90",
+    "sku": "VEG-SPROUT-SOYBEAN",
+    "pricePaise": "8000"
+  },
+  {
+    "id": "var_01m3f6d68ym6j0vyzrt0b9n9wp",
+    "sku": "VEG-SPROUT-MOONG-MATKI-MIX",
+    "pricePaise": "2800"
+  },
+  {
+    "id": "var_01m637fzfcxh8h4zms0em6zn1g",
+    "sku": "VEG-SPROUT-MOONG-MATKI-MIX",
+    "pricePaise": "6500"
+  },
+  {
+    "id": "var_01m3f6d6a2n2vwyr7x44a07rx7",
+    "sku": "VEG-SPROUT-MIXED-DAL",
+    "pricePaise": "3200"
+  },
+  {
+    "id": "var_01m637fzfzd02az3bt1x86f897",
+    "sku": "VEG-SPROUT-MIXED-DAL",
+    "pricePaise": "7500"
+  },
+  {
+    "id": "var_01m3f6d6bhast9pw8m0jnp5h8k",
+    "sku": "VEG-SPROUT-BLACK-CHANA",
+    "pricePaise": "3200"
+  },
+  {
+    "id": "var_01m637fzge5xva7j4j1he4yyza",
+    "sku": "VEG-SPROUT-BLACK-CHANA",
+    "pricePaise": "7500"
+  },
+  {
+    "id": "var_01m3f6d6cq09nsc5jqzk557tmg",
+    "sku": "VEG-SPROUT-GREEN-PEA",
+    "pricePaise": "3000"
+  },
+  {
+    "id": "var_01m637fzgwsvvzgrrv9hpp526p",
+    "sku": "VEG-SPROUT-GREEN-PEA",
+    "pricePaise": "7000"
+  },
+  {
+    "id": "var_01m3f6d6e2shmyj0jgfhh6x13t",
+    "sku": "FRT-BANANA",
+    "pricePaise": "2600"
+  },
+  {
+    "id": "var_01m3f6d6efmqbr1tbzs96j674n",
+    "sku": "FRT-BANANA",
+    "pricePaise": "5000"
+  },
+  {
+    "id": "var_01m3f6d6gmr2hacpvnvysz8q0v",
+    "sku": "FRT-APPLE",
+    "pricePaise": "4500"
+  },
+  {
+    "id": "var_01m3f6d6gs94m30fat0qnes1x2",
+    "sku": "FRT-APPLE",
+    "pricePaise": "9000"
+  },
+  {
+    "id": "var_01m3f6d6gzvk8wsmp0d0hgr6nr",
+    "sku": "FRT-APPLE",
+    "pricePaise": "18000"
+  },
+  {
+    "id": "var_01m3f6d6jh6p17wt7zrasktwym",
+    "sku": "FRT-MOSAMBI",
+    "pricePaise": "1800"
+  },
+  {
+    "id": "var_01m3f6d6jq8fk72xm9cvxzqbgv",
+    "sku": "FRT-MOSAMBI",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m3f6d6jv1ckh9q8tvxffxfkb",
+    "sku": "FRT-MOSAMBI",
+    "pricePaise": "7000"
+  },
+  {
+    "id": "var_01m3f6d6m60d6jmvqc2yhysr9h",
+    "sku": "FRT-PAPAYA",
+    "pricePaise": "1000"
+  },
+  {
+    "id": "var_01m3f6d6mdhn0a0hfdf65wgk3a",
+    "sku": "FRT-PAPAYA",
+    "pricePaise": "2000"
+  },
+  {
+    "id": "var_01m3f6d6mtgh2dhwmfvvk4y4k7",
+    "sku": "FRT-PAPAYA",
+    "pricePaise": "4000"
+  },
+  {
+    "id": "var_01m3f6d6p9jb2fcn2fs8gb7zsa",
+    "sku": "FRT-POMEGRANATE",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m3f6d6pg7dgz8asrbay28g96",
+    "sku": "FRT-POMEGRANATE",
+    "pricePaise": "7000"
+  },
+  {
+    "id": "var_01m3f6d6pp8s34bzgr344d5y2w",
+    "sku": "FRT-POMEGRANATE",
+    "pricePaise": "14000"
+  },
+  {
+    "id": "var_01m3f6d6r8cjb6gn4405c8k5r1",
+    "sku": "FRT-LEMON",
+    "pricePaise": "2000"
+  },
+  {
+    "id": "var_01m3f6d6stxejj05qp3ztw77tg",
+    "sku": "FRT-ORANGE",
+    "pricePaise": "2300"
+  },
+  {
+    "id": "var_01m3f6d6szfj6xtr7sfk0d7f97",
+    "sku": "FRT-ORANGE",
+    "pricePaise": "4500"
+  },
+  {
+    "id": "var_01m3f6d6t34mvk16htpa1xf5zn",
+    "sku": "FRT-ORANGE",
+    "pricePaise": "9000"
+  },
+  {
+    "id": "var_01m3f6d6ty1pzvz3vrcgnt38f9",
+    "sku": "FRT-MANGO",
+    "pricePaise": "4000"
+  },
+  {
+    "id": "var_01m3f6d6v3fx3bj5t563ej9t2n",
+    "sku": "FRT-MANGO",
+    "pricePaise": "8000"
+  },
+  {
+    "id": "var_01m3f6d6v9ggpd2fr3ctvs4fbz",
+    "sku": "FRT-MANGO",
+    "pricePaise": "16000"
+  },
+  {
+    "id": "var_01m3f6d6w717xcf25r7f22htkc",
+    "sku": "FRT-WATERMELON",
+    "pricePaise": "900"
+  },
+  {
+    "id": "var_01m3f6d6wd49xa3k99zh2zjxp8",
+    "sku": "FRT-WATERMELON",
+    "pricePaise": "1800"
+  },
+  {
+    "id": "var_01m3f6d6wjazm83ynhfsst226t",
+    "sku": "FRT-WATERMELON",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m3f6d6xk3tk1nq4f22ykx9jp",
+    "sku": "FRT-JAMUN",
+    "pricePaise": "4500"
+  },
+  {
+    "id": "var_01m3f6d6xsacn9n8xh0fa7cve6",
+    "sku": "FRT-JAMUN",
+    "pricePaise": "9000"
+  },
+  {
+    "id": "var_01m3f6d6y0z6cr9zqczbzss4yt",
+    "sku": "FRT-JAMUN",
+    "pricePaise": "18000"
+  },
+  {
+    "id": "var_01m3f6d6yyvjqrwwsvf7xy9zab",
+    "sku": "FRT-KIWI",
+    "pricePaise": "8900"
+  },
+  {
+    "id": "var_01m3f6d6zq48p9fp6d4pzjyts4",
+    "sku": "FRT-DRAGONFRUIT",
+    "pricePaise": "9900"
+  },
+  {
+    "id": "var_01m3f6d70mjm1vt1k4ya9hh8qc",
+    "sku": "FRT-AVOCADO",
+    "pricePaise": "7900"
+  },
+  {
+    "id": "var_01m3f6d71cseqkf5k9weks5f76",
+    "sku": "FRT-BLUEBERRY",
+    "pricePaise": "19900"
+  },
+  {
+    "id": "var_01m637fzhbf56tzvmrv7m7zn88",
+    "sku": "FRT-BLUEBERRY",
+    "pricePaise": "38000"
+  },
+  {
+    "id": "var_01m3f6d724cnesz84anxetbbpy",
+    "sku": "FRT-ALMOND",
+    "pricePaise": "21000"
+  },
+  {
+    "id": "var_01m637fzht9zps53kqxt6xeqnv",
+    "sku": "FRT-ALMOND",
+    "pricePaise": "40000"
+  },
+  {
+    "id": "var_01m3f6d72z5dx3krfxkd5re602",
+    "sku": "FRT-CASHEW",
+    "pricePaise": "24000"
+  },
+  {
+    "id": "var_01m637fzj9abyp08mcd8pddjst",
+    "sku": "FRT-CASHEW",
+    "pricePaise": "45500"
+  },
+  {
+    "id": "var_01m3f6d73whjqvfy3m4xdyfwvw",
+    "sku": "FRT-WALNUT",
+    "pricePaise": "26000"
+  },
+  {
+    "id": "var_01m637fzjymhdf2saxa8emsz8m",
+    "sku": "FRT-WALNUT",
+    "pricePaise": "49500"
+  },
+  {
+    "id": "var_01m3f6d7500d3bdphggrgzfx54",
+    "sku": "FRT-RAISINS",
+    "pricePaise": "6500"
+  },
+  {
+    "id": "var_01m637fzkms2sw6h8m8b21hnsj",
+    "sku": "FRT-RAISINS",
+    "pricePaise": "12500"
+  },
+  {
+    "id": "var_01m3f6d76sxnwkz6se5h1qnfa6",
+    "sku": "DRY-MILK-500",
+    "pricePaise": "2800"
+  },
+  {
+    "id": "var_01m637fzkzkts3vyn63dav7w93",
+    "sku": "DRY-MILK-500",
+    "pricePaise": "5500"
+  },
+  {
+    "id": "var_01m3f6d78z4z42xkqv5ktparb3",
+    "sku": "DRY-CURD-400",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m637fzn3ar30ns0aa8z02pst",
+    "sku": "DRY-CURD-400",
+    "pricePaise": "8000"
+  },
+  {
+    "id": "var_01m3f6d7bcnw9t8fdk90xqa1vc",
+    "sku": "DRY-PANEER-200",
+    "pricePaise": "9500"
+  },
+  {
+    "id": "var_01m637fznemzz2pkxexz4wh9cz",
+    "sku": "DRY-PANEER-200",
+    "pricePaise": "22000"
+  },
+  {
+    "id": "var_01m3f6d7eby2b5y75f218yzj0b",
+    "sku": "DRY-GHEE-500",
+    "pricePaise": "34000"
+  },
+  {
+    "id": "var_01m637fznyf2s701zx1t8tpdr2",
+    "sku": "DRY-GHEE-500",
+    "pricePaise": "64500"
+  },
+  {
+    "id": "var_01m3f6d7vaeb9c2f0knxjqtcdb",
+    "sku": "BKY-MARIE-250",
+    "pricePaise": "4000"
+  },
+  {
+    "id": "var_01m3f6d7xnkt6erky9c1bseq1g",
+    "sku": "BKY-BREAD-WHITE-400",
+    "pricePaise": "4200"
+  },
+  {
+    "id": "var_01m3f6d7yhar9f3mg8qbhwe806",
+    "sku": "BKY-BUN-BURGER-4",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m3f6d8afmdqhynnrne855prg",
+    "sku": "GRC-RICE-5KG",
+    "pricePaise": "38000"
+  },
+  {
+    "id": "var_01m637g004s1kmy7rdd7da5m8a",
+    "sku": "GRC-RICE-5KG",
+    "pricePaise": "8000"
+  },
+  {
+    "id": "var_01m3f6d8ckbg40cz3mdaashgd2",
+    "sku": "GRC-OIL-1L",
+    "pricePaise": "14500"
+  },
+  {
+    "id": "var_01m637fzyk035mr4mp5mzp3mkk",
+    "sku": "GRC-OIL-1L",
+    "pricePaise": "65500"
+  },
+  {
+    "id": "var_01m3f6d8emz031an48mafv2net",
+    "sku": "GRC-TEA-250",
+    "pricePaise": "14000"
+  },
+  {
+    "id": "var_01m637fzyvhbsem5hgm8g2dp46",
+    "sku": "GRC-TEA-250",
+    "pricePaise": "26500"
+  },
+  {
+    "id": "var_01m3f6d8gy3jgm27sa7zrpaepy",
+    "sku": "GRC-SUGAR-1KG",
+    "pricePaise": "4800"
+  },
+  {
+    "id": "var_01m637fzz3mnq6ktv6cm0ervvm",
+    "sku": "GRC-SUGAR-1KG",
+    "pricePaise": "21500"
+  },
+  {
+    "id": "var_01m3f6d8k2nws5xmnfz7w7q2ga",
+    "sku": "GRC-TOORDAL-1KG",
+    "pricePaise": "16500"
+  },
+  {
+    "id": "var_01m637fzzg84n7qrhpg5bj6ke2",
+    "sku": "GRC-TOORDAL-1KG",
+    "pricePaise": "74500"
+  },
+  {
+    "id": "var_01m3f6d8p4m5cgkjaqch2c1fj6",
+    "sku": "GRC-ATTA-5KG",
+    "pricePaise": "23500"
+  },
+  {
+    "id": "var_01m637g00j2axx5n4g8n7r1wah",
+    "sku": "GRC-ATTA-5KG",
+    "pricePaise": "5000"
+  },
+  {
+    "id": "var_01m66mhe2spn5kx93wdsh3yq23",
+    "sku": "VEG-SMALLBRINJAL",
+    "pricePaise": "1200"
+  },
+  {
+    "id": "var_01m66mhe45xv2g2vbmt2gqasg5",
+    "sku": "VEG-SMALLBRINJAL",
+    "pricePaise": "2400"
+  },
+  {
+    "id": "var_01m66mhe6p0d969tkqkq3aaxgx",
+    "sku": "VEG-SMALLBRINJAL",
+    "pricePaise": "4800"
+  },
+  {
+    "id": "var_01m66mhefd78vch7g5tyam70c4",
+    "sku": "VEG-BHARITBRINJAL",
+    "pricePaise": "1300"
+  },
+  {
+    "id": "var_01m66mheg33h1pznhcfwa9vn05",
+    "sku": "VEG-BHARITBRINJAL",
+    "pricePaise": "2700"
+  },
+  {
+    "id": "var_01m66mhegy3ahvmwevxh5sncpw",
+    "sku": "VEG-BHARITBRINJAL",
+    "pricePaise": "5300"
+  },
+  {
+    "id": "var_01m66mhepxpw3ejf55407vfxm8",
+    "sku": "VEG-CHAWLISHENG",
+    "pricePaise": "1300"
+  },
+  {
+    "id": "var_01m66mheqa9z3rgwtj0a9df6t5",
+    "sku": "VEG-CHAWLISHENG",
+    "pricePaise": "2500"
+  },
+  {
+    "id": "var_01m66mher4x0ctvkv0z2gtjhqr",
+    "sku": "VEG-CHAWLISHENG",
+    "pricePaise": "5000"
+  },
+  {
+    "id": "var_01m66mhezjy8jnjay00z51y7h5",
+    "sku": "VEG-GILKE",
+    "pricePaise": "1300"
+  },
+  {
+    "id": "var_01m66mhf0jgynhsbktg34gamxw",
+    "sku": "VEG-GILKE",
+    "pricePaise": "2700"
+  },
+  {
+    "id": "var_01m66mhf1e7h45wpbyx1cne0v6",
+    "sku": "VEG-GILKE",
+    "pricePaise": "5300"
+  },
+  {
+    "id": "var_01m66mhf7wk5sejhn1mt2tzkf2",
+    "sku": "VEG-SHEVGA",
+    "pricePaise": "1900"
+  },
+  {
+    "id": "var_01m66mhf8px5bxbc6smrdwsdz7",
+    "sku": "VEG-SHEVGA",
+    "pricePaise": "3800"
+  },
+  {
+    "id": "var_01m66mhf9ysc91hwjkmd0fqfrd",
+    "sku": "VEG-SHEVGA",
+    "pricePaise": "7500"
+  },
+  {
+    "id": "var_01m66mhfhnx6g4pcwe8rqmyh32",
+    "sku": "VEG-POPTIVAL",
+    "pricePaise": "1500"
+  },
+  {
+    "id": "var_01m66mhfja4j0zghbcv77p6tzk",
+    "sku": "VEG-POPTIVAL",
+    "pricePaise": "3000"
+  },
+  {
+    "id": "var_01m66mhfkhtqt8kkxyae8tmsxd",
+    "sku": "VEG-POPTIVAL",
+    "pricePaise": "6000"
+  },
+  {
+    "id": "var_01m66mhfqrbnm7pryydaj4rjvy",
+    "sku": "VEG-MOTHAVAL",
+    "pricePaise": "1500"
+  },
+  {
+    "id": "var_01m66mhfrdrn4v6pvjwdwd4trj",
+    "sku": "VEG-MOTHAVAL",
+    "pricePaise": "3000"
+  },
+  {
+    "id": "var_01m66mhfsbr6ssqxe0kz1d9p0p",
+    "sku": "VEG-MOTHAVAL",
+    "pricePaise": "6000"
+  },
+  {
+    "id": "var_01m66mhfzt6vyz4hxyv0xtsep2",
+    "sku": "VEG-KASHIPHAL",
+    "pricePaise": "800"
+  },
+  {
+    "id": "var_01m66mhg0gev8a4hkjqrd0yghh",
+    "sku": "VEG-KASHIPHAL",
+    "pricePaise": "1500"
+  },
+  {
+    "id": "var_01m66mhg1vmb8z6wz8fy7g67r6",
+    "sku": "VEG-KASHIPHAL",
+    "pricePaise": "3000"
+  },
+  {
+    "id": "var_01m66mhg6vy89qm2w6kpykaymq",
+    "sku": "VEG-KARLE",
+    "pricePaise": "1500"
+  },
+  {
+    "id": "var_01m66mhg7c6gevxqamb3g8p4yd",
+    "sku": "VEG-KARLE",
+    "pricePaise": "2900"
+  },
+  {
+    "id": "var_01m66mhg8e1aj2f3m1gztapezf",
+    "sku": "VEG-KARLE",
+    "pricePaise": "5800"
+  },
+  {
+    "id": "var_01m66mhgcwmcb8z9yz4cyp60bp",
+    "sku": "VEG-CHUKA",
+    "pricePaise": "2000"
+  },
+  {
+    "id": "var_01m66mhgh4bg4x2eeksnf5vv22",
+    "sku": "VEG-VATANE",
+    "pricePaise": "1900"
+  },
+  {
+    "id": "var_01m66mhghk6922tbjkbqewg60s",
+    "sku": "VEG-VATANE",
+    "pricePaise": "3800"
+  },
+  {
+    "id": "var_01m66mhgjaf0w71jtx0n30ad5c",
+    "sku": "VEG-VATANE",
+    "pricePaise": "7500"
+  },
+  {
+    "id": "var_01m66mhgq537r7xtq4bfdx8krx",
+    "sku": "VEG-BROCCOLI",
+    "pricePaise": "3100"
+  },
+  {
+    "id": "var_01m66mhgqha30v0a6bgfd9xq90",
+    "sku": "VEG-BROCCOLI",
+    "pricePaise": "6300"
+  },
+  {
+    "id": "var_01m66mhgrezxk0xxmc3gd4xy0w",
+    "sku": "VEG-BROCCOLI",
+    "pricePaise": "12500"
+  },
+  {
+    "id": "var_01m66mhgw7pmsyc07he330d8gb",
+    "sku": "VEG-BEANS",
+    "pricePaise": "2000"
+  },
+  {
+    "id": "var_01m66mhgwmsjv8yd58c8ns2s4a",
+    "sku": "VEG-BEANS",
+    "pricePaise": "4000"
+  },
+  {
+    "id": "var_01m66mhgx3yn525wdggb7ftx5y",
+    "sku": "VEG-BEANS",
+    "pricePaise": "8000"
+  },
+  {
+    "id": "var_01m66mhh2dpk5a5a843nv9b682",
+    "sku": "VEG-POKABHAJI",
+    "pricePaise": "2000"
+  },
+  {
+    "id": "var_01m66mhh8cmmszyyd406ynzvvw",
+    "sku": "VEG-MUSHROOM",
+    "pricePaise": "4500"
+  },
+  {
+    "id": "var_01m66mhhcxxjb914c08edpp34a",
+    "sku": "VEG-TONDLI",
+    "pricePaise": "1300"
+  },
+  {
+    "id": "var_01m66mhhdc62c9gp3d7a0szx2f",
+    "sku": "VEG-TONDLI",
+    "pricePaise": "2700"
+  },
+  {
+    "id": "var_01m66mhhdyp69853vcmxxs8waf",
+    "sku": "VEG-TONDLI",
+    "pricePaise": "5300"
+  },
+  {
+    "id": "var_01m66mhhkry11q0qm0tc18rv17",
+    "sku": "FRT-GUAVA",
+    "pricePaise": "1800"
+  },
+  {
+    "id": "var_01m66mhhmcexgpyckwmfhex4vd",
+    "sku": "FRT-GUAVA",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m66mhhn4q7pd54gqjxyc2ytq",
+    "sku": "FRT-GUAVA",
+    "pricePaise": "7000"
+  },
+  {
+    "id": "var_01m66mhht12njfd9nqvpk0pjn3",
+    "sku": "FRT-CUSTARDAPPLE",
+    "pricePaise": "2300"
+  },
+  {
+    "id": "var_01m66mhhtgy9nhvn1b2mk7r4hh",
+    "sku": "FRT-CUSTARDAPPLE",
+    "pricePaise": "4500"
+  },
+  {
+    "id": "var_01m66mhhv5ypqaegnqb4ep16py",
+    "sku": "FRT-CUSTARDAPPLE",
+    "pricePaise": "9000"
+  },
+  {
+    "id": "var_01m66mhj1hq36gbg2h0ty9pyws",
+    "sku": "FRT-BER",
+    "pricePaise": "1000"
+  },
+  {
+    "id": "var_01m66mhj20137bmdqdehsdswdr",
+    "sku": "FRT-BER",
+    "pricePaise": "2000"
+  },
+  {
+    "id": "var_01m66mhj2pkvw8st8xzy2xkh03",
+    "sku": "FRT-BER",
+    "pricePaise": "4000"
+  },
+  {
+    "id": "var_01m66mhj8swz2523t4wm6d15k6",
+    "sku": "FRT-GRAPES",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m66mhj98wknwrv8xh3px9q6a",
+    "sku": "FRT-GRAPES",
+    "pricePaise": "7000"
+  },
+  {
+    "id": "var_01m66mhj9qfea22jfzb1tf3mdx",
+    "sku": "FRT-GRAPES",
+    "pricePaise": "14000"
+  },
+  {
+    "id": "var_01m66mhjfaadcmvpgsgwen6q08",
+    "sku": "FRT-STRAWBERRY",
+    "pricePaise": "24000"
+  },
+  {
+    "id": "var_01m66mhjkh2g290j3vbk4ygs6g",
+    "sku": "FRT-FIGS",
+    "pricePaise": "3300"
+  },
+  {
+    "id": "var_01m66mhjmm4tct0rf0ehdtpnyc",
+    "sku": "FRT-FIGS",
+    "pricePaise": "6500"
+  },
+  {
+    "id": "var_01m66mhjnat7gt24vxc3mpvgq2",
+    "sku": "FRT-FIGS",
+    "pricePaise": "13000"
+  },
+  {
+    "id": "var_01m66mhjrpspe3ac3canpjwr20",
+    "sku": "VEG-REDCARROT",
+    "pricePaise": "1300"
+  },
+  {
+    "id": "var_01m66mhjs2b72p6bd8ms2c4r7s",
+    "sku": "VEG-REDCARROT",
+    "pricePaise": "2500"
+  },
+  {
+    "id": "var_01m66mhjsvpn8p7z5kty48dmjd",
+    "sku": "VEG-REDCARROT",
+    "pricePaise": "5000"
+  },
+  {
+    "id": "var_01m66mhjyh9zsxrwc6016trj7m",
+    "sku": "VEG-THICKGREENCHILLI",
+    "pricePaise": "1500"
+  },
+  {
+    "id": "var_01m66mhjz012478vfe937mpcmk",
+    "sku": "VEG-THICKGREENCHILLI",
+    "pricePaise": "3000"
+  },
+  {
+    "id": "var_01m66mhjzkkerbs3kkt6axf10w",
+    "sku": "VEG-THICKGREENCHILLI",
+    "pricePaise": "6000"
+  },
+  {
+    "id": "var_01m66mhk3hm6br7kz382a6bd02",
+    "sku": "VEG-THINGREENCHILLI",
+    "pricePaise": "1800"
+  },
+  {
+    "id": "var_01m66mhk4dpasq6b3nbw23j2ch",
+    "sku": "VEG-THINGREENCHILLI",
+    "pricePaise": "3500"
+  },
+  {
+    "id": "var_01m66mhk595gsxza1bvjcda38f",
+    "sku": "VEG-THINGREENCHILLI",
+    "pricePaise": "7000"
+  },
+  {
+    "id": "var_01m66mhk93w43wwzfb63fxnans",
+    "sku": "VEG-WHITESALADCUCUMBER",
+    "pricePaise": "1100"
+  },
+  {
+    "id": "var_01m66mhk9w9rvzbzz72gxr51st",
+    "sku": "VEG-WHITESALADCUCUMBER",
+    "pricePaise": "2200"
+  },
+  {
+    "id": "var_01m66mhkangwnzkw8dy3bc854w",
+    "sku": "VEG-WHITESALADCUCUMBER",
+    "pricePaise": "4300"
+  },
+  {
+    "id": "var_01m66mhkfa0wwrzg7sx3sxrea3",
+    "sku": "VEG-GREENCUCUMBER",
+    "pricePaise": "1000"
+  },
+  {
+    "id": "var_01m66mhkg5s977dkqqhqnnpbyx",
+    "sku": "VEG-GREENCUCUMBER",
+    "pricePaise": "1900"
+  },
+  {
+    "id": "var_01m66mhkht0qrq853b3wcbehkb",
+    "sku": "VEG-GREENCUCUMBER",
+    "pricePaise": "3800"
+  }
+]
