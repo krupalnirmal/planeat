@@ -347,11 +347,26 @@ export function CartScreen() {
           className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-4 lg:static lg:mx-0 lg:max-w-none lg:px-0"
           style={{ bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 0.75rem)' }}
         >
+          {/* Right on the sticky bar, not just inside the scrollable bill
+              card above (`BillSummary`'s own copy of this message) — a
+              customer who's already scrolled down to this fixed button
+              never sees that card again, so the greyed-out button looked
+              broken with no visible reason why (owner report, session
+              2026-11-10). Same message, repeated here where it's actually
+              seen. */}
+          {quote.data && !quote.data.bill.meetsMinimum && (
+            <p className="-mb-2 flex items-center gap-1.5 rounded-t-[var(--radius-2xl)] border border-b-0 border-warning/30 bg-[#FDF3E3] px-4 pt-2.5 pb-4 text-xs font-bold text-warning">
+              <AlertTriangle className="size-3.5 shrink-0" aria-hidden />
+              {t('belowMinimum', {
+                amount: formatPaise(paise(quote.data.bill.minOrderValuePaise), { hidePaise: true }),
+              })}
+            </p>
+          )}
           <Link
             href="/checkout"
             aria-disabled={!quote.data?.canPlaceOrder}
             className={cn(
-              'flex h-14 items-center justify-between rounded-[var(--radius-2xl)] bg-primary px-4 shadow-lg',
+              'relative flex h-14 items-center justify-between rounded-[var(--radius-2xl)] bg-primary px-4 shadow-lg',
               !quote.data?.canPlaceOrder && 'pointer-events-none opacity-50',
             )}
           >
