@@ -17,8 +17,10 @@ import { env } from '@/lib/env';
 export const SETTING_KEYS = {
   minOrderValuePaise: 'pricing.min_order_value_paise',
   deliveryFeePaise: 'pricing.delivery_fee_paise',
+  mealPlanDeliveryFeePaise: 'pricing.meal_plan_delivery_fee_paise',
   freeDeliveryThresholdPaise: 'pricing.free_delivery_threshold_paise',
   handlingFeePaise: 'pricing.handling_fee_paise',
+  surgeChargePaise: 'pricing.surge_charge_paise',
   planFeePaise: 'pricing.plan_fee_paise',
   lowWalletThresholdPaise: 'wallet.low_balance_threshold_paise',
   codMaxOrderPaise: 'pricing.cod_max_order_paise',
@@ -55,8 +57,10 @@ export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];
 export const SETTING_GROUPS: Record<SettingKey, string> = {
   [SETTING_KEYS.minOrderValuePaise]: 'pricing',
   [SETTING_KEYS.deliveryFeePaise]: 'pricing',
+  [SETTING_KEYS.mealPlanDeliveryFeePaise]: 'pricing',
   [SETTING_KEYS.freeDeliveryThresholdPaise]: 'pricing',
   [SETTING_KEYS.handlingFeePaise]: 'pricing',
+  [SETTING_KEYS.surgeChargePaise]: 'pricing',
   [SETTING_KEYS.planFeePaise]: 'pricing',
   [SETTING_KEYS.lowWalletThresholdPaise]: 'wallet',
   [SETTING_KEYS.codMaxOrderPaise]: 'pricing',
@@ -91,8 +95,10 @@ export function bootstrapSettings(): Record<SettingKey, unknown> {
   return {
     [SETTING_KEYS.minOrderValuePaise]: d.minOrderValuePaise,
     [SETTING_KEYS.deliveryFeePaise]: d.deliveryFeePaise,
+    [SETTING_KEYS.mealPlanDeliveryFeePaise]: d.mealPlanDeliveryFeePaise,
     [SETTING_KEYS.freeDeliveryThresholdPaise]: d.freeDeliveryThresholdPaise,
     [SETTING_KEYS.handlingFeePaise]: d.handlingFeePaise,
+    [SETTING_KEYS.surgeChargePaise]: d.surgeChargePaise,
     [SETTING_KEYS.planFeePaise]: d.planFeePaise,
     [SETTING_KEYS.lowWalletThresholdPaise]: d.lowWalletThresholdPaise,
     [SETTING_KEYS.codMaxOrderPaise]: d.codMaxOrderPaise,

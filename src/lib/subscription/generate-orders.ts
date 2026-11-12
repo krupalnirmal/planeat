@@ -7,6 +7,7 @@ import { buildCandidates } from '@/lib/meal-plan/candidates';
 import { parseDateKey, weekdayNumber } from '@/lib/meal-plan/pricing';
 import { TEMPLATE, notifyEvent } from '@/lib/notifications/notify';
 import { notifyEventNow } from '@/lib/notifications/notify-now';
+import { computeBill, loadFeeConfig, type FeeConfig } from '@/lib/orders/pricing';
 import { findNearestVendor } from '@/lib/vendor/match';
 import { InsufficientBalanceError, LEDGER_REF, debit } from '@/lib/wallet/ledger';
 import type { Locale } from '@/generated/prisma/enums';
@@ -158,6 +159,10 @@ export async function generateDailyOrders(
   const dueToday = subscriptions.filter((sub) => isDeliveryDueToday(sub.deliveryMode, sub.startDate, scheduledDate));
   result.eligible = dueToday.length;
 
+  // Loaded once for the whole run, not per subscription — same fee numbers
+  // apply to every order generated in this job.
+  const feeConfig = await loadFeeConfig();
+
   for (const subscription of dueToday) {
     try {
       const outcome = await generateForSubscription({
@@ -166,6 +171,7 @@ export async function generateDailyOrders(
         targetDate,
         weekday,
         locale,
+        feeConfig,
       });
 
       switch (outcome.kind) {
@@ -226,6 +232,7 @@ interface PerSubscriptionInput {
   targetDate: string;
   weekday: number;
   locale: Locale;
+  feeConfig: FeeConfig;
 }
 
 type PerSubscriptionOutcome =
@@ -377,12 +384,22 @@ async function generateForSubscription(
   }
   const merged = [...mergedByVariant.values()];
 
-  // B10 — delivery is always free on meal-plan days; the ₹99 plan fee covers
-  // it. B7 — the price difference from a substitution settles honestly here,
+  // B7 — the price difference from a substitution settles honestly here,
   // because the order is priced from what is actually being sent.
   const subtotalPaise = merged.reduce(
     (sum, item) => sum + item.unitPricePaise * BigInt(item.quantity),
     0n,
+  );
+
+  // B10 (updated session 2026-11-12) — meal-plan days pay their own delivery
+  // rate + handling + surge below the free threshold, same `computeBill()`
+  // an instant order goes through, not a second copy of the rule.
+  const bill = computeBill(
+    {
+      itemTotalPaise: subtotalPaise,
+      orderType: subscription.deliveryMode === 'WEEKLY' ? 'MEAL_PLAN_WEEKLY' : 'MEAL_PLAN_DAILY',
+    },
+    input.feeConfig,
   );
 
   const orderId = newId(ID_PREFIX.order);
@@ -424,10 +441,11 @@ async function generateForSubscription(
           type: subscription.deliveryMode === 'WEEKLY' ? 'MEAL_PLAN_WEEKLY' : 'MEAL_PLAN_DAILY',
           status: 'PLACED',
           subtotalPaise,
-          deliveryFeePaise: 0n,
-          handlingFeePaise: 0n,
+          deliveryFeePaise: bill.deliveryFeePaise,
+          handlingFeePaise: bill.handlingFeePaise,
+          surgeChargePaise: bill.surgeChargePaise,
           discountPaise: 0n,
-          totalPaise: subtotalPaise,
+          totalPaise: bill.totalPaise,
           // B9 — COD is normally never offered on a daily plan order, except
           // during a first-time subscriber's 7-day COD trial (`cod`, above).
           paymentMethod: cod ? 'COD' : 'WALLET',
@@ -478,7 +496,7 @@ async function generateForSubscription(
           await debit(
             {
               userId: subscription.userId,
-              amountPaise: subtotalPaise,
+              amountPaise: bill.totalPaise,
               source: 'ORDER',
               ...LEDGER_REF.order(orderId),
               note: subscription.deliveryMode === 'WEEKLY' ? `Weekly delivery ${targetDate}` : `Daily delivery ${targetDate}`,
@@ -546,7 +564,7 @@ async function generateForSubscription(
     await notifyEvent(subscription.userId, TEMPLATE.orderPaymentPending, {
       orderId,
       date: targetDate,
-      amountPaise: subtotalPaise,
+      amountPaise: bill.totalPaise,
     });
   }
 

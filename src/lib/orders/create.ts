@@ -262,6 +262,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
           subtotalPaise: bill.itemTotalPaise,
           deliveryFeePaise: bill.deliveryFeePaise,
           handlingFeePaise: bill.handlingFeePaise,
+          surgeChargePaise: bill.surgeChargePaise,
           discountPaise: bill.discountPaise,
           totalPaise: bill.totalPaise,
           paymentMethod: input.paymentMethod,

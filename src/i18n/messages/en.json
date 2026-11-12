@@ -279,6 +279,7 @@
     "itemTotal": "Items total",
     "deliveryFee": "Delivery charge",
     "handlingFee": "Handling charge",
+    "surgeCharge": "High demand surge charge",
     "discount": "Discount",
     "free": "FREE",
     "grandTotal": "Grand total",

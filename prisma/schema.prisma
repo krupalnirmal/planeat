@@ -569,6 +569,10 @@ model Order {
   subtotalPaise    BigInt        @default(0)
   deliveryFeePaise BigInt        @default(0)
   handlingFeePaise BigInt        @default(0)
+  /// "High demand surge charge" (session 2026-11-12, client's Blinkit-style
+  /// reference) — waived at/above `pricing.free_delivery_threshold_paise`,
+  /// same as `deliveryFeePaise`.
+  surgeChargePaise BigInt        @default(0)
   discountPaise    BigInt        @default(0)
   totalPaise       BigInt        @default(0)
   paymentMethod    PaymentMethod @default(WALLET)

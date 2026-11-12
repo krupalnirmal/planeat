@@ -15,8 +15,10 @@ import type { OrderType, PaymentMethod } from '@/generated/prisma/enums';
 export interface FeeConfig {
   minOrderValuePaise: bigint;
   deliveryFeePaise: bigint;
+  mealPlanDeliveryFeePaise: bigint;
   freeDeliveryThresholdPaise: bigint;
   handlingFeePaise: bigint;
+  surgeChargePaise: bigint;
   codMaxOrderPaise: bigint;
   codEnabled: boolean;
 }
@@ -25,15 +27,19 @@ export async function loadFeeConfig(): Promise<FeeConfig> {
   const [
     minOrderValuePaise,
     deliveryFeePaise,
+    mealPlanDeliveryFeePaise,
     freeDeliveryThresholdPaise,
     handlingFeePaise,
+    surgeChargePaise,
     codMaxOrderPaise,
     codEnabled,
   ] = await Promise.all([
     getSettingPaise(SETTING_KEYS.minOrderValuePaise),
     getSettingPaise(SETTING_KEYS.deliveryFeePaise),
+    getSettingPaise(SETTING_KEYS.mealPlanDeliveryFeePaise),
     getSettingPaise(SETTING_KEYS.freeDeliveryThresholdPaise),
     getSettingPaise(SETTING_KEYS.handlingFeePaise),
+    getSettingPaise(SETTING_KEYS.surgeChargePaise),
     getSettingPaise(SETTING_KEYS.codMaxOrderPaise),
     getSettingBoolean(SETTING_KEYS.featureCod),
   ]);
@@ -41,8 +47,10 @@ export async function loadFeeConfig(): Promise<FeeConfig> {
   return {
     minOrderValuePaise,
     deliveryFeePaise,
+    mealPlanDeliveryFeePaise,
     freeDeliveryThresholdPaise,
     handlingFeePaise,
+    surgeChargePaise,
     codMaxOrderPaise,
     codEnabled,
   };
@@ -61,6 +69,7 @@ export interface Bill {
   itemTotalPaise: bigint;
   deliveryFeePaise: bigint;
   handlingFeePaise: bigint;
+  surgeChargePaise: bigint;
   discountPaise: bigint;
   totalPaise: bigint;
 
@@ -77,31 +86,38 @@ export interface Bill {
 }
 
 /**
- * B10 — instant orders pay ₹25 below ₹299 and nothing at or above it.
- * Meal-plan deliveries are always free (B2: the ₹99 plan fee covers it).
+ * B10 (updated session 2026-11-12, client's Blinkit-style reference) — below
+ * the free-delivery threshold, every order pays a delivery fee, a flat
+ * handling fee and a "high demand surge charge"; at or above it, delivery
+ * and the surge charge both drop to ₹0 (handling stays — the reference
+ * screenshot's own waiver note only ever covers delivery/surge, not
+ * handling). Meal-plan days are no longer free outright: they pay their own,
+ * lower delivery rate (`mealPlanDeliveryFeePaise`) instead of the instant
+ * rate, under the same threshold — the ₹99 plan fee no longer covers
+ * delivery by itself.
  */
 export function computeBill(input: BillInput, config: FeeConfig): Bill {
   const discountPaise = input.discountPaise ?? 0n;
-  const isMealPlan = input.orderType === 'MEAL_PLAN_DAILY';
+  const isMealPlan = input.orderType === 'MEAL_PLAN_DAILY' || input.orderType === 'MEAL_PLAN_WEEKLY';
 
   const threshold = input.areaFreeDeliveryThresholdPaise ?? config.freeDeliveryThresholdPaise;
-  const baseDeliveryFee = input.areaDeliveryFeePaise ?? config.deliveryFeePaise;
+  // Area overrides only ever applied to instant orders — no service area has
+  // ever configured a meal-plan-specific rate, so meal-plan always uses its
+  // own flat setting rather than an instant-order area override.
+  const baseDeliveryFee = isMealPlan
+    ? config.mealPlanDeliveryFeePaise
+    : (input.areaDeliveryFeePaise ?? config.deliveryFeePaise);
 
-  const deliveryFeePaise = isMealPlan
-    ? 0n
-    : input.itemTotalPaise >= threshold
-      ? 0n
-      : baseDeliveryFee;
+  const belowThreshold = input.itemTotalPaise < threshold;
 
-  // B10 — the handling fee is ₹0 and the brief says not to add one. It stays
-  // in the model because the schema and the bill both have a slot for it.
+  const deliveryFeePaise = belowThreshold ? baseDeliveryFee : 0n;
+  const surgeChargePaise = belowThreshold ? config.surgeChargePaise : 0n;
   const handlingFeePaise = config.handlingFeePaise;
 
   const totalPaise =
-    input.itemTotalPaise + deliveryFeePaise + handlingFeePaise - discountPaise;
+    input.itemTotalPaise + deliveryFeePaise + handlingFeePaise + surgeChargePaise - discountPaise;
 
-  const amountForFreeDeliveryPaise =
-    isMealPlan || input.itemTotalPaise >= threshold ? 0n : threshold - input.itemTotalPaise;
+  const amountForFreeDeliveryPaise = belowThreshold ? threshold - input.itemTotalPaise : 0n;
 
   const meetsMinimum = isMealPlan || input.itemTotalPaise >= config.minOrderValuePaise;
 
@@ -120,6 +136,7 @@ export function computeBill(input: BillInput, config: FeeConfig): Bill {
     itemTotalPaise: input.itemTotalPaise,
     deliveryFeePaise,
     handlingFeePaise,
+    surgeChargePaise,
     discountPaise,
     totalPaise: totalPaise > 0n ? totalPaise : 0n,
     amountForFreeDeliveryPaise,

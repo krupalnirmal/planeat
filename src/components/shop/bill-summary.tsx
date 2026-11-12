@@ -1,6 +1,6 @@
 'use client';
 
-import { Package, ShoppingBag, Truck } from 'lucide-react';
+import { Package, ShoppingBag, Truck, Zap } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { formatPaise, paise } from '@/lib/money';
 
@@ -22,6 +22,7 @@ export interface BillView {
   itemTotalPaise: string;
   deliveryFeePaise: string;
   handlingFeePaise: string;
+  surgeChargePaise: string;
   discountPaise: string;
   totalPaise: string;
   amountForFreeDeliveryPaise: string;
@@ -43,6 +44,7 @@ export function BillSummary({
   const itemTotal = paise(bill.itemTotalPaise);
   const deliveryFee = paise(bill.deliveryFeePaise);
   const handlingFee = paise(bill.handlingFeePaise);
+  const surgeCharge = paise(bill.surgeChargePaise);
   const discount = paise(bill.discountPaise);
   const total = paise(bill.totalPaise);
   const forFreeDelivery = paise(bill.amountForFreeDeliveryPaise);
@@ -94,6 +96,22 @@ export function BillSummary({
                 {t('handlingFee')}
               </dt>
               <dd className="font-semibold">{formatPaise(handlingFee)}</dd>
+            </div>
+          )}
+
+          {/* B10 (session 2026-11-12) — same free-above-threshold waiver as
+              delivery, so it only ever shows a non-zero amount when delivery
+              does too; shown as FREE rather than hidden once waived, so the
+              bill explains itself instead of a line silently vanishing. */}
+          {(surgeCharge > 0n || deliveryFee === 0n) && (
+            <div className="flex items-baseline justify-between gap-2">
+              <dt className="flex items-center gap-2 text-muted-foreground">
+                <Zap className="size-4 shrink-0" aria-hidden />
+                {t('surgeCharge')}
+              </dt>
+              <dd className="font-semibold">
+                {surgeCharge === 0n ? <span className="text-primary">{t('free')}</span> : formatPaise(surgeCharge)}
+              </dd>
             </div>
           )}
 

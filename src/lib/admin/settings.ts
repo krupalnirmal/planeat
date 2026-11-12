@@ -37,12 +37,19 @@ export const SETTING_DESCRIPTORS: SettingDescriptor[] = [
   { key: SETTING_KEYS.minOrderValuePaise, group: 'pricing', type: 'paise', reference: 'B10' },
   { key: SETTING_KEYS.deliveryFeePaise, group: 'pricing', type: 'paise', reference: 'B10' },
   {
+    key: SETTING_KEYS.mealPlanDeliveryFeePaise,
+    group: 'pricing',
+    type: 'paise',
+    reference: 'B10',
+  },
+  {
     key: SETTING_KEYS.freeDeliveryThresholdPaise,
     group: 'pricing',
     type: 'paise',
     reference: 'B10',
   },
   { key: SETTING_KEYS.handlingFeePaise, group: 'pricing', type: 'paise', reference: 'B10' },
+  { key: SETTING_KEYS.surgeChargePaise, group: 'pricing', type: 'paise', reference: 'B10' },
   { key: SETTING_KEYS.planFeePaise, group: 'pricing', type: 'paise', reference: 'B2' },
   { key: SETTING_KEYS.codMaxOrderPaise, group: 'pricing', type: 'paise', reference: 'B9' },
 

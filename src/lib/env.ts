@@ -163,10 +163,17 @@ export const env = {
 
   /** Bootstrap defaults for app_settings. See src/lib/settings.ts. */
   defaults: {
-    minOrderValuePaise: num('MIN_ORDER_VALUE_PAISE', 14900),
+    minOrderValuePaise: num('MIN_ORDER_VALUE_PAISE', 0),
     deliveryFeePaise: num('DEFAULT_DELIVERY_FEE_PAISE', 2500),
-    freeDeliveryThresholdPaise: num('FREE_DELIVERY_THRESHOLD_PAISE', 29900),
-    handlingFeePaise: num('HANDLING_FEE_PAISE', 0),
+    // Client reference (session 2026-11-12, Blinkit-style bill breakdown) —
+    // meal-plan days carry their own, lower delivery rate instead of being
+    // free outright; see `mealPlanDeliveryFeePaise` below.
+    mealPlanDeliveryFeePaise: num('MEAL_PLAN_DELIVERY_FEE_PAISE', 1500),
+    freeDeliveryThresholdPaise: num('FREE_DELIVERY_THRESHOLD_PAISE', 20000),
+    handlingFeePaise: num('HANDLING_FEE_PAISE', 300),
+    // "High demand surge charge" — same free-above-threshold waiver as
+    // delivery (`freeDeliveryThresholdPaise`).
+    surgeChargePaise: num('SURGE_CHARGE_PAISE', 200),
     planFeePaise: num('PLAN_FEE_PAISE', 9900),
     lowWalletThresholdPaise: num('LOW_WALLET_THRESHOLD_PAISE', 20000),
     codMaxOrderPaise: num('COD_MAX_ORDER_PAISE', 150000),

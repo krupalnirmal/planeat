@@ -104,6 +104,7 @@ interface OrderDetailResponse {
     subtotalPaise: string;
     deliveryFeePaise: string;
     handlingFeePaise: string;
+    surgeChargePaise: string;
     discountPaise: string;
     totalPaise: string;
     notes: string | null;
@@ -513,6 +514,24 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                 : formatPaise(paise(order.deliveryFeePaise))
             }
           />
+          {paise(order.handlingFeePaise) > 0n && (
+            <BillRow
+              label={tCart('handlingFee')}
+              value={formatPaise(paise(order.handlingFeePaise))}
+            />
+          )}
+          {/* Same free-above-threshold waiver as delivery (B10, session
+              2026-11-12) — shown as FREE rather than hidden once waived. */}
+          {(paise(order.surgeChargePaise) > 0n || paise(order.deliveryFeePaise) === 0n) && (
+            <BillRow
+              label={tCart('surgeCharge')}
+              value={
+                paise(order.surgeChargePaise) === 0n
+                  ? tCart('free')
+                  : formatPaise(paise(order.surgeChargePaise))
+              }
+            />
+          )}
           {paise(order.discountPaise) > 0n && (
             <BillRow
               label={tCart('discount')}

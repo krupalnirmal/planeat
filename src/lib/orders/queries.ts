@@ -65,6 +65,7 @@ export interface OrderDetailView extends Omit<OrderSummaryView, 'previewItems'> 
   subtotalPaise: bigint;
   deliveryFeePaise: bigint;
   handlingFeePaise: bigint;
+  surgeChargePaise: bigint;
   discountPaise: bigint;
   notes: string | null;
   cancelledAt: Date | null;
@@ -200,6 +201,7 @@ export async function getOrderDetail(
       subtotalPaise: true,
       deliveryFeePaise: true,
       handlingFeePaise: true,
+      surgeChargePaise: true,
       discountPaise: true,
       totalPaise: true,
       notes: true,
@@ -260,6 +262,7 @@ export async function getOrderDetail(
     subtotalPaise: order.subtotalPaise,
     deliveryFeePaise: order.deliveryFeePaise,
     handlingFeePaise: order.handlingFeePaise,
+    surgeChargePaise: order.surgeChargePaise,
     discountPaise: order.discountPaise,
     totalPaise: order.totalPaise,
     itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
