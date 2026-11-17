@@ -139,6 +139,19 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
   // 2026-09-27) always saves what was JUST set, not whatever this render
   // captured before React applied the state update.
   const selectionsRef = useRef<Selections>(selections);
+  // Serializes `saveNow()` (session 2026-11-18, client report — rapid taps
+  // on "remove" fired one overlapping PUT per tap with nothing stopping
+  // their responses from landing out of order; whichever one's
+  // `applyServerPlan` happened to run LAST won, so an item removed by an
+  // earlier-sent-but-slower-to-respond request could silently reappear).
+  // `saveInFlightRef` holds the in-flight call so a tap that arrives mid-save
+  // joins it instead of firing a second overlapping PUT; `savePendingRef`
+  // marks that at least one more tap arrived meanwhile, so the in-flight
+  // call loops exactly once more afterwards, always reading the latest
+  // `selectionsRef.current` — never two requests in flight at once, so a
+  // response can never be applied out of order.
+  const saveInFlightRef = useRef<Promise<void> | null>(null);
+  const savePendingRef = useRef(false);
 
   const current = useQuery({
     queryKey: ['meal-plan-current', locale],
@@ -285,7 +298,7 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
     }));
   }
 
-  async function saveNow(): Promise<void> {
+  async function putCurrentDraft(): Promise<void> {
     const days = DAYS.map((dayOfWeek) => ({
       dayOfWeek,
       variantIds: Object.values(selectionsRef.current[dayOfWeek] ?? {}),
@@ -293,6 +306,25 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
     const response = await api.put<SavePlanResponse>(`/api/meal-plan/current${qs({ locale })}`, { days });
     applyServerPlan(response.plan.days);
     void queryClient.invalidateQueries({ queryKey: ['meal-plan-current', locale] });
+  }
+
+  function saveNow(): Promise<void> {
+    if (saveInFlightRef.current) {
+      savePendingRef.current = true;
+      return saveInFlightRef.current;
+    }
+
+    const run = (async () => {
+      do {
+        savePendingRef.current = false;
+        await putCurrentDraft();
+      } while (savePendingRef.current);
+    })().finally(() => {
+      saveInFlightRef.current = null;
+    });
+
+    saveInFlightRef.current = run;
+    return run;
   }
 
   const value: PlanDraftContextValue = {
