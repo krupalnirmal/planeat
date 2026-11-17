@@ -3,7 +3,7 @@ import { db } from '../src/lib/db';
 
 async function main() {
   const area = await db.serviceArea.findUnique({ where: { pincode: '422101' } });
-  console.log(JSON.stringify(area, null, 2));
+  console.log(JSON.stringify(area, (_k, v) => (typeof v === 'bigint' ? v.toString() : v), 2));
 }
 
 main()
