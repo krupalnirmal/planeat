@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { PageHeader } from '@/components/shop/page-header';
 import { api, qs } from '@/lib/api/client';
+import { useSession } from '@/hooks/use-session';
 import { useDeliveryArea } from '@/stores/delivery-area';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +25,7 @@ export function ServiceabilityCheck() {
   const ta = useTranslations('auth');
   const te = useTranslations('errors');
   const searchParams = useSearchParams();
+  const { isLoggedIn } = useSession();
 
   // The post-onboarding chain `login-flow.tsx` builds for a new customer
   // (session 2026-10-21) — defaults to home for the ordinary anonymous
@@ -92,11 +94,62 @@ export function ServiceabilityCheck() {
       (position) => {
         const next = { lat: position.coords.latitude, lng: position.coords.longitude };
         setCoords(next);
-        check.mutate({ ...next, ...(pincode ? { pincode } : {}) });
+
+        let serviceable = false;
+        const checked = check
+          .mutateAsync({ ...next, ...(pincode ? { pincode } : {}) })
+          .then((data) => {
+            serviceable = data.serviceable;
+          })
+          .catch(() => {
+            // check's own onError already surfaces the failure.
+          });
 
         void api
-          .get<{ displayName: string }>(`/api/geocode/reverse?lat=${next.lat}&lng=${next.lng}`)
-          .then((resolved) => setDetectedAddress(resolved.displayName || null))
+          .get<{
+            line1: string;
+            landmark: string;
+            city: string;
+            state: string;
+            pincode: string;
+            displayName: string;
+          }>(`/api/geocode/reverse?lat=${next.lat}&lng=${next.lng}`)
+          .then(async (resolved) => {
+            setDetectedAddress(resolved.displayName || null);
+            await checked;
+
+            // Client feedback (session 2026-11-17) — "use current location"
+            // during onboarding only ever confirmed the delivery *zone*;
+            // nothing was ever saved as an actual address, so a brand-new
+            // customer who had just done this was asked to type the whole
+            // address again from scratch at checkout. Saved here as their
+            // default address instead, silently — a failed save (address
+            // API rejects it, server-side serviceability disagrees, etc.)
+            // must not block this screen's own job of confirming coverage.
+            if (
+              isLoggedIn &&
+              serviceable &&
+              resolved.line1.trim().length >= 3 &&
+              resolved.city.trim().length >= 2 &&
+              /^[1-9]\d{5}$/.test(resolved.pincode)
+            ) {
+              try {
+                await api.post('/api/addresses', {
+                  label: 'Home',
+                  line1: resolved.line1,
+                  landmark: resolved.landmark,
+                  city: resolved.city,
+                  state: resolved.state || 'Maharashtra',
+                  pincode: resolved.pincode,
+                  latitude: next.lat,
+                  longitude: next.lng,
+                  isDefault: true,
+                });
+              } catch {
+                // The customer can still add an address manually later.
+              }
+            }
+          })
           .catch(() => {});
       },
       () => setError(te('generic')),
