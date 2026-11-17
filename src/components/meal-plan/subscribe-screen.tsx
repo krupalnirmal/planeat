@@ -62,9 +62,10 @@ interface QuoteResponse {
     };
     walletBalancePaise: string;
     shortfallPaise: string;
-    /** First-ever subscription for this customer — the shortfall above is
-        waived server-side and the first 7 days' deliveries bill as COD
-        instead (session 2026-09-27). */
+    /** First-ever subscription for this customer — feeds the plan-fee trial
+        above only. The COD trial this used to also waive the wallet-balance
+        gate for was removed (session 2026-11-18): low balance now always
+        blocks activation. */
     isFirstSubscription: boolean;
   };
 }
@@ -600,6 +601,7 @@ function SummaryStep({
 }) {
   const t = useTranslations('mealPlan.subscribe');
   const ta = useTranslations('address');
+  const tc = useTranslations('common');
   const invalidateSession = useInvalidateSession();
   const [showItems, setShowItems] = useState(false);
   // Lets a customer with zero saved addresses add one right here instead of
@@ -607,10 +609,12 @@ function SummaryStep({
   // the same `AddressForm` the standalone /addresses page uses, including
   // its "use current location" option.
   const [addingAddress, setAddingAddress] = useState(false);
-  // A first-time subscriber's shortfall is waived server-side — they can
-  // activate now and pay their first 7 days' deliveries as COD instead
-  // (session 2026-09-27).
-  const covered = shortfall <= 0n || q.isFirstSubscription;
+  // Client feedback (session 2026-11-18): tapping Activate with a low wallet
+  // balance now always pops up "recharge wallet first" instead of silently
+  // activating (the first-subscription COD trial this used to waive the
+  // check for was removed).
+  const [showLowBalancePopup, setShowLowBalancePopup] = useState(false);
+  const covered = shortfall <= 0n;
 
   return (
     <div className="space-y-2 px-0">
@@ -653,11 +657,7 @@ function SummaryStep({
           <Row label={t('walletBalance')} value={formatPaise(paise(q.walletBalancePaise))} />
         </dl>
 
-        {shortfall > 0n && q.isFirstSubscription ? (
-          <div className="mt-3 rounded-[var(--radius)] bg-tint-green px-3 py-2.5 text-sm text-primary-dark">
-            {t('codTrial', { amount: formatPaise(paise(q.prepay.requiredBalancePaise)) })}
-          </div>
-        ) : shortfall > 0n ? (
+        {shortfall > 0n ? (
           <div className="mt-3 rounded-[var(--radius)] bg-[#FDF3E3] px-3 py-2.5 text-sm text-warning">
             {t('shortfall', { amount: formatPaise(shortfall) })}
           </div>
@@ -744,20 +744,52 @@ function SummaryStep({
       >
         <button
           type="button"
-          onClick={covered ? onContinue : onNeedsTopup}
+          onClick={() => (covered ? onContinue() : setShowLowBalancePopup(true))}
           // An address is required before EITHER path: activating directly,
-          // or topping up — the top-up flow lands on Confirm straight after
-          // payment with no address step of its own, so skipping this check
-          // for `!covered` let a customer pay into their wallet and only
-          // then discover activation fails for a missing address.
+          // or seeing the low-balance popup — the top-up flow it can lead to
+          // lands on Confirm straight after payment with no address step of
+          // its own, so skipping this check for `!covered` let a customer
+          // pay into their wallet and only then discover activation fails
+          // for a missing address.
           disabled={resolvedAddressId === null}
           className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
         >
-          {covered ? t('continueToActivate') : t('addMoneyToWallet')}
+          {t('continueToActivate')}
         </button>
       </div>
 
       {showItems && <PlanItemsPopup planDays={planDays} onClose={() => setShowItems(false)} />}
+
+      {showLowBalancePopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-[380px] rounded-[calc(var(--radius)*1.6)] bg-background p-5 text-center">
+            <div className="mx-auto grid size-14 place-items-center rounded-full bg-[#FDF3E3]">
+              <Wallet className="size-6 text-warning" aria-hidden />
+            </div>
+            <h2 className="mt-3 text-base font-black">{t('lowBalanceTitle')}</h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              {t('lowBalanceBody', { amount: formatPaise(shortfall) })}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setShowLowBalancePopup(false);
+                onNeedsTopup();
+              }}
+              className="mt-4 h-11 w-full rounded-[var(--radius)] bg-primary text-sm font-bold text-primary-foreground"
+            >
+              {t('rechargeNow')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowLowBalancePopup(false)}
+              className="mt-2 h-11 w-full text-sm font-medium text-muted-foreground"
+            >
+              {tc('cancel')}
+            </button>
+          </div>
+        </div>
+      )}
 
       {addingAddress && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -1093,8 +1125,8 @@ function ConfirmStep({
           {t('walletBalance')}: {formatPaise(paise(q.walletBalancePaise))}
         </p>
         <p className="mt-0.5 text-xs text-primary-dark">
-          {paise(q.shortfallPaise) > 0n && q.isFirstSubscription
-            ? t('codTrial', { amount: formatPaise(paise(q.prepay.requiredBalancePaise)) })
+          {paise(q.shortfallPaise) > 0n
+            ? t('shortfall', { amount: formatPaise(paise(q.shortfallPaise)) })
             : t('sufficientBalance')}
         </p>
       </section>

@@ -31,8 +31,9 @@ export interface QuoteResult {
   prepay: PrepayBreakdown;
   walletBalancePaise: bigint;
   shortfallPaise: bigint;
-  /** True for a customer's first-ever subscription — lets `activateSubscription`
-      waive the wallet-balance gate below for the 7-day COD trial. */
+  /** True for a customer's first-ever subscription — feeds `computePlanFee`'s
+      own trial-days waiver above. No longer waives the wallet-balance gate
+      itself (the COD trial it used to drive was removed, session 2026-11-18). */
   isFirstSubscription: boolean;
 }
 
@@ -133,9 +134,11 @@ export async function activateSubscription(userId: string, input: ActivateInput)
   if (!address || address.userId !== userId) return { ok: false, reason: 'ADDRESS_NOT_FOUND' };
 
   const quote = await getSubscriptionQuote(userId, plan.id, input.durationDays, input.startDateKey);
-  // A first-time subscriber can activate with zero wallet balance — their
-  // first 7 days of deliveries bill as COD instead (session 2026-09-27).
-  if (quote.shortfallPaise > 0n && !quote.isFirstSubscription) {
+  // Client feedback (session 2026-11-18): the first-time-subscriber COD
+  // trial (activate with zero wallet balance, first 7 days bill as COD) is
+  // removed — every activation, first subscription or not, now needs the
+  // wallet to already cover `prepay.requiredBalancePaise`.
+  if (quote.shortfallPaise > 0n) {
     return { ok: false, reason: 'INSUFFICIENT_BALANCE', shortfallPaise: quote.shortfallPaise };
   }
 
@@ -146,14 +149,11 @@ export async function activateSubscription(userId: string, input: ActivateInput)
   try {
     await db.$transaction(
       async (tx) => {
-        // A first-time subscriber activates with zero wallet balance
-        // required, full stop (session 2026-09-27) — not just the
-        // trial-days-bounded waiver `computePlanFee` already applies. Any
-        // plan fee still owed for a longer first plan is simply not charged
-        // at activation; only the per-delivery COD-trial cost (handled in
-        // `generate-orders.ts`) and, from day 8, the normal wallet billing
-        // apply.
-        if (quote.planFee.feePaise > 0n && !quote.isFirstSubscription) {
+        // The shortfall check above already guarantees the wallet covers
+        // `prepay.requiredBalancePaise` (which includes this fee whenever
+        // it isn't waived by `computePlanFee`'s own trial-days rule), so
+        // charging it here no longer needs a first-subscription exception.
+        if (quote.planFee.feePaise > 0n) {
           await debit(
             {
               userId,
@@ -179,7 +179,9 @@ export async function activateSubscription(userId: string, input: ActivateInput)
             endDate,
             status: 'ACTIVE',
             pricingMode: 'PER_DELIVERY',
-            codTrialEligible: quote.isFirstSubscription,
+            // COD trial removed (session 2026-11-18) — every subscription's
+            // daily deliveries now bill from the wallet from day one.
+            codTrialEligible: false,
             planFeePaise: quote.planFee.feePaise,
             // Informational snapshot of what was required at approval, not
             // a second charge — the buffer itself stays in the wallet.

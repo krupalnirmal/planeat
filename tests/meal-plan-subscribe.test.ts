@@ -118,8 +118,8 @@ describe('activateSubscription — refusals', () => {
   });
 });
 
-describe('activateSubscription — first-time COD trial (session 2026-09-27)', () => {
-  it('activates a first-ever subscription despite an empty wallet, flagged for the COD trial', async () => {
+describe('activateSubscription — COD trial removed (session 2026-11-18)', () => {
+  it('refuses a first-ever subscription too when the wallet is empty — no more free trial', async () => {
     dbMock.mealPlan.findFirst.mockResolvedValue(PLAN_WITH_ITEMS);
     dbMock.subscription.findFirst.mockResolvedValue(null);
     dbMock.subscription.count.mockResolvedValue(0); // first-ever subscription
@@ -131,9 +131,24 @@ describe('activateSubscription — first-time COD trial (session 2026-09-27)', (
 
     const result = await activateSubscription('user_1', INPUT);
 
+    expect(result).toEqual({ ok: false, reason: 'INSUFFICIENT_BALANCE', shortfallPaise: expect.any(BigInt) });
+  });
+
+  it('activates a first-ever subscription once the wallet actually covers the required balance', async () => {
+    dbMock.mealPlan.findFirst.mockResolvedValue(PLAN_WITH_ITEMS);
+    dbMock.subscription.findFirst.mockResolvedValue(null);
+    dbMock.subscription.count.mockResolvedValue(0); // first-ever subscription
+    dbMock.address.findUnique.mockResolvedValue({ userId: 'user_1' });
+    dbMock.mealPlanDay.findMany.mockResolvedValue([
+      { dayOfWeek: 1, items: [{ variant: { pricePaise: 100_000n } }] },
+    ]);
+    vi.mocked(getBalance).mockResolvedValue(50_00_000n); // comfortably enough
+
+    const result = await activateSubscription('user_1', INPUT);
+
     expect(result.ok).toBe(true);
     expect(dbMock.subscription.create).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ codTrialEligible: true }) }),
+      expect.objectContaining({ data: expect.objectContaining({ codTrialEligible: false }) }),
     );
   });
 
@@ -157,12 +172,15 @@ describe('activateSubscription — preferredDeliveryTime (session 2026-10-17)', 
   beforeEach(() => {
     dbMock.mealPlan.findFirst.mockResolvedValue(PLAN_WITH_ITEMS);
     dbMock.subscription.findFirst.mockResolvedValue(null);
-    dbMock.subscription.count.mockResolvedValue(0); // first-ever — skips the wallet gate
+    dbMock.subscription.count.mockResolvedValue(0); // first-ever subscription
     dbMock.address.findUnique.mockResolvedValue({ userId: 'user_1' });
     dbMock.mealPlanDay.findMany.mockResolvedValue([
       { dayOfWeek: 1, items: [{ variant: { pricePaise: 100_000n } }] },
     ]);
-    vi.mocked(getBalance).mockResolvedValue(0n);
+    // The wallet gate applies regardless of first-subscription status now
+    // (COD trial removed) — give it enough balance so these tests exercise
+    // preferredDeliveryTime, not the gate itself.
+    vi.mocked(getBalance).mockResolvedValue(50_00_000n);
   });
 
   it('defaults to 06:30 — the slot\'s own old hardcoded window — when the customer never touches the picker', async () => {
