@@ -12,11 +12,9 @@ import { isAppLocale } from '@/i18n/routing';
  * cookie) server-side, before any HTML paints — unlike `LocaleSync`, which
  * only runs after hydration and would otherwise flash the wrong language on
  * every cold launch. No cookie yet (fresh install, nothing picked) falls
- * back to `/mr`, matching this app's actual default audience — distinct from
- * `routing.ts`'s technical `DEFAULT_LOCALE` ('en'), which only exists so the
- * bare domain root still serves content directly for payment-gateway checks.
+ * back to `/en`, matching `routing.ts`'s `DEFAULT_LOCALE`.
  */
-const FALLBACK_LOCALE = 'mr';
+const FALLBACK_LOCALE = 'en';
 
 export async function GET(request: Request) {
   const jar = await cookies();
