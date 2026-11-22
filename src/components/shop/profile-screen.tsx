@@ -13,6 +13,7 @@ import {
   MapPin,
   MessageSquareWarning,
   Package,
+  Pencil,
   ShieldCheck,
   Stethoscope,
   Trash2,
@@ -109,6 +110,15 @@ export function ProfileScreen() {
             </>
           )}
         </div>
+        {isLoggedIn && (
+          <Link
+            href="/profile/edit"
+            aria-label={t('editProfile')}
+            className="ml-auto grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground"
+          >
+            <Pencil className="size-4" aria-hidden />
+          </Link>
+        )}
       </section>
 
       <section className="mt-6">
