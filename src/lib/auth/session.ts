@@ -90,10 +90,25 @@ export async function rotateSession(): Promise<{ userId: string } | null> {
   }
 
   if (stored.revokedAt) {
-    await db.refreshToken.updateMany({
-      where: { userId: claims.userId, revokedAt: null },
-      data: { revokedAt: new Date() },
-    });
+    // Session 2026-11-22 fix (client report: customers forced to re-enter
+    // OTP daily): several API calls fire in parallel on app open (home feed,
+    // cart, wallet, session…). If the access token had already expired while
+    // the app was closed, every one of them hits this same rotation path with
+    // the same refresh token at once — only the first to land actually
+    // rotates it. Every other one then finds its own just-presented token
+    // already revoked a moment ago, which used to be treated as theft and
+    // revoked *every* session, including the brand-new one the winning
+    // request had just issued — forcing a fresh OTP login on the very next
+    // request. A real stolen-token replay shows up long after the legitimate
+    // rotation, not within the same request burst, so a short grace window
+    // tells the two apart without weakening real reuse detection.
+    const REUSE_GRACE_MS = 30_000;
+    if (Date.now() - stored.revokedAt.getTime() > REUSE_GRACE_MS) {
+      await db.refreshToken.updateMany({
+        where: { userId: claims.userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+    }
     return null;
   }
 

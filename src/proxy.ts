@@ -10,10 +10,12 @@ import { routing } from '@/i18n/routing';
  * and warns on every dev start about the old one.
  *
  * API routes, static files and the service worker are excluded — a locale
- * prefix on `/api/orders` would be nonsense.
+ * prefix on `/api/orders` would be nonsense. `launch` (the TWA's cold-start
+ * redirect, `src/app/launch/route.ts`) is excluded for the same reason: it
+ * must run before any locale is decided, not get rewritten to one first.
  */
 export default createMiddleware(routing);
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|manifest.json|sw.js|icons|uploads|.*\\..*).*)'],
+  matcher: ['/((?!api|_next|_vercel|manifest.json|sw.js|icons|uploads|launch|.*\\..*).*)'],
 };

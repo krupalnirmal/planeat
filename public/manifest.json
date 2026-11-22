@@ -3,7 +3,7 @@
   "name": "Get Frresh",
   "short_name": "Get Frresh",
   "description": "ताज्या भाज्या, रोज दारात. Fresh vegetables delivered daily, with a personalised weekly plan.",
-  "start_url": "/mr",
+  "start_url": "/launch",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

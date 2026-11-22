@@ -29,6 +29,18 @@ import { isAppLocale, type AppLocale } from '@/i18n/routing';
  */
 const PREFERENCE_KEY = 'getfresh.preferred-locale';
 
+/**
+ * Mirrors the same choice into a plain (non-httpOnly) cookie so the server
+ * can see it too — `localStorage` only exists in the browser. Read by
+ * `/launch` (session 2026-11-22, client report: a customer picked English,
+ * but every time they reopened the Android app it showed Marathi again).
+ * Root cause: the TWA always relaunches at the fixed `start_url` baked into
+ * `public/manifest.json`, which was hardcoded to `/mr` — nothing about that
+ * cold start ever looked at what the customer had actually picked. `/launch`
+ * now owns that redirect, which is why `start_url` points there instead.
+ */
+const PREFERENCE_COOKIE = 'gf_pref_locale';
+
 export function readPreferredLocale(): AppLocale | null {
   try {
     const value = window.localStorage.getItem(PREFERENCE_KEY);
@@ -43,6 +55,12 @@ export function writePreferredLocale(locale: AppLocale): void {
     window.localStorage.setItem(PREFERENCE_KEY, locale);
   } catch {
     // Quota or private mode — the switch itself still works for this tab.
+  }
+  try {
+    const maxAgeSeconds = 60 * 60 * 24 * 365;
+    document.cookie = `${PREFERENCE_COOKIE}=${locale}; path=/; max-age=${maxAgeSeconds}; samesite=lax`;
+  } catch {
+    // Same fallback as above — the in-tab switch itself is unaffected.
   }
 }
 
