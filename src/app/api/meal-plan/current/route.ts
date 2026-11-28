@@ -72,6 +72,21 @@ export const PUT = route(async (request: Request) => {
   const { locale } = parseQuery(request, querySchema);
   const { days } = await parseJson(request, saveSchema);
 
+  // Temporary diagnostic (session 2026-11-28, client report — a removed
+  // item sometimes stays reverted after several rapid removes on the
+  // Android app): logs each incoming save's received counts and the
+  // counts it actually persisted, to see whether a lost removal is a
+  // wrong/stale payload reaching the server, or something dropping it
+  // after. Remove once the report is confirmed fixed.
+  const receivedAt = Date.now();
+  const sentCounts = days.map((d) => d.variantIds.length);
+
   const plan = await saveCustomerPlan(session.userId, days, locale);
+
+  const keptCounts = plan.days.map((d) => d.items.length);
+  console.log(
+    `[meal-plan-save] user=${session.userId} t=${receivedAt} sent=${JSON.stringify(sentCounts)} kept=${JSON.stringify(keptCounts)}`,
+  );
+
   return ok({ plan });
 });
