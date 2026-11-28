@@ -299,9 +299,15 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function putCurrentDraft(): Promise<void> {
+    // Snapshot exactly what THIS request sends — reconciling the response
+    // below must diff against this snapshot, not whatever selectionsRef
+    // holds once the response lands. `saveNow()`'s pending-chain can
+    // already have a newer edit (e.g. a second remove, tapped while this
+    // request was still in flight) staged in selectionsRef by then.
+    const sent = selectionsRef.current;
     const days = DAYS.map((dayOfWeek) => ({
       dayOfWeek,
-      variantIds: Object.values(selectionsRef.current[dayOfWeek] ?? {}),
+      variantIds: Object.values(sent[dayOfWeek] ?? {}),
     }));
     // `keepalive` (session 2026-11-28, client report — a removed item came
     // back after a page refresh): a remove's save fires without being
@@ -316,7 +322,43 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
       { days },
       { keepalive: true },
     );
-    applyServerPlan(response.plan.days);
+
+    // Reconcile instead of `applyServerPlan`'s wholesale replace (session
+    // 2026-11-28, client report: removing a second item while the first's
+    // save was still in flight made the second one reappear). The server
+    // only ever silently DROPS a sent pick (inactive/out-of-stock/
+    // ineligible since pick-time) — it never adds one back — so the only
+    // thing this response can teach us is which of THIS request's own sent
+    // picks got dropped. Replacing the whole draft with it would also
+    // discard any edit made to `selectionsRef` after this request was
+    // already built (exactly the newer remove `saveNow()`'s pending-chain
+    // is about to resend), since this response predates that edit.
+    const keptByDay = new Map(
+      response.plan.days.map((day) => [day.dayOfWeek, new Set(day.items.map((item) => item.productId))]),
+    );
+    let changed = false;
+    const reconciled = emptySelections();
+    for (const dayOfWeek of DAYS) {
+      const sentDay = sent[dayOfWeek] ?? {};
+      const currentDay = selectionsRef.current[dayOfWeek] ?? {};
+      const kept = keptByDay.get(dayOfWeek) ?? new Set();
+      const nextDay = { ...currentDay };
+      for (const [productId, variantId] of Object.entries(sentDay)) {
+        // Only a pick THIS request sent and the server then dropped gets
+        // removed — one removed locally after this request was built, or
+        // added since, is left exactly as the current draft already has it.
+        if (currentDay[productId] === variantId && !kept.has(productId)) {
+          delete nextDay[productId];
+          changed = true;
+        }
+      }
+      reconciled[dayOfWeek] = nextDay;
+    }
+    if (changed) {
+      selectionsRef.current = reconciled;
+      setSelections(reconciled);
+    }
+    setIsDirty(false);
     void queryClient.invalidateQueries({ queryKey: ['meal-plan-current', locale] });
   }
 
