@@ -60,7 +60,11 @@ export const api = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, json?: unknown) => request<T>(path, { method: 'POST', json }),
   patch: <T>(path: string, json?: unknown) => request<T>(path, { method: 'PATCH', json }),
-  put: <T>(path: string, json?: unknown) => request<T>(path, { method: 'PUT', json }),
+  // `init` lets a caller pass `{ keepalive: true }` (meal-plan's immediate
+  // remove-save, `plan-draft-context.tsx`) so the browser finishes sending a
+  // request a page reload would otherwise abort mid-flight.
+  put: <T>(path: string, json?: unknown, init?: RequestInit) =>
+    request<T>(path, { ...init, method: 'PUT', json }),
   delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
 };
 

@@ -41,9 +41,13 @@ export function WeeklySummaryScreen() {
 
   const save = useMutation({
     mutationFn: () =>
-      api.put<SavePlanResponse>(`/api/meal-plan/current${qs({ locale })}`, {
-        days: draft.buildSavePayload(),
-      }),
+      // `keepalive` — same reason as `plan-draft-context.tsx`'s own save:
+      // survives a reload fired right after this tap.
+      api.put<SavePlanResponse>(
+        `/api/meal-plan/current${qs({ locale })}`,
+        { days: draft.buildSavePayload() },
+        { keepalive: true },
+      ),
     onSuccess: (response) => {
       setSaveError(null);
       setSaved(true);

@@ -303,7 +303,19 @@ export function PlanDraftProvider({ children }: { children: React.ReactNode }) {
       dayOfWeek,
       variantIds: Object.values(selectionsRef.current[dayOfWeek] ?? {}),
     }));
-    const response = await api.put<SavePlanResponse>(`/api/meal-plan/current${qs({ locale })}`, { days });
+    // `keepalive` (session 2026-11-28, client report — a removed item came
+    // back after a page refresh): a remove's save fires without being
+    // awaited by the tap handler (`pick()`/`DaySummaryView`'s trash button),
+    // so a customer who reloads right after tapping remove — the most
+    // natural way to "check it really saved" — could abort this request
+    // mid-flight, same as any other in-flight fetch on unload. `keepalive`
+    // tells the browser to finish sending it in the background regardless;
+    // the day payload is a handful of ids, nowhere near its ~64KB cap.
+    const response = await api.put<SavePlanResponse>(
+      `/api/meal-plan/current${qs({ locale })}`,
+      { days },
+      { keepalive: true },
+    );
     applyServerPlan(response.plan.days);
     void queryClient.invalidateQueries({ queryKey: ['meal-plan-current', locale] });
   }
